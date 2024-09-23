@@ -1201,7 +1201,7 @@ let nLocations = callContent2(`/locations`,(data) => {
 	let locations_order = [3,2,4,5,1,0]
 	
     for(let i=0; i<locations_order.length; i++){
-        selectData[locations_order[i]] = {id:locations[locations_order[i]]["id"], text:locations[locations_order[i]]["TS_location_arabic_name"]}
+        selectData[i] = {id:locations[locations_order[i]]["id"], text:locations[locations_order[i]]["TS_location_arabic_name"]}
       }
     $('.js-example-basic-single').select2({
           data:selectData,
