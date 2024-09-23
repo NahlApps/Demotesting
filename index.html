@@ -1195,6 +1195,7 @@ let nLocations = callContent2(`/locations`,(data) => {
     for(let i=0; i<locations.length; i++){
         selectData[i] = {id:locations[i]["id"], text:locations[i]["TS_location_arabic_name"]}
       }
+	selectData.sort()
     $('.js-example-basic-single').select2({
           data:selectData,
           width: "50%"
