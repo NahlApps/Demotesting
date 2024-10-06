@@ -1025,25 +1025,35 @@ height: 37px !important;
 </body>
 
 <script>
-function addTags() {
-    let textags = ""; // Initialize an empty string for the selected tags
-
-    // Loop through the chips (assuming you have 3 chips with IDs 'tag1', 'tag2', 'tag3')
-    for (let i = 1; i <= 3; i++) {
-        // Get each chip element by its ID
-        let chip = document.getElementById("tag" + i);
-
-        // Check if the chip has the 'active' class, meaning it's selected
-        if (chip.classList.contains("active")) {
-            // Get the text content (value) of the chip
-            let tag_x = chip.textContent.trim(); 
-            // Append the chip value to the `textags` string
-            textags += tag_x + " ";
-        }
+function addTags(){
+	let textags= "";
+    for( let i=1; i<=3;i++){
+     // if (document.getElementById("tag"+i).checked){
+    let tag_x = document.getElementById("tag"+i).value
+    textags= textags+ tag_x+" "
+// }
     }
+    document.getElementById("locationDescription").value = textags;
+ }   
+// function addTags() {
+//     let textags = ""; // Initialize an empty string for the selected tags
 
-    // Update the input field or text area with the concatenated string of selected tags
-    document.getElementById("locationDescription").value = textags.trim(); // Remove any trailing space
+//     // Loop through the chips (assuming you have 3 chips with IDs 'tag1', 'tag2', 'tag3')
+//     for (let i = 1; i <= 3; i++) {
+//         // Get each chip element by its ID
+//         let chip = document.getElementById("tag" + i);
+
+//         // Check if the chip has the 'active' class, meaning it's selected
+//         if (chip.classList.contains("active")) {
+//             // Get the text content (value) of the chip
+//             let tag_x = chip.textContent.trim(); 
+//             // Append the chip value to the `textags` string
+//             textags += tag_x + " ";
+//         }
+//     }
+
+//     // Update the input field or text area with the concatenated string of selected tags
+//     document.getElementById("locationDescription").value = textags.trim(); // Remove any trailing space
 }
 
 	
