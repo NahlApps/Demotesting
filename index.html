@@ -694,16 +694,17 @@ height: 37px !important;
 }
 
 .chip.active {
-  background-color: white; /* White background when selected */
-  color: #45474B; /* Dark gray text when selected */
-  border-color: #F4CE14; /* Yellow border when selected */
+  background-color: #F4CE14; /* Yellow background when selected */
+  color: white; /* White text when selected */
+  border-color: #F4CE14; /* Keep yellow border */
 }
 
 .chip.active:hover {
-  background-color: #FFF7E6; /* Light yellow background on hover when selected */
-  color: #45474B; /* Keep dark gray text when hovered in selected state */
-  border-color: #EFB11D; /* Slightly darker yellow border on hover when selected */
+  background-color: #F4CE14; /* Keep yellow background when hovered and selected */
+  color: white; /* Keep white text on hover when selected */
+  border-color: #EFB11D; /* Optional: slightly change border on hover */
 }
+
 
 
 </style>
@@ -850,7 +851,7 @@ height: 37px !important;
   <div class="chip" onclick="addService(this)" id="tag6">Service 6</div>
   <div class="chip" onclick="addService(this)" id="tag7">Service 7</div> -->
 </div>
-		    
+	<br>	    
 <input dir="rtl" maxlength="200" id="locationDescription" placeholder="وصف المكان أو أي ملاحظة" type="text" style="width: 100%; margin: 0;"></input>
                 </form>
                 
