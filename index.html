@@ -672,7 +672,7 @@ height: 37px !important;
 #toggle-container {
   display: flex;
   justify-content: center; /* Centers the toggles horizontally */
-  gap: 30px; /* Space between each toggle */
+  gap: 20px; /* Space between each toggle */
   flex-wrap: wrap;
   margin-top: 20px;
 }
@@ -681,7 +681,7 @@ height: 37px !important;
   position: relative;
   display: flex;
   align-items: center;
-  width: 100px; /* Adjust as necessary */
+  width: 80px;
 }
 
 .switch input {
@@ -690,48 +690,53 @@ height: 37px !important;
 
 .slider {
   position: relative;
-  width: 60px;
-  height: 34px;
-  background-color: #ccc;
+  width: 50px;
+  height: 28px;
+  background-color: #f0f0f0; /* Light grey background for inactive switch */
   border-radius: 34px;
   transition: 0.4s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for cuteness */
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 26px;
-  width: 26px;
+  height: 20px;
+  width: 20px;
   background-color: white;
   border-radius: 50%;
   transition: 0.4s;
   left: 4px;
   bottom: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* A slight shadow for depth */
 }
 
 input:checked + .slider {
-  background-color: #F4CE14;
+  background-color: #ffebcd; /* Light peach color for active switch */
 }
 
 input:checked + .slider:before {
-  transform: translateX(26px);
+  transform: translateX(22px); /* Knob moves to the right when checked */
+  background-color: #FFD700; /* Light yellow knob for active state */
 }
 
 .label-text {
-  margin-left: 15px;
-  font-size: 16px;
-  color: #45474B;
+  margin-left: 10px;
+  font-size: 14px;
+  color: #6e6e6e; /* Soft grey text */
+  font-family: 'M PLUS Rounded 1c', sans-serif; /* Rounded font for a cute style */
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .switch:hover .label-text {
-  color: #EFB11D; /* Hover effect for label */
+  color: #ffae42; /* Gentle orange hover effect for text */
 }
 
 .slider:active:before {
-  width: 30px; /* Effect on the knob when active */
+  width: 24px; /* Slightly larger knob when toggling */
 }
+
 
 
 </style>
@@ -1021,6 +1026,9 @@ input:checked + .slider:before {
     <span class="label-text">ورود</span>
   </label>
 </div>
+
+
+
 
 
 		    
