@@ -678,7 +678,7 @@ height: 37px !important;
 }
 
 .chip {
-  padding: 10px 20px;
+  padding: 5px 15px; /* Smaller height */
   background-color: #F4CE14;
   color: #45474B;
   border-radius: 25px;
@@ -689,13 +689,18 @@ height: 37px !important;
 }
 
 .chip.active {
-  background-color: #45474B;
-  color: #F5F5F5;
+  background-color: white; /* White background when selected */
+  color: #45474B; /* Dark gray text when selected */
   border-color: #F4CE14;
 }
 
 .chip:hover {
-  background-color: #EFB11D;
+  background-color: #EFB11D; /* Change to a darker yellow on hover */
+}
+
+.chip.active:hover {
+  background-color: white; /* White background remains on hover when selected */
+  color: #45474B; /* Text remains dark gray on hover when selected */
 }
 
 
