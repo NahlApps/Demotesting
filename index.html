@@ -669,74 +669,34 @@ height: 37px !important;
   opacity: 1;
 }
 .iti { width: 100%; }
-#toggle-container {
+#chip-container {
   display: flex;
-  justify-content: center; /* Centers the toggles horizontally */
-  gap: 20px; /* Space between each toggle */
+  justify-content: center;
+  gap: 15px;
   flex-wrap: wrap;
   margin-top: 20px;
 }
 
-.switch {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 80px;
-}
-
-.switch input {
-  display: none; /* Hide the default checkbox */
-}
-
-.slider {
-  position: relative;
-  width: 50px;
-  height: 28px;
-  background-color: #f0f0f0; /* Light grey background for inactive switch */
-  border-radius: 34px;
-  transition: 0.4s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for cuteness */
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
-  left: 4px;
-  bottom: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* A slight shadow for depth */
-}
-
-input:checked + .slider {
-  background-color: #ffebcd; /* Light peach color for active switch */
-}
-
-input:checked + .slider:before {
-  transform: translateX(22px); /* Knob moves to the right when checked */
-  background-color: #FFD700; /* Light yellow knob for active state */
-}
-
-.label-text {
-  margin-left: 10px;
-  font-size: 14px;
-  color: #6e6e6e; /* Soft grey text */
-  font-family: 'M PLUS Rounded 1c', sans-serif; /* Rounded font for a cute style */
+.chip {
+  padding: 10px 20px;
+  background-color: #F4CE14;
+  color: #45474B;
+  border-radius: 25px;
   cursor: pointer;
-  transition: color 0.3s ease;
+  font-size: 14px;
+  border: 2px solid transparent;
+  transition: background-color 0.3s, color 0.3s, border 0.3s;
 }
 
-.switch:hover .label-text {
-  color: #ffae42; /* Gentle orange hover effect for text */
+.chip.active {
+  background-color: #45474B;
+  color: #F5F5F5;
+  border-color: #F4CE14;
 }
 
-.slider:active:before {
-  width: 24px; /* Slightly larger knob when toggling */
+.chip:hover {
+  background-color: #EFB11D;
 }
-
 
 
 </style>
@@ -1007,25 +967,14 @@ input:checked + .slider:before {
             <div id="googleMap" style="width:100%;height:400px;margin-top: 3%;margin-bottom: 3%;;color: #493a68"></div>
             <form onsubmit="handleSubmit(event)"id="page6-form" action="" style="display: flex; flex-direction:column;width: 100%; padding-bottom: 3%;">
                 <!-- <label for="locationDescription" style=" padding-bottom: 3%;">وصف المكان</label> -->
-<div id="toggle-container">
-  <label class="switch">
-    <input type="checkbox" id="tag1" onclick="addTags()">
-    <span class="slider"></span>
-    <span class="label-text">ريحة</span>
-  </label>
-
-  <label class="switch">
-    <input type="checkbox" id="tag2" onclick="addTags()">
-    <span class="slider"></span>
-    <span class="label-text">كيس</span>
-  </label>
-
-  <label class="switch">
-    <input type="checkbox" id="tag3" onclick="addTags()">
-    <span class="slider"></span>
-    <span class="label-text">ورود</span>
-  </label>
+<div id="chip-container">
+  <div class="chip" onclick="addService(this)" id="tag1">Service 1</div>
+  <div class="chip" onclick="addService(this)" id="tag2">Service 2</div>
+  <div class="chip" onclick="addService(this)" id="tag3">Service 3</div>
 </div>
+
+
+
 
 
 
@@ -1093,26 +1042,19 @@ input:checked + .slider:before {
 //     }
 //     document.getElementById("locationDescription").value = textags;
 //  }   
-function addTags() {
-    let textags = ""; // Initialize an empty string for the selected tags
+function addService(element) {
+  element.classList.toggle("active");
 
-    // Loop through the toggle switches (assuming you have 3 toggles with IDs 'tag1', 'tag2', 'tag3')
-    for (let i = 1; i <= 3; i++) {
-        // Get each toggle by its ID
-        let toggle = document.getElementById("tag" + i);
+  // Collect selected chips
+  let selectedServices = [];
+  document.querySelectorAll(".chip.active").forEach(function(chip) {
+    selectedServices.push(chip.textContent.trim());
+  });
 
-        // Check if the toggle is checked
-        if (toggle.checked) {
-            // Get the corresponding label text (use nextElementSibling to get the label text span)
-            let labelText = toggle.nextElementSibling.nextElementSibling.textContent.trim();
-            // Append the label text to the `textags` string
-            textags += labelText + " ";
-        }
-    }
-
-    // Update the input field or text area with the concatenated string of selected tags
-    document.getElementById("locationDescription").value = textags.trim(); // Remove any trailing space
+  // Update the textarea with selected services
+  document.getElementById("locationDescription").value = selectedServices.join(", ");
 }
+
 
 	
       const input = document.querySelector("#mobile");
