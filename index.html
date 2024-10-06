@@ -669,27 +669,41 @@ height: 37px !important;
   opacity: 1;
 }
 .iti { width: 100%; }
-#custom-checkbox-container {
+#chip-container {
+  display: flex;
+  justify-content: center; /* Centers the chips horizontally */
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.chip {
+  padding: 10px 20px;
+  background-color: #F4CE14; /* Chip background color */
+  color: #45474B; /* Text color */
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  border: 2px solid transparent;
+  transition: background-color 0.3s, color 0.3s, border 0.3s;
+}
+
+.chip.active {
+  background-color: #45474B; /* Active state background color */
+  color: #F5F5F5; /* Active state text color */
+  border-color: #F4CE14; /* Active state border color */
+}
+
+.chip:hover {
+  background-color: #EFB11D; /* Hover background color */
+}
+
+.chip-container {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
-#custom-checkbox-container input[type="checkbox"] {
-  margin-right: 5px;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #F4CE14; /* Checkbox color */
-}
-
-#custom-checkbox-container label {
-  margin-right: 15px;
-  font-size: 16px;
-  color: #45474B; /* Text color */
-  cursor: pointer;
-}
 
 </style>
 <body>
@@ -959,15 +973,10 @@ height: 37px !important;
             <div id="googleMap" style="width:100%;height:400px;margin-top: 3%;margin-bottom: 3%;;color: #493a68"></div>
             <form onsubmit="handleSubmit(event)"id="page6-form" action="" style="display: flex; flex-direction:column;width: 100%; padding-bottom: 3%;">
                 <!-- <label for="locationDescription" style=" padding-bottom: 3%;">وصف المكان</label> -->
-<div id="custom-checkbox-container">
-  <input onclick="addTags()" type="checkbox" id="tag1" name="tag1" value="ريحة#">
-  <label for="tag1">ريحة</label>
-
-  <input onclick="addTags()" type="checkbox" id="tag2" name="tag2" value="كيس#">
-  <label for="tag2">كيس</label>
-
-  <input onclick="addTags()" type="checkbox" id="tag3" name="tag3" value="ورود#">
-  <label for="tag3">ورود</label>
+<div id="chip-container">
+  <div class="chip" onclick="toggleChip(this, 'ريحة#')" id="chip1">ريحة</div>
+  <div class="chip" onclick="toggleChip(this, 'كيس#')" id="chip2">كيس</div>
+  <div class="chip" onclick="toggleChip(this, 'ورود#')" id="chip3">ورود</div>
 </div>
 
 		    
