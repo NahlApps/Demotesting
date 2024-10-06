@@ -698,12 +698,6 @@ height: 37px !important;
   background-color: #EFB11D; /* Hover background color */
 }
 
-.chip-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 
 </style>
 <body>
@@ -974,9 +968,9 @@ height: 37px !important;
             <form onsubmit="handleSubmit(event)"id="page6-form" action="" style="display: flex; flex-direction:column;width: 100%; padding-bottom: 3%;">
                 <!-- <label for="locationDescription" style=" padding-bottom: 3%;">وصف المكان</label> -->
 <div id="chip-container">
-  <div class="chip" onclick="toggleChip(this, 'ريحة#')" id="chip1">ريحة</div>
-  <div class="chip" onclick="toggleChip(this, 'كيس#')" id="chip2">كيس</div>
-  <div class="chip" onclick="toggleChip(this, 'ورود#')" id="chip3">ورود</div>
+  <div class="chip" onclick="addTags(this)" id="tag1">ريحة</div>
+  <div class="chip" onclick="addTags(this)" id="tag2">كيس</div>
+  <div class="chip" onclick="addTags(this)" id="tag3">ورود</div>
 </div>
 
 		    
