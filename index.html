@@ -669,33 +669,68 @@ height: 37px !important;
   opacity: 1;
 }
 .iti { width: 100%; }
-#chip-container {
+#toggle-container {
   display: flex;
-  justify-content: center; /* Centers the chips horizontally */
-  gap: 15px;
+  justify-content: center; /* Centers the toggles horizontally */
+  gap: 30px; /* Space between each toggle */
   flex-wrap: wrap;
   margin-top: 20px;
 }
 
-.chip {
-  padding: 10px 20px;
-  background-color: #F4CE14; /* Chip background color */
-  color: #45474B; /* Text color */
-  border-radius: 25px;
-  cursor: pointer;
+.switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100px; /* Adjust as necessary */
+}
+
+.switch input {
+  display: none; /* Hide the default checkbox */
+}
+
+.slider {
+  position: relative;
+  width: 60px;
+  height: 34px;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+  left: 4px;
+  bottom: 4px;
+}
+
+input:checked + .slider {
+  background-color: #F4CE14;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.label-text {
+  margin-left: 15px;
   font-size: 16px;
-  border: 2px solid transparent;
-  transition: background-color 0.3s, color 0.3s, border 0.3s;
+  color: #45474B;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
-.chip.active {
-  background-color: #45474B; /* Active state background color */
-  color: #F5F5F5; /* Active state text color */
-  border-color: #F4CE14; /* Active state border color */
+.switch:hover .label-text {
+  color: #EFB11D; /* Hover effect for label */
 }
 
-.chip:hover {
-  background-color: #EFB11D; /* Hover background color */
+.slider:active:before {
+  width: 30px; /* Effect on the knob when active */
 }
 
 
@@ -967,11 +1002,26 @@ height: 37px !important;
             <div id="googleMap" style="width:100%;height:400px;margin-top: 3%;margin-bottom: 3%;;color: #493a68"></div>
             <form onsubmit="handleSubmit(event)"id="page6-form" action="" style="display: flex; flex-direction:column;width: 100%; padding-bottom: 3%;">
                 <!-- <label for="locationDescription" style=" padding-bottom: 3%;">وصف المكان</label> -->
-<div id="chip-container">
-  <div class="chip" onclick="addTags()" id="tag1">ريحة</div>
-  <div class="chip" onclick="addTags()" id="tag2">كيس</div>
-  <div class="chip" onclick="addTags()" id="tag3">ورود</div>
+<div id="toggle-container">
+  <label class="switch">
+    <input type="checkbox" id="tag1" onclick="addTags()">
+    <span class="slider"></span>
+    <span class="label-text">ريحة</span>
+  </label>
+
+  <label class="switch">
+    <input type="checkbox" id="tag2" onclick="addTags()">
+    <span class="slider"></span>
+    <span class="label-text">كيس</span>
+  </label>
+
+  <label class="switch">
+    <input type="checkbox" id="tag3" onclick="addTags()">
+    <span class="slider"></span>
+    <span class="label-text">ورود</span>
+  </label>
 </div>
+
 
 		    
                 <input dir="rtl" maxlength="200" id="locationDescription" placeholder="وصف المكان أو أي ملاحظة" type="text" style="width: 100%; margin: 0;"></input>
@@ -1025,36 +1075,36 @@ height: 37px !important;
 </body>
 
 <script>
-function addTags(){
-	let textags= "";
-    for( let i=1; i<=3;i++){
-     // if (document.getElementById("tag"+i).checked){
-    let tag_x = document.getElementById("tag"+i).textContent
-    textags= textags+ tag_x+" "
-// }
-    }
-    document.getElementById("locationDescription").value = textags;
- }   
-// function addTags() {
-//     let textags = ""; // Initialize an empty string for the selected tags
-
-//     // Loop through the chips (assuming you have 3 chips with IDs 'tag1', 'tag2', 'tag3')
-//     for (let i = 1; i <= 3; i++) {
-//         // Get each chip element by its ID
-//         let chip = document.getElementById("tag" + i);
-
-//         // Check if the chip has the 'active' class, meaning it's selected
-//         if (chip.classList.contains("active")) {
-//             // Get the text content (value) of the chip
-//             let tag_x = chip.textContent.trim(); 
-//             // Append the chip value to the `textags` string
-//             textags += tag_x + " ";
-//         }
+// function addTags(){
+// 	let textags= "";
+//     for( let i=1; i<=3;i++){
+//      // if (document.getElementById("tag"+i).checked){
+//     let tag_x = document.getElementById("tag"+i).textContent
+//     textags= textags+ tag_x+" "
+// // }
 //     }
+//     document.getElementById("locationDescription").value = textags;
+//  }   
+function addTags() {
+    let textags = ""; // Initialize an empty string for the selected tags
 
-//     // Update the input field or text area with the concatenated string of selected tags
-//     document.getElementById("locationDescription").value = textags.trim(); // Remove any trailing space
-// }
+    // Loop through the toggle switches (assuming you have 3 toggles with IDs 'tag1', 'tag2', 'tag3')
+    for (let i = 1; i <= 3; i++) {
+        // Get each toggle by its ID
+        let toggle = document.getElementById("tag" + i);
+
+        // Check if the toggle is checked
+        if (toggle.checked) {
+            // Get the corresponding label text (use nextElementSibling to get the label text span)
+            let labelText = toggle.nextElementSibling.nextElementSibling.textContent.trim();
+            // Append the label text to the `textags` string
+            textags += labelText + " ";
+        }
+    }
+
+    // Update the input field or text area with the concatenated string of selected tags
+    document.getElementById("locationDescription").value = textags.trim(); // Remove any trailing space
+}
 
 	
       const input = document.querySelector("#mobile");
