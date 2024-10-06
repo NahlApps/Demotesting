@@ -840,7 +840,17 @@ height: 37px !important;
                       <option value="9">9</option>
                       <option value="10">10</option>
                     </select>
-
+<div id="chip-container">
+  <div class="chip" onclick="addService(this)" id="tag1">معطر هواء</div>
+  <div class="chip" onclick="addService(this)" id="tag2">تغليف دوسات</div>
+  <div class="chip" onclick="addService(this)" id="tag3">تلميع طبلون</div>
+<!--  <div class="chip" onclick="addService(this)" id="tag4">Service 4</div>
+  <div class="chip" onclick="addService(this)" id="tag5">Service 5</div>
+  <div class="chip" onclick="addService(this)" id="tag6">Service 6</div>
+  <div class="chip" onclick="addService(this)" id="tag7">Service 7</div> -->
+</div>
+		    
+<input dir="rtl" maxlength="200" id="locationDescription" placeholder="وصف المكان أو أي ملاحظة" type="text" style="width: 100%; margin: 0;"></input>
                 </form>
                 
                 <div id="page3-buttons" >
@@ -973,25 +983,7 @@ height: 37px !important;
             <div id="googleMap" style="width:100%;height:400px;margin-top: 3%;margin-bottom: 3%;;color: #493a68"></div>
             <form onsubmit="handleSubmit(event)"id="page6-form" action="" style="display: flex; flex-direction:column;width: 100%; padding-bottom: 3%;">
                 <!-- <label for="locationDescription" style=" padding-bottom: 3%;">وصف المكان</label> -->
-<div id="chip-container">
-  <div class="chip" onclick="addService(this)" id="tag1">Service 1</div>
-  <div class="chip" onclick="addService(this)" id="tag2">Service 2</div>
-  <div class="chip" onclick="addService(this)" id="tag3">Service 3</div>
- <div class="chip" onclick="addService(this)" id="tag4">Service 4</div>
-  <div class="chip" onclick="addService(this)" id="tag5">Service 5</div>
-  <div class="chip" onclick="addService(this)" id="tag6">Service 6</div>
-  <div class="chip" onclick="addService(this)" id="tag7">Service 7</div>
-</div>
 
-
-
-
-
-
-
-
-		    
-                <input dir="rtl" maxlength="200" id="locationDescription" placeholder="وصف المكان أو أي ملاحظة" type="text" style="width: 100%; margin: 0;"></input>
             </form>
             <button class="filter-button" id="show-my-location" style="border-radius: 0px;width: 100%;"> اظهار موقعي</button>
             <div id="page6-buttons" >
