@@ -2790,35 +2790,39 @@ function handleSubmit(event) {
   
 let map, infoWindow, marker;
 let prePosition = "https://www.google.com/maps/search/?api=1&query=";
-let position = "";
-
+let position = ''
 function myMap() {
-    const APP_Location = {
-      north: 25.214088,
-  south: 24.29913124,
-  west: 46.26038506,
-  east: 47.415736,
-    };
+    const APP_Location= {
+  north: 26.34804019,
+  south: 26.04270373,
+  west: 49.93534533,
+  east: 50.2589603,
+};
 
-    const mapProp = {
-        center: {  lat:24.71177429, lng:46.67188908 },
-        zoom: 12,
-        minZoom: 11,
-        restriction: {
-            latLngBounds: APP_Location,
-            strictBounds: false,
-        },
-    };
+// let map_bounds = google.maps.LatLngBounds(
+//   new google.maps.LatLng(26.536779190289344,49.97836898973129)
+//   ,
+//   new google.maps.LatLng(26.609585664339363,50.095371286627525)
+// )
+// console.log(map_bounds.getNorthEast())
+var mapProp= {
+  center: {
+    lat:26.30948398, lng:50.14850845
+},
+  zoom:12,
+  minZoom: 11 ,
+  restriction: {
+    latLngBounds: APP_Location,
+    strictBounds: false,
+    },
+};
 
-    map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-    infoWindow = new google.maps.InfoWindow();
+map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
+infoWindow = new google.maps.InfoWindow();
 
-    const defaultLatLng = { lat: 24.71177429, lng: 46.67188908 };
-    marker = new google.maps.Marker({
-        position: defaultLatLng,
-        map,
-        title: "Click to zoom",
-    });
+const myLatlng = {
+   lat:26.30948398, lng:50.14850845
+  };
 
     // Listen for map click to place marker
     map.addListener("click", (e) => {
