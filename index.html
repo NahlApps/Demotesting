@@ -1559,9 +1559,9 @@ try {
 //     {repeat: 999, duration: 3000, yoyo:true}
 // )
 // tween.start()
-document.getElementById("date").setAttribute("min", new Date().toLocaleDateString("fr-ca"))
+document.getElementById("date").setAttribute("min", new Date().toLocaleDateString("fr-ca"));
 // const defaultLink = "https://script.google.com/macros/s/AKfycbyQVnKXb6U_XD9ZS2AllJSV20kCGr6G55dq2q8Fy3qRIHuQnM1O6vIUJ7D3DHaLOszoFw/exec";
-const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'0377be6c-a454-4a09-a9f9-e7953eb82bcb'}/form`
+const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'7ba0fa5a-a891-455b-aa42-d5bc5d8bde5e'}/form`
 const acceptedHourdiff = 1;
 const acceptedMindiff = 30;
 var mydata = ""
@@ -2013,24 +2013,21 @@ function timesSetter (index) {
 
 
 for(let i = 1; i <= 3 ; i ++){
-  // console.log(i)
+
   document.getElementById(`day${i}`).innerText = weekdays[dates[i-1].weekday];
-  // document.getElementById(`day${i}date`).innerText = dates[i-1].toISOString().substring(0, 10); 
+
   document.getElementById(`day${i}date`).innerText = dates[i-1].toFormat('yyyy-MM-dd');; 
 }
-// let appointments = [1,2,3,4]
+
     $(document).ready(function() {
-        // $('.js-example-basic-single').select2({
-        //     data:data,
-        //     width: "50%"
-        // });
+
     });
     $('#test').on('click', function(event) { 
      $('.select2').select2({width: '100%'});
     })
 
     for (let i = 1; i < 7; i++) {
-        // console.log(i)
+ 
         if( i == 4) continue;
         let pb1 = document.getElementById(`page${i}-button`);
         let p1 = document.getElementById(`page${i}`);
@@ -2038,16 +2035,11 @@ for(let i = 1; i <= 3 ; i ++){
         if ( i == 2){
             pb1.onclick = async () => {
             let field1 = document.getElementById("area")
-            // // console.log(await checkUrlValidity(true))
+         
             if (field1.value == "" ){
-                // field1.checkValidity()
-                // field2.checkValidity()
+          
                  infoWindow.setPosition(map.getCenter());
-                // infoWindow.setContent(
-                //   browserHasGeolocation
-                //     ? "Error: The Geolocation service failed."
-                //     : "Error: Your browser doesn't support geolocation."
-                // );
+     
                 infoWindow.setContent(
                   "الرجاء تحديد الموقع"
                 );
@@ -2056,7 +2048,7 @@ for(let i = 1; i <= 3 ; i ++){
                 document.getElementById("page2-form").reportValidity()
                 return
             }
-            // // console.log(, field2.value)
+   
             p1.classList.remove("fadeIn");
             p1.classList.add("fadeOut");
             p2.classList.remove("fadeOut");
@@ -2064,6 +2056,7 @@ for(let i = 1; i <= 3 ; i ++){
             setTimeout(() => {
                 p1.style.display = "none";
                 p2.style.display = "flex";
+
             }, "1000")
             formData[0] = field1.value
             nForm.location = document.getElementById("area").value
@@ -2071,23 +2064,14 @@ for(let i = 1; i <= 3 ; i ++){
              
         }else if ( i == 3){
             pb1.onclick = () => {
-            // let field1 = document.getElementById("name")
-            // let field2 = document.getElementById("mobile")
+          
             let field3 = document.getElementById("serviceCat")
             let field4 = document.getElementById("service")
             let serviceCount = document.getElementById("serviceCount")
             let payingMethod = ''
             let form = document.getElementById("page3-form")
             try {
-              // payingMethod = document.querySelector('input[name="payingMethod"]:checked').value;
-              // if(field1.value.trim() == ""){
-              //   if(locale == "en"){
-              //     field1.setCustomValidity("Required field");
-              //   }else {
-              //     field1.setCustomValidity("يُرجى ملئ هذا الحقل");
-              //   }
-              //   throw new Error("no name")
-              // }
+   
               if(parseInt(serviceCount.value) <=0 || parseInt(serviceCount.value) >10 ){
                 if(locale == "en"){
                   serviceCount.setCustomValidity("Must be between 1 and 10");
@@ -2101,11 +2085,8 @@ for(let i = 1; i <= 3 ; i ++){
               console.log(error)
               return
             }
-            // if (!checkNumberValidity() ){
-            //     form.reportValidity()
-            //     return
-            // }
-            // nForm.paymentMethod = payingMethod
+ 
+        
             if (field3.value == "" || field4.value == "" ){
               if ( field3.value == ""){
                 field3.style.borderColor='red';
@@ -2130,32 +2111,19 @@ for(let i = 1; i <= 3 ; i ++){
               field4.style.borderColor='green';
               field4.style.borderWidth='thin';
             }
-            // // console.log(, field2.value)
-            // field1.disabled = true;
-            // field2.disabled = true;
-            // field3.disabled = true;
-            // field4.disabled = true;
-            // document.getElementById(`page${i}-return`).style.display = "none";
-            // pb1.style.display = "none";
-            // let pageSpinner = document.getElementById(`page${i}-spinner`);
-            // document.getElementById(`fail-alert`).style.display = "none";
-            // pageSpinner.style.display = "block"
+   
             
-            
-            // formData[4] = field1.value
+         
             formData[5] = countryCodeInput.getNumber().substring(1)
             formData[6] = field3.value
             formData[7] = field4.value
             formData[8] = payingMethod
             
             nForm.customerN = document.getElementById("name").value.trim()
-            // nForm.customerM = countryCodeInput.getNumber().substring(1)
             nForm.serviceCat = document.getElementById("serviceCat").value
             nForm.service = document.getElementById("service").value
             nForm.serviceCount = serviceCount.value
-            // document.getElementById("mobileNumbLoading").textContent = formData[5]
-            // // send data
-            // // console.log(formData)
+   
 
                 p1.classList.remove("fadeIn");
                 p1.classList.add("fadeOut");
@@ -2164,19 +2132,11 @@ for(let i = 1; i <= 3 ; i ++){
                 setTimeout(() => {
                     p1.style.display = "none";
                     p2.style.display = "flex";
+		// ★ عند عرض الصفحة 4، شغّل حدث 'change' على #date ليعرض أوقات اليوم افتراضيًا
+		document.getElementById("date").dispatchEvent(new Event("change"));
+
                 }, "1000")
-            //   }else{
-            //     field1.disabled = false;
-            //     field2.disabled = false;
-            //     field3.disabled = false;
-            //     field4.disabled = false;
-            //     document.getElementById(`page${i}-return`).style.display = "inline-block";
-            //     pb1.style.display = "inline-block";
-            //     document.getElementById(`fail-alert`).style.display = "block";
-                
-            //   }
-             
-            // }).form_store(formData);
+   
             }
         }
         else if ( i == 5){
@@ -2211,9 +2171,7 @@ for(let i = 1; i <= 3 ; i ++){
             
             nForm.customerN = document.getElementById("name").value.trim()
             nForm.customerM = countryCodeInput.getNumber().substring(1)
-            // document.getElementById("mobileNumbLoading").textContent = formData[5]
-            // // send data
-            // // console.log(formData)
+
 
                 p1.classList.remove("fadeIn");
                 p1.classList.add("fadeOut");
@@ -2223,29 +2181,14 @@ for(let i = 1; i <= 3 ; i ++){
                     p1.style.display = "none";
                     p2.style.display = "flex";
                 }, "1000")
-            //   }else{
-            //     field1.disabled = false;
-            //     field2.disabled = false;
-            //     field3.disabled = false;
-            //     field4.disabled = false;
-            //     document.getElementById(`page${i}-return`).style.display = "inline-block";
-            //     pb1.style.display = "inline-block";
-            //     document.getElementById(`fail-alert`).style.display = "block";
-                
-            //   }
-             
-            // }).form_store(formData);
+
             }
         }else if ( i == 6){
           pb1.onclick = () => {
          
             if (position == "") {
                infoWindow.setPosition(map.getCenter());
-              //   // infoWindow.setContent(
-              //   //   browserHasGeolocation
-              //   //     ? "Error: The Geolocation service failed."
-              //   //     : "Error: Your browser doesn't support geolocation."
-              //   // );
+
                 infoWindow.setContent(
                   "الرجاء تحديد الموقع"
                 );
@@ -2275,7 +2218,7 @@ for(let i = 1; i <= 3 ; i ++){
               }
             } catch (error) {
               document.getElementById("page6-form").reportValidity()
-              // form.reportValidity()
+          
               document.getElementById(`page${i}-return`).style.display = "inline-block";
               pb1.style.display = "inline-block";
               pageSpinner.style.display = "none"
@@ -2285,27 +2228,12 @@ for(let i = 1; i <= 3 ; i ++){
             }          
             
             nForm.locationDescription = document.getElementById("locationDescription").value
-            // formData[0] = ""
-            // formData[2] = ""
-            // formData[3] = ""
-            // formData[4] = ""
-            // formData[5] = "966533466569"
-            // formData[6] = ""
-            // formData[7] = ""
-            // formData[8] = ""
+
       
             formData[9] = ""
             formData[10] = ""
-            // p1.classList.remove("fadeIn");
-            //     p1.classList.add("fadeOut");
-            //     p2.classList.remove("fadeOut");
-            //     p2.classList.add("fadeIn");
-            //     setTimeout(() => {
-            //         p1.style.display = "none";
-            //         p2.style.display = "flex";
-            //     }, "1000")
+
                 
-              // send data
             console.log(formData)
             let submitFormData = encodeURIComponent(JSON.stringify(formData), "UTF-8")
             mydata = {
@@ -2314,7 +2242,7 @@ for(let i = 1; i <= 3 ; i ++){
                       failAlert: document.getElementById(`fail-alert`),
                     }
                     console.log(nForm)
-            // return ""
+
             fetch(defaultLink2 +`${'/reserveAppointment'}`, {
               redirect: "follow",
               method: "POST",
@@ -2327,10 +2255,10 @@ for(let i = 1; i <= 3 ; i ++){
                 }
                 response = await response.json()
                 if (response.success){
-                  // to skip otp
+            
                   p1 = document.getElementById(`page${i}`);
                   p2 = document.getElementById(`page${i+1}`);
-                  // formData[10] = reply.signature
+                  
                   p1.classList.remove("fadeIn");
                   p1.classList.add("fadeOut");
                   p2.classList.remove("fadeOut");
@@ -2346,10 +2274,7 @@ for(let i = 1; i <= 3 ; i ++){
                         localStorage.removeItem("name")
                         localStorage.removeItem("mobile")
                       }
-                      // document.getElementById(`page${i}-return`).style.display = "inline-block";
-                      // pb1.style.display = "inline-block";
-                      
-                      // startTimer(3*60,document.getElementById("resendTimer"))
+
                   }, "1000")
                 
                 }
@@ -2360,10 +2285,7 @@ for(let i = 1; i <= 3 ; i ++){
               document.getElementById(`page${i}-return`).style.display = "inline-block";
               pb1.style.display = "inline-block";
 
-              // failAlert.style.display = "block";
-              // failAlert.children[0].innerHTML = reply.msg
 
-              // skip otp
               p1.classList.remove("fadeIn");
               p1.classList.add("fadeOut");
               p1.style.display = "none"
@@ -2383,192 +2305,14 @@ for(let i = 1; i <= 3 ; i ++){
               setTimeout(() => {
                   p1.style.display = "none";
                   p2.style.display = "flex";
-                  // clearInterval(time_counter)
+     
               }, "1000")
           });
 
-            // callContent(`formSubmit&data=${submitFormData}`,(reply)=> {
-            //   // console.log("store")
-            //   // console.log(reply);
-            //   // console.log(reply.success);
-            //   pageSpinner.style.display = 'none';
-            //   if(reply.success){
-            //     // to skip otp
-            //     p1 = document.getElementById(`page${i}`);
-            //     p2 = document.getElementById(`page${i+2}`);
-            //     formData[10] = reply.signature
-            //     p1.classList.remove("fadeIn");
-            //     p1.classList.add("fadeOut");
-            //     p2.classList.remove("fadeOut");
-            //     p2.classList.add("fadeIn");
-            //     setTimeout(() => {
-            //         p1.style.display = "none";
-            //         p2.style.display = "flex";
-            //         pageSpinner.style.display = "none"
-            //         // if(confirm(`عزيزنا/عزيزتنا, ودك نتذكر بياناتك على هذا الجهاز لتسهيل الغسلات الجاية ؟`)){
-            //         //   localStorage.setItem("name", document.getElementById("name").value);
-            //         //   localStorage.setItem("mobile", document.getElementById("mobile").value);
-
-            //         // }
-            //         // document.getElementById(`page${i}-return`).style.display = "inline-block";
-            //         // pb1.style.display = "inline-block";
-                    
-            //         // startTimer(3*60,document.getElementById("resendTimer"))
-            //     }, "1000")
-            //   }else{
-            //     document.getElementById(`page${i}-return`).style.display = "inline-block";
-            //     pb1.style.display = "inline-block";
-
-            //     // failAlert.style.display = "block";
-            //     // failAlert.children[0].innerHTML = reply.msg
-
-            //     // skip otp
-            //     p1.classList.remove("fadeIn");
-            //     p1.classList.add("fadeOut");
-            //     p1.style.display = "none"
-            //     let p2 = document.getElementById(`page3`);
-            //     p2.classList.remove("fadeOut");
-            //     p2.classList.add("fadeIn");
-            //     p2.style.display = "flex"
-            //     let failAlert3 = document.getElementById(`fail-alert-3`)
-            //     failAlert3.style.display = "block";
-            //     failAlert3.children[0].innerHTML ="عذرا, لم يعد الموعد المراد متاح."
-            //     failAlert3.children[2].innerHTML = "الرجاء اختيار موعد آخر"
-            //     $('#date').trigger('change');
-            //     setTimeout(() => {
-            //         p1.style.display = "none";
-            //         p2.style.display = "flex";
-            //         // clearInterval(time_counter)
-            //     }, "1000")
-            //   }
-             
-            // })
-
+  
           }
         }
-        // else if (i == 6 ){
-        //   pb1.onclick = () => {
-        //     let codeEl = document.getElementById(`code`)
-        //     let code = codeEl.value
-        //     let form = document.getElementById("page6-form")
-        //     codeEl.setCustomValidity("الرجاء ادخال الرقم المُرسل بالشكل الصحيح");
-        //     try {
-        //       code = parseInt(code)
-        //     } catch (error) {
-        //       form.reportValidity()
-        //       return
-        //     }
-        //     if (code.toString().length < 4 ){
-        //       form.reportValidity()
-        //       return
-        //     }
-        //     code = codeEl.value
-        //     // formData[0] = ""
-        //     // formData[1] = ""
-        //     // formData[2] = ""
-        //     // formData[3] = ""
-        //     // formData[4] = ""
-        //     // formData[5] = ""
-        //     // formData[6] = ""
-        //     // formData[7] = ""
-        //     formData[9] = document.getElementById(`code`).value
-        //     // document.getElementById(`page${i}-return`).style.display = "none";
-        //     pb1.style.display = "none";
-        //     let pageSpinner = document.getElementById(`page${i}-spinner`);
-        //     let failAlert = document.getElementById(`fail-alert`)
-        //     let failAlert3 = document.getElementById(`fail-alert-3`)
-        //     let failAlert4 = document.getElementById(`fail-alert-4`)
-        //     let failAlert5 = document.getElementById(`fail-alert-5`)
-        //     failAlert.style.display = "none";
-        //     failAlert3.style.display = "none";
-        //     failAlert4.style.display = "none";
-        //     failAlert5.style.display = "none";
-        //     pageSpinner.style.display = "inline-block"
-            
-        //       // send data
-        //     console.log(formData)
-        //     let submitFormData = encodeURIComponent(JSON.stringify(formData), "UTF-8")
-        //     // mydata = {submitFormData,pageSpinner,p1,p2,pb1,failAlert,failAlert3,failAlert4,failAlert5}
-        //     // resendData({submitFormData,pageSpinner,p1,p2,pb1,failAlert,failAlert3,failAlert4,failAlert5})
-        //     callContent(`formSubmit&data=${submitFormData}`,(reply)=> {
-        //       // console.log("store")
-        //       console.log(reply);
-        //       pageSpinner.style.display = 'none';
-        //       if(reply.success){
-        //         p1.classList.remove("fadeIn");
-        //         p1.classList.add("fadeOut");
-        //         p2.classList.remove("fadeOut");
-        //         p2.classList.add("fadeIn");
-        //         setTimeout(() => {
-        //             p1.style.display = "none";
-        //             p2.style.display = "flex";
-        //             clearInterval(time_counter)
-        //         }, "1000")
-        //       }
-        //       // else{
-        //       //   // document.getElementById(`page${i}-return`).style.display = "inline-block";
-        //       //   pb1.style.display = "inline-block";
-        //       //   if( reply.signature == "badSig"){
-        //       //     p1.classList.remove("fadeIn");
-        //       //     p1.classList.add("fadeOut");
-        //       //     let p2 = document.getElementById(`page4`);
-        //       //     p2.classList.remove("fadeOut");
-        //       //     p2.classList.add("fadeIn");
-        //       //     failAlert4.style.display = "block";
-        //       //     failAlert4.children[0].innerHTML = reply.msg.split(",")[0]
-        //       //     failAlert4.children[2].innerHTML = reply.msg.split(",")[1] == undefined ? "":reply.msg.split(",")[1]
-        //       //     setTimeout(() => {
-        //       //         p1.style.display = "none";
-        //       //         p2.style.display = "flex";
-        //       //         clearInterval(time_counter)
-        //       //     }, "1000")
-        //       //   }else if( reply.signature == "timeout"){
-        //       //     p1.classList.remove("fadeIn");
-        //       //     p1.classList.add("fadeOut");
-        //       //     let p2 = document.getElementById(`page4`);
-        //       //     p2.classList.remove("fadeOut");
-        //       //     p2.classList.add("fadeIn");
-        //       //     failAlert4.style.display = "block";
-        //       //     failAlert4.children[0].innerHTML = reply.msg.split(",")[0]
-        //       //     failAlert4.children[2].innerHTML = reply.msg.split(",")[1] == undefined ? "":reply.msg.split(",")[1]
-        //       //     setTimeout(() => {
-        //       //         p1.style.display = "none";
-        //       //         p2.style.display = "flex";
-        //       //         clearInterval(time_counter)
-        //       //     }, "1000")
-        //       //     // p1.classList.remove("fadeIn");
 
-        //       //   }else if( reply.signature == "failed"){
-        //       //     failAlert.style.display = "block";
-        //       //     failAlert.children[0].innerHTML = reply.msg.split(",")[0]
-        //       //     failAlert.children[2].innerHTML = reply.msg.split(",")[1] == undefined ? "":reply.msg.split(",")[1]
-        //       //   }
-        //         else{
-
-        //           p1.classList.remove("fadeIn");
-        //           p1.classList.add("fadeOut");
-        //           p1.style.display = "none"
-        //           let p2 = document.getElementById(`page3`);
-        //           p2.classList.remove("fadeOut");
-        //           p2.classList.add("fadeIn");
-        //           p2.style.display = "flex"
-        //           let failAlert3 = document.getElementById(`fail-alert-3`)
-        //           failAlert3.style.display = "block";
-        //           failAlert3.children[0].innerHTML ="عذرا, لم يعد الموعد المراد متاح."
-        //           failAlert3.children[2].innerHTML = "الرجاء اختيار موعد آخر"
-        //           $('#date').trigger('change');
-        //           setTimeout(() => {
-        //               p1.style.display = "none";
-        //               p2.style.display = "flex";
-        //               clearInterval(time_counter)
-        //           }, "1000")
-        //         }
-
-        //       }
-             
-        //     )
-        //   }
-        // }
         else {
             pb1.onclick = () => {
             p1.classList.remove("fadeIn");
@@ -2617,6 +2361,8 @@ for(let i = 1; i <= 3 ; i ++){
         }
         
     }
+
+
     function resendData({submitFormData,pageSpinner,p1,p2,pb1,failAlert,failAlert3,failAlert4,failAlert5}){
       // pageSpinner,p1,p2,pb1,failAlert,failAlert3,failAlert4,failAlert5
       document.getElementById("resend-objects").style.display = "none"
@@ -2641,6 +2387,13 @@ for(let i = 1; i <= 3 ; i ++){
              
             })
     }
+
+
+
+
+
+
+
     function choosedDate(time,date, i){
         // console.log(time)
         formData[2] = date
@@ -2892,10 +2645,10 @@ let prePosition = "https://www.google.com/maps/search/?api=1&query=";
 let position = ''
 function myMap() {
     const APP_Location= {
-  north: 17.071796167136846,
-  south: 16.82157383499607, 
-  west: 42.414534438296805, 
-  east: 42.650673912341475,  
+  north: 24.989,
+  south: 24.522591,
+  west: 46.458665,
+  east: 46.889878,
 };
 
 // let map_bounds = google.maps.LatLngBounds(
@@ -2906,7 +2659,7 @@ function myMap() {
 // console.log(map_bounds.getNorthEast())
 var mapProp= {
   center: {
-    lat:16.891004191032007, lng:42.55703837672307
+    lat:24.732317, lng:46.700364
 },
   zoom:12,
   minZoom: 11 ,
@@ -2918,9 +2671,9 @@ var mapProp= {
 
 map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
 infoWindow = new google.maps.InfoWindow();
- 
+
 const myLatlng = {
-   lat:16.891004191032007, lng:42.55703837672307
+   lat:24.732317, lng:46.700364
   };
 
  marker = new google.maps.Marker({
@@ -3039,6 +2792,62 @@ function startTimer(duration, display) {
         }
     }, 1000);
 }
+// startTimer(3,document.getElementById("resendTimer"))
+  // map each label to its description
+  const descriptions = {
+    '✨ خدمات التلميع': `غسيل خارجي وداخلي بالبخار
+
+تنظيف فتحات المكيف والسقف
+
+إزالة البقع وتلميع المقاعد وأحزمة الأمان
+
+تلميع الديكورات والأبواب والإطارات
+
+تكنيس الأرضيات وتغليف الدعاسات
+
+تغليف الدركسون والقير
+
+تعطير السيارة وفواحة عطرية`,
+    '🫧 غسيل عادي / شامبو': `غسيل خارجي احترافي للهيكل
+
+تنظيف وتلميع إطارات السيارة
+
+تنظيف داخلي وتكنيس شامل
+
+فواحة عطريّة تنعش الأجواء
+
+تغليف فاخر للدركسون والقير
+
+حماية أنيقة للدواسات`,
+    '💨 غسيل عادي / بالبخار': `غسيل خارجي احترافي للهيكل
+
+تنظيف وتلميع إطارات السيارة
+
+تنظيف داخلي وتكنيس شامل
+
+فواحة عطريّة تنعش الأجواء
+
+تغليف فاخر للدركسون والقير
+
+حماية أنيقة للدواسات`
+  };
+
+
+  // render all sections inside the collapsed <details>
+  const detailsEl = document.getElementById('serviceDetails');
+  Object.entries(descriptions).forEach(([label, text]) => {
+    const section = document.createElement('section');
+    const heading = document.createElement('h4');
+    heading.textContent = label;
+    const pre = document.createElement('pre');
+    pre.textContent = text;
+    section.appendChild(heading);
+    section.appendChild(pre);
+    detailsEl.appendChild(section);
+  });
+document.getElementById('serviceDetails').open = false;
+
+
 
 
 
@@ -3240,31 +3049,81 @@ function startTimer(duration, display) {
   // ----------------------
   // 7) دالة attachServiceChangeListener(): ربط مستمعين بالسعر عند بناء #service
   // ----------------------
-function attachServiceChangeListener() {
-  const serviceSelect = document.getElementById("service");
-  if (!serviceSelect) return;
+  function attachServiceChangeListener() {
+    const serviceSelect = document.getElementById("service");
+    if (!serviceSelect) return;
 
-  // 1) Grab the price from whatever option is currently selected:
-  if (serviceSelect.options.length > 0) {
-    serviceSum = extractPriceFromText(
-      serviceSelect.options[serviceSelect.selectedIndex].text
-    );
-    updateTotalDisplay();
+    if (serviceSelect.options.length > 0) {
+      const firstText = serviceSelect.options[serviceSelect.selectedIndex].text;
+      serviceSum = extractPriceFromText(firstText);
+      updateTotalDisplay();
+    }
+
+    serviceSelect.replaceWith(serviceSelect.cloneNode(true));
+    const freshSelect = document.getElementById("service");
+    freshSelect.addEventListener("change", function () {
+      serviceSum = extractPriceFromText(
+        this.options[this.selectedIndex].text
+      );
+      updateTotalDisplay();
+    });
   }
 
-  // 2) Replace the node so that we can safely re‐attach a fresh listener:
-  serviceSelect.replaceWith(serviceSelect.cloneNode(true));
-  const freshSelect = document.getElementById("service");
-
-  freshSelect.addEventListener("change", function () {
-    serviceSum = extractPriceFromText(
-      this.options[this.selectedIndex].text
+  // ----------------------
+  // 8) دالة servicesDropdownLoader2(data): بناء القوائم وربط الأسعار تلقائيًا
+  // ----------------------
+  function servicesDropdownLoader2(data) {
+    const categoriesID = Object.keys(data || {});
+    const categoriesNames = [];
+    for (const id of categoriesID) {
+      if (locale === "en") {
+        categoriesNames.push(data[id].category.TS_category_english_name);
+      } else {
+        categoriesNames.push(data[id].category.TS_category_arabic_name);
+      }
+    }
+    add_dropdown_list(
+      categoriesNames,
+      categoriesID,
+      "serviceCat",
+      "disabled",
+      "servicesCat"
     );
-    updateTotalDisplay();
-  });
-}
 
+    document
+      .getElementById("serviceCat")
+      .addEventListener("change", function () {
+        const currentCategory = this.value;
+        const sortedServices = (data[currentCategory]?.services || []).sort(
+          (a, b) => a.TS_service_id - b.TS_service_id
+        );
 
+        const myServicesID = [];
+        const myServiceNames = [];
+        for (let serviceObj of sortedServices) {
+          myServicesID.push(serviceObj.TS_service_id);
+          if (locale === "en") {
+            myServiceNames.push(serviceObj.TS_service_english_name);
+          } else {
+            myServiceNames.push(serviceObj.TS_service_arabic_name);
+          }
+        }
+
+        add_dropdown_list(
+          myServiceNames,
+          myServicesID,
+          "service",
+          "disabled",
+          "services"
+        );
+
+        attachServiceChangeListener();
+      });
+
+    document
+      .getElementById("serviceCat")
+      .dispatchEvent(new Event("change"));
+  }
 
   // ----------------------
   // 9) حدث تغيُّر المنطقة (#area): جلب الخدمات وبناء القوائم وإخفاء المؤشرات
@@ -3331,7 +3190,7 @@ function attachServiceChangeListener() {
   // ---------------------------------------------------
   // 1) رابط Web App في Apps Script بعد إعادة النشر
   // ---------------------------------------------------
-  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw_Ms6DWFnw5-Yo6fJaU7J7lo9dFdo5-2MlFztqPzht4CkVY6NMR8Dqj_oLRfsoKnDN/exec';
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzqHWiCKJqXHLSbQ2Gic3-LuvEUibfywzuEG4CmO7EOM4UTBoE3ClWHbBhyzchyfgzyOA/exec';
 
   // ---------------------------------------------------
   // 2) متغيّرات مساعدة لتخزين بيانات القسائم عند جلبها
@@ -3628,6 +3487,12 @@ async function redeemVoucher(code, orderAmount) {
       redeemBtn.classList.add('visible');
     }
   });
+
+
+
+
+
+
 
 
 </script>
