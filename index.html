@@ -3181,6 +3181,10 @@ document.getElementById('serviceDetails').open = false;
     );
   });
 
+<!-- تأكد من أن لديك حقل لإدخال رقم هاتف العميل في HTML، مثلاً: -->
+<!-- <input type="text" id="customerPhone" placeholder="رقم جوال العميل" /> -->
+
+
   // ---------------------------------------------------
   // 1) رابط Web App في Apps Script بعد إعادة النشر
   // ---------------------------------------------------
@@ -3246,105 +3250,117 @@ document.getElementById('serviceDetails').open = false;
 
   // ---------------------------------------------------
   // 3) دالة للتحقّق من صلاحية القسيمة واحتساب قيمة الخصم
-  //    بلوازمها (نفس ما ذكرناه سابقًا)
+  //    مع مراعاة حقل CustomerPhone (عمود C)
   // ---------------------------------------------------
-async function redeemVoucher(code, orderAmount) {
-  try {
-    const vouchers = await fetchVouchersData_JSONP();
-    const upperCode = code.trim().toUpperCase();
-    const voucherObj = vouchers.find(
-      v => String(v.VoucherCode).trim().toUpperCase() === upperCode
-    );
-    if (!voucherObj) {
-      return { success: false, message: 'الكود غير موجود.', discountAmount: 0 };
-    }
+  async function redeemVoucher(code, orderAmount, enteredPhone) {
+    try {
+      const vouchers    = await fetchVouchersData_JSONP();
+      const upperCode   = code.trim().toUpperCase();
 
-    const status        = String(voucherObj.Status || '').trim().toLowerCase();
-    const startDateStr  = String(voucherObj.StartDate || '').trim();
-    const expiryDateStr = String(voucherObj.ExpiryDate || '').trim();
-    const discountType  = String(voucherObj.DiscountType || '').trim().toLowerCase();
-    const discountValue = parseFloat(voucherObj.DiscountValue) || 0;
-    const minSpend      = parseFloat(voucherObj.MinimumSpend) || 0;
-    const usageLimit    = parseInt(voucherObj.UsageLimit, 10) || 0;
-    const timesRedeemed = parseInt(voucherObj.TimesRedeemed, 10) || 0;
+      // نبحث القسيمة بالرمز
+      const voucherObj = vouchers.find(
+        v => String(v.VoucherCode).trim().toUpperCase() === upperCode
+      );
+      if (!voucherObj) {
+        return { success: false, message: 'الكود غير موجود.', discountAmount: 0 };
+      }
 
-    // 1) التحقق من حالة القسيمة
-    if (status !== 'active') {
-      // إذا كان هناك حالة محددة مثل 'inactive' أو 'blocked' يمكن التحقق منها هنا، لكن بشكل عام أي قيمة ليست 'active' تعتبر غير فعّالة
-      return { success: false, message: 'هذا الكود غير فعال.', discountAmount: 0 };
-    }
+      // نتحقّق من رقم الجوال المربوط بالقسيمة إن وُجد
+      const linkedPhone = String(voucherObj.CustomerPhone || '').trim();
+      if (linkedPhone) {
+        // إذا كان حقل CustomerPhone غير فارغ، يجب أن يطابق رقم العميل المدخل
+        if (linkedPhone !== enteredPhone) {
+          return {
+            success: false,
+            message: 'هذا الكود لم يُربط برقم جوالك.',
+            discountAmount: 0
+          };
+        }
+      }
 
-    // 2) التحقق من النطاق الزمني
-    const today      = new Date();
-    const startDate  = new Date(startDateStr + 'T00:00:00');
-    const expiryDate = new Date(expiryDateStr + 'T23:59:59');
+      const status        = String(voucherObj.Status || '').trim().toLowerCase();
+      const startDateStr  = String(voucherObj.StartDate || '').trim();
+      const expiryDateStr = String(voucherObj.ExpiryDate || '').trim();
+      const discountType  = String(voucherObj.DiscountType || '').trim().toLowerCase();
+      const discountValue = parseFloat(voucherObj.DiscountValue) || 0;
+      const minSpend      = parseFloat(voucherObj.MinimumSpend) || 0;
+      const usageLimit    = parseInt(voucherObj.UsageLimit, 10) || 0;
+      const timesRedeemed = parseInt(voucherObj.TimesRedeemed, 10) || 0;
 
-    if (today < startDate) {
-      // لم يبدأ الكود بعد
-      const formattedStart = startDate.toLocaleDateString('ar-EG', {
-        year: 'numeric', month: '2-digit', day: '2-digit'
-      });
+      // 1) التحقق من حالة القسيمة
+      if (status !== 'active') {
+        return { success: false, message: 'هذا الكود غير فعال.', discountAmount: 0 };
+      }
+
+      // 2) التحقق من النطاق الزمني
+      const today      = new Date();
+      const startDate  = new Date(startDateStr + 'T00:00:00');
+      const expiryDate = new Date(expiryDateStr + 'T23:59:59');
+
+      if (today < startDate) {
+        const formattedStart = startDate.toLocaleDateString('ar-EG', {
+          year: 'numeric', month: '2-digit', day: '2-digit'
+        });
+        return {
+          success: false,
+          message: `هذا الكود لم يبدأ بعد. يبدأ من: ${formattedStart}.`,
+          discountAmount: 0
+        };
+      }
+      if (today > expiryDate) {
+        const formattedExpiry = expiryDate.toLocaleDateString('ar-EG', {
+          year: 'numeric', month: '2-digit', day: '2-digit'
+        });
+        return {
+          success: false,
+          message: `انتهت صلاحية هذا الكود بتاريخ: ${formattedExpiry}.`,
+          discountAmount: 0
+        };
+      }
+
+      // 3) التحقق من حد الاستخدام
+      if (timesRedeemed >= usageLimit) {
+        return {
+          success: false,
+          message: 'تم استنفاد عدد مرات استخدام هذا الكود.',
+          discountAmount: 0
+        };
+      }
+
+      // 4) التحقق من الحد الأدنى للإنفاق
+      if (orderAmount < minSpend) {
+        return {
+          success: false,
+          message: `الحد الأدنى لاستخدام الكود هو ${minSpend.toFixed(2)} ر.س.`,
+          discountAmount: 0
+        };
+      }
+
+      // 5) حساب قيمة الخصم
+      let discountAmount = 0;
+      if (discountType === 'percentage') {
+        discountAmount = (orderAmount * discountValue) / 100;
+      } else {
+        discountAmount = discountValue;
+      }
+      if (discountAmount > orderAmount) {
+        discountAmount = orderAmount;
+      }
+
+      return {
+        success: true,
+        message: `تم تفعيل الكود. خصم بقيمة ${discountAmount.toFixed(2)} ر.س.`,
+        discountAmount
+      };
+
+    } catch (err) {
       return {
         success: false,
-        message: `هذا الكود لم يبدأ بعد. يبدأ من: ${formattedStart}.`,
+        message: 'تعذّر التحقق من الكود. جرب لاحقًا.',
         discountAmount: 0
       };
     }
-    if (today > expiryDate) {
-      // انتهت صلاحية الكود
-      const formattedExpiry = expiryDate.toLocaleDateString('ar-EG', {
-        year: 'numeric', month: '2-digit', day: '2-digit'
-      });
-      return {
-        success: false,
-        message: `انتهت صلاحية هذا الكود بتاريخ: ${formattedExpiry}.`,
-        discountAmount: 0
-      };
-    }
-
-    // 3) التحقق من حد الاستخدام
-    if (timesRedeemed >= usageLimit) {
-      return {
-        success: false,
-        message: 'تم استنفاد عدد مرات استخدام هذا الكود.',
-        discountAmount: 0
-      };
-    }
-
-    // 4) التحقق من الحد الأدنى للإنفاق
-    if (orderAmount < minSpend) {
-      return {
-        success: false,
-        message: `الحد الأدنى لاستخدام الكود هو ${minSpend.toFixed(2)} ر.س.`,
-        discountAmount: 0
-      };
-    }
-
-    // 5) حساب قيمة الخصم
-    let discountAmount = 0;
-    if (discountType === 'percentage') {
-      discountAmount = (orderAmount * discountValue) / 100;
-    } else {
-      discountAmount = discountValue;
-    }
-    if (discountAmount > orderAmount) {
-      discountAmount = orderAmount;
-    }
-
-    return {
-      success: true,
-      message: `تم تفعيل الكود. خصم بقيمة ${discountAmount.toFixed(2)} ر.س.`,
-      discountAmount
-    };
-
-  } catch (err) {
-    return {
-      success: false,
-      message: 'تعذّر التحقق من الكود. جرب لاحقًا.',
-      discountAmount: 0
-    };
   }
-}
 
   // ---------------------------------------------------
   // 4) دالة خاصة بزيادة TimesRedeemed عبر JSONP
@@ -3380,17 +3396,26 @@ async function redeemVoucher(code, orderAmount) {
   // 5) بعد تحميل الصفحة، نربط زر “تفعيل” والمنطق
   // ---------------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
-    const voucherInput    = document.getElementById('voucher');
-    const redeemBtn       = document.getElementById('redeemBtn');
-    const noteEl          = document.getElementById('voucherNote');
-    const orderSubtotalEl = document.getElementById('orderSubtotal');
-    const finalTotalEl    = document.getElementById('finalTotal');
+    const voucherInput      = document.getElementById('voucher');
+    const redeemBtn         = document.getElementById('redeemBtn');
+    const noteEl            = document.getElementById('voucherNote');
+    const orderSubtotalEl   = document.getElementById('orderSubtotal');
+    const finalTotalEl      = document.getElementById('finalTotal');
+    const customerPhoneEl   = document.getElementById('customerPhone');
 
-    if (!voucherInput || !redeemBtn || !noteEl || !orderSubtotalEl || !finalTotalEl) {
+    if (
+      !voucherInput ||
+      !redeemBtn ||
+      !noteEl ||
+      !orderSubtotalEl ||
+      !finalTotalEl ||
+      !customerPhoneEl
+    ) {
       console.error('عنصر أو أكثر مفقود من DOM.');
       return;
     }
 
+    // عند الإدخال في حقل القسيمة نعيد تهيئة الرسالة ونظهر/نخفي زر التفعيل
     voucherInput.addEventListener('input', () => {
       noteEl.textContent = '';
       noteEl.classList.remove('error');
@@ -3403,18 +3428,24 @@ async function redeemVoucher(code, orderAmount) {
     });
 
     redeemBtn.addEventListener('click', async () => {
-      const code = voucherInput.value.trim();
+      const code         = voucherInput.value.trim();
+      const enteredPhone = customerPhoneEl.value.trim();
+
       if (!code) {
         alert('يرجى إدخال كود الخصم أولاً');
         return;
       }
+      if (!enteredPhone) {
+        alert('يرجى إدخال رقم جوال العميل أولاً');
+        return;
+      }
 
-      // نستدعي updateTotalDisplay() من كودك السابق ليُعيد المجموع قبل الخصم
+      // نعيد المجموع قبل الخصم من خلال updateTotalDisplay()
       const orderAmount = updateTotalDisplay();
 
       try {
-        // أولًا: التحقّق من القسيمة
-        const result = await redeemVoucher(code, orderAmount);
+        // أولًا: التحقّق من القسيمة (مع تمرير رقم الجوال)
+        const result = await redeemVoucher(code, orderAmount, enteredPhone);
 
         if (result.success) {
           // عرض رسالة نجاح
@@ -3426,7 +3457,7 @@ async function redeemVoucher(code, orderAmount) {
           const newTotal = orderAmount - result.discountAmount;
           finalTotalEl.textContent = newTotal.toFixed(2);
 
-          // جمعُ أسماءِ الشِرائحِ المختارة
+          // جمع أسماء الشرائح المختارة
           const selectedChipNames = Array.from(
             document.querySelectorAll(".chip.active")
           ).map(chip => chip.textContent.trim());
@@ -3471,7 +3502,7 @@ async function redeemVoucher(code, orderAmount) {
       }
     });
 
-    // فكّر في جلب القسائم مُسبقًا حتى يصبح vouchersCache جاهزًا؛ على سبيل المثال:
+    // جلب القسائم مُسبقًا حتى يصبح vouchersCache جاهزًا
     fetchVouchersData_JSONP().catch(err => {
       console.error("خطأ أثناء تحميل القسائم JSONP:", err);
     });
