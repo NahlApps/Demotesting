@@ -3265,22 +3265,6 @@ function attachServiceChangeListener() {
 }
 
 
-  // ----------------------
-  // 8) دالة servicesDropdownLoader2(data): بناء القوائم وربط الأسعار تلقائيًا
-  // ----------------------
-function servicesDropdownLoader2(data) {
-  // … build the “serviceCat” dropdown …
-  document.getElementById("serviceCat").addEventListener("change", function () {
-    // … build the “service” dropdown inside this block …
-    add_dropdown_list(myServiceNames, myServicesID, "service", "disabled", "services");
-    // As soon as #service is in the DOM with its new <option> tags:
-    attachServiceChangeListener();
-  });
-
-  // Trigger the initial population of “service” so that attachServiceChangeListener() runs once:
-  document.getElementById("serviceCat").dispatchEvent(new Event("change"));
-}
-
 
   // ----------------------
   // 9) حدث تغيُّر المنطقة (#area): جلب الخدمات وبناء القوائم وإخفاء المؤشرات
