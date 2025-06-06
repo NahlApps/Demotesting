@@ -3182,8 +3182,7 @@ document.getElementById('serviceDetails').open = false;
     );
   });
 
-<!-- تأكد من أن لديك حقل لإدخال رقم هاتف العميل في HTML، مثلاً: -->
-<!-- <input type="text" id="customerPhone" placeholder="رقم جوال العميل" /> -->
+
 
 
   // ---------------------------------------------------
@@ -3215,7 +3214,6 @@ document.getElementById('serviceDetails').open = false;
   function loadVouchersViaJSONP() {
     if (vouchersLoaded || vouchersLoadError) return;
     const script = document.createElement('script');
-    // نمرّر callback=handleVouchersData حتى يردّ Apps Script بنتيجته على شكل handleVouchersData(...)
     script.src = WEB_APP_URL + '?callback=handleVouchersData';
     script.onerror = () => {
       vouchersLoadError = 'فشل تحميل بيانات القسائم.';
@@ -3251,7 +3249,7 @@ document.getElementById('serviceDetails').open = false;
 
   // ---------------------------------------------------
   // 3) دالة للتحقّق من صلاحية القسيمة واحتساب قيمة الخصم
-  //    مع مراعاة حقل CustomerPhone (عمود C)
+  //    مع مراعاة أن CustomerPhone اختياري
   // ---------------------------------------------------
   async function redeemVoucher(code, orderAmount, enteredPhone) {
     try {
@@ -3266,17 +3264,15 @@ document.getElementById('serviceDetails').open = false;
         return { success: false, message: 'الكود غير موجود.', discountAmount: 0 };
       }
 
-      // نتحقّق من رقم الجوال المربوط بالقسيمة إن وُجد
+      // إذا كانت القسيمة مربوطة برقم جوال (CustomerPhone غير فارغ)
+      // وقدم المستخدم رقم جوال، نتحقّق من التطابق
       const linkedPhone = String(voucherObj.CustomerPhone || '').trim();
-      if (linkedPhone) {
-        // إذا كان حقل CustomerPhone غير فارغ، يجب أن يطابق رقم العميل المدخل
-        if (linkedPhone !== enteredPhone) {
-          return {
-            success: false,
-            message: 'هذا الكود لم يُربط برقم جوالك.',
-            discountAmount: 0
-          };
-        }
+      if (linkedPhone && enteredPhone && linkedPhone !== enteredPhone) {
+        return {
+          success: false,
+          message: 'هذا الكود غير مرتبط برقم جوالك المدخل.',
+          discountAmount: 0
+        };
       }
 
       const status        = String(voucherObj.Status || '').trim().toLowerCase();
@@ -3369,17 +3365,11 @@ document.getElementById('serviceDetails').open = false;
   // ---------------------------------------------------
   function incrementTimes_JSONP(code) {
     return new Promise((resolve, reject) => {
-      // نُنشئ callback باسمٍ عشوائي قليلًا لتجنّب التكرار
       const callbackName = 'handleIncrement_' + Math.floor(Math.random() * 1e9);
-
-      // نعرّف دالة callback عالميًا
       window[callbackName] = function (data) {
-        // بعد أن تستدعيّها JSONP، ننظّف العنصر وننهي الوعد
         delete window[callbackName];
         resolve(data);
       };
-
-      // صياغة رابط JSONP مع callback وaction=incrementTimes
       const script = document.createElement('script');
       script.src = `${WEB_APP_URL}`
                  + `?action=incrementTimes`
@@ -3416,7 +3406,6 @@ document.getElementById('serviceDetails').open = false;
       return;
     }
 
-    // عند الإدخال في حقل القسيمة نعيد تهيئة الرسالة ونظهر/نخفي زر التفعيل
     voucherInput.addEventListener('input', () => {
       noteEl.textContent = '';
       noteEl.classList.remove('error');
@@ -3430,41 +3419,31 @@ document.getElementById('serviceDetails').open = false;
 
     redeemBtn.addEventListener('click', async () => {
       const code         = voucherInput.value.trim();
-      const enteredPhone = customerPhoneEl.value.trim();
+      const enteredPhone = customerPhoneEl.value.trim(); // قد يكون فارغًا
 
       if (!code) {
         alert('يرجى إدخال كود الخصم أولاً');
         return;
       }
-      if (!enteredPhone) {
-        alert('يرجى إدخال رقم جوال العميل أولاً');
-        return;
-      }
 
-      // نعيد المجموع قبل الخصم من خلال updateTotalDisplay()
       const orderAmount = updateTotalDisplay();
 
       try {
-        // أولًا: التحقّق من القسيمة (مع تمرير رقم الجوال)
+        // استدعاء الدالة مع تمرير enteredPhone حتى وإن كان فارغًا
         const result = await redeemVoucher(code, orderAmount, enteredPhone);
 
         if (result.success) {
-          // عرض رسالة نجاح
           noteEl.classList.remove('error');
           noteEl.style.color = '#28a745';
           noteEl.textContent = `تم خصم ${result.discountAmount.toFixed(2)} ر.س`;
 
-          // احتساب المجموع النهائي وتحديث الواجهة
           const newTotal = orderAmount - result.discountAmount;
           finalTotalEl.textContent = newTotal.toFixed(2);
 
-          // جمع أسماء الشرائح المختارة
           const selectedChipNames = Array.from(
             document.querySelectorAll(".chip.active")
           ).map(chip => chip.textContent.trim());
 
-          // بناء النص لعرضه في حقل #locationDescription:
-          // "الإجمالي النهائي: XXX ر.س — خدمات مختارة: chip1, chip2, …"
           let displayString = `الإجمالي النهائي: ${newTotal.toFixed(2)} ر.س`;
           if (selectedChipNames.length > 0) {
             displayString += ` — خدمات مختارة: ${selectedChipNames.join(", ")}`;
@@ -3475,7 +3454,6 @@ document.getElementById('serviceDetails').open = false;
             descInput.value = displayString;
           }
 
-          // ثانيًا: زيادة TimesRedeemed عبر JSONP
           try {
             const incData = await incrementTimes_JSONP(code);
             if (!incData.success) {
@@ -3488,7 +3466,6 @@ document.getElementById('serviceDetails').open = false;
           }
 
         } else {
-          // إذا فشل التفعيل
           noteEl.classList.add('error');
           noteEl.style.color = '#dc3545';
           noteEl.textContent = result.message;
@@ -3503,18 +3480,14 @@ document.getElementById('serviceDetails').open = false;
       }
     });
 
-    // جلب القسائم مُسبقًا حتى يصبح vouchersCache جاهزًا
     fetchVouchersData_JSONP().catch(err => {
       console.error("خطأ أثناء تحميل القسائم JSONP:", err);
     });
 
-    // اظهار زر التفعيل لو كان الحقل معبأ مسبقًا
     if (voucherInput.value.trim().length > 0) {
       redeemBtn.classList.add('visible');
     }
   });
-
-
 
 
 
