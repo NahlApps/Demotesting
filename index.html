@@ -3049,339 +3049,177 @@ function startTimer(duration, display) {
 
 
 
-<!-- افتراضياً: مكان إدراج هذه السكربتات داخل صفحة HTML -->
+    // ----------------------
+    // 1) مبالغ الجروب: خدمة رئيسية + رقائق
+    // ----------------------
+    let serviceSum = 0; // السعرُ المستخرجُ من <select id="service">
+    let chipSum    = 0; // مجموعُ أسعارِ الشِرائحِ ذاتِ الصنفِ “.chip.active”
 
-
-  // ----------------------
-  // 1) مبالغ الجروب: خدمة رئيسية + رقائق
-  // ----------------------
-  let serviceSum = 0; // السعرُ المستخرجُ من <select id="service">
-  let chipSum    = 0; // مجموعُ أسعارِ الشِرائحِ ذاتِ الصنفِ “.chip.active”
-
-  // ----------------------
-  // 2) دالة مساعدة: استخراجُ الأرقام من نصٍ ينتهي بـ "– <digits> ريال"
-  // ----------------------
-  function extractPriceFromText(text) {
-    const match = text.trim().match(/[-–]\s*(\d+)\s*ريال/);
-    return match ? parseInt(match[1], 10) : 0;
-  }
-
-  // ----------------------
-  // 3) دالة مساعدة: قراءةُ عددِ السياراتِ من <select id="serviceCount">
-  // ----------------------
-  function getServiceCount() {
-    const select = document.getElementById("serviceCount");
-    if (!select) return 1;
-    const val = parseInt(select.value, 10);
-    return isNaN(val) || val < 1 ? 1 : val;
-  }
-
-  // ----------------------
-  // 4) دالةٌ لحسابِ وعرضِ الإجمالي الفرعي والمجموع النهائي (قبل الخصم)
-  // ----------------------
-  function updateTotalDisplay() {
-    // 1) حسابُ مجموعِ الخدمةِ الأساسيةِ + مجموعِ الرقائق
-    const baseSum = serviceSum + chipSum;
-
-    // 2) الحصولُ على عددِ السيارات
-    const count = getServiceCount();
-
-    // 3) حسابُ المجموع النهائي = baseSum × عددِ السيارات
-    const finalTotal = baseSum * count;
-
-    // ▶ تحديثُ <span id="orderSubtotal">
-    const subtotalEl = document.getElementById("orderSubtotal");
-    if (subtotalEl) {
-      subtotalEl.textContent = finalTotal.toFixed(2);
+    // ----------------------
+    // 2) دالة مساعدة: استخراجُ الأرقام من نصٍ ينتهي بـ "– <digits> ريال"
+    // ----------------------
+    function extractPriceFromText(text) {
+      const match = text.trim().match(/[-–]\s*(\d+)\s*ريال/);
+      return match ? parseInt(match[1], 10) : 0;
     }
 
-    // ▶ تحديثُ <span id="finalTotal"> ليتساوى مع الاجمالي الفرعي قبل تفعيل القسيمة
-    const finalTotalEl = document.getElementById("finalTotal");
-    if (finalTotalEl) {
-      finalTotalEl.textContent = finalTotal.toFixed(2);
+    // ----------------------
+    // 3) دالة مساعدة: قراءةُ عددِ السياراتِ من <select id="serviceCount">
+    // ----------------------
+    function getServiceCount() {
+      const select = document.getElementById("serviceCount");
+      if (!select) return 1;
+      const val = parseInt(select.value, 10);
+      return isNaN(val) || val < 1 ? 1 : val;
     }
 
-    // 4) جمعُ أسماءِ الشِرائحِ ذاتِ الصنفِ "chip active"
-    const selectedChipNames = Array.from(
-      document.querySelectorAll(".chip.active")
-    ).map(chip => chip.textContent.trim());
+    // ----------------------
+    // 4) دالةٌ لحسابِ وعرضِ الإجمالي الفرعي والمجموع النهائي (قبل وبعد الخصم)
+    // ----------------------
+    function updateTotalDisplay(discountAmount = 0) {
+      // 1) حسابُ مجموعِ الخدمةِ الأساسيةِ + مجموعِ الشرائح
+      const baseSum = serviceSum + chipSum;
 
-    // 5) بناءُ النصِّ المعروضِ داخلِ <input id="locationDescription">
-    let displayString;
-    if (selectedChipNames.length === 0) {
-      displayString = `الإجمالي: ${finalTotal} ريال`;
-    } else {
-      const joinedChips = selectedChipNames.join(", ");
-      displayString = `خدمات مختارة: ${joinedChips} — الإجمالي: ${finalTotal} ريال`;
-    }
+      // 2) الحصولُ على عددِ السيارات
+      const count = getServiceCount();
 
-    const descInput = document.getElementById("locationDescription");
-    if (descInput) {
-      descInput.value = displayString;
-    }
+      // 3) حسابُ المجموع النهائي = baseSum × عددِ السيارات
+      const subTotal = baseSum * count;
 
-    return finalTotal;
-  }
+      // 4) حسابُ المجموع بعد الخصم (إذا وُجد)
+      const finalTotal = Math.max(subTotal - discountAmount, 0);
 
-  // ----------------------
-  // 5) ربطُ حدثِ زرِّ "تفعيل القسيمة" بعد تحميل DOM
-  // ----------------------
-  document.addEventListener("DOMContentLoaded", () => {
-    const voucherInput = document.getElementById("voucher");
-    const redeemBtn    = document.getElementById("redeemBtn");
-    const noteEl       = document.getElementById("voucherNote");
-    const finalTotalEl = document.getElementById("finalTotal");
-
-    if (!voucherInput || !redeemBtn || !noteEl || !finalTotalEl) {
-      console.error("عنصر أو أكثر مفقود من DOM.");
-      return;
-    }
-
-    // عند الكتابةِ في حقلِ القسيمة: نظّف الرسالة وأظهر/أخفِ زرَّ التفعيل
-    voucherInput.addEventListener("input", () => {
-      noteEl.textContent = "";
-      noteEl.classList.remove("error");
-      if (voucherInput.value.trim().length > 0) {
-        redeemBtn.classList.add("visible");
-      } else {
-        redeemBtn.classList.remove("visible");
+      // ▶ تحديثُ <span id="orderSubtotal">
+      const subtotalEl = document.getElementById("orderSubtotal");
+      if (subtotalEl) {
+        subtotalEl.textContent = subTotal.toFixed(2);
       }
-    });
 
-    // عند الضغطِ على زرِّ "تفعيل"
-    redeemBtn.addEventListener("click", async () => {
-      const code = voucherInput.value.trim();
-      if (!code) {
-        alert("يرجى إدخال كود الخصم أولاً");
+      // ▶ تحديثُ <span id="finalTotal">
+      const finalTotalEl = document.getElementById("finalTotal");
+      if (finalTotalEl) {
+        finalTotalEl.textContent = finalTotal.toFixed(2);
+      }
+
+      // 5) إعادة القيمة الفرعية (قبل الخصم) للاستخدام في دوال أخرى
+      return subTotal;
+    }
+
+    // ----------------------
+    // 5) عند تحميل الصفحة: إعداد الأحداث اللازمة
+    // ----------------------
+    document.addEventListener("DOMContentLoaded", () => {
+      const serviceSelect = document.getElementById("service");
+      const countSelect   = document.getElementById("serviceCount");
+      const chips         = document.querySelectorAll(".chip");
+      const voucherInput  = document.getElementById("voucher");
+      const redeemBtn     = document.getElementById("redeemBtn");
+      const noteEl        = document.getElementById("voucherNote");
+      const finalTotalEl  = document.getElementById("finalTotal");
+
+      if (!serviceSelect || !countSelect || !redeemBtn || !noteEl || !finalTotalEl) {
+        console.error("عنصر أو أكثر مفقود من DOM.");
         return;
       }
 
-      // ▶ إعادة حساب الإجمالي الفرعي (مع الشِرائح وعدد السيارات)
-      const totalBeforeDiscount = updateTotalDisplay();
-
-      try {
-        // استدعاءُ الدالةِ للتحققِ من القسيمةِ وحسابِ قيمة الخصم
-        const result = await redeemVoucher(code, totalBeforeDiscount);
-
-        if (result.success) {
-          noteEl.classList.remove("error");
-          noteEl.textContent = `تم خصم ${result.discountAmount.toFixed(2)} ريال`;
-
-          // حسابُ المجموعِ النهائي بعدَ الخصم
-          const discountedTotal = totalBeforeDiscount - result.discountAmount;
-
-          // تحديثُ "المجموع النهائي"
-          if (finalTotalEl) {
-            finalTotalEl.textContent = discountedTotal.toFixed(2);
-          }
-
-          // جمعُ أسماءِ الشِرائحِ المختارة
-          const selectedChipNames = Array.from(
-            document.querySelectorAll(".chip.active")
-          ).map(chip => chip.textContent.trim());
-
-          // بناء النص لعرضه في #locationDescription:
-          // "الإجمالي النهائي: XXX ريال — خدمات مختارة: chip1, chip2, ..."
-          let displayString = `الإجمالي النهائي: ${discountedTotal.toFixed(2)} ريال`;
-          if (selectedChipNames.length > 0) {
-            displayString += ` — خدمات مختارة: ${selectedChipNames.join(", ")}`;
-          }
-
-          // تحديثُ حقلِ #locationDescription
-          const descInput = document.getElementById("locationDescription");
-          if (descInput) {
-            descInput.value = displayString;
-          }
-
-        } else {
-          noteEl.classList.add("error");
-          noteEl.textContent = result.message || "كودُ القسيمة غير صالح.";
-
-          // في حالةِ الخطأ: إعادةُ "المجموع النهائي" إلى الإجمالي الفرعي
-          if (finalTotalEl) {
-            finalTotalEl.textContent = totalBeforeDiscount.toFixed(2);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        noteEl.classList.add("error");
-        noteEl.textContent = "حصل خطأ أثناء محاولة تفعيل الكود.";
-
-        // إعادةُ "المجموع النهائي" إلى الإجمالي الفرعي
-        if (finalTotalEl) {
-          finalTotalEl.textContent = totalBeforeDiscount.toFixed(2);
-        }
-      }
-    });
-
-    // إذا كان الحقلُ معبأً مسبقًا، أظهر زرَّ التفعيل
-    if (voucherInput.value.trim().length > 0) {
-      redeemBtn.classList.add("visible");
-    }
-
-    // ▶ ربطُ حدثِ تغيير عدد السيارات لإعادة الحساب
-    const countSelect = document.getElementById("serviceCount");
-    if (countSelect) {
-      countSelect.addEventListener("change", () => {
-        updateTotalDisplay();
-      });
-    }
-  });
-
-  // ----------------------
-  // 6) دالة addService(element): عند الضغط على شريحة (chip)
-  // ----------------------
-  function addService(element) {
-    element.classList.toggle("active");
-    const chipValue = extractPriceFromText(element.textContent);
-    if (element.classList.contains("active")) {
-      chipSum += chipValue;
-    } else {
-      chipSum -= chipValue;
-    }
-    updateTotalDisplay();
-  }
-
-  // ----------------------
-  // 7) دالة attachServiceChangeListener(): ربط مستمعين بالسعر عند بناء #service
-  // ----------------------
-  function attachServiceChangeListener() {
-    const serviceSelect = document.getElementById("service");
-    if (!serviceSelect) return;
-
-    if (serviceSelect.options.length > 0) {
-      const firstText = serviceSelect.options[serviceSelect.selectedIndex].text;
-      serviceSum = extractPriceFromText(firstText);
-      updateTotalDisplay();
-    }
-
-    serviceSelect.replaceWith(serviceSelect.cloneNode(true));
-    const freshSelect = document.getElementById("service");
-    freshSelect.addEventListener("change", function () {
+      // (أ) حساب السعر الابتدائي للخدمة المحددة افتراضيًا
       serviceSum = extractPriceFromText(
-        this.options[this.selectedIndex].text
+        serviceSelect.options[serviceSelect.selectedIndex].text
       );
       updateTotalDisplay();
-    });
-  }
 
-  // ----------------------
-  // 8) دالة servicesDropdownLoader2(data): بناء القوائم وربط الأسعار تلقائيًا
-  // ----------------------
-  function servicesDropdownLoader2(data) {
-    const categoriesID = Object.keys(data || {});
-    const categoriesNames = [];
-    for (const id of categoriesID) {
-      if (locale === "en") {
-        categoriesNames.push(data[id].category.TS_category_english_name);
-      } else {
-        categoriesNames.push(data[id].category.TS_category_arabic_name);
-      }
-    }
-    add_dropdown_list(
-      categoriesNames,
-      categoriesID,
-      "serviceCat",
-      "disabled",
-      "servicesCat"
-    );
-
-    document
-      .getElementById("serviceCat")
-      .addEventListener("change", function () {
-        const currentCategory = this.value;
-        const sortedServices = (data[currentCategory]?.services || []).sort(
-          (a, b) => a.TS_service_id - b.TS_service_id
+      // (ب) ربط حدث التغيير في قائمة الخدمات
+      serviceSelect.addEventListener("change", function () {
+        serviceSum = extractPriceFromText(
+          this.options[this.selectedIndex].text
         );
-
-        const myServicesID = [];
-        const myServiceNames = [];
-        for (let serviceObj of sortedServices) {
-          myServicesID.push(serviceObj.TS_service_id);
-          if (locale === "en") {
-            myServiceNames.push(serviceObj.TS_service_english_name);
-          } else {
-            myServiceNames.push(serviceObj.TS_service_arabic_name);
-          }
-        }
-
-        add_dropdown_list(
-          myServiceNames,
-          myServicesID,
-          "service",
-          "disabled",
-          "services"
-        );
-
-        attachServiceChangeListener();
+        // عند تغيير الخدمة، نعيد ضبط القسيمة (في حال تم تفعيلها مسبقًا)
+        noteEl.textContent = "";
+        redeemBtn.classList.remove("visible");
+        updateTotalDisplay();
       });
 
-    document
-      .getElementById("serviceCat")
-      .dispatchEvent(new Event("change"));
-  }
+      // (ج) عند تغيير عدد السيارات
+      countSelect.addEventListener("change", () => {
+        // نعيد أيضًا خلو حقل القسيمة
+        noteEl.textContent = "";
+        redeemBtn.classList.remove("visible");
+        updateTotalDisplay();
+      });
 
-  // ----------------------
-  // 9) حدث تغيُّر المنطقة (#area): جلب الخدمات وبناء القوائم وإخفاء المؤشرات
-  // ----------------------
-  $("#area").on("change", () => {
-    document.getElementById("page3-1-spinner").style.display = "block";
-    document.getElementById("page3-2-spinner").style.display = "block";
+      // (د) إظهار/إخفاء زر "تفعيل" عند الكتابة في حقل القسيمة
+      voucherInput.addEventListener("input", () => {
+        noteEl.textContent = "";
+        noteEl.classList.remove("error");
+        if (voucherInput.value.trim().length > 0) {
+          redeemBtn.classList.add("visible");
+        } else {
+          redeemBtn.classList.remove("visible");
+        }
+      });
 
-    document.getElementById("serviceCat").innerHTML = "";
-    document.getElementById("service").innerHTML = "";
+      // (هـ) عند الضغط على زر "تفعيل الكود"
+      redeemBtn.addEventListener("click", async () => {
+        const code = voucherInput.value.trim();
+        if (!code) {
+          alert("يرجى إدخال كود الخصم أولاً");
+          return;
+        }
 
-    callContent2(
-      `/services?location=${document.getElementById("area").value}`,
-      (data) => {
-        const services = data.data.services;
-        const serviceCategories = data.data.servicesCat;
+        // ▶ إعادة حساب المجموع الفرعي قبل الخصم
+        const subtotal = updateTotalDisplay();
 
-        const categoriesWithServices = {};
-        services.forEach((service) => {
-          const cid = service.TS_category_id;
-          if (!categoriesWithServices[cid]) {
-            categoriesWithServices[cid] = {
-              category: serviceCategories.find(
-                (cat) => cat.TS_category_id === cid
-              ),
-              services: [],
-              locations: new Set(),
-            };
+        try {
+          // استدعاء دالة التحقق من القسيمة (يجب أن تنفذها بنفسك؛ هنا نستخدم هئية تمثيلية)
+          const result = await redeemVoucher(code, subtotal);
+
+          if (result.success) {
+            noteEl.classList.remove("error");
+            noteEl.textContent = `تم خصم ${result.discountAmount.toFixed(2)} ريال`;
+
+            // إعادة احتساب وإظهار المجموع النهائي بعد الخصم
+            updateTotalDisplay(result.discountAmount);
+
+            // إذا نجح التفعيل، يمكن أيضًا زيادة "TimesRedeemed" عبر JSONP (optional)
+            try {
+              await incrementTimes_JSONP(code);
+            } catch (_) {
+              console.warn("فشل تحديث TimesRedeemed عبر JSONP.");
+            }
+          } else {
+            noteEl.classList.add("error");
+            noteEl.textContent = result.message || "كودُ القسيمة غير صالح.";
+            // عرض الفرعي فقط دون خصم
+            updateTotalDisplay(0);
           }
-          categoriesWithServices[cid].services.push(service);
-          (service.location || []).forEach((loc) => {
-            categoriesWithServices[cid].locations.add(loc);
-          });
-        });
-
-        for (let j = 0; j < services.length; j++) {
-          const elt = services[j];
-          translations.ar["services"][
-            elt.TS_service_english_name.toLowerCase()
-          ] = elt.TS_service_arabic_name;
-          translations.en["services"][
-            elt.TS_service_english_name.toLowerCase()
-          ] = elt.TS_service_english_name;
+        } catch (err) {
+          console.error(err);
+          noteEl.classList.add("error");
+          noteEl.textContent = "حصل خطأ أثناء محاولة تفعيل الكود.";
+          updateTotalDisplay(0);
         }
-        for (let j = 0; j < serviceCategories.length; j++) {
-          const elt = serviceCategories[j];
-          translations.ar["servicesCat"][
-            elt.TS_category_english_name.toLowerCase()
-          ] = elt.TS_category_arabic_name;
-          translations.en["servicesCat"][
-            elt.TS_category_english_name.toLowerCase()
-          ] = elt.TS_category_english_name;
-        }
+      });
 
-        servicesDropdownLoader2(categoriesWithServices);
+      // (و) البدء بتحميل (أو جلب) بيانات القسائم مقدمًا إذا رغبتَ
+      fetchVouchersData_JSONP().catch(err => {
+        console.error("فشل تحميل بيانات القسائم:", err);
+      });
+    });
 
-        document.getElementById("page3-1-spinner").style.display = "none";
-        document.getElementById("page3-2-spinner").style.display = "none";
-      },
-      true
-    );
-  });
+    // ----------------------
+    // 6) دالة addService(element): عند الضغط على شريحة (chip)
+    // ----------------------
+    function addService(element) {
+      element.classList.toggle("active");
+      const chipValue = extractPriceFromText(element.textContent);
+      if (element.classList.contains("active")) {
+        chipSum += chipValue;
+      } else {
+        chipSum -= chipValue;
+      }
+      // بعد إضافة/حذف الشريحة، إعادة حساب الإجمالي بدون خصم
+      updateTotalDisplay();
+    }
 
   // ---------------------------------------------------
   // 1) رابط Web App في Apps Script بعد إعادة النشر
