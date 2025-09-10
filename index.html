@@ -877,7 +877,7 @@
       loadLocations();
       setMinToday();
       // preload header dates
-      (function presetDates(){ const ev = new Event('change'); document.getElementById('date').dispatchEvent(ev); })();
+      // (function presetDates(){ const ev = new Event('change'); document.getElementById('date').dispatchEvent(ev); })();
 
       document.getElementById('show-my-location').addEventListener('click', detectMyLocation);
       document.getElementById('page4-return').addEventListener('click', ()=>{ document.getElementById('page4').style.display='none'; document.getElementById('page2').style.display='flex'; });
