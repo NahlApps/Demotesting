@@ -45,6 +45,8 @@
       --shadow-md:0 10px 30px rgba(5,28,59,.15);
       --shadow-sm:0 6px 16px rgba(5,28,59,.10);
       --transition:.32s cubic-bezier(.22,.61,.36,1);
+      --header-h:68px;
+      --footer-h:74px;
     }
 
     *{box-sizing:border-box}
@@ -57,32 +59,78 @@
       min-height:100vh;
       display:flex;
       flex-direction:column;
+      padding-top:var(--header-h);
+      padding-bottom:var(--footer-h);
     }
 
-    /* ======= HEADER / MAIN / FOOTER LAYOUT ======= */
+    /* ======= HEADER ======= */
     header{
-      width:100%;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:28px 14px 8px;
+      position:sticky; top:0; z-index:50;
+      display:flex; justify-content:center; align-items:center;
+      height:var(--header-h);
+      background:rgba(2, 56, 70, .38);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.15);
+      box-shadow:0 10px 30px rgba(0,0,0,.12);
     }
-    header .brand img{ width:190px; filter: drop-shadow(0 6px 20px rgba(0,0,0,.25)); }
+    header .container{
+      max-width:1120px; width:100%; padding:0 12px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    header .brand img{ width:160px; filter: drop-shadow(0 6px 20px rgba(0,0,0,.25)); }
+    header .mini-progress{
+      display:flex; align-items:center; gap:10px; min-width:180px; width:40%;
+    }
+    .mini-progress .bar{
+      flex:1; height:6px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden;
+    }
+    .mini-progress .bar > span{
+      display:block; height:100%; width:0%; background:linear-gradient(90deg,#00b7d6,#48b5d0);
+      transition:width var(--transition);
+    }
+    .mini-progress .step{
+      font-weight:800; font-size:.95rem; color:#fff; white-space:nowrap;
+    }
 
+    /* ======= MAIN ======= */
     main{
       flex:1 0 auto;
       display:flex;
       justify-content:center;
       align-items:stretch;
-      padding:0 10px 10px;
+      padding:10px 10px 0;
     }
 
-    footer{
-      flex-shrink:0;
-      text-align:center;
-      padding:14px 10px 24px;
-      opacity:.95;
+    /* ======= FOOTER (STICKY NAV) ======= */
+    footer.sticky-nav{
+      position:sticky; bottom:0; z-index:40;
+      height:var(--footer-h);
+      background:rgba(2, 56, 70, .45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top:1px solid rgba(255,255,255,.15);
+      box-shadow:0 -10px 30px rgba(0,0,0,.12);
+      display:flex; align-items:center; justify-content:center;
     }
+    .footer-inner{
+      max-width:1120px; width:100%; padding:8px 12px;
+      display:flex; gap:10px; align-items:center;
+    }
+    .footer-actions{
+      display:flex; gap:8px; flex:1;
+    }
+    .btn-footer{
+      flex:1; border:0; border-radius:12px; padding:12px 14px; font-weight:800;
+      box-shadow:var(--shadow-sm); transition:var(--transition);
+      background:#ffffff; color:var(--brand);
+    }
+    .btn-footer.primary{ background:var(--brand); color:#fff }
+    .btn-footer:disabled{ opacity:.6; cursor:not-allowed }
+    .footer-brand{
+      display:none; align-items:center; gap:8px; color:#e0f5fb; font-weight:700;
+    }
+    @media (min-width:992px){ .footer-brand{ display:flex } }
 
     /* ======= APP SHELL ======= */
     #app{
@@ -92,7 +140,7 @@
       box-shadow:var(--shadow-lg);
     }
 
-    /* Steps + progress */
+    /* Steps (kept in main for large context view) */
     .steps-wrap{ padding:6px 18px 0 }
     nav[aria-label="Progress"]{ display:block; }
     .steps{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; padding:0; margin:0; list-style:none }
@@ -155,7 +203,7 @@
     .time-option[aria-checked="true"]{ outline:3px solid var(--brand) }
     .time-option:hover{ transform:translateY(-1px); background:#e9fbff }
 
-    /* Buttons */
+    /* Buttons in pages (kept) */
     .actions{ display:flex; gap:10px; width:100%; max-width:900px; padding:8px 14px }
     .btn-pill{
       flex:1; border:0; border-radius:12px; padding:14px 16px; font-weight:800;
@@ -200,13 +248,13 @@
       transition:transform .18s ease, box-shadow .18s ease;
     }
     .social-fab:hover{ transform:translateY(-2px) }
-    .whatsapp-button{ bottom:15px }
-    .instagram-button{ bottom:74px }
-    .tiktok-button{ bottom:133px }
+    .whatsapp-button{ bottom:calc(var(--footer-h) + 15px) }
+    .instagram-button{ bottom:calc(var(--footer-h) + 74px) }
+    .tiktok-button{ bottom:calc(var(--footer-h) + 133px) }
 
     /* Toast */
     .toast-wrap{
-      position:fixed; inset-inline:16px auto; bottom:16px; z-index:9999; max-width:420px
+      position:fixed; inset-inline:16px auto; bottom:calc(var(--footer-h) + 16px); z-index:9999; max-width:420px
     }
 
     /* Visually hidden for screen readers */
@@ -216,16 +264,22 @@
     @media (max-width:920px){ .time-container{ grid-template-columns:repeat(2,1fr) } }
     @media (max-width:520px){ .time-container{ grid-template-columns:1fr } }
     @media (prefers-reduced-motion: reduce){
-      .page, .btn-pill, .time-option, .pay-card, .progress-line > span{ transition:none!important }
+      .page, .btn-pill, .time-option, .pay-card, .progress-line > span, .mini-progress .bar > span{ transition:none!important }
     }
   </style>
 </head>
 <body>
 
-  <!-- ======================= HEADER ======================= -->
+  <!-- ======================= HEADER (Sticky) ======================= -->
   <header>
-    <div class="brand">
-      <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png" alt="Sponge & Soap"/>
+    <div class="container">
+      <div class="brand">
+        <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png" alt="Sponge & Soap"/>
+      </div>
+      <div class="mini-progress">
+        <div class="step" id="miniStepLabel">الخدمة</div>
+        <div class="bar" aria-hidden="true"><span id="miniProgressFill"></span></div>
+      </div>
     </div>
   </header>
 
@@ -484,10 +538,18 @@
     </div>
   </main>
 
-  <!-- ======================= FOOTER ======================= -->
-  <footer>
-    <div>Sponge & Soap</div>
-    <a target="_blank" href="https://www.instagram.com/nahl.app">Made with Nahl Perfection</a>
+  <!-- ======================= FOOTER (Sticky Nav) ======================= -->
+  <footer class="sticky-nav">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <i class="fa-solid fa-soap"></i>
+        <span>Sponge & Soap</span>
+      </div>
+      <div class="footer-actions">
+        <button id="footerPrev" class="btn-footer">السابق</button>
+        <button id="footerNext" class="btn-footer primary">التالي</button>
+      </div>
+    </div>
   </footer>
 
   <!-- Social FABs -->
@@ -540,18 +602,35 @@
     let currentPage = document.querySelector('.page.active');
     const progressEl = document.querySelector('.progress-line');
     const progressFill = document.getElementById('progressFill');
+    const miniProgressFill = document.getElementById('miniProgressFill');
+    const miniStepLabel = document.getElementById('miniStepLabel');
     const stepPills = [...document.querySelectorAll('.step-pill')];
     const ariaErrors = document.getElementById('ariaErrors');
+
+    // Footer nav refs
+    const footerPrev = document.getElementById('footerPrev');
+    const footerNext = document.getElementById('footerNext');
+
+    const pageNames = {
+      page1:'الخدمة', page2:'الخدمة', page3:'الوقت', page4:'الوقت',
+      page5:'البيانات', page6:'الموقع', page7:'التأكيد'
+    };
 
     const progressByPage = { page1:0, page2:20, page3:40, page4:60, page5:80, page6:90, page7:100 };
     function setProgress(pageId){
       const pct = progressByPage[pageId] ?? 0;
       progressFill.style.width = pct + '%';
+      miniProgressFill.style.width = pct + '%';
       progressEl.setAttribute('aria-valuenow', pct);
-      const activeIx = ['page1','page2','page3','page4','page5','page6','page7'].indexOf(pageId);
+      miniStepLabel.textContent = pageNames[pageId] || 'الحجز';
+
+      const order=['page1','page2','page3','page4','page5','page6','page7'];
+      const activeIx = order.indexOf(pageId);
       stepPills.forEach((p, idx)=> p.classList.toggle('active', idx <= Math.min(activeIx,4)));
       stepPills.forEach((p, idx)=> p.removeAttribute('aria-current'));
       if(activeIx>=0 && activeIx<=4) stepPills[activeIx].setAttribute('aria-current', 'step');
+
+      updateFooterButtons();
     }
 
     function goTo(pageId){
@@ -589,7 +668,6 @@
       date:'', time:'', location:'', service:'', serviceCount:'', serviceCat:'',
       customerM:'', customerN:'', paymentMethod:'', urlLocation:'', locationDescription:''
     };
-    let appointments=[[],[],[]], ActualTimes=[[],[],[]], timesLoaded=false;
 
     // Price index for preview
     let servicesIndexById = {}; // { serviceId: {name, price, vat, total} }
@@ -676,6 +754,7 @@
           $('#sumVat').text(`${data.vat.toFixed(2)} ر.س`);
           $('#sumTotal').text(`${data.total.toFixed(2)} ر.س`);
           $('#pricePreview').show();
+          updateFooterButtons();
         });
 
         $('#serviceCat').trigger('change');
@@ -711,7 +790,7 @@
     function renderTimeOptions(arr, dateISO){
       const group = document.getElementById('timeRadios');
       group.innerHTML = '';
-      if(!arr.length){ group.innerHTML = '<div class="text-center text-muted">لا توجد مواعيد متاحة</div>'; return; }
+      if(!arr.length){ group.innerHTML = '<div class="text-center text-muted">لا توجد مواعيد متاحة</div>'; updateFooterButtons(); return; }
 
       const now = DateTime.now();
       const isToday = DateTime.fromISO(dateISO).hasSame(now, 'day');
@@ -737,10 +816,12 @@
           nForm.date = dateISO;
           nForm.time = t.toFormat('HH:mm');
           toast('تم اختيار الوقت', 'success');
+          updateFooterButtons(); // enable footer next
           setTimeout(()=> goTo('page5'), 250);
         });
         group.appendChild(btn);
       });
+      updateFooterButtons();
     }
 
     function loadAppointmentsFor(isoDate){
@@ -760,7 +841,7 @@
     }
 
     document.getElementById('date').setAttribute('min', DateTime.now().toFormat('yyyy-MM-dd'));
-    document.getElementById('date').addEventListener('change', (e)=> loadAppointmentsFor(e.target.value));
+    document.getElementById('date').addEventListener('change', (e)=> { loadAppointmentsFor(e.target.value); updateFooterButtons(); });
     document.getElementById('page4-return').onclick = ()=> goTo('page2');
 
     /* ============================================================
@@ -795,6 +876,7 @@
         $('#err-name').text('رجاءً أدخل اسمًا صحيحًا.').show();
         ariaErrors.textContent = 'رجاءً أدخل اسمًا صحيحًا.';
       } else $('#err-name').hide();
+      updateFooterButtons();
     });
 
     $('#plateNumber').on('input', function(){
@@ -803,7 +885,7 @@
         $('#err-plate').text('أدخل من 1 إلى 4 أرقام.').show();
         ariaErrors.textContent = 'أدخل من 1 إلى 4 أرقام.';
       } else $('#err-plate').hide();
-      updateLocationDescription();
+      updateLocationDescription(); updateFooterButtons();
     });
 
     const carBrands=["Acura","Alfa Romeo","Aston Martin","Audi","Bentley","BMW","Bugatti","Buick","Cadillac","Chevrolet","Chrysler","Citroën","Dacia","Daewoo","Daihatsu","Dodge","Ferrari","Fiat","Ford","Genesis","GMC","Haval","Holden","Honda","Hummer","Hyundai","Infiniti","Isuzu","Jaguar","Jeep","Kia","Koenigsegg","Lada","Lamborghini","Lancia","Land Rover","Lexus","Lincoln","Lotus","Maserati","Maybach","Mazda","McLaren","Mercedes-Benz","Mercury","MG","Mini","Mitsubishi","Nissan","Opel","Pagani","Peugeot","Plymouth","Pontiac","Porsche","RAM","Renault","Rolls-Royce","Saab","Saturn","Scion","Seat","Skoda","Smart","SsangYong","Subaru","Suzuki","Tata","Tesla","Toyota","Volkswagen","Volvo","Wiesmann","Zotye"].sort();
@@ -824,6 +906,7 @@
         document.querySelectorAll('#payRadios .pay-card').forEach(x=> x.setAttribute('aria-checked','false'));
         btn.setAttribute('aria-checked','true');
         selectedPay = btn.dataset.value;
+        updateFooterButtons();
       });
     });
 
@@ -870,6 +953,7 @@
       const svc = servicesIndexById[serviceId] || {name: chosenServiceReadable, total: 0};
       const dateStr = nForm.date || '';
       const timeStr = nForm.time || '';
+
       chosenAreaReadable = areaText;
       chosenServiceReadable = svc.name || chosenServiceReadable;
 
@@ -880,6 +964,7 @@
       $('#sumTime').text(timeStr || '—');
       $('#sumPay').text(nForm.paymentMethod || '—');
       $('#sumTotalInline').text(svc.total ? `${svc.total.toFixed(2)} ر.س` : '—');
+      updateFooterButtons();
     }
 
     /* ============================================================
@@ -887,7 +972,7 @@
     ============================================================ */
     let polygon=null, map=null, marker=null, infoWindow=null, geocoder=null, placesAC=null;
     let defaultLocation={lat:26.34165524787632, lng:50.11524831545726};
-    let position="", insideServiceArea=false, submitting=false;
+    let position="", insideServiceArea=false;
     const prePosition = "https://www.google.com/maps/search/?api=1&query=";
     let mapsLoaded = false, mapsLoadingPromise = null;
 
@@ -941,6 +1026,7 @@
     function setNextEnabled(can){
       const btn = document.getElementById('page6-button');
       btn.disabled = !can; btn.style.opacity = can ? '1' : '.6';
+      updateFooterButtons();
     }
 
     function updateAddressPreview(latLng){
@@ -1014,7 +1100,7 @@
       document.getElementById('addressPreview').style.display='none';
     }
 
-    $('#area').on('change', ()=>{ if(map) setBoundaries(); });
+    $('#area').on('change', ()=>{ if(map) setBoundaries(); updateFooterButtons(); });
 
     function detectMyLocation(){
       if(!map){ toast('الخريطة لم تكتمل بعد', 'error'); return; }
@@ -1112,6 +1198,98 @@
 
     // Navigation from Page1
     document.getElementById('page1-button').addEventListener('click', ()=> setProgress('page2'));
+
+    /* ============================================================
+       FOOTER STICKY NAV: context-aware prev/next
+    ============================================================ */
+    function updateFooterButtons(){
+      const id = currentPage.id;
+
+      // Default states
+      let prevEnabled = true, nextEnabled = true, nextLabel = 'التالي';
+
+      switch(id){
+        case 'page1':
+          prevEnabled = false;
+          nextEnabled = true;
+          break;
+        case 'page2':
+          // require area + service to enable next
+          nextEnabled = !!($('#area').val() && $('#service').val());
+          break;
+        case 'page3':
+          // loading screen — allow next (auto goes to page4)
+          nextEnabled = true;
+          break;
+        case 'page4':
+          // next requires choosing time (nForm.date & nForm.time set on click)
+          nextEnabled = !!(nForm.date && nForm.time);
+          break;
+        case 'page5':
+          // next requires name, phone valid, and payment selected
+          const nameOk = ($('#name').val() || '').trim().length >= 2;
+          const phoneOk = ( ()=> {
+            try{ return !!(iti.isValidNumber()); }catch(_){ return false; }
+          })();
+          const payOk = !!(document.querySelector('#payRadios .pay-card[aria-checked="true"]'));
+          nextEnabled = nameOk && phoneOk && payOk;
+          break;
+        case 'page6':
+          // next is confirm; needs insideServiceArea
+          nextLabel = 'تأكيد';
+          nextEnabled = !!insideServiceArea;
+          break;
+        case 'page7':
+          prevEnabled = false;
+          nextEnabled = false;
+          break;
+      }
+
+      footerPrev.disabled = !prevEnabled;
+      footerNext.disabled = !nextEnabled;
+      footerNext.textContent = nextLabel;
+    }
+
+    function footerNavigate(which){
+      const id = currentPage.id;
+      if(which==='prev'){
+        switch(id){
+          case 'page1': /* none */ break;
+          case 'page2': goTo('page1'); break;
+          case 'page3': document.getElementById('page3-return').click(); break;
+          case 'page4': document.getElementById('page4-return').click(); break;
+          case 'page5': document.getElementById('page5-return').click(); break;
+          case 'page6': document.getElementById('page6-return').click(); break;
+          case 'page7': /* none */ break;
+        }
+      } else {
+        switch(id){
+          case 'page1': document.getElementById('page1-button').click(); break;
+          case 'page2': document.getElementById('page2-button').click(); break;
+          case 'page3': document.getElementById('page3-button').click(); break;
+          case 'page4':
+            // Only proceed if a time is chosen (guarded by disabled state)
+            if(!footerNext.disabled) goTo('page5');
+            break;
+          case 'page5': document.getElementById('page5-button').click(); break;
+          case 'page6': document.getElementById('page6-button').click(); break;
+          case 'page7': /* none */ break;
+        }
+      }
+      updateFooterButtons();
+    }
+
+    footerPrev.addEventListener('click', ()=> footerNavigate('prev'));
+    footerNext.addEventListener('click', ()=> footerNavigate('next'));
+
+    // Also re-evaluate footer buttons on relevant input changes
+    ['area','service','serviceCat','serviceCount','name','carName','plateNumber','date'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('input', updateFooterButtons);
+      if(el) el.addEventListener('change', updateFooterButtons);
+    });
+
+    // Payment selection already calls updateFooterButtons inside its handler
   </script>
 
 </body>
