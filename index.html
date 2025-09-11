@@ -383,31 +383,33 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    function renderTimes(items){
-      const cont = document.getElementById('time-container');
-      cont.innerHTML = '';
-      selectedTime = null;
+function renderTimes(items){
+  const cont = document.getElementById('time-container');
+  cont.innerHTML = '';
+  selectedTime = null;
 
-      if (!items.length){
-        cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>';
-        return;
-      }
-      items.forEach(t=>{
-        const btn = document.createElement('button');
-        btn.className = 'time-option';
-        btn.type = 'button';
-        btn.setAttribute('role','radio');
-        btn.setAttribute('aria-label', `${t.ui} — Available`);
-        btn.innerHTML = `<div>${t.ui}</div>`;
-        btn.addEventListener('click', ()=>{
-          [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
-          btn.setAttribute('aria-checked','true');
-          selectedTime = t;
-          nForm.time = t.iso.slice(0,5); // HH:mm
-        });
-        cont.appendChild(btn);
-      });
-    }
+  if (!items.length){
+    cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>';
+    return;
+  }
+
+  items.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.className = 'time-option';
+    btn.type = 'button';
+    btn.setAttribute('role','radio');
+    btn.setAttribute('aria-label', `${t.ui} — Available`);
+    btn.innerHTML = `<div>${t.ui}</div>`;
+    btn.addEventListener('click', ()=>{
+      [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
+      btn.setAttribute('aria-checked','true');
+      selectedTime = t;
+      nForm.time = t.iso.slice(0,5); // HH:mm
+    });
+    cont.appendChild(btn);
+  });
+}
+
 
     // Fetch times filtered by area + service, show only Available
 function fetchAndRenderTimes(){
