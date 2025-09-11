@@ -410,56 +410,56 @@
     }
 
     // Fetch times filtered by area + service, show only Available
-    function fetchAndRenderTimes(){
-      setLoadingTimes(true);
-      const startDate=document.getElementById('date').value||DateTime.now().toFormat('yyyy-LL-dd');
-      const loc=document.getElementById('area').value||'';
-      const srv=document.getElementById('service').value||'';
+function fetchAndRenderTimes(){
+  setLoadingTimes(true);
+  const startDate = document.getElementById('date').value || luxon.DateTime.now().toFormat('yyyy-LL-dd');
+  const loc = document.getElementById('area').value || '';
+  const srv = document.getElementById('service').value || '';
 
-      callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
-        const appts=(res?.data?.appointments||[]);
-        const items = appts.map(a=>{
-          const rawTime = a.TS_appointment_time || a.time || a.TS_time || a.appointment_time;
-          let t = luxon.DateTime.fromISO(rawTime || '', { setZone:true });
-          if(!t.isValid) t = luxon.DateTime.fromFormat(String(rawTime||''), 'HH:mm:ss');
-          if(!t.isValid) t = luxon.DateTime.fromFormat(String(rawTime||''), 'H:mm');
+  callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
+    const appts = (res?.data?.appointments || []);
 
-          const statusStr = String(a.status ?? a.TS_status ?? '').toLowerCase();
-          const availableFlag = a.available ?? a.isAvailable ?? a.TS_available ?? a.TS_is_available;
-          const bookedFlag    = a.booked   ?? a.isBooked    ?? a.TS_is_booked ?? a.TS_booked;
+    // Normalize & interpret API fields
+    const items = appts.map(a=>{
+      const rawTime = a.TS_appointment_time || a.time || a.TS_time || a.appointment_time;
+      let t = luxon.DateTime.fromISO(rawTime || '', { setZone:true });
+      if(!t.isValid) t = luxon.DateTime.fromFormat(String(rawTime||''), 'HH:mm:ss');
+      if(!t.isValid) t = luxon.DateTime.fromFormat(String(rawTime||''), 'H:mm');
 
-          let isBooked;
-          if (bookedFlag !== undefined) {
-            isBooked = !!bookedFlag;
-          } else if (availableFlag !== undefined) {
-            isBooked = !availableFlag;
-          } else if (statusStr) {
-            isBooked = /booked|appointed|unavailable|full|busy/.test(statusStr);
-          } else {
-            isBooked = false;
-          }
+      // Decide if booked or available using common flags
+      const statusStr     = String(a.status ?? a.TS_status ?? '').toLowerCase();
+      const availableFlag = a.available ?? a.isAvailable ?? a.TS_available ?? a.TS_is_available;
+      const bookedFlag    = a.booked   ?? a.isBooked    ?? a.TS_is_booked ?? a.TS_booked;
 
-          return {
-            ui: t.isValid ? t.toLocaleString(luxon.DateTime.TIME_SIMPLE) : (rawTime || ''),
-            iso: t.isValid ? t.toFormat('HH:mm') : String(rawTime || ''),
-            booked: isBooked
-          };
-        }).filter(x=>x.iso);
+      let isBooked;
+      if (bookedFlag !== undefined)      isBooked = !!bookedFlag;
+      else if (availableFlag !== undefined) isBooked = !availableFlag;
+      else if (statusStr)                isBooked = /booked|appointed|unavailable|full|busy/.test(statusStr);
+      else                               isBooked = false; // default: treat as available
 
-        // Merge duplicates preferring available
-        const merged={};
-        items.forEach(it=>{
-          if(!merged[it.iso]) merged[it.iso]=it;
-          if(merged[it.iso].booked && !it.booked) merged[it.iso]=it;
-        });
+      return {
+        ui:  t.isValid ? t.toLocaleString(luxon.DateTime.TIME_SIMPLE) : (rawTime || ''),
+        iso: t.isValid ? t.toFormat('HH:mm') : String(rawTime || ''),
+        booked: isBooked
+      };
+    }).filter(x => x.iso); // keep only valid times
 
-        const sorted = Object.values(merged).sort((a,b)=> a.iso.localeCompare(b.iso));
-        const onlyAvailable = sorted.filter(x=>!x.booked);
+    // Deduplicate by time, prefer available over booked
+    const merged = {};
+    items.forEach(it=>{
+      if(!merged[it.iso]) merged[it.iso] = it;
+      if(merged[it.iso].booked && !it.booked) merged[it.iso] = it;
+    });
 
-        renderTimes(onlyAvailable);
-        setLoadingTimes(false);
-      }, true);
-    }
+    // ✅ show ONLY available times
+    const onlyAvailable = Object.values(merged)
+      .filter(x => !x.booked)
+      .sort((a,b)=> a.iso.localeCompare(b.iso));
+
+    renderTimes(onlyAvailable);
+    setLoadingTimes(false);
+  }, true);
+}
 
     function validateMobile(){
       if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
