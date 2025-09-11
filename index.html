@@ -417,81 +417,83 @@
     }
 
     /* Time rendering with Available/Appointed labels */
-    function renderTimes(items){
-      const cont = document.getElementById('time-container');
-      cont.innerHTML = '';
-      selectedTime = null;
+function renderTimes(items){
+  const cont = document.getElementById('time-container');
+  cont.innerHTML = '';
+  selectedTime = null;
 
-      if (!items.length){
-        cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>';
-        return;
-      }
+  if (!items.length){
+    cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>';
+    return;
+  }
 
-      items.forEach(t=>{
-        const isBooked = !!t.booked;
+  items.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.className = 'time-option';
+    btn.type = 'button';
+    btn.setAttribute('role','radio');
+    btn.setAttribute('aria-label', `${t.ui} — Available`);
 
-        const btn = document.createElement('button');
-        btn.className = 'time-option';
-        btn.type = 'button';
+    btn.innerHTML = `
+      <div>${t.ui}</div>
+      <span class="status-badge available">Available</span>
+    `;
 
-        const statusText = isBooked ? 'Appointed' : 'Available';
-        btn.setAttribute('aria-label', `${t.ui} — ${statusText}`);
+    btn.addEventListener('click', ()=>{
+      [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
+      btn.setAttribute('aria-checked','true');
+      selectedTime = t;
+      nForm.time = t.iso.slice(0,5); // HH:mm
+    });
 
-        btn.innerHTML = `
-          <div>${t.ui}</div>
-          <span class="status-badge ${isBooked ? 'appointed' : 'available'}">${statusText}</span>
-        `;
+    cont.appendChild(btn);
+  });
+}
 
-        if (isBooked){
-          btn.setAttribute('aria-disabled','true');
-          btn.disabled = true;
-          btn.title = 'Appointed';
-        } else {
-          btn.setAttribute('role','radio');
-          btn.addEventListener('click', ()=>{
-            [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
-            btn.setAttribute('aria-checked','true');
-            selectedTime = t;
-            nForm.time = t.iso.slice(0,5); // HH:mm
-          });
-        }
-
-        cont.appendChild(btn);
-      });
-    }
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
     // Fetch times filtered by area + service, mark booked via API flags
-    function fetchAndRenderTimes(){
-      setLoadingTimes(true);
-      const startDate=document.getElementById('date').value||DateTime.now().toFormat('yyyy-LL-dd');
-      const loc=document.getElementById('area').value||'';
-      const srv=document.getElementById('service').value||'';
-      callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
-        const appts=(res?.data?.appointments||[]);
-        const items = appts.map(a=>{
-          const t=luxon.DateTime.fromISO(a.TS_appointment_time||a.time||a.TS_time,{setZone:true});
-          // derive "booked" using common API variants:
-          const availableFlag =
-            (a.available ?? a.isAvailable ?? a.TS_available ?? a.TS_is_available);
-          const statusStr = (a.status||a.TS_status||'').toString().toLowerCase();
-          const isAvailable = (availableFlag===true) || (statusStr==='available');
-          return {
-            ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE),
-            iso: t.toFormat('HH:mm'),
-            booked: !isAvailable
-          };
-        });
-        // de-duplicate by time keeping free over booked if duplicates exist
-        const merged={};
-        items.forEach(it=>{
-          if(!merged[it.iso]) merged[it.iso]=it;
-          if(merged[it.iso].booked && !it.booked) merged[it.iso]=it;
-        });
-        renderTimes(Object.values(merged)); setLoadingTimes(false);
-      }, true);
-    }
+function fetchAndRenderTimes(){
+  setLoadingTimes(true);
+  const startDate = document.getElementById('date').value || DateTime.now().toFormat('yyyy-LL-dd');
+  const loc       = document.getElementById('area').value || '';
+  const srv       = document.getElementById('service').value || '';
+
+  callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
+    const appts = (res?.data?.appointments || []);
+
+    // Map API → normalized items
+    const mapped = appts.map(a=>{
+      const t = luxon.DateTime.fromISO(a.TS_appointment_time || a.time || a.TS_time, { setZone:true });
+
+      // Availability detection (keep both styles you’ve seen)
+      const availableFlag = (a.available ?? a.isAvailable ?? a.TS_available ?? a.TS_is_available);
+      const statusStr     = (a.status || a.TS_status || '').toString().toLowerCase();
+      const isAvailable   = (availableFlag === true) || (statusStr === 'available');
+
+      return {
+        ui:  t.toLocaleString(luxon.DateTime.TIME_SIMPLE),
+        iso: t.toFormat('HH:mm'),
+        booked: !isAvailable
+      };
+    });
+
+    // De-duplicate by time (prefer available over booked if duplicates exist)
+    const merged = {};
+    mapped.forEach(it=>{
+      if(!merged[it.iso]) merged[it.iso] = it;
+      if(merged[it.iso].booked && !it.booked) merged[it.iso] = it;
+    });
+
+    // 🚫 Filter to available only
+    const availableOnly = Object.values(merged).filter(x => !x.booked);
+
+    renderTimes(availableOnly);
+    setLoadingTimes(false);
+  }, true);
+}
+
 
     function validateMobile(){
       if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
