@@ -75,13 +75,13 @@
     }
     .header-inner{max-width:1120px; width:100%; padding:0 var(--sp-3); display:flex; align-items:center; justify-content:space-between}
     .brand{display:flex; align-items:center; gap:var(--sp-2)}
-    .brand img{height:60px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
-    @media (max-width:520px){ .brand img{height:52px} }
+    .brand img{height:56px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
+    @media (max-width:520px){ .brand img{height:50px} }
 
-    .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:56%}
+    .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:60%}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
-    .mini-progress .bar>span{display:block; height:100%; width:14%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
+    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
 
     /* ===== Main ===== */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
@@ -92,7 +92,7 @@
     .step-pill{background:rgba(255,255,255,.25); color:#fff; font-weight:var(--fw-bold); font-size:var(--fs-md); padding:8px 14px; border-radius:var(--radius-pill)}
     .step-pill.active{background:var(--brand-700)}
     .progress-line{height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden; width:calc(100% - 28px); margin:var(--sp-2) auto 0}
-    .progress-line>span{display:block; height:100%; width:14%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
+    .progress-line>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
 
     .stage{position:relative; min-height:540px; padding:var(--sp-2) 0 var(--sp-3)}
     .page{
@@ -190,7 +190,7 @@
       display:inline-block; margin-bottom:var(--sp-2);
       font-size:var(--fs-sm); font-weight:var(--fw-bold); color:var(--ink-700);
     }
-    .iti { width: 100% !important; } /* wrapper */
+    .iti { width: 100% !important; }
     #mobile.form-control{
       min-height:48px; height:48px; line-height:48px; text-align:center;
       border-radius:var(--radius-md); border:1px solid var(--border-300);
@@ -200,10 +200,8 @@
       border-color:var(--brand-600);
       box-shadow:0 0 0 3px var(--brand-200); outline:0;
     }
-    /* RTL: flag & dial on the right */
     html[dir="rtl"] .iti--allow-dropdown .iti__flag-container { right:0; left:auto; }
     html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control { padding-right:62px; padding-left:12px; text-align:center; }
-    /* LTR fallback */
     html[dir="ltr"] .iti--allow-dropdown .iti__flag-container { left:0; right:auto; }
     html[dir="ltr"] .iti--allow-dropdown input#mobile.form-control { padding-left:62px; padding-right:12px; }
     .iti__flag-container .iti__selected-flag{ height:48px; padding-inline:10px; }
@@ -218,8 +216,8 @@
   <header>
     <div class="header-inner">
       <div class="mini-progress" aria-hidden="true">
-        <div class="bar"><span style="width:14%"></span></div>
-        <div class="step">الخدمة</div>
+        <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
+        <div class="step" id="miniStepTitle">الترحيب</div>
       </div>
       <div class="brand">
         <img alt="Sponge & Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png"/>
@@ -231,14 +229,16 @@
   <main>
     <div id="app">
       <div class="steps-wrap">
+        <!-- Now includes the Welcome pill -->
         <ul class="steps" aria-label="خطوات الحجز">
-          <li class="step-pill active">الخدمة</li>
+          <li class="step-pill active">الترحيب</li>
+          <li class="step-pill">الخدمة</li>
           <li class="step-pill">الوقت</li>
           <li class="step-pill">البيانات</li>
           <li class="step-pill">الموقع</li>
           <li class="step-pill">التأكيد</li>
         </ul>
-        <div class="progress-line"><span style="width:14%"></span></div>
+        <div class="progress-line"><span id="mainBarFill" style="width:0%"></span></div>
       </div>
 
       <div class="stage">
@@ -247,7 +247,7 @@
           <h1>✨ غسيل بدون طوابير</h1>
           <div class="card text-center">
             <p class="mb-3" style="color:var(--ink-700)">واكس يحمي سيارتك • فوط نظيفة • إسفنجة للكفرات</p>
-            <button id="page1-button" class="btn btn-primary" type="button">احجز موعدك</button>
+            <button id="page1-button" class="btn btn-primary" type="button">ابدأ الحجز</button>
           </div>
         </section>
 
@@ -313,7 +313,7 @@
                 <input id="name" type="text" class="form-control" placeholder="اسمك الكريم"/>
               </div>
 
-              <!-- Updated Mobile field (size & label unified) -->
+              <!-- Mobile field (consistent size + label) -->
               <div class="col-12 col-md-6 form-block">
                 <label for="mobile" class="form-label">رقم الجوال</label>
                 <input id="mobile" type="tel" class="form-control" placeholder="+9665…"/>
@@ -435,6 +435,7 @@
        ========================= */
     const DateTime = luxon.DateTime;
     const orderedPages = ["page1","page2","page3","page4","page5","page6","page7"];
+    const STEPS_LABELS = ["الترحيب","الخدمة","الوقت","البيانات","الموقع","التأكيد","انتهى"];
     let selectedTime = null;
     let positionUrl = "";
     let servicesCache = null;
@@ -447,7 +448,6 @@
       urlLocation:'', locationDescription:''
     };
 
-    /* Mobile inline validation helper */
     function validateMobileInline() {
       const mobileEl = document.getElementById('mobile');
       const mobileHint = document.getElementById('mobileHint');
@@ -461,9 +461,6 @@
       return true;
     }
 
-    /* =========================
-       UI HELPERS
-       ========================= */
     function showPage(idx){
       const current = document.querySelector('.page.active');
       const next = document.getElementById(orderedPages[idx]);
@@ -481,16 +478,18 @@
       return Math.max(0, orderedPages.indexOf(id));
     }
     function syncProgress(i){
+      // percentage based on number of steps (pages)
       const pct = ((i+1)/orderedPages.length)*100;
-      document.querySelectorAll(".mini-progress .bar>span, .progress-line>span").forEach(el=>el.style.width = pct+"%");
-      const labels = ["الخدمة","الوقت","البيانات","الموقع","التأكيد","انتهى","انتهى"];
-      document.querySelector(".mini-progress .step").textContent = labels[Math.min(i,labels.length-1)];
-      document.querySelectorAll(".step-pill").forEach((pill,idx)=>pill.classList.toggle("active", idx===i));
-      const prev = document.getElementById('footer-prev');
-      const next = document.getElementById('footer-next');
-      prev.disabled = (i===0);
-      next.textContent = (i>=orderedPages.length-2) ? "تأكيد" : "التالي";
-      if(i===orderedPages.length-1){ next.textContent = "إنهاء"; }
+      document.getElementById('miniBarFill').style.width = pct+"%";
+      document.getElementById('mainBarFill').style.width = pct+"%";
+
+      // header title
+      document.getElementById('miniStepTitle').textContent = STEPS_LABELS[Math.min(i, STEPS_LABELS.length-1)];
+
+      // pills highlight (we have 6 visible pills – map indices accordingly)
+      const pillIndexMap = [0,1,2,3,4,5,5]; // page7 maps to "التأكيد"
+      const pills = document.querySelectorAll(".step-pill");
+      pills.forEach((pill, idx)=>pill.classList.toggle("active", idx===pillIndexMap[i]));
     }
 
     function renderTimes(list){
@@ -514,9 +513,6 @@
       });
     }
 
-    /* =========================
-       LOAD & INIT
-       ========================= */
     $(function(){
       // date defaults & min
       const today = DateTime.now().toFormat('yyyy-LL-dd');
@@ -528,19 +524,15 @@
       $('#service').select2({width:'100%', placeholder:'الخدمة'});
       $('#carBrand').select2({width:'100%', placeholder:'ماركة السيارة'});
 
-      // phone input (keep instance)
+      // phone input
       itiPhone = window.intlTelInput(document.querySelector("#mobile"), {
         initialCountry:"sa",
         onlyCountries:["sa","ae","bh","kw","om","qa"],
         utilsScript:"https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js"
       });
-
-      // Inline validation hooks
       const mobileEl = document.getElementById('mobile');
       mobileEl.addEventListener('blur', validateMobileInline);
-      mobileEl.addEventListener('input', () => {
-        if (mobileEl.getAttribute('aria-invalid') === 'true') validateMobileInline();
-      });
+      mobileEl.addEventListener('input', () => { if (mobileEl.getAttribute('aria-invalid') === 'true') validateMobileInline(); });
 
       // CTA
       document.getElementById('page1-button').addEventListener('click', ()=>showPage(1));
@@ -602,11 +594,11 @@
 
       // Rebook
       document.getElementById('rebook').addEventListener('click', ()=>location.href='/');
+
+      // Initial sync
+      syncProgress(0);
     });
 
-    /* =========================
-       TIMES (API)
-       ========================= */
     function fetchAndRenderTimes(){
       const startDate = document.getElementById('date').value || DateTime.now().toFormat('yyyy-LL-dd');
       const loc = document.getElementById('area').value;
@@ -625,9 +617,6 @@
       }, true);
     }
 
-    /* =========================
-       FOOTER NAV
-       ========================= */
     (function footerNav(){
       const $prev = document.getElementById("footer-prev");
       const $next = document.getElementById("footer-next");
@@ -663,11 +652,9 @@
         }
 
         if(id==="page5"){
-          // gather + validate
           const name = document.getElementById('name').value.trim();
           if(!name) return;
-
-          if(!validateMobileInline()) return;
+          if(!(window.intlTelInputUtils && itiPhone) || !validateMobileInline()) return;
 
           nForm.customerN = name;
           nForm.customerM = itiPhone.getNumber().replace(/^\+/, '');
@@ -677,7 +664,6 @@
             document.getElementById('plateNumber').value||''
           ].filter(Boolean).join(', ');
 
-          // payment required
           if(!nForm.paymentMethod) return;
 
           showPage(5); return;
@@ -708,7 +694,6 @@
           return;
         }
 
-        // default forward
         showPage(Math.min(i+1, orderedPages.length-1));
       });
 
@@ -745,7 +730,6 @@
     }
     window.initMap = initMap;
 
-    // Ensure min date is today on load (fallback)
     document.addEventListener('DOMContentLoaded', ()=>{
       const today = DateTime.now().toFormat('yyyy-LL-dd');
       document.getElementById("date").setAttribute("min", today);
