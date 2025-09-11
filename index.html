@@ -31,7 +31,7 @@
       padding-top:var(--header-h); padding-bottom:var(--footer-h);
     }
 
-    /* ========== Header ========== */
+    /* Header */
     header{
       position:sticky; top:0; z-index:50; height:var(--header-h);
       background:rgba(2,56,70,.38); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
@@ -40,9 +40,7 @@
     }
     .header-inner{max-width:1120px; width:100%; padding:0 12px; display:flex; align-items:center; justify-content:space-between}
     .brand{display:flex; align-items:center; gap:10px}
-    .brand img{
-      height:50px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));
-    }
+    .brand img{height:50px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
     @media (min-width:576px){ .brand img{height:56px} }
     @media (min-width:992px){ .brand img{height:62px} }
 
@@ -51,7 +49,7 @@
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,#00b7d6,#48b5d0); transition:width var(--transition)}
     .mini-progress .step{font-weight:800; font-size:1rem}
 
-    /* ========== Body ========== */
+    /* Body */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 10px 0}
     #app{width:100%; max-width:1120px}
 
@@ -105,7 +103,7 @@
     @media (min-width:576px){ #googleMap{height:430px} }
     .inline-error{margin-top:8px; padding:8px 10px; border-radius:10px; color:#7f1d1d; background:#fee2e2; border:1px solid #fecaca; display:none}
 
-    /* ========== Footer (single method nav) ========== */
+    /* Footer nav */
     footer.sticky-nav{
       position:sticky; bottom:0; z-index:40; height:var(--footer-h);
       background:rgba(2,56,70,.45); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
@@ -119,7 +117,7 @@
     .btn-footer:disabled{opacity:.6; cursor:not-allowed}
     #footer-next.is-confirm{background:#0f766e}
 
-    /* Hide any page-local nav buttons (we use footer only) */
+    /* Hide any page-local nav buttons (footer only) */
     [id^="page"][id$="-button"], [id^="page"][id$="-return"]{display:none!important}
 
     /* Social FABs */
@@ -327,6 +325,7 @@
     let positionUrl = "";
     let servicesCache = null;
     let categoriesCache = null;
+    let itiPhone = null; // << store phone input instance
 
     const nForm = {
       date:'', time:'', location:'', service:'', serviceCount:'1',
@@ -397,9 +396,10 @@
       $('#service').select2({width:'100%', placeholder:'الخدمة'});
       $('#carBrand').select2({width:'100%', placeholder:'ماركة السيارة'});
 
-      // phone
-      window.intlTelInput(document.querySelector("#mobile"), {
-        initialCountry:"sa", onlyCountries:["sa","ae","bh","kw","om","qa"],
+      // phone (store instance)
+      itiPhone = window.intlTelInput(document.querySelector("#mobile"), {
+        initialCountry:"sa",
+        onlyCountries:["sa","ae","bh","kw","om","qa"],
         utilsScript:"https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js"
       });
 
@@ -408,9 +408,7 @@
 
       // fetch locations
       callContent2(`/locations`, (res)=>{
-        const data = (res && res.data) ? res.data : {data:[]};
-        const list = (data || {}).data || res.data;
-        if(!list) return;
+        const list = res?.data || [];
         const ds = list.map(l=>({id:l.id, text:l.TS_location_arabic_name}));
         $('#area').empty().select2({data:ds, width:'100%'});
         if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
@@ -440,13 +438,6 @@
           ?.map(s=>({id:s.TS_service_id, text:s.TS_service_arabic_name})) || [];
         $('#service').empty().select2({data:items, width:'100%'});
         if(items.length){ $('#service').val(items[0].id).trigger('change'); }
-      });
-
-      // when service changes → prefetch times for selected date
-      $('#service').on('change', function(){
-        nForm.service = this.value;
-        // force going to loading page > then times
-        // (actual load is in footer-next click on page3)
       });
 
       // date change → refresh times (if we’re already on page4)
@@ -481,17 +472,15 @@
       const startDate = document.getElementById('date').value || DateTime.now().toFormat('yyyy-LL-dd');
       const loc = document.getElementById('area').value;
       const srv = document.getElementById('service').value;
-      // show loader quickly
+
       document.getElementById('time-container').innerHTML =
         '<div class="text-center" style="grid-column:1/-1"><div class="spinner-border text-info" role="status"><span class="visually-hidden">Loading…</span></div></div>';
 
       callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
         const appts = res?.data?.appointments || [];
-        // normalize to [{ui:"9:15 PM", iso:"21:15"}]
         const items = appts.map(a=>{
-          const timeISO = luxon.DateTime.fromISO(a.TS_appointment_time, { setZone:true }).toFormat('HH:mm');
-          const ui = luxon.DateTime.fromISO(a.TS_appointment_time, { setZone:true }).toLocaleString(luxon.DateTime.TIME_SIMPLE);
-          return { ui, iso: timeISO };
+          const t = luxon.DateTime.fromISO(a.TS_appointment_time, { setZone:true });
+          return { ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso: t.toFormat('HH:mm') };
         });
         renderTimes(items);
       }, true);
@@ -508,20 +497,16 @@
         if(orderedPages[i]==="page1"){ showPage(1); return; }
 
         if(orderedPages[i]==="page2"){
-          // validate minimal
-          if(!nForm.location || !nForm.service){ return; }
+          if(!nForm.location || !document.getElementById('service').value){ return; }
+          nForm.service = document.getElementById('service').value;
           nForm.serviceCount = document.getElementById('serviceCount').value || '1';
-          showPage(2); // page3 (loading)
-          // kick times load and after done go to page4
-          fetchAndRenderTimes();
-          setTimeout(()=>showPage(3), 350); // small delay to show loading state
+          showPage(2);            // page3 (loading)
+          fetchAndRenderTimes();  // fetch times
+          setTimeout(()=>showPage(3), 350);
           return;
         }
 
-        if(orderedPages[i]==="page3"){
-          // already fetched → go to times
-          showPage(3); return;
-        }
+        if(orderedPages[i]==="page3"){ showPage(3); return; } // to page4
 
         if(orderedPages[i]==="page4"){
           if(!selectedTime){
@@ -536,21 +521,30 @@
         }
 
         if(orderedPages[i]==="page5"){
-          // gather form
+          // gather + validate
           const name = document.getElementById('name').value.trim();
           if(!name) return;
-          const iti = window.intlTelInputGlobals.getInstance(document.getElementById('mobile'));
-          if(!iti || !iti.isValidNumber()) return;
+
+          // use stored instance (fix)
+          if(!itiPhone || !itiPhone.isValidNumber()) return;
 
           nForm.customerN = name;
-          nForm.customerM = iti.getNumber().substring(1); // without +
-          nForm.locationDescription = [$('#carBrand').val()||'', document.getElementById('carName').value||'', document.getElementById('plateNumber').value||''].filter(Boolean).join(', ');
+          nForm.customerM = itiPhone.getNumber().substring(1); // strip '+'
+          nForm.locationDescription = [
+            $('#carBrand').val()||'',
+            document.getElementById('carName').value||'',
+            document.getElementById('plateNumber').value||''
+          ].filter(Boolean).join(', ');
+
           showPage(5); return;
         }
 
         if(orderedPages[i]==="page6"){
-          // submit reservation
-          if(!positionUrl){ document.getElementById('polyError').textContent='الرجاء تحديد الموقع'; document.getElementById('polyError').style.display='block'; return; }
+          if(!positionUrl){
+            const e = document.getElementById('polyError');
+            e.textContent='الرجاء تحديد الموقع'; e.style.display='block';
+            return;
+          }
           nForm.urlLocation = positionUrl;
 
           try{
@@ -562,10 +556,10 @@
             const json = await res.json();
             if(json?.success){ showPage(6); } else { throw new Error('Reservation failed'); }
           }catch(e){
-            // bounce back to page4 with message (matches your original behavior)
-            showPage(3); // to keep flow simple
-            document.getElementById('fail-alert-3').style.display='block';
-            document.getElementById('fail-alert-3').textContent='عذرًا حصل خطأ غير متوقع الرجاء المحاولة لاحقًا';
+            showPage(3);
+            const err = document.getElementById('fail-alert-3');
+            err.style.display='block';
+            err.textContent='عذرًا حصل خطأ غير متوقع الرجاء المحاولة لاحقًا';
           }
           return;
         }
