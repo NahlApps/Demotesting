@@ -16,14 +16,13 @@
     :root{
       --brand-700:#01657A; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --ink-700:#224652; --surface-000:#FFF; --surface-100:#EDF3F6; --border-300:#D4E0E6;
-      --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-pill:999px;
+      --radius-md:14px; --radius-pill:999px;
       --shadow-sm:0 2px 8px rgba(11,38,48,.08); --shadow-md:0 10px 28px rgba(11,38,48,.14);
       --ease:cubic-bezier(.22,.61,.36,1); --t-med:.28s var(--ease);
       --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
       --header-h:76px; --footer-h:78px;
     }
-    *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
@@ -44,7 +43,6 @@
     .header-inner{max-width:1120px; width:100%; padding:0 var(--sp-3); display:flex; align-items:center; justify-content:space-between}
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
-    @media (max-width:520px){ .brand img{height:50px} }
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:60%}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
@@ -92,7 +90,7 @@
     .time-option:hover{transform:translateY(-1px); background:var(--brand-050)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
-    /* Overlay Loading inside time card */
+    /* Overlay Loading */
     .load-overlay{
       position:absolute; inset:0; background:rgba(255,255,255,.85); color:#0B2630;
       display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md);
@@ -125,7 +123,6 @@
     }
     .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
 
-    /* Phone field unify */
     .form-block{margin-bottom:var(--sp-5)}
     .form-label{display:inline-block; margin-bottom:6px; font-size:var(--fs-sm); font-weight:var(--fw-bold); color:#224652}
     .iti{width:100%!important}
@@ -134,7 +131,7 @@
     html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{padding-right:62px}
     .field-hint{margin-top:6px; font-size:.85rem; color:#B42318; display:none}
 
-    /* Hide page-local nav */
+    /* Hide page-local nav btns (نستخدم أزرار الفوتر فقط) */
     [id^="page"][id$="-button"], [id^="page"][id$="-return"]{display:none!important}
 
     .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;margin:-1px}
@@ -208,7 +205,7 @@
           </div>
         </section>
 
-        <!-- 3) Time (with inline overlay) -->
+        <!-- 3) Time -->
         <section id="page4" class="page" aria-label="اختيار الموعد">
           <h1>متى تحب نجيك؟</h1>
           <div class="card position-relative" id="timeCard">
@@ -221,8 +218,6 @@
 
             <div class="position-relative mt-3">
               <div id="time-container" class="time-grid"></div>
-
-              <!-- Overlay تحميل -->
               <div id="timeLoading" class="load-overlay">
                 <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
                 <strong>جاري جلب المواعيد…</strong>
@@ -346,9 +341,8 @@
 
     /* STATE */
     const DateTime=luxon.DateTime;
-    const orderedPages=["page1","page2","page4","page5","page6","page7"]; // لا توجد صفحة انتظار مستقلة
+    const orderedPages=["page1","page2","page4","page5","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","التأكيد"];
-    const pillIndexMap=[0,1,2,3,4,5,5]; // للحماية لو توسّعت
     let selectedTime=null, positionUrl="";
     let servicesCache=null, categoriesCache=null, itiPhone=null;
 
@@ -374,8 +368,7 @@
 
     function renderTimes(items){
       const cont=document.getElementById('time-container');
-      cont.innerHTML='';
-      selectedTime=null;
+      cont.innerHTML=''; selectedTime=null;
       if(!items.length){ cont.innerHTML='<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>'; return; }
       items.forEach(t=>{
         const b=document.createElement('button');
@@ -384,27 +377,38 @@
         cont.appendChild(b);
       });
     }
-    function setLoadingTimes(on){
-      const ov=document.getElementById('timeLoading');
-      ov.classList.toggle('show', !!on);
-    }
+    function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
+
+    // NEW: Fetch times filtered by area + service, and available-only
     function fetchAndRenderTimes(){
       setLoadingTimes(true);
       const startDate=document.getElementById('date').value||DateTime.now().toFormat('yyyy-LL-dd');
-      const loc=document.getElementById('area').value; const srv=document.getElementById('service').value;
+      const loc=document.getElementById('area').value||'';
+      const srv=document.getElementById('service').value||'';
       callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
-        const appts=res?.data?.appointments||[];
-        const items=appts.map(a=>{
-          const t=luxon.DateTime.fromISO(a.TS_appointment_time,{setZone:true});
+        const appts=(res?.data?.appointments||[])
+          // keep only available ones (defensive for different API field names)
+          .filter(a=>{
+            if(a==null) return false;
+            if(a.available===false || a.isAvailable===false || a.TS_available===false || a.TS_is_available===false) return false;
+            if(typeof a.status==='string' && a.status.toLowerCase()!=='available') return false;
+            return true;
+          });
+
+        const items = appts.map(a=>{
+          const t=luxon.DateTime.fromISO(a.TS_appointment_time||a.time||a.TS_time,{setZone:true});
           return {ui:t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso:t.toFormat('HH:mm')};
         });
-        renderTimes(items); setLoadingTimes(false);
+
+        // remove duplicates just in case
+        const uniq = Array.from(new Map(items.map(it=>[it.iso,it])).values());
+        renderTimes(uniq); setLoadingTimes(false);
       }, true);
     }
 
     function validateMobileInline(){
-      const mobileEl=document.getElementById('mobile'); const hint=document.getElementById('mobileHint');
-      if(itiPhone && !itiPhone.isValidNumber()){ hint.style.display='block'; return false; }
+      const hint=document.getElementById('mobileHint');
+      if(!itiPhone || !itiPhone.isValidNumber()){ hint.style.display='block'; return false; }
       hint.style.display='none'; return true;
     }
 
@@ -412,23 +416,20 @@
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
-      // select2
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة'});
       $('#serviceCat').select2({width:'100%',placeholder:'التصنيف'});
       $('#service').select2({width:'100%',placeholder:'الخدمة'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة'});
 
-      // phone
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
       $('#mobile').on('blur input', validateMobileInline);
 
-      // CTA
       $('#page1-button').on('click', ()=>showPage(1));
 
-      // Load locations
+      // load locations
       callContent2(`/locations`, res=>{
         const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
         $('#area').empty().select2({data:ds,width:'100%'}); if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
@@ -451,10 +452,10 @@
         $('#service').empty().select2({data:items,width:'100%'}); if(items.length){ $('#service').val(items[0].id).trigger('change'); }
       });
 
-      // date change refresh times (if on page4)
-      $('#date').on('change', ()=>{ if(getActiveIndex()===2) fetchAndRenderTimes(); });
+      // on service/date change, refresh times if user في صفحة الوقت
+      $('#service, #date').on('change', ()=>{ if(getActiveIndex()===2) fetchAndRenderTimes(); });
 
-      // car brands
+      // brands
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands,width:'100%'});
 
@@ -485,8 +486,8 @@
         if(id==='page2'){
           if(!$('#area').val() || !$('#service').val()) return;
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          showPage(2);        // الوقت
-          fetchAndRenderTimes();
+          showPage(2);               // إلى صفحة الوقت
+          fetchAndRenderTimes();     // جلب المواعيد (حسب المنطقة والخدمة)
           return;
         }
 
@@ -494,16 +495,22 @@
           if(!selectedTime){ $('#fail-alert-3').text('الرجاء اختيار وقت.').show(); return; }
           $('#fail-alert-3').hide();
           nForm.date=$('#date').val();
-          showPage(3); return;
+          showPage(3);               // إلى صفحة البيانات
+          return;
         }
 
         if(id==='page5'){
-          const name=$('#name').val().trim(); if(!name) return;
-          if(!(window.intlTelInputUtils && itiPhone) || !itiPhone.isValidNumber()) return;
-          nForm.customerN=name; nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
-          nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
+          const name=$('#name').val().trim();
+          if(!name) return;
+          if(!itiPhone || !itiPhone.isValidNumber()){ validateMobileInline(); return; }
           if(!nForm.paymentMethod) return;
-          showPage(4); return;
+
+          nForm.customerN=name;
+          nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
+          nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
+
+          showPage(4);               // ✅ ينتقل الآن مباشرة لصفحة الخريطة
+          return;
         }
 
         if(id==='page6'){
@@ -547,7 +554,7 @@
     });
   </script>
 
-  <!-- Google Maps (replace key if needed) -->
+  <!-- Google Maps (استبدل المفتاح إذا لزم) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap" async defer></script>
 </body>
 </html>
