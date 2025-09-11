@@ -55,13 +55,6 @@
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
     #app{width:100%; max-width:1120px}
 
-    .steps-wrap{padding:var(--sp-2) var(--sp-3) 0}
-    .steps{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; list-style:none; margin:0; padding:0}
-    .step-pill{background:rgba(255,255,255,.25); color:#fff; font-weight:var(--fw-bold); font-size:var(--fs-md); padding:8px 14px; border-radius:var(--radius-pill)}
-    .step-pill.active{background:var(--brand-700)}
-    .progress-line{height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden; width:calc(100% - 28px); margin:10px auto 0}
-    .progress-line>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
-
     .stage{position:relative; min-height:560px; padding:8px 0 20px}
     .page{
       position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
@@ -166,17 +159,7 @@
   <!-- Body -->
   <main>
     <div id="app">
-      <div class="steps-wrap">
-        <ul class="steps" aria-label="خطوات الحجز">
-          <li class="step-pill active">الترحيب</li>
-          <li class="step-pill">الخدمة</li>
-          <li class="step-pill">الوقت</li>
-          <li class="step-pill">البيانات</li>
-          <li class="step-pill">الموقع</li>
-          <li class="step-pill">التأكيد</li>
-        </ul>
-        <div class="progress-line"><span id="mainBarFill" style="width:0%"></span></div>
-      </div>
+      <!-- (Removed steps list & progress bar from body as requested) -->
 
       <div class="stage">
         <!-- 1) Welcome -->
@@ -391,10 +374,7 @@
     function syncProgress(i){
       const pct=((i+1)/orderedPages.length)*100;
       document.getElementById('miniBarFill').style.width=pct+'%';
-      document.getElementById('mainBarFill').style.width=pct+'%';
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
-      const pills=document.querySelectorAll('.step-pill');
-      pills.forEach((p,idx)=>p.classList.toggle('active', idx===Math.min(i,5)));
       // Hide prev on welcome
       document.getElementById('footer-prev').classList.toggle('hidden', i===0);
     }
@@ -438,8 +418,6 @@
 
       callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
         const appts=(res?.data?.appointments||[]);
-        // console.debug('API /appointments raw:', appts);
-
         const items = appts.map(a=>{
           const rawTime = a.TS_appointment_time || a.time || a.TS_time || a.appointment_time;
           let t = luxon.DateTime.fromISO(rawTime || '', { setZone:true });
@@ -450,7 +428,6 @@
           const availableFlag = a.available ?? a.isAvailable ?? a.TS_available ?? a.TS_is_available;
           const bookedFlag    = a.booked   ?? a.isBooked    ?? a.TS_is_booked ?? a.TS_booked;
 
-          // Decide availability (default to available if unclear)
           let isBooked;
           if (bookedFlag !== undefined) {
             isBooked = !!bookedFlag;
@@ -467,7 +444,7 @@
             iso: t.isValid ? t.toFormat('HH:mm') : String(rawTime || ''),
             booked: isBooked
           };
-        }).filter(x=>x.iso); // valid-ish
+        }).filter(x=>x.iso);
 
         // Merge duplicates preferring available
         const merged={};
@@ -577,7 +554,7 @@
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
           showPage(2);               // إلى صفحة الوقت
-          fetchAndRenderTimes();     // جلب المواعيد (حسب المنطقة والخدمة)
+          fetchAndRenderTimes();     // جلب المواعيد
           return;
         }
 
@@ -641,7 +618,9 @@
         positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
       };
       marker.addListener('dragend',e=>setPos(e.latLng));
-      map.addListener('click',e=>setPos(e.latLng));
+      map.addEventListener?.('click',e=>setPos(e.latLng));  // fallback
+      google.maps.event.addListener(map,'click',e=>setPos(e.latLng)); // standard
+
       document.getElementById('show-my-location').addEventListener('click', ()=>{
         if(navigator.geolocation){
           navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true));
