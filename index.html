@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>حجوزات المواعيد</title>
 
   <!-- UI libs -->
@@ -89,8 +89,11 @@
     }
     .time-option:hover{transform:translateY(-1px); background:var(--brand-050)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
+    .time-option[aria-disabled="true"]{
+      background:#F6F7F8; color:#9AA7B0; border-style:dashed; cursor:not-allowed; filter:grayscale(.2);
+    }
 
-    /* Overlay Loading */
+    /* Overlays */
     .load-overlay{
       position:absolute; inset:0; background:rgba(255,255,255,.85); color:#0B2630;
       display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md);
@@ -122,6 +125,7 @@
       background:#fff; color:var(--brand-600);
     }
     .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
+    .btn-footer.hidden{visibility:hidden}
 
     .form-block{margin-bottom:var(--sp-5)}
     .form-label{display:inline-block; margin-bottom:6px; font-size:var(--fs-sm); font-weight:var(--fw-bold); color:#224652}
@@ -129,15 +133,21 @@
     #mobile.form-control{height:48px; line-height:48px; text-align:center}
     html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{right:0}
     html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{padding-right:62px}
-    .field-hint{margin-top:6px; font-size:.85rem; color:#B42318; display:none}
 
-    /* Hide page-local nav btns (نستخدم أزرار الفوتر فقط) */
-    [id^="page"][id$="-button"], [id^="page"][id$="-return"]{display:none!important}
+    /* Toast */
+    .toast-wrap{position:fixed; top:10px; left:50%; transform:translateX(-50%); z-index:1050; display:flex; flex-direction:column; gap:8px}
+    .toast-msg{min-width:260px; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:var(--shadow-md)}
+    .toast-success{background:#16a34a}
+    .toast-error{background:#dc2626}
+    .toast-info{background:#0284c7}
 
     .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;margin:-1px}
   </style>
 </head>
 <body>
+  <!-- Toasts -->
+  <div id="toastWrap" class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
+
   <!-- Header -->
   <header>
     <div class="header-inner">
@@ -179,13 +189,12 @@
         <!-- 2) Service & Location -->
         <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
           <h1>وين تحب نجيك؟</h1>
-          <div class="card">
+
+          <div class="card position-relative" id="servicesCard">
             <label class="form-label">اختيار المنطقة</label>
             <select id="area" class="js-example-basic-single" style="width:100%"></select>
-          </div>
 
-          <div class="card">
-            <div class="row g-3">
+            <div class="row g-3 mt-3">
               <div class="col-12 col-md-6">
                 <label class="form-label">التصنيف</label>
                 <select id="serviceCat" style="width:100%"></select>
@@ -201,6 +210,12 @@
                   <option value="3">3</option><option value="4">4</option><option value="5">5</option>
                 </select>
               </div>
+            </div>
+
+            <!-- Spinner while service loads -->
+            <div id="servicesLoading" class="load-overlay">
+              <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
+              <strong>جاري تحميل الخدمات…</strong>
             </div>
           </div>
         </section>
@@ -223,8 +238,6 @@
                 <strong>جاري جلب المواعيد…</strong>
               </div>
             </div>
-
-            <div id="fail-alert-3" class="field-hint" style="display:none"></div>
           </div>
         </section>
 
@@ -240,7 +253,6 @@
               <div class="col-12 col-md-6 form-block">
                 <label for="mobile" class="form-label">رقم الجوال</label>
                 <input id="mobile" type="tel" class="form-control" placeholder="+9665…"/>
-                <div id="mobileHint" class="field-hint">الرجاء إدخال رقم جوال صالح</div>
               </div>
             </div>
           </div>
@@ -286,7 +298,6 @@
           <h1>الموقع على خريطة قوقل</h1>
           <div class="card">
             <div id="googleMap" style="width:100%;height:420px;border-radius:14px;overflow:hidden"></div>
-            <div id="polyError" class="field-hint" style="display:none">الرجاء تحديد الموقع</div>
           </div>
           <div class="card text-center">
             <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
@@ -309,7 +320,7 @@
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-actions">
-        <button id="footer-prev" type="button" class="btn-footer">السابق</button>
+        <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary">التالي</button>
       </div>
     </div>
@@ -339,6 +350,15 @@
       }catch(e){ if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),700); }
     }
 
+    /* Toast helper */
+    function showToast(type='info', msg=''){
+      const wrap=document.getElementById('toastWrap');
+      const div=document.createElement('div');
+      div.className='toast-msg '+(type==='error'?'toast-error':type==='success'?'toast-success':'toast-info');
+      div.textContent=msg; wrap.appendChild(div);
+      setTimeout(()=>{ div.style.opacity='0'; setTimeout(()=>div.remove(),300); }, 2200);
+    }
+
     /* STATE */
     const DateTime=luxon.DateTime;
     const orderedPages=["page1","page2","page4","page5","page6","page7"];
@@ -364,6 +384,8 @@
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
       const pills=document.querySelectorAll('.step-pill');
       pills.forEach((p,idx)=>p.classList.toggle('active', idx===Math.min(i,5)));
+      // Hide prev on welcome
+      document.getElementById('footer-prev').classList.toggle('hidden', i===0);
     }
 
     function renderTimes(items){
@@ -372,44 +394,46 @@
       if(!items.length){ cont.innerHTML='<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>'; return; }
       items.forEach(t=>{
         const b=document.createElement('button');
-        b.className='time-option'; b.type='button'; b.setAttribute('role','radio'); b.textContent=t.ui;
-        b.onclick=()=>{ [...cont.children].forEach(x=>x.setAttribute('aria-checked','false')); b.setAttribute('aria-checked','true'); selectedTime=t; nForm.time=t.iso.slice(0,5); };
+        b.className='time-option'; b.type='button';
+        b.textContent=t.ui;
+        if(t.booked){
+          b.setAttribute('aria-disabled','true'); b.disabled=true; b.title='محجوز';
+        }else{
+          b.setAttribute('role','radio');
+          b.onclick=()=>{ [...cont.children].forEach(x=>x.setAttribute('aria-checked','false')); b.setAttribute('aria-checked','true'); selectedTime=t; nForm.time=t.iso.slice(0,5); };
+        }
         cont.appendChild(b);
       });
     }
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
+    function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    // NEW: Fetch times filtered by area + service, and available-only
+    // Fetch times filtered by area + service, and mark booked
     function fetchAndRenderTimes(){
       setLoadingTimes(true);
       const startDate=document.getElementById('date').value||DateTime.now().toFormat('yyyy-LL-dd');
       const loc=document.getElementById('area').value||'';
       const srv=document.getElementById('service').value||'';
       callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
-        const appts=(res?.data?.appointments||[])
-          // keep only available ones (defensive for different API field names)
-          .filter(a=>{
-            if(a==null) return false;
-            if(a.available===false || a.isAvailable===false || a.TS_available===false || a.TS_is_available===false) return false;
-            if(typeof a.status==='string' && a.status.toLowerCase()!=='available') return false;
-            return true;
-          });
-
+        const appts=(res?.data?.appointments||[]);
         const items = appts.map(a=>{
           const t=luxon.DateTime.fromISO(a.TS_appointment_time||a.time||a.TS_time,{setZone:true});
-          return {ui:t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso:t.toFormat('HH:mm')};
+          const available = (a.available ?? a.isAvailable ?? a.TS_available ?? a.TS_is_available ?? (String(a.status||'').toLowerCase()==='available')) ? true : false;
+          return {ui:t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso:t.toFormat('HH:mm'), booked: !available};
         });
-
-        // remove duplicates just in case
-        const uniq = Array.from(new Map(items.map(it=>[it.iso,it])).values());
-        renderTimes(uniq); setLoadingTimes(false);
+        // de-duplicate by time; keep a booked==false if any is free
+        const merged = {};
+        items.forEach(it=>{
+          if(!merged[it.iso]) merged[it.iso]=it;
+          if(merged[it.iso].booked && !it.booked) merged[it.iso]=it;
+        });
+        renderTimes(Object.values(merged)); setLoadingTimes(false);
       }, true);
     }
 
-    function validateMobileInline(){
-      const hint=document.getElementById('mobileHint');
-      if(!itiPhone || !itiPhone.isValidNumber()){ hint.style.display='block'; return false; }
-      hint.style.display='none'; return true;
+    function validateMobile(){
+      if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
+      return true;
     }
 
     $(function(){
@@ -425,23 +449,27 @@
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
-      $('#mobile').on('blur input', validateMobileInline);
 
       $('#page1-button').on('click', ()=>showPage(1));
 
       // load locations
+      setLoadingServices(true);
       callContent2(`/locations`, res=>{
         const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
-        $('#area').empty().select2({data:ds,width:'100%'}); if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
+        $('#area').empty().select2({data:ds,width:'100%'}); 
+        if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
+        else { setLoadingServices(false); showToast('error','لا توجد مناطق متاحة حالياً'); }
       });
 
       // area -> services
       $('#area').on('change', function(){
-        nForm.location=this.value;
+        nForm.location=this.value; setLoadingServices(true);
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
           servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
-          $('#serviceCat').empty().select2({data:cats,width:'100%'}); if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
+          $('#serviceCat').empty().select2({data:cats,width:'100%'}); 
+          if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
+          setLoadingServices(false);
         }, true);
       });
 
@@ -449,7 +477,8 @@
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
         const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
-        $('#service').empty().select2({data:items,width:'100%'}); if(items.length){ $('#service').val(items[0].id).trigger('change'); }
+        $('#service').empty().select2({data:items,width:'100%'}); 
+        if(items.length){ $('#service').val(items[0].id).trigger('change'); }
       });
 
       // on service/date change, refresh times if user في صفحة الوقت
@@ -484,7 +513,8 @@
         if(id==='page1'){ showPage(1); return; }
 
         if(id==='page2'){
-          if(!$('#area').val() || !$('#service').val()) return;
+          if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
+          if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
           showPage(2);               // إلى صفحة الوقت
           fetchAndRenderTimes();     // جلب المواعيد (حسب المنطقة والخدمة)
@@ -492,8 +522,7 @@
         }
 
         if(id==='page4'){
-          if(!selectedTime){ $('#fail-alert-3').text('الرجاء اختيار وقت.').show(); return; }
-          $('#fail-alert-3').hide();
+          if(!selectedTime){ showToast('error','الرجاء اختيار وقت.'); return; }
           nForm.date=$('#date').val();
           showPage(3);               // إلى صفحة البيانات
           return;
@@ -501,28 +530,29 @@
 
         if(id==='page5'){
           const name=$('#name').val().trim();
-          if(!name) return;
-          if(!itiPhone || !itiPhone.isValidNumber()){ validateMobileInline(); return; }
-          if(!nForm.paymentMethod) return;
+          if(!name){ showToast('error','يرجى إدخال الاسم'); return; }
+          if(!validateMobile()) return;
+          if(!nForm.paymentMethod){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
 
           nForm.customerN=name;
           nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
 
-          showPage(4);               // ✅ ينتقل الآن مباشرة لصفحة الخريطة
+          showPage(4);               // إلى صفحة الخريطة
           return;
         }
 
         if(id==='page6'){
-          if(!positionUrl){ $('#polyError').show(); return; }
+          if(!positionUrl){ showToast('error','الرجاء تحديد الموقع على الخريطة'); return; }
           nForm.urlLocation=positionUrl;
 
           try{
             const res=await fetch(defaultLink2 + '/reserveAppointment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nForm)});
             const json=await res.json();
-            if(json?.success){ showPage(5); } else { throw new Error('fail'); }
+            if(json?.success){ showToast('success','تم إنشاء الحجز'); showPage(5); } 
+            else { showToast('error', json?.msgAR || 'حدث خطأ غير متوقع'); }
           }catch(e){
-            showPage(2); $('#fail-alert-3').text('عذرًا حصل خطأ غير متوقع الرجاء المحاولة لاحقًا').show();
+            showToast('error','عذرًا حصل خطأ غير متوقع، حاول لاحقًا');
           }
           return;
         }
@@ -539,7 +569,7 @@
       const def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-      const setPos=(latLng,pan=false)=>{ marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; $('#polyError').hide(); };
+      const setPos=(latLng,pan=false)=>{ marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; };
       marker.addListener('dragend',e=>setPos(e.latLng));
       map.addListener('click',e=>setPos(e.latLng));
       document.getElementById('show-my-location').addEventListener('click', ()=>{
@@ -554,7 +584,7 @@
     });
   </script>
 
-  <!-- Google Maps (استبدل المفتاح إذا لزم) -->
+  <!-- Google Maps -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap" async defer></script>
 </body>
 </html>
