@@ -1,123 +1,176 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>حجوزات المواعيد</title>
 
-  <!-- UI libs -->
+  <!-- External UI libs -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css"/>
+  <link href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css" rel="stylesheet"/>
 
   <style>
+    /* ===========================
+       THEME TOKENS (WCAG 2.2 AA)
+       =========================== */
     :root{
-      --brand:#028aa7; --brand-2:#48b5d0; --ink:#062d3a;
-      --radius:14px; --shadow-md:0 10px 28px rgba(5,28,59,.14);
-      --header-h:68px; --footer-h:72px; --transition:.28s cubic-bezier(.22,.61,.36,1);
+      /* Brand */
+      --brand-700:#01657A; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
+
+      /* Neutral */
+      --ink-900:#0B2630; --ink-700:#224652; --ink-500:#557784;
+      --surface-000:#FFFFFF; --surface-050:#F7F9FA; --surface-100:#EDF3F6; --border-300:#D4E0E6;
+      --scrim-500:rgba(11,38,48,.52);
+
+      /* States */
+      --success-600:#18794E; --success-050:#EEF9F3;
+      --warning-700:#8A5700; --warning-050:#FFF7E6;
+      --error-650:#B42318;  --error-050:#FEECEC;
+      --info-650:#1E5F8A;   --info-050:#E9F5FC;
+
+      /* Elevation & radii */
+      --radius-sm:10px; --radius-md:14px; --radius-lg:18px; --radius-pill:999px;
+      --shadow-sm:0 2px 8px rgba(11,38,48,.08);
+      --shadow-md:0 10px 28px rgba(11,38,48,.14);
+      --shadow-lg:0 22px 48px rgba(11,38,48,.18);
+
+      /* Motion */
+      --ease:cubic-bezier(.22,.61,.36,1);
+      --t-quick:.18s var(--ease);
+      --t-med:.28s var(--ease);
+
+      /* Type scale */
+      --fs-2xl: clamp(1.6rem, 2vw + 1rem, 2.2rem);
+      --fs-xl: 1.375rem; --fs-lg:1.125rem; --fs-md:1rem; --fs-sm:.9rem;
+      --fw-reg:400; --fw-bold:800;
+
+      /* Spacing (8pt) */
+      --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+      --sp-6:24px; --sp-7:32px; --sp-8:40px;
+
+      /* Layout bars */
+      --header-h:76px; --footer-h:78px;
     }
-    @media (min-width:576px){ :root{ --header-h:72px } }
-    @media (min-width:992px){ :root{ --header-h:76px } }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
-      background:linear-gradient(180deg, rgba(2,138,167,.92), rgba(72,181,208,.92)),
-                 url("https://www.dropbox.com/s/s9bxuykl0w49dqa/background2.jpg?raw=1") center/cover fixed;
+      background:
+        linear-gradient(180deg, rgba(11,38,48,.65), rgba(11,38,48,.35)),
+        url("https://www.dropbox.com/s/s9bxuykl0w49dqa/background2.jpg?raw=1") center/cover fixed;
       min-height:100vh; display:flex; flex-direction:column;
       padding-top:var(--header-h); padding-bottom:var(--footer-h);
     }
 
-    /* Header */
+    /* ===== Header ===== */
     header{
       position:sticky; top:0; z-index:50; height:var(--header-h);
-      background:rgba(2,56,70,.38); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      background:rgba(11,38,48,.36); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
       border-bottom:1px solid rgba(255,255,255,.15); box-shadow:0 10px 30px rgba(0,0,0,.12);
       display:flex; align-items:center; justify-content:center;
     }
-    .header-inner{max-width:1120px; width:100%; padding:0 12px; display:flex; align-items:center; justify-content:space-between}
-    .brand{display:flex; align-items:center; gap:10px}
-    .brand img{height:50px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
-    @media (min-width:576px){ .brand img{height:56px} }
-    @media (min-width:992px){ .brand img{height:62px} }
+    .header-inner{max-width:1120px; width:100%; padding:0 var(--sp-3); display:flex; align-items:center; justify-content:space-between}
+    .brand{display:flex; align-items:center; gap:var(--sp-2)}
+    .brand img{height:60px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
+    @media (max-width:520px){ .brand img{height:52px} }
 
-    .mini-progress{display:flex; align-items:center; gap:10px; width:56%}
-    .mini-progress .bar{flex:1; height:6px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
-    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,#00b7d6,#48b5d0); transition:width var(--transition)}
-    .mini-progress .step{font-weight:800; font-size:1rem}
+    .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:56%}
+    .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
+    .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
+    .mini-progress .bar>span{display:block; height:100%; width:14%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
 
-    /* Body */
-    main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 10px 0}
+    /* ===== Main ===== */
+    main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
     #app{width:100%; max-width:1120px}
 
-    .steps-wrap{padding:6px 14px 0}
-    .steps{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; list-style:none; margin:0; padding:0}
-    .step-pill{background:rgba(255,255,255,.25); color:#fff; font-weight:800; font-size:.98rem; padding:8px 14px; border-radius:999px}
-    .step-pill.active{background:#056e86}
-    .progress-line{height:6px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden; width:calc(100% - 32px); margin:8px auto 0}
-    .progress-line>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,#00b7d6,#48b5d0); transition:width var(--transition)}
+    .steps-wrap{padding:var(--sp-2) var(--sp-3) 0}
+    .steps{display:flex; gap:var(--sp-2); flex-wrap:wrap; justify-content:center; list-style:none; margin:0; padding:0}
+    .step-pill{background:rgba(255,255,255,.25); color:#fff; font-weight:var(--fw-bold); font-size:var(--fs-md); padding:8px 14px; border-radius:var(--radius-pill)}
+    .step-pill.active{background:var(--brand-700)}
+    .progress-line{height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden; width:calc(100% - 28px); margin:var(--sp-2) auto 0}
+    .progress-line>span{display:block; height:100%; width:14%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
 
-    .stage{position:relative; min-height:520px; padding:8px 0 16px}
+    .stage{position:relative; min-height:540px; padding:var(--sp-2) 0 var(--sp-3)}
     .page{
-      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:12px;
-      padding:14px 10px 18px; overflow:auto; opacity:0; transform:translateY(14px) scale(.99);
-      pointer-events:none; transition:opacity var(--transition), transform var(--transition);
+      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-3);
+      padding:var(--sp-4) var(--sp-3) var(--sp-5); overflow:auto; opacity:0; transform:translateY(14px) scale(.99);
+      pointer-events:none; transition:opacity var(--t-med), transform var(--t-med);
     }
     .page.active{position:relative; opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
     .page.exit{opacity:0; transform:translateY(18px) scale(.985)}
 
-    .page h1{font-size:28px; font-weight:800; margin:6px 0 4px; text-align:center}
-    @media (min-width:576px){ .page h1{font-size:30px} }
-    @media (min-width:992px){ .page h1{font-size:32px} }
+    .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center}
 
-    .card-pane{width:calc(100% - 24px); max-width:900px; background:#fff; color:#022b3a; border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-md)}
+    .card{background:var(--surface-000); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:var(--shadow-md); padding:var(--sp-6); width:100%; max-width:920px}
 
-    /* Inputs */
+    /* Inputs & Selects */
     .form-control, select, .select2-selection{
-      border-radius:12px!important; text-align:center; border:0!important; min-height:48px; font-size:1rem;
+      background:var(--surface-000); color:var(--ink-900);
+      border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
+      min-height:48px; text-align:center; font-size:var(--fs-md);
     }
-    .select2-selection{height:48px!important; display:flex; align-items:center}
-    .select2-selection__rendered{line-height:48px!important}
+    .select2-selection{height:48px !important; display:flex; align-items:center}
+    .select2-selection__rendered{line-height:48px !important}
 
-    /* Times */
-    .time-container{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
-    @media (min-width:576px){ .time-container{grid-template-columns:repeat(3,1fr)} }
-    .time-option{
-      background:#fff; color:#022b3a; font-weight:800; border:0; border-radius:14px; padding:16px 10px;
-      min-height:48px; font-size:1rem; box-shadow:0 6px 16px rgba(5,28,59,.10); transition:var(--transition);
+    .form-control:focus{
+      border-color:var(--brand-600) !important; box-shadow:0 0 0 3px var(--brand-200) !important; outline:0;
     }
-    .time-option[aria-checked="true"]{outline:3px solid var(--brand)}
-    .time-option:hover{transform:translateY(-1px); background:#e9fbff}
+
+    /* Time options */
+    .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-3)}
+    @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
+    .time-option{
+      background:var(--surface-000); color:var(--ink-900); font-weight:var(--fw-bold);
+      border:1px solid var(--border-300); border-radius:var(--radius-md); padding:14px 10px; min-height:48px;
+      box-shadow:var(--shadow-sm); transition:var(--t-quick);
+    }
+    .time-option:hover{transform:translateY(-1px); background:var(--brand-050)}
+    .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
     /* Payment */
-    .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:6px 0; max-width:900px; width:100%}
-    .pay-card{background:#fff; color:#022b3a; border-radius:12px; padding:16px; display:flex; justify-content:center; align-items:center; gap:10px; min-height:64px; cursor:pointer; outline:2px solid transparent; transition:var(--transition)}
-    .pay-card[aria-checked="true"]{outline-color:var(--brand)}
+    .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3); width:100%; max-width:920px}
+    .pay-card{
+      background:var(--surface-000); color:var(--ink-900);
+      border:1px solid var(--border-300); border-radius:var(--radius-md);
+      padding:var(--sp-5); display:flex; justify-content:center; align-items:center; gap:var(--sp-3);
+      min-height:64px; cursor:pointer; transition:var(--t-quick);
+    }
     .pay-card img{max-width:120px; height:auto}
+    .pay-card:hover{box-shadow:var(--shadow-sm)}
+    .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
     /* Map */
-    #googleMap{width:100%; height:400px; border-radius:14px; overflow:hidden}
-    @media (min-width:576px){ #googleMap{height:430px} }
-    .inline-error{margin-top:8px; padding:8px 10px; border-radius:10px; color:#7f1d1d; background:#fee2e2; border:1px solid #fecaca; display:none}
+    #googleMap{width:100%; height:420px; border-radius:var(--radius-md); overflow:hidden}
+    .helper-error{margin-top:var(--sp-2); padding:var(--sp-2) var(--sp-3); border-radius:var(--radius-sm); color:var(--error-650); background:var(--error-050); border:1px solid #F9D3D0; display:none}
+
+    /* Buttons */
+    .btn-primary{background:var(--brand-600); color:#fff; border:0; border-radius:var(--radius-md); font-weight:var(--fw-bold)}
+    .btn-primary:hover{background:var(--brand-700)}
+    .btn-outline-primary{color:var(--brand-600); border:1px solid var(--brand-600); border-radius:var(--radius-md); font-weight:var(--fw-bold)}
+    .btn-outline-primary:hover{background:var(--brand-050)}
 
     /* Footer nav */
     footer.sticky-nav{
       position:sticky; bottom:0; z-index:40; height:var(--footer-h);
-      background:rgba(2,56,70,.45); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      background:rgba(11,38,48,.45); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
       border-top:1px solid rgba(255,255,255,.15); box-shadow:0 -10px 30px rgba(0,0,0,.12);
       display:flex; align-items:center; justify-content:center;
     }
-    .footer-inner{max-width:1120px; width:100%; padding:8px 12px; display:flex; gap:10px; align-items:center}
-    .footer-actions{display:flex; gap:10px; flex:1}
-    .btn-footer{flex:1; border:0; border-radius:12px; padding:12px 16px; min-height:48px; font-size:1rem; font-weight:800; box-shadow:0 6px 16px rgba(5,28,59,.10); transition:var(--transition); background:#fff; color:var(--brand)}
-    .btn-footer.primary{background:var(--brand); color:#fff}
+    .footer-inner{max-width:1120px; width:100%; padding:var(--sp-2) var(--sp-3); display:flex; gap:var(--sp-3); align-items:center}
+    .footer-actions{display:flex; gap:var(--sp-3); width:100%}
+    .btn-footer{
+      flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md);
+      padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold);
+      background:var(--surface-000); color:var(--brand-600); box-shadow:var(--shadow-sm); transition:var(--t-quick);
+    }
+    .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
     .btn-footer:disabled{opacity:.6; cursor:not-allowed}
-    #footer-next.is-confirm{background:#0f766e}
 
-    /* Hide any page-local nav buttons (footer only) */
+    /* Hide any page-local nav buttons (we use footer only) */
     [id^="page"][id$="-button"], [id^="page"][id$="-return"]{display:none!important}
 
     /* Social FABs */
@@ -132,20 +185,20 @@
 </head>
 <body>
 
-  <!-- ===== HEADER ===== -->
+  <!-- ========== HEADER ========== -->
   <header>
     <div class="header-inner">
-      <div class="mini-progress">
-        <div class="bar" aria-hidden="true"><span style="width:14%"></span></div>
+      <div class="mini-progress" aria-hidden="true">
+        <div class="bar"><span style="width:14%"></span></div>
         <div class="step">الخدمة</div>
       </div>
       <div class="brand">
-        <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png" alt="Sponge &amp; Soap"/>
+        <img alt="Sponge & Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png"/>
       </div>
     </div>
   </header>
 
-  <!-- ===== BODY ===== -->
+  <!-- ========== BODY ========== -->
   <main>
     <div id="app">
       <div class="steps-wrap">
@@ -160,41 +213,50 @@
       </div>
 
       <div class="stage">
-        <!-- Page 1 -->
+        <!-- Page 1: Intro -->
         <section id="page1" class="page active" aria-label="الترحيب">
-          <h1>✨ واكس يحمي سيارتك</h1>
-          <div class="card-pane" style="text-align:center">
-            <p style="margin:0 0 14px">🧼 فوط نظيفة • لمعان مضمون • 🛞 إسفنجة للكفرات</p>
+          <h1>✨ غسيل بدون طوابير</h1>
+          <div class="card text-center">
+            <p class="mb-3" style="color:var(--ink-700)">واكس يحمي سيارتك • فوط نظيفة • إسفنجة للكفرات</p>
             <button id="page1-button" class="btn btn-primary" type="button">احجز موعدك</button>
           </div>
         </section>
 
-        <!-- Page 2 -->
+        <!-- Page 2: Location + Service -->
         <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
           <h1>وين تحب نجيك؟</h1>
-          <div class="card-pane">
+
+          <div class="card">
             <label class="form-label">اختيار المنطقة</label>
             <select id="area" class="js-example-basic-single" style="width:100%"></select>
           </div>
 
-          <div class="card-pane">
-            <label class="form-label">التصنيف</label>
-            <select id="serviceCat" style="width:100%"></select>
-            <div style="height:8px"></div>
-            <label class="form-label">الخدمة</label>
-            <select id="service" style="width:100%"></select>
-            <div style="height:8px"></div>
-            <label class="form-label">عدد السيارات</label>
-            <select id="serviceCount" style="width:100%">
-              <option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-            </select>
+          <div class="card">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">التصنيف</label>
+                <select id="serviceCat" style="width:100%"></select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">الخدمة</label>
+                <select id="service" style="width:100%"></select>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label">عدد السيارات</label>
+                <select id="serviceCount" class="form-select">
+                  <option value="1" selected>1</option>
+                  <option value="2">2</option><option value="3">3</option>
+                  <option value="4">4</option><option value="5">5</option>
+                </select>
+              </div>
+            </div>
           </div>
         </section>
 
-        <!-- Page 3: Loading -->
+        <!-- Page 3: Loading times -->
         <section id="page3" class="page" aria-label="جلب المواعيد">
           <h1>جاري جلب المواعيد…</h1>
-          <div class="card-pane" style="text-align:center">
+          <div class="card text-center">
             <div class="spinner-border text-info" role="status"><span class="visually-hidden">Loading…</span></div>
           </div>
         </section>
@@ -202,64 +264,85 @@
         <!-- Page 4: Times -->
         <section id="page4" class="page" aria-label="اختيار الموعد">
           <h1>متى تحب نجيك؟</h1>
-          <div class="card-pane">
+          <div class="card">
+            <label class="form-label">التاريخ</label>
             <input id="date" type="date" class="form-control"/>
           </div>
-          <div class="card-pane">
-            <div id="time-container" class="time-container"></div>
-            <div id="fail-alert-3" class="inline-error"></div>
+          <div class="card">
+            <div id="time-container" class="time-grid"></div>
+            <div id="fail-alert-3" class="helper-error"></div>
           </div>
         </section>
 
         <!-- Page 5: Contact -->
         <section id="page5" class="page" aria-label="معلومات الاتصال">
           <h1>معلومات الاتصال</h1>
-          <div class="card-pane">
-            <label class="form-label">الإسم</label>
-            <input id="name" type="text" class="form-control" placeholder="اسمك الكريم"/>
-            <div style="height:8px"></div>
-            <label class="form-label">رقم الجوال</label>
-            <input id="mobile" type="tel" class="form-control"/>
+          <div class="card">
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">الإسم</label>
+                <input id="name" type="text" class="form-control" placeholder="اسمك الكريم"/>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">رقم الجوال</label>
+                <input id="mobile" type="tel" class="form-control" placeholder="+9665…"/>
+              </div>
+            </div>
           </div>
 
           <h1>معلومات المركبة</h1>
-          <div class="card-pane">
-            <label class="form-label">ماركة السيارة 🚘</label>
-            <select id="carBrand" style="width:100%"></select>
-            <div style="height:8px"></div>
-            <label class="form-label">اسم السيارة</label>
-            <input id="carName" type="text" class="form-control" placeholder="كامري، إلنترا..."/>
-            <div style="height:8px"></div>
-            <label class="form-label">رقم اللوحة</label>
-            <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="مثال: 1234"/>
-            <input id="locationDescription" type="text" hidden/>
+          <div class="card">
+            <div class="row g-3">
+              <div class="col-12 col-md-4">
+                <label class="form-label">ماركة السيارة 🚘</label>
+                <select id="carBrand" style="width:100%"></select>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label">اسم السيارة</label>
+                <input id="carName" type="text" class="form-control" placeholder="كامري، إلنترا…"/>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label">رقم اللوحة</label>
+                <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234"/>
+              </div>
+              <input id="locationDescription" type="text" hidden/>
+            </div>
           </div>
 
           <h1>طريقة الدفع</h1>
           <div class="pay-grid">
-            <label class="pay-card" tabindex="0"><input type="radio" name="payingMethod" value="STC Pay" class="visually-hidden"/><img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay"></label>
-            <label class="pay-card" tabindex="0"><input type="radio" name="payingMethod" value="Cash" class="visually-hidden"/><span style="font-weight:800">Cash</span></label>
-            <label class="pay-card" style="grid-column:1/-1" tabindex="0"><input type="radio" name="payingMethod" value="MADA" class="visually-hidden"/><img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada"></label>
+            <label class="pay-card" tabindex="0">
+              <input type="radio" name="payingMethod" value="STC Pay" class="visually-hidden"/>
+              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay">
+            </label>
+            <label class="pay-card" tabindex="0">
+              <input type="radio" name="payingMethod" value="Cash" class="visually-hidden"/>
+              <strong>Cash</strong>
+            </label>
+            <label class="pay-card" style="grid-column:1/-1" tabindex="0">
+              <input type="radio" name="payingMethod" value="MADA" class="visually-hidden"/>
+              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada">
+            </label>
           </div>
         </section>
 
         <!-- Page 6: Map -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
-          <div class="card-pane">
+          <div class="card">
             <div id="googleMap"></div>
-            <div id="polyError" class="inline-error">عذرًا، موقعك خارج نطاق الخدمة</div>
+            <div id="polyError" class="helper-error">الرجاء تحديد الموقع</div>
           </div>
-          <div class="card-pane" style="text-align:center">
-            <button id="show-my-location" class="btn btn-outline-primary" type="button">اظهار موقعي</button>
+          <div class="card text-center">
+            <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
           </div>
         </section>
 
-        <!-- Page 7 -->
+        <!-- Page 7: Done -->
         <section id="page7" class="page" aria-label="تم الحجز">
           <h1>شكراً لكم</h1>
-          <div class="card-pane" style="text-align:center">
-            <p style="margin:0 0 6px">تم حجز الموعد، وراح نأكده لكم على الواتساب</p>
+          <div class="card text-center">
+            <p class="mb-3" style="color:var(--ink-700)">تم حجز الموعد، وراح نأكده لكم على الواتساب</p>
             <button id="rebook" class="btn btn-primary" type="button">🔁 حجز جديد</button>
           </div>
         </section>
@@ -267,10 +350,10 @@
     </div>
   </main>
 
-  <!-- ===== FOOTER (Single navigation) ===== -->
-  <footer class="sticky-nav" aria-label="التنقل بين خطوات الحجز">
+  <!-- ========== FOOTER (sticky nav) ========== -->
+  <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
-      <div class="footer-actions" style="width:100%">
+      <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary">التالي</button>
       </div>
@@ -278,11 +361,11 @@
   </footer>
 
   <!-- Social FABs -->
-  <a target="_blank" href="https://www.tiktok.com/@sponge.soap_sa?_t=ZS-8zaj1CA4aJg&_r=1" class="social-fab tiktok-button" aria-label="تيك توك"><i class="fab fa-tiktok"></i></a>
-  <a target="_blank" href="https://www.instagram.com/sponge.soap_sa?igsh=MWRtOHI5OHZpbWpvdA==" class="social-fab instagram-button" aria-label="إنستغرام"><i class="fab fa-instagram"></i></a>
-  <a target="_blank" href="https://wa.me/966503668222" class="social-fab whatsapp-button" aria-label="واتساب"><i class="fab fa-whatsapp"></i></a>
+  <a target="_blank" class="social-fab tiktok-button" aria-label="تيك توك" href="https://www.tiktok.com/@sponge.soap_sa?_t=ZS-8zaj1CA4aJg&_r=1"><i class="fab fa-tiktok"></i></a>
+  <a target="_blank" class="social-fab instagram-button" aria-label="إنستغرام" href="https://www.instagram.com/sponge.soap_sa?igsh=MWRtOHI5OHZpbWpvdA=="><i class="fab fa-instagram"></i></a>
+  <a target="_blank" class="social-fab whatsapp-button" aria-label="واتساب" href="https://wa.me/966503668222"><i class="fab fa-whatsapp"></i></a>
 
-  <!-- Scripts -->
+  <!-- JS libs -->
   <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
@@ -290,26 +373,23 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ================== API CONFIG (original) ================== */
+    /* =========================
+       API (original endpoints)
+       ========================= */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
 
-    // retry + abort support like your original
     let controllers = [];
     async function callContent2(path, cb, abortable=false, retries=3){
       let signal = '';
-      if(abortable){
-        if(controllers.length){
-          controllers.forEach(([c])=>c.abort());
-          controllers=[];
-        }
-        const controller = new AbortController();
-        signal = controller.signal; controllers.push([controller, signal]);
+      if (abortable){
+        if (controllers.length){ controllers.forEach(([c])=>c.abort()); controllers=[]; }
+        const controller = new AbortController(); signal=controller.signal;
+        controllers.push([controller, signal]);
       }
       try{
         const res = await fetch(defaultLink2 + path, {method:'GET', redirect:'follow', ...(abortable && {signal})});
         if(!res.ok){ if(retries>0) return callContent2(path, cb, abortable, retries-1); throw new Error('Network error'); }
-        const json = await res.json();
-        cb(json);
+        const json = await res.json(); cb(json);
       }catch(e){
         if(!String(e.message).includes('aborted')){
           if(retries>0) return setTimeout(()=>callContent2(path, cb, abortable, retries-1), 800);
@@ -318,14 +398,16 @@
       }
     }
 
-    /* ================== STATE ================== */
+    /* =========================
+       STATE
+       ========================= */
     const DateTime = luxon.DateTime;
     const orderedPages = ["page1","page2","page3","page4","page5","page6","page7"];
     let selectedTime = null;
     let positionUrl = "";
     let servicesCache = null;
     let categoriesCache = null;
-    let itiPhone = null; // << store phone input instance
+    let itiPhone = null;
 
     const nForm = {
       date:'', time:'', location:'', service:'', serviceCount:'1',
@@ -333,7 +415,9 @@
       urlLocation:'', locationDescription:''
     };
 
-    /* ================== UI HELPERS ================== */
+    /* =========================
+       UI HELPERS
+       ========================= */
     function showPage(idx){
       const current = document.querySelector('.page.active');
       const next = document.getElementById(orderedPages[idx]);
@@ -352,17 +436,17 @@
     }
     function syncProgress(i){
       const pct = ((i+1)/orderedPages.length)*100;
-      document.querySelectorAll(".mini-progress .bar>span, .progress-line>span")
-        .forEach(el=>el.style.width = pct+"%");
-      const labels = ["الخدمة","الوقت","البيانات","الموقع","التأكيد"];
+      document.querySelectorAll(".mini-progress .bar>span, .progress-line>span").forEach(el=>el.style.width = pct+"%");
+      const labels = ["الخدمة","الوقت","البيانات","الموقع","التأكيد","انتهى","انتهى"];
       document.querySelector(".mini-progress .step").textContent = labels[Math.min(i,labels.length-1)];
       document.querySelectorAll(".step-pill").forEach((pill,idx)=>pill.classList.toggle("active", idx===i));
       const prev = document.getElementById('footer-prev');
       const next = document.getElementById('footer-next');
       prev.disabled = (i===0);
-      next.textContent = (i>=orderedPages.length-1) ? "إنهاء" : (i===orderedPages.length-2 ? "تأكيد" : "التالي");
-      next.classList.toggle('is-confirm', i>=orderedPages.length-2);
+      next.textContent = (i>=orderedPages.length-2) ? "تأكيد" : "التالي";
+      if(i===orderedPages.length-1){ next.textContent = "إنهاء"; }
     }
+
     function renderTimes(list){
       const cont = document.getElementById('time-container');
       cont.innerHTML = "";
@@ -377,18 +461,20 @@
         b.onclick=()=>{
           [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
           b.setAttribute('aria-checked','true');
-          selectedTime = t; // {ui:"9:15 PM", iso:"21:15"}
-          nForm.time = t.iso.slice(0,5); // "HH:mm"
+          selectedTime = t; // {ui, iso}
+          nForm.time = t.iso.slice(0,5);
         };
         cont.appendChild(b);
       });
     }
 
-    /* ================== LOAD BASICS ================== */
+    /* =========================
+       LOAD & INIT
+       ========================= */
     $(function(){
-      // date default
+      // date defaults & min
       const today = DateTime.now().toFormat('yyyy-LL-dd');
-      document.getElementById('date').value = today;
+      $('#date').val(today).attr('min', today);
 
       // selects
       $('#area').select2({width:'100%', placeholder:'اختر المنطقة'});
@@ -396,17 +482,17 @@
       $('#service').select2({width:'100%', placeholder:'الخدمة'});
       $('#carBrand').select2({width:'100%', placeholder:'ماركة السيارة'});
 
-      // phone (store instance)
+      // phone input (keep instance)
       itiPhone = window.intlTelInput(document.querySelector("#mobile"), {
         initialCountry:"sa",
         onlyCountries:["sa","ae","bh","kw","om","qa"],
         utilsScript:"https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js"
       });
 
-      // page1 CTA
+      // CTA
       document.getElementById('page1-button').addEventListener('click', ()=>showPage(1));
 
-      // fetch locations
+      // Locations
       callContent2(`/locations`, (res)=>{
         const list = res?.data || [];
         const ds = list.map(l=>({id:l.id, text:l.TS_location_arabic_name}));
@@ -414,24 +500,22 @@
         if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
       });
 
-      // on area change → load services + categories
+      // On area change -> services & categories
       $('#area').on('change', function(){
-        const loc = this.value;
-        nForm.location = loc;
-        callContent2(`/services?location=${encodeURIComponent(loc)}`, (res)=>{
+        nForm.location = this.value;
+        callContent2(`/services?location=${encodeURIComponent(this.value)}`, (res)=>{
           servicesCache = res?.data?.services || [];
           categoriesCache = res?.data?.servicesCat || [];
-          // categories
           const cats = categoriesCache.map(c=>({id:c.TS_category_id, text:c.TS_category_arabic_name}));
           $('#serviceCat').empty().select2({data:cats, width:'100%'});
           if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
         }, true);
       });
 
-      // when category changes → filter services
+      // Category -> services
       $('#serviceCat').on('change', function(){
-        const catId = Number(this.value);
         nForm.serviceCat = this.value;
+        const catId = Number(this.value);
         const items = servicesCache
           ?.filter(s=>Number(s.TS_category_id)===catId)
           ?.sort((a,b)=>a.TS_service_id-b.TS_service_id)
@@ -440,17 +524,17 @@
         if(items.length){ $('#service').val(items[0].id).trigger('change'); }
       });
 
-      // date change → refresh times (if we’re already on page4)
+      // Date change -> refresh times (if on page4)
       $('#date').on('change', function(){
         if(getActiveIndex()===3){ fetchAndRenderTimes(); }
       });
 
-      // car brands (short list + Other)
+      // Car brands
       const brands = ["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"]
         .sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands, width:'100%'});
 
-      // payment selection UX
+      // Payment selection
       document.querySelectorAll('.pay-card').forEach(card=>{
         card.addEventListener('click', ()=>{
           document.querySelectorAll('.pay-card').forEach(c=>{
@@ -463,11 +547,13 @@
         });
       });
 
-      // rebook
+      // Rebook
       document.getElementById('rebook').addEventListener('click', ()=>location.href='/');
     });
 
-    /* ================== TIMES (API) ================== */
+    /* =========================
+       TIMES (API)
+       ========================= */
     function fetchAndRenderTimes(){
       const startDate = document.getElementById('date').value || DateTime.now().toFormat('yyyy-LL-dd');
       const loc = document.getElementById('area').value;
@@ -486,29 +572,32 @@
       }, true);
     }
 
-    /* ================== FOOTER NAV ================== */
+    /* =========================
+       FOOTER NAV
+       ========================= */
     (function footerNav(){
       const $prev = document.getElementById("footer-prev");
       const $next = document.getElementById("footer-next");
 
       $next.addEventListener('click', async ()=>{
         const i = getActiveIndex();
+        const id = orderedPages[i];
 
-        if(orderedPages[i]==="page1"){ showPage(1); return; }
+        if(id==="page1"){ showPage(1); return; }
 
-        if(orderedPages[i]==="page2"){
+        if(id==="page2"){
           if(!nForm.location || !document.getElementById('service').value){ return; }
           nForm.service = document.getElementById('service').value;
           nForm.serviceCount = document.getElementById('serviceCount').value || '1';
-          showPage(2);            // page3 (loading)
+          showPage(2);            // page3 loading
           fetchAndRenderTimes();  // fetch times
           setTimeout(()=>showPage(3), 350);
           return;
         }
 
-        if(orderedPages[i]==="page3"){ showPage(3); return; } // to page4
+        if(id==="page3"){ showPage(3); return; } // to page4
 
-        if(orderedPages[i]==="page4"){
+        if(id==="page4"){
           if(!selectedTime){
             const e = document.getElementById('fail-alert-3');
             e.textContent='الرجاء اختيار وقت.'; e.style.display='block';
@@ -520,26 +609,29 @@
           showPage(4); return;
         }
 
-        if(orderedPages[i]==="page5"){
+        if(id==="page5"){
           // gather + validate
           const name = document.getElementById('name').value.trim();
           if(!name) return;
 
-          // use stored instance (fix)
-          if(!itiPhone || !itiPhone.isValidNumber()) return;
+          // use phone instance
+          if(!(itiPhone && itiPhone.isValidNumber())) return;
 
           nForm.customerN = name;
-          nForm.customerM = itiPhone.getNumber().substring(1); // strip '+'
+          nForm.customerM = itiPhone.getNumber().replace(/^\+/, '');
           nForm.locationDescription = [
             $('#carBrand').val()||'',
             document.getElementById('carName').value||'',
             document.getElementById('plateNumber').value||''
           ].filter(Boolean).join(', ');
 
+          // payment required
+          if(!nForm.paymentMethod) return;
+
           showPage(5); return;
         }
 
-        if(orderedPages[i]==="page6"){
+        if(id==="page6"){
           if(!positionUrl){
             const e = document.getElementById('polyError');
             e.textContent='الرجاء تحديد الموقع'; e.style.display='block';
@@ -574,13 +666,15 @@
       });
     })();
 
-    /* ================== GOOGLE MAP ================== */
+    /* =========================
+       GOOGLE MAP
+       ========================= */
     let map, marker;
     function initMap(){
       const def = { lat:26.34165524787632, lng:50.11524831545726 };
       map = new google.maps.Map(document.getElementById("googleMap"), {center:def, zoom:12, disableDoubleClickZoom:true});
       marker = new google.maps.Marker({position:def, map, draggable:true, title:"اسحب أو اضغط لتحديد الموقع"});
-      const setPos = (latLng, pan)=>{
+      const setPos = (latLng, pan=false)=>{
         marker.setPosition(latLng);
         if(pan) map.panTo(latLng);
         map.setZoom(17);
@@ -599,13 +693,14 @@
     }
     window.initMap = initMap;
 
-    // set min date = today
+    // Ensure min date is today on load (fallback)
     document.addEventListener('DOMContentLoaded', ()=>{
-      document.getElementById("date").setAttribute("min", DateTime.now().toFormat('yyyy-LL-dd'));
+      const today = DateTime.now().toFormat('yyyy-LL-dd');
+      document.getElementById("date").setAttribute("min", today);
     });
   </script>
 
-  <!-- NOTE: replace key if needed -->
+  <!-- Replace key if required -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap" async defer></script>
 </body>
 </html>
