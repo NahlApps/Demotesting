@@ -442,12 +442,26 @@
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
       let signal='';
-      if(abortable){ controllers.forEach(([c])=>c.abort()); controllers=[]; const controller=new AbortController(); signal=controller.signal; controllers.push([controller,signal]); }
+      if(abortable){
+        controllers.forEach(([c])=>c.abort());
+        controllers=[];
+        const controller=new AbortController();
+        signal=controller.signal;
+        controllers.push([controller,signal]);
+      }
       try{
+        // a small debounce for UX parity with original
+        await new Promise(r=>setTimeout(r, 300));
         const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal})});
-        if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network'); }
+        if(!res.ok){
+          if(retries>0) return callContent2(path,cb,abortable,retries-1);
+          throw new Error('Network');
+        }
         cb(await res.json());
-      }catch(e){ if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),700); }
+      }catch(e){
+        if(!String(e).includes('AbortError') && retries>0)
+          setTimeout(()=>callContent2(path,cb,abortable,retries-1),700);
+      }
     }
 
     /* ---------------- Toast ---------------- */
@@ -488,13 +502,12 @@
       const next=document.getElementById('footer-next');
       const start=document.getElementById('page1-button');
       const onWelcome = i===0;
-      prev.classList.toggle('hidden', i === 0); // show back except on first page
+      prev.classList.toggle('hidden', i === 0);
       next.classList.toggle('hidden', onWelcome);
       start.classList.toggle('hidden', !onWelcome);
       if(onWelcome){ start.textContent='تخطي العرض'; }
     }
 
-    // Date min: today
     function enforceDateMinToday(){
       const today = DateTime.now().toFormat('yyyy-LL-dd');
       const dateEl = document.getElementById('date');
@@ -503,17 +516,17 @@
       if(!dateEl.value || dateEl.value < today) dateEl.value = today;
     }
 
-    // Availability check
+    function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
+    function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
+
+    // OPTIONAL helper kept (not used in filtering)
     function isAvailable(row){
       const raw = row?.TS_appintment_status ?? row?.TS_status ?? row?.status ?? '';
       const norm = String(raw).trim().toLowerCase();
       return norm === 'available';
     }
 
-    function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
-    function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
-
-    // Resolve department from selected service/category
+    // Resolve department from selected service/category (for badge only)
     function getDepartmentIdFromServiceId(sid){
       if(!sid) return '';
       const svc = (servicesCache || []).find(x => String(x.TS_service_id) === String(sid));
@@ -529,8 +542,6 @@
       if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
       return true;
     }
-
-    // Plate validation
     function validatePlate(){
       const el = document.getElementById('plateNumber');
       const ok = el.value && el.value.length === 4;
@@ -607,14 +618,16 @@
 
       const loc = document.getElementById('area').value || '';
       const srv = document.getElementById('service').value || '';
-      const dept = (nForm?.departmentId || '').trim();
       if(!loc || !srv){
         timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`;
         dateEl.disabled = false;
         return;
       }
 
-      const qs = `/appointments?startDate=${datesWindow[0].toFormat('yyyy-MM-dd')}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}${dept?`&departmentId=${encodeURIComponent(dept)}`:''}`;
+      // IMPORTANT: no departmentId here (to match original behavior)
+      const qs = `/appointments?startDate=${datesWindow[0].toFormat('yyyy-MM-dd')}`
+               + `&location=${encodeURIComponent(loc)}`
+               + `&service=${encodeURIComponent(srv)}`;
 
       callContent2(qs, (res)=>{
         timeContainer.innerHTML = `
@@ -622,15 +635,18 @@
             <span class="visually-hidden">Loading...</span>
           </div>`;
 
-        const raw = (res?.data?.appointments || []);
-        const rows = typeof isAvailable === 'function' ? raw.filter(isAvailable) : raw;
+        // DO NOT over-filter — keep as original working version
+        const rows = (res?.data?.appointments || []);
 
         for (let i=0;i<rows.length;i++){
           const d = DateTime.fromISO(rows[i]['TS_appointment_date'], { setZone:true });
           let t  = DateTime.fromISO(rows[i]['TS_appointment_time'], { setZone:true });
           if(!t.isValid){
-            t = DateTime.fromFormat(String(rows[i]['TS_appointment_time']||'').trim(), 'HH:mm:ss', { setZone:true });
-            if(!t.isValid) t = DateTime.fromFormat(String(rows[i]['TS_appointment_time']||''), 'H:mm', { setZone:true });
+            // robust fallbacks
+            const raw = String(rows[i]['TS_appointment_time']||'').trim();
+            t = DateTime.fromFormat(raw, 'HH:mm:ss', { setZone:true });
+            if(!t.isValid) t = DateTime.fromFormat(raw, 'H:mm a', { setZone:true });
+            if(!t.isValid) t = DateTime.fromFormat(raw, 'H:mm',   { setZone:true });
           }
           if(!d.isValid || !t.isValid) continue;
 
@@ -689,6 +705,7 @@
             لا توجد مواعيد متاحة
           </div>`;
         window.selectedTime = null;
+        selectedTime = null; // keep gating consistent
         updateNextAvailability?.();
         return;
       }
@@ -712,6 +729,8 @@
           nForm.time = parsed.isValid ? parsed.toFormat("HH:mm") : picked12;
 
           window.selectedTime = { ui: label, iso: nForm.time };
+          selectedTime        = window.selectedTime; // <-- critical for Next button logic
+
           updateNextAvailability?.();
           // Optionally auto-advance: showPage(3);
         });
@@ -729,12 +748,13 @@
       });
     })();
 
-    // Compatibility function (optional)
+    // Compatibility function if needed by other parts
     function choosedDate(time12, dateISO /*, i */) {
       const parsed = DateTime.fromFormat(time12, "h:mm a");
       nForm.date = dateISO;
       nForm.time = parsed.isValid ? parsed.toFormat("HH:mm") : time12;
       window.selectedTime = { ui: time12, iso: nForm.time };
+      selectedTime        = window.selectedTime;
       updateNextAvailability?.();
       // showPage(3);
     }
@@ -780,7 +800,7 @@
         updateNextAvailability();
       });
 
-      // Service change: store service + department, update badge, refetch if on time page
+      // Service change: store service + department (badge only), refetch if on time page
       $('#service').on('change', function(){
         nForm.service = this.value || '';
         nForm.departmentId = getDepartmentIdFromServiceId(this.value);
@@ -789,8 +809,6 @@
         if(getActiveIndex()===2) document.getElementById('date').dispatchEvent(new Event('change'));
         updateNextAvailability();
       });
-
-      // Date change is already handled by native onchange (set above)
 
       // Preload brands
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
@@ -850,7 +868,7 @@
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          nForm.departmentId = getDepartmentIdFromServiceId(nForm.service);
+          nForm.departmentId = getDepartmentIdFromServiceId(nForm.service); // badge only
           showPage(2); // go to time page (page4)
           document.getElementById('date').dispatchEvent(new Event('change'));
           return;
@@ -858,7 +876,7 @@
 
         if(id==='page4'){
           if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; }
-          nForm.date=$('#date').val();
+          // Do NOT overwrite nForm.date here — it was set when the user picked a slot.
           showPage(3);
           return;
         }
@@ -866,12 +884,12 @@
         if(id==='page5'){
           const name=$('#name').val().trim();
           if(!name){ showToast('error','يرجى إدخال الاسم'); document.getElementById('name').focus(); return; }
-          if(!validateMobile()) return; // swap to lenient if needed
+          if(!validateMobile()) return;
           if(!validatePlate()) return;
           if(!nForm.paymentMethod){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
 
           nForm.customerN=name;
-          nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
+          nForm.customerM=itiPhone.getNumber().replace(/^\+/, '');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
           showPage(4);
           return;
@@ -918,7 +936,7 @@
         enable = !!selectedTime;
       } else if(i === 3){ // page5: contact + payment + plate
         const nameOk = $('#name').val().trim().length > 0;
-        const phoneOk = (itiPhone && itiPhone.isValidNumber()); // swap to lenient if desired
+        const phoneOk = (itiPhone && itiPhone.isValidNumber());
         const payOk = !!nForm.paymentMethod;
         const plateOk = ($('#plateNumber').val()||'').length === 4;
         enable = nameOk && phoneOk && payOk && plateOk;
@@ -937,9 +955,19 @@
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
+      map.addEventListener?.('click', ({latLng})=>setPos(latLng)); // fallback if newer API shape
       map.addListener('click', ({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
-      if(btn){ btn.addEventListener('click', ()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition( pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true), err=>{ const msg = err?.message || 'رجاءً فعّل الـ GPS وأذونات الموقع'; showToast('error','تعذر تحديد موقعك: '+msg); }, { enableHighAccuracy:true, timeout:10000, maximumAge:30000 } ); }); }
+      if(btn){
+        btn.addEventListener('click', ()=>{
+          if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
+          navigator.geolocation.getCurrentPosition(
+            pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
+            err=>{ const msg = err?.message || 'رجاءً فعّل الـ GPS وأذونات الموقع'; showToast('error','تعذر تحديد موقعك: '+msg); },
+            { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
+          );
+        });
+      }
     }
     window.initMap = initMap;
   </script>
