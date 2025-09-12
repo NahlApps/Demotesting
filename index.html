@@ -31,7 +31,7 @@
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms; --dur-lg:640ms;
 
       /* Typography + spacing */
-      --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
+      --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
 
       /* Layout */
@@ -188,10 +188,9 @@
     /* serviceCount full width */
     #serviceCount{ width:100% !important; }
 
-    /* Opening Motion (Soft Luxury) */
+    /* Opening Motion (Soft Luxury) for first paint */
     @media (prefers-reduced-motion: no-preference) {
       .will-anim { will-change: transform, opacity; }
-
       @keyframes introSlideDown { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:none } }
       @keyframes introFadeIn    { from { opacity:0 } to { opacity:1 } }
       @keyframes introRiseZoom  { from { opacity:0; transform:translateY(14px) scale(.985) } to { opacity:1; transform:none } }
@@ -200,10 +199,8 @@
 
       body.intro-play header .mini-progress { animation:introSlideDown var(--dur-sm) var(--ease-decel) 40ms both; }
       body.intro-play header .mini-progress .bar>span { animation:barGrow var(--dur-md) var(--ease-decel) 80ms both; }
-
       body.intro-play #page1 h1 { animation:introFadeIn calc(var(--dur-sm) + 80ms) var(--ease) 80ms both; }
       body.intro-play #page1 .card { animation:introRiseZoom var(--dur-md) var(--ease-decel) 120ms both; }
-
       body.intro-play footer .footer-actions { animation:introSlideUp var(--dur-sm) var(--ease) 180ms both; }
       body.intro-play footer .footer-brand   { animation:introFadeIn var(--dur-sm) var(--ease) 220ms both; }
     }
@@ -215,6 +212,62 @@
       body.intro-play footer .footer-actions,
       body.intro-play footer .footer-brand { animation:none !important; opacity:1; }
     }
+
+    /* =================== PowerPoint-style Deck =================== */
+    .ppt-deck{
+      position:relative; width:100%; max-width:860px; min-height:220px;
+      margin:8px auto 0; overflow:hidden; border-radius:14px;
+      background:linear-gradient(180deg,#ffffff, #f6fbfd);
+      box-shadow:var(--shadow-md);
+    }
+    .ppt-slide{
+      position:absolute; inset:0; padding:28px 18px; display:flex;
+      flex-direction:column; align-items:center; justify-content:center; text-align:center;
+      opacity:0; transform:translateY(10px) scale(.995);
+    }
+    .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
+    .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
+
+    /* Slide animations */
+    @media (prefers-reduced-motion: no-preference) {
+      .ppt-slide.is-active   { animation: pptIn var(--dur-md) var(--ease-decel) both; }
+      .ppt-slide.is-exiting  { animation: pptOut var(--dur-sm) var(--ease-accel) both; }
+      .ppt-slide .ppt-hero   { animation: heroFloat 1400ms var(--ease) 120ms both; }
+    }
+    @keyframes pptIn{
+      from{opacity:0; transform:translateY(14px) scale(.985)}
+      to  {opacity:1; transform:none}
+    }
+    @keyframes pptOut{
+      from{opacity:1; transform:none}
+      to  {opacity:0; transform:translateY(-12px) scale(.992)}
+    }
+    @keyframes heroFloat{
+      from{ transform:translateY(6px) }
+      to  { transform:translateY(0) }
+    }
+
+    /* Ken Burns bg (optional): add .kb to slide for subtle zoom */
+    .ppt-slide.kb::before{
+      content:""; position:absolute; inset:-4%; background:radial-gradient(120% 120% at 50% 10%, rgba(2,122,147,.06), rgba(1,101,122,.02) 60%, transparent 100%);
+      transform:scale(1.02); z-index:0; pointer-events:none;
+      animation:kb 4200ms ease-in-out both;
+    }
+    @keyframes kb{
+      from{ transform:scale(1.06) }
+      to  { transform:scale(1.00) }
+    }
+
+    /* Deck dots */
+    .ppt-dots{
+      position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
+      display:flex; gap:8px; z-index:2;
+    }
+    .ppt-dot{
+      width:8px; height:8px; border-radius:50%; background:#cfe6ee; box-shadow:0 0 0 2px rgba(2,122,147,.10) inset;
+      transition:transform var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+    }
+    .ppt-dot.active{ background:var(--brand-600); transform:scale(1.22) }
   </style>
 </head>
 <body>
@@ -247,12 +300,31 @@
   <main>
     <div id="app">
       <div class="stage">
-        <!-- 1) Welcome -->
+        <!-- 1) Welcome with PowerPoint Deck -->
         <section id="page1" class="page active" aria-label="الترحيب">
-          <h1 class="will-anim">✨ غسيل بدون طوابير</h1>
-          <div class="card text-center will-anim">
-            <p class="mb-3" style="color:#224652">واكس يحمي سيارتك • فوط نظيفة • إسفنجة للكفرات</p>
-            <!-- original welcome button moved to footer -->
+          <h1 class="will-anim visually-hidden">عرض ترحيبي</h1>
+          <div class="card text-center will-anim" style="background:transparent; box-shadow:none; padding:0;">
+            <div id="pptDeck" class="ppt-deck" aria-live="polite">
+              <div class="ppt-slide kb">
+                <div class="ppt-hero">
+                  <h2>✨ غسيل بدون طوابير</h2>
+                  <p>نجيك لين باب بيتك — جودة وفخامة بالتفاصيل الصغيرة</p>
+                </div>
+              </div>
+              <div class="ppt-slide kb">
+                <div class="ppt-hero">
+                  <h2>🧼 عناية مدروسة</h2>
+                  <p>واكس يحمي السيارة • فوط نظيفة • إسفنجة للكفرات</p>
+                </div>
+              </div>
+              <div class="ppt-slide kb">
+                <div class="ppt-hero">
+                  <h2>⏱️ حجز سريع</h2>
+                  <p>اختر المنطقة والخدمة والوقت — والباقي علينا</p>
+                </div>
+              </div>
+              <div class="ppt-dots" id="pptDots" aria-hidden="true"></div>
+            </div>
           </div>
         </section>
 
@@ -386,7 +458,7 @@
     </div>
   </main>
 
-  <!-- Footer nav (with Nahl marking + page1-button in footer) -->
+  <!-- Footer nav (with Nahl marking + welcome Skip in footer) -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-brand will-anim" aria-label="Nahl Marking">
@@ -395,8 +467,8 @@
       <div class="footer-actions will-anim">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary">التالي</button>
-        <!-- Original welcome button preserved & relocated -->
-        <button id="page1-button" class="btn-footer primary">ابدأ الحجز</button>
+        <!-- On Welcome page this acts as "Skip show" -->
+        <button id="page1-button" class="btn-footer primary">تخطي العرض</button>
       </div>
     </div>
   </footer>
@@ -468,6 +540,10 @@
     function showPage(idx){
       const cur=document.querySelector('.page.active');
       const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
+
+      // stop deck if leaving welcome
+      if(cur && cur.id==='page1'){ stopWelcomeDeck(); }
+
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
       requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260); });
@@ -487,6 +563,7 @@
       prev.classList.toggle('hidden', true);     // always hidden on first page
       next.classList.toggle('hidden', onWelcome);
       start.classList.toggle('hidden', !onWelcome);
+      if(onWelcome){ start.textContent='تخطي العرض'; }
     }
 
     /* ---------------- Availability logic ---------------- */
@@ -561,6 +638,63 @@
       return true;
     }
 
+    /* ---------------- PowerPoint Deck Controller ---------------- */
+    let deckTimers = [];
+    let deckIndex = 0;
+    let deckRunning = false;
+    const SLIDE_MS = 2600;  // per slide
+    const GAP_MS   = 180;   // gap between slides
+
+    function startWelcomeDeck(){
+      const deck = document.getElementById('pptDeck');
+      if(!deck) return;
+      const slides = Array.from(deck.querySelectorAll('.ppt-slide'));
+      const dotsWrap = document.getElementById('pptDots');
+      dotsWrap.innerHTML = slides.map((_,i)=>`<span class="ppt-dot${i===0?' active':''}"></span>`).join('');
+      const dots = Array.from(dotsWrap.children);
+
+      // helper
+      const setActive = (i, exiting=-1)=>{
+        slides.forEach((s,idx)=>{
+          s.classList.remove('is-active','is-exiting');
+          if(idx===i){ s.style.zIndex=2; s.classList.add('is-active'); }
+          else if(idx===exiting){ s.style.zIndex=1; s.classList.add('is-exiting'); }
+          else{ s.style.zIndex=0; }
+        });
+        dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
+      };
+
+      deckRunning = true;
+      deckIndex = 0;
+      setActive(0, -1);
+
+      const advance = ()=>{
+        if(!deckRunning) return;
+        const prev = deckIndex;
+        deckIndex++;
+        if(deckIndex >= slides.length){
+          // Auto advance to next page after last slide
+          stopWelcomeDeck();
+          showPage(1);
+          return;
+        }
+        setActive(deckIndex, prev);
+        schedule();
+      };
+
+      const schedule = ()=>{
+        deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS));
+      };
+
+      schedule();
+    }
+
+    function stopWelcomeDeck(){
+      deckRunning = false;
+      deckTimers.forEach(t=>clearTimeout(t));
+      deckTimers = [];
+    }
+
     /* ---------------- Init & bindings ---------------- */
     $(function(){
       const today=DateTime.now().toFormat('yyyy-LL-dd');
@@ -618,15 +752,27 @@
 
       // initial progress + welcome footer state
       syncProgress(0);
+
+      // Start PowerPoint show (respect reduced motion)
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduced){
+        // Fast auto-advance to service page
+        setTimeout(()=>showPage(1), 400);
+      }else{
+        startWelcomeDeck();
+      }
     });
 
-    // Footer nav + welcome start button
+    // Footer nav + welcome Skip button
     (function(){
       const $prev=document.getElementById('footer-prev');
       const $next=document.getElementById('footer-next');
       const $start=document.getElementById('page1-button');
 
-      $start.addEventListener('click', ()=>showPage(1));
+      $start.addEventListener('click', ()=>{
+        stopWelcomeDeck();
+        showPage(1);
+      });
 
       $next.addEventListener('click', async ()=>{
         const i=getActiveIndex(); const id=orderedPages[i];
