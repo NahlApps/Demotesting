@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>حجوزات المواعيد</title>
 
-  <!-- UI libs (single includes, no duplicates) -->
+  <!-- UI libs -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
@@ -85,11 +85,13 @@
     .time-option{
       background:#fff; color:#0B2630; font-weight:var(--fw-bold);
       border:1px solid var(--border-300); border-radius:var(--radius-md);
-      padding:14px 10px; min-height:56px; box-shadow:var(--shadow-sm); transition:.18s var(--ease);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:14px 10px; min-height:48px; box-shadow:var(--shadow-sm); transition:.18s var(--ease);
     }
     .time-option:hover{transform:translateY(-1px); background:var(--brand-050)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
+    .time-option[aria-disabled="true"]{
+      background:#F6F7F8; color:#9AA7B0; border-style:dashed; cursor:not-allowed; filter:grayscale(.2);
+    }
 
     /* Overlays */
     .load-overlay{
@@ -138,6 +140,8 @@
     .toast-success{background:#16a34a}
     .toast-error{background:#dc2626}
     .toast-info{background:#0284c7}
+
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;margin:-1px}
   </style>
 </head>
 <body>
@@ -152,7 +156,7 @@
         <div class="step" id="miniStepTitle">الترحيب</div>
       </div>
       <div class="brand">
-        <img alt="Sponge & Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/lorenzo-hamers-n1SRvkP6bEk-unsplash%20(1).jpg/>
+        <img alt="Sponge & Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png"/>
       </div>
     </div>
   </header>
@@ -188,7 +192,7 @@
 
           <div class="card position-relative" id="servicesCard">
             <label class="form-label">اختيار المنطقة</label>
-            <select id="area" style="width:100%"></select>
+            <select id="area" class="js-example-basic-single" style="width:100%"></select>
 
             <div class="row g-3 mt-3">
               <div class="col-12 col-md-6">
@@ -202,11 +206,8 @@
               <div class="col-12 col-md-4">
                 <label class="form-label">عدد السيارات</label>
                 <select id="serviceCount" class="form-select">
-                  <option value="1" selected>1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
+                  <option value="1" selected>1</option><option value="2">2</option>
+                  <option value="3">3</option><option value="4">4</option><option value="5">5</option>
                 </select>
               </div>
             </div>
@@ -315,7 +316,7 @@
     </div>
   </main>
 
-  <!-- Footer nav (single instance, sticky) -->
+  <!-- Footer nav -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-actions">
@@ -325,7 +326,7 @@
     </div>
   </footer>
 
-  <!-- JS libs (single includes) -->
+  <!-- JS libs -->
   <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
@@ -333,9 +334,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---------------------------
-       API Helpers (original base)
-    ----------------------------*/
+    /* API */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -351,9 +350,7 @@
       }catch(e){ if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),700); }
     }
 
-    /* ---------------------------
-       Toasts
-    ----------------------------*/
+    /* Toast helper */
     function showToast(type='info', msg=''){
       const wrap=document.getElementById('toastWrap');
       const div=document.createElement('div');
@@ -362,14 +359,13 @@
       setTimeout(()=>{ div.style.opacity='0'; setTimeout(()=>div.remove(),300); }, 2200);
     }
 
-    /* ---------------------------
-       State
-    ----------------------------*/
+    /* STATE */
     const DateTime=luxon.DateTime;
     const orderedPages=["page1","page2","page4","page5","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","التأكيد"];
-    let itiPhone=null, selectedTime=null, positionUrl="";
-    let servicesCache=[], categoriesCache=[];
+    let selectedTime=null, positionUrl="";
+    let servicesCache=null, categoriesCache=null, itiPhone=null;
+
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
     function showPage(idx){
@@ -386,135 +382,83 @@
       document.getElementById('miniBarFill').style.width=pct+'%';
       document.getElementById('mainBarFill').style.width=pct+'%';
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
-      document.querySelectorAll('.step-pill').forEach((p,idx)=>p.classList.toggle('active', idx===Math.min(i,5)));
+      const pills=document.querySelectorAll('.step-pill');
+      pills.forEach((p,idx)=>p.classList.toggle('active', idx===Math.min(i,5)));
+      // Hide prev on welcome
       document.getElementById('footer-prev').classList.toggle('hidden', i===0);
     }
 
-    /* ---------------------------
-       Services loading spinners
-    ----------------------------*/
-    function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
-    function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
-
-    /* ---------------------------
-       Original-style appointments
-       (trust API to return only AVAILABLE)
-    ----------------------------*/
-    let appointments=[[],[],[]];   // labels like "7:00 AM"
-    let ActualTimes =[[],[],[]];   // HH:mm for payload
-    let timesLoaded=false;
-
-    function timesSetter(index){
-      const cont=document.getElementById("time-container");
-      cont.innerHTML="";
-      if(appointments[index].length===0){
-        cont.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#6b7280">لا توجد مواعيد متاحة</div>';
-        return;
-      }
-      for(let y=0;y<appointments[index].length;y++){
-        const label=appointments[index][y];
-        const iso=ActualTimes[index][y];
-        const chosenDate=document.getElementById('date').value;
-        const btn=document.createElement('button');
-        btn.className='time-option'; btn.type='button'; btn.dir='ltr';
-        btn.textContent=label;
-        btn.addEventListener('click', ()=>{
-          [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
-          btn.setAttribute('aria-checked','true');
-          selectedTime={ui:label, iso, date:chosenDate};
-          nForm.time=iso; // HH:mm
-        });
-        cont.appendChild(btn);
-      }
-    }
-
-    function fetchAndRenderTimesOriginal(){
-      setLoadingTimes(true);
-
-      const day1=DateTime.fromISO(document.getElementById('date').value || DateTime.now().toISODate());
-      const day2=day1.plus({days:1});
-      const day3=day1.plus({days:2});
-
-      // clear arrays
-      appointments=[[],[],[]];
-      ActualTimes =[[],[],[]];
-      timesLoaded=false;
-
-      const loc=document.getElementById('area').value || '';
-      const srv=document.getElementById('service').value || '';
-
-      callContent2(`/appointments?startDate=${day1.toFormat('yyyy-MM-dd')}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (data)=>{
-        try{
-          const list=(data?.data?.appointments||[]).slice();
-
-          // normalize like original
-          for(let i=0;i<list.length;i++){
-            const d=luxon.DateTime.fromISO(list[i]['TS_appointment_date'],{setZone:true});
-            const t=luxon.DateTime.fromISO(list[i]['TS_appointment_time'],{setZone:true});
-            list[i]['TS_appointment_date']=d.toISODate(); // yyyy-MM-dd
-            list[i]['TS_appointment_time']=t.toLocaleString(luxon.DateTime.TIME_SIMPLE).replace(" "," ");
-            list[i]['TS_appointment_time_iso']=t.toFormat('HH:mm'); // payload
-          }
-
-          // split into three days
-          for(let i=0;i<list.length;i++){
-            const r=list[i];
-            if(r["TS_appointment_date"]===day1.toFormat('yyyy-MM-dd')){
-              appointments[0].push(r['TS_appointment_time']);
-              ActualTimes[0].push(r['TS_appointment_time_iso']);
-            }else if(r["TS_appointment_date"]===day2.toFormat('yyyy-MM-dd')){
-              appointments[1].push(r['TS_appointment_time']);
-              ActualTimes[1].push(r['TS_appointment_time_iso']);
-            }else if(r["TS_appointment_date"]===day3.toFormat('yyyy-MM-dd')){
-              appointments[2].push(r['TS_appointment_time']);
-              ActualTimes[2].push(r['TS_appointment_time_iso']);
-            }
-          }
-
-          // show only day1 immediately (original UX)
-          timesLoaded=true;
-          timesSetter(0);
-        }catch(e){
-          console.error('parse error',e);
-          document.getElementById('time-container').innerHTML='<div class="text-center text-muted" style="grid-column:1/-1">تعذر جلب المواعيد</div>';
-        }finally{
-          setLoadingTimes(false);
+    function renderTimes(items){
+      const cont=document.getElementById('time-container');
+      cont.innerHTML=''; selectedTime=null;
+      if(!items.length){ cont.innerHTML='<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>'; return; }
+      items.forEach(t=>{
+        const b=document.createElement('button');
+        b.className='time-option'; b.type='button';
+        b.textContent=t.ui;
+        if(t.booked){
+          b.setAttribute('aria-disabled','true'); b.disabled=true; b.title='محجوز';
+        }else{
+          b.setAttribute('role','radio');
+          b.onclick=()=>{ [...cont.children].forEach(x=>x.setAttribute('aria-checked','false')); b.setAttribute('aria-checked','true'); selectedTime=t; nForm.time=t.iso.slice(0,5); };
         }
+        cont.appendChild(b);
+      });
+    }
+    function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
+    function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
+
+    // Fetch times filtered by area + service, and mark booked
+    function fetchAndRenderTimes(){
+      setLoadingTimes(true);
+      const startDate=document.getElementById('date').value||DateTime.now().toFormat('yyyy-LL-dd');
+      const loc=document.getElementById('area').value||'';
+      const srv=document.getElementById('service').value||'';
+      callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
+        const appts=(res?.data?.appointments||[]);
+        const items = appts.map(a=>{
+          const t=luxon.DateTime.fromISO(a.TS_appointment_time||a.time||a.TS_time,{setZone:true});
+          const available = (a.available ?? a.isAvailable ?? a.TS_available ?? a.TS_is_available ?? (String(a.status||'').toLowerCase()==='available')) ? true : false;
+          return {ui:t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso:t.toFormat('HH:mm'), booked: !available};
+        });
+        // de-duplicate by time; keep a booked==false if any is free
+        const merged = {};
+        items.forEach(it=>{
+          if(!merged[it.iso]) merged[it.iso]=it;
+          if(merged[it.iso].booked && !it.booked) merged[it.iso]=it;
+        });
+        renderTimes(Object.values(merged)); setLoadingTimes(false);
       }, true);
     }
 
-    /* ---------------------------
-       Init & Event bindings
-    ----------------------------*/
+    function validateMobile(){
+      if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
+      return true;
+    }
+
     $(function(){
-      // date min = today
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
-      // selects
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة'});
       $('#serviceCat').select2({width:'100%',placeholder:'التصنيف'});
       $('#service').select2({width:'100%',placeholder:'الخدمة'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة'});
 
-      // phone
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
 
-      // welcome → service
       $('#page1-button').on('click', ()=>showPage(1));
 
       // load locations
       setLoadingServices(true);
       callContent2(`/locations`, res=>{
-        const list=res?.data||[];
-        const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
-        $('#area').empty().select2({data:ds,width:'100%'});
+        const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
+        $('#area').empty().select2({data:ds,width:'100%'}); 
         if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
-        else { showToast('error','لا توجد مناطق متاحة حالياً'); }
-        setLoadingServices(false);
+        else { setLoadingServices(false); showToast('error','لا توجد مناطق متاحة حالياً'); }
       });
 
       // area -> services
@@ -532,20 +476,15 @@
       // category -> service
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
-        const items=servicesCache
-          .filter(s=>Number(s.TS_category_id)===cid)
-          .sort((a,b)=>a.TS_service_id-b.TS_service_id)
-          .map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}));
+        const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
         $('#service').empty().select2({data:items,width:'100%'}); 
         if(items.length){ $('#service').val(items[0].id).trigger('change'); }
       });
 
-      // when on Time page, update appointments on change
-      $('#service, #date').on('change', ()=>{
-        if(getActiveIndex()===2){ fetchAndRenderTimesOriginal(); }
-      });
+      // on service/date change, refresh times if user في صفحة الوقت
+      $('#service, #date').on('change', ()=>{ if(getActiveIndex()===2) fetchAndRenderTimes(); });
 
-      // car brands (short list; expand as needed)
+      // brands
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands,width:'100%'});
 
@@ -563,9 +502,7 @@
       syncProgress(0);
     });
 
-    /* ---------------------------
-       Footer navigation (single)
-    ----------------------------*/
+    // Footer nav
     (function(){
       const $prev=document.getElementById('footer-prev');
       const $next=document.getElementById('footer-next');
@@ -580,7 +517,7 @@
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
           showPage(2);               // إلى صفحة الوقت
-          fetchAndRenderTimesOriginal();
+          fetchAndRenderTimes();     // جلب المواعيد (حسب المنطقة والخدمة)
           return;
         }
 
@@ -594,7 +531,7 @@
         if(id==='page5'){
           const name=$('#name').val().trim();
           if(!name){ showToast('error','يرجى إدخال الاسم'); return; }
-          if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return; }
+          if(!validateMobile()) return;
           if(!nForm.paymentMethod){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
 
           nForm.customerN=name;
@@ -626,9 +563,7 @@
       $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
 
-    /* ---------------------------
-       Google Map (single init)
-    ----------------------------*/
+    /* Google Map */
     let map, marker;
     function initMap(){
       const def={lat:26.34165524787632,lng:50.11524831545726};
@@ -636,22 +571,20 @@
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; };
       marker.addListener('dragend',e=>setPos(e.latLng));
-      map.addEventListener?.('click',e=>setPos(e.latLng)); // compatibility
-      google.maps.event.addListener(map,'click',e=>setPos(e.latLng));
+      map.addListener('click',e=>setPos(e.latLng));
       document.getElementById('show-my-location').addEventListener('click', ()=>{
         if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true)); }
       });
     }
     window.initMap=initMap;
 
-    // Ensure date min set on load as well
     document.addEventListener('DOMContentLoaded', ()=>{
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       document.getElementById('date').setAttribute('min',today);
     });
   </script>
 
-  <!-- Google Maps (single include) -->
+  <!-- Google Maps -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap" async defer></script>
 </body>
 </html>
