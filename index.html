@@ -36,32 +36,44 @@
 
       /* Layout */
       --header-h:76px; --footer-h:78px;
+
+      /* Light glass theme */
+      --glass-bg: rgba(255,255,255,.72);
+      --glass-border: rgba(11,38,48,.10);
     }
 
     html,body{height:100%}
     body{
-      margin:0; font-family:'Cairo',sans-serif; color:#fff;
+      margin:0; font-family:'Cairo',sans-serif; color:var(--ink-900);
       background:
-        linear-gradient(180deg, rgba(11,38,48,.65), rgba(11,38,48,.35)),
+        /* light scrim over the bright studio photo */
+        linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.12)),
         url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/lorenzo-hamers-n1SRvkP6bEk-unsplash%20(1).jpg") center/cover fixed;
       min-height:100vh; display:flex; flex-direction:column;
       padding-top:var(--header-h); padding-bottom:var(--footer-h);
+    }
+    /* subtle vignette to lift foreground */
+    body::before{
+      content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(120% 70% at 50% -5%, rgba(255,255,255,.0) 0%, rgba(0,0,0,.06) 75%, rgba(0,0,0,.08) 100%),
+        linear-gradient(180deg, rgba(255,255,255,0), rgba(0,0,0,.05));
     }
 
     /* Header */
     header{
       position:sticky; top:0; z-index:50; height:var(--header-h);
-      background:rgba(11,38,48,.36); backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.15);
+      background:var(--glass-bg); backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--glass-border);
       display:flex; align-items:center; justify-content:center;
     }
     .header-inner{max-width:1120px; width:100%; padding:0 var(--sp-3); display:flex; align-items:center; justify-content:space-between}
     .brand{display:flex; align-items:center; gap:10px}
-    .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
+    .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 2px 10px rgba(0,0,0,.08))}
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:60%}
-    .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
+    .mini-progress .bar{flex:1; height:8px; background:rgba(2,122,147,.20); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
-    .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
+    .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md); color:var(--ink-900)}
 
     /* Main */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
@@ -86,48 +98,42 @@
       from{opacity:1; transform:translateY(0)    scale(1)}
       to  {opacity:0; transform:translateY(14px) scale(.985)}
     }
-    .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center}
+    .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center; color:var(--ink-900)}
 
     /* Cards + fields */
-    .card{background:var(--surface-000); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:var(--shadow-md); padding:var(--sp-6); width:100%; max-width:920px}
+    .card{background:rgba(255,255,255,.96); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:0 8px 32px rgba(11,38,48,.10); padding:var(--sp-6); width:100%; max-width:920px}
     .form-control, select, .select2-selection{
-      background:var(--surface-000); color:#0B2630;
-      border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
+      background:#fff; color:var(--ink-900);
+      border:1px solid var(--glass-border) !important; border-radius:var(--radius-md)!important;
       min-height:48px; text-align:center; font-size:var(--fs-md);
       transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
     }
     .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .select2-selection{height:48px !important; display:flex; align-items:center}
     .select2-selection__rendered{line-height:48px !important}
-
-    /* Select2 dropdown luxury open */
     .select2-container--open .select2-dropdown{
-      border:1px solid var(--border-300); box-shadow:var(--shadow-sm); overflow:hidden;
-      transform-origin:top center;
-      animation:dropdownIn var(--dur-sm) var(--ease-decel) both;
+      border:1px solid var(--glass-border); box-shadow:var(--shadow-sm); overflow:hidden;
+      transform-origin:top center; animation:dropdownIn var(--dur-sm) var(--ease-decel) both;
     }
-    @keyframes dropdownIn{
-      from{opacity:0; transform:translateY(6px) scale(.99)}
-      to  {opacity:1; transform:none}
-    }
+    @keyframes dropdownIn{ from{opacity:0; transform:translateY(6px) scale(.99)} to{opacity:1; transform:none} }
 
     /* Time grid */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-4)}
     @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
     .time-option{
-      background:#fff; color:#0B2630; font-weight:var(--fw-bold);
-      border:1px solid var(--border-300); border-radius:var(--radius-md);
-      padding:14px 10px; min-height:56px; box-shadow:var(--shadow-xs);
+      background:#fff; color:var(--ink-900); font-weight:var(--fw-bold);
+      border:1px solid var(--glass-border); border-radius:var(--radius-md);
+      padding:14px 10px; min-height:56px; box-shadow:0 2px 8px rgba(11,38,48,.06);
       transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
       display:flex; flex-direction:column; align-items:center; justify-content:center;
     }
-    .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
+    .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:0 6px 18px rgba(11,38,48,.10)}
     .time-option:active{transform:translateY(0) scale(.995)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
     /* Overlays */
     .load-overlay{
-      position:absolute; inset:0; background:rgba(255,255,255,.85); color:#0B2630;
+      position:absolute; inset:0; background:rgba(255,255,255,.85); color:var(--ink-900);
       display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md);
     }
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
@@ -136,11 +142,12 @@
     /* Payment */
     .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4); width:100%; max-width:920px}
     .pay-card{
-      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md);
+      background:#fff; color:var(--ink-900); border:1px solid var(--glass-border); border-radius:var(--radius-md);
       padding:var(--sp-6); display:flex; justify-content:center; align-items:center; gap:var(--sp-4);
       min-height:64px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+      box-shadow:0 2px 8px rgba(11,38,48,.06);
     }
-    .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
+    .pay-card:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(11,38,48,.10); background:var(--brand-050)}
     .pay-card:active{transform:translateY(0) scale(.995)}
     .pay-card img{max-width:120px; height:auto}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
@@ -148,25 +155,23 @@
     /* Footer */
     footer.sticky-nav{
       position:sticky; bottom:0; z-index:40; height:var(--footer-h);
-      background:rgba(11,38,48,.45); backdrop-filter:blur(10px);
-      border-top:1px solid rgba(255,255,255,.15);
-      display:flex; align-items:center; justify-content:center;
+      background:var(--glass-bg); backdrop-filter:blur(10px);
+      border-top:1px solid var(--glass-border);
+      display:flex; align-items:center; justify-content:center; color:var(--ink-900);
     }
-    .footer-inner{
-      max-width:1120px; width:100%; padding:8px 12px;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .footer-brand{ font-size:.95rem; color:#fff; opacity:.92 }
+    .footer-inner{max-width:1120px; width:100%; padding:8px 12px; display:flex; align-items:center; justify-content:space-between}
+    .footer-brand{ font-size:.95rem; color:var(--ink-900); opacity:.92 }
+    .footer-brand a{ color:var(--brand-700) !important; text-decoration:none }
     .footer-actions{display:flex; gap:12px}
     .btn-footer{
-      flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md);
+      flex:1; border:1px solid var(--glass-border); border-radius:var(--radius-md);
       padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold);
-      background:#fff; color:var(--brand-600);
+      background:#fff; color:var(--brand-700);
       transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
     }
     .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
     .btn-footer:active{transform:translateY(0) scale(.995)}
-    .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
+    .btn-footer.primary{background:var(--brand-700); color:#fff; border-color:var(--brand-700)}
     .btn-footer.hidden{visibility:hidden}
 
     .form-block{margin-bottom:var(--sp-5)}
@@ -199,7 +204,6 @@
 
       body.intro-play header .mini-progress { animation:introSlideDown var(--dur-sm) var(--ease-decel) 40ms both; }
       body.intro-play header .mini-progress .bar>span { animation:barGrow var(--dur-md) var(--ease-decel) 80ms both; }
-      body.intro-play #page1 h1 { animation:introFadeIn calc(var(--dur-sm) + 80ms) var(--ease) 80ms both; }
       body.intro-play #page1 .card { animation:introRiseZoom var(--dur-md) var(--ease-decel) 120ms both; }
       body.intro-play footer .footer-actions { animation:introSlideUp var(--dur-sm) var(--ease) 180ms both; }
       body.intro-play footer .footer-brand   { animation:introFadeIn var(--dur-sm) var(--ease) 220ms both; }
@@ -207,7 +211,6 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
       body.intro-play header .mini-progress,
-      body.intro-play #page1 h1,
       body.intro-play #page1 .card,
       body.intro-play footer .footer-actions,
       body.intro-play footer .footer-brand { animation:none !important; opacity:1; }
@@ -228,37 +231,21 @@
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
     .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
 
-    /* Slide animations */
     @media (prefers-reduced-motion: no-preference) {
       .ppt-slide.is-active   { animation: pptIn var(--dur-md) var(--ease-decel) both; }
       .ppt-slide.is-exiting  { animation: pptOut var(--dur-sm) var(--ease-accel) both; }
       .ppt-slide .ppt-hero   { animation: heroFloat 1400ms var(--ease) 120ms both; }
     }
-    @keyframes pptIn{
-      from{opacity:0; transform:translateY(14px) scale(.985)}
-      to  {opacity:1; transform:none}
-    }
-    @keyframes pptOut{
-      from{opacity:1; transform:none}
-      to  {opacity:0; transform:translateY(-12px) scale(.992)}
-    }
-    @keyframes heroFloat{
-      from{ transform:translateY(6px) }
-      to  { transform:translateY(0) }
-    }
+    @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
+    @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
+    @keyframes heroFloat{ from{ transform:translateY(6px) } to{ transform:translateY(0) } }
 
-    /* Ken Burns bg (optional): add .kb to slide for subtle zoom */
     .ppt-slide.kb::before{
       content:""; position:absolute; inset:-4%; background:radial-gradient(120% 120% at 50% 10%, rgba(2,122,147,.06), rgba(1,101,122,.02) 60%, transparent 100%);
-      transform:scale(1.02); z-index:0; pointer-events:none;
-      animation:kb 4200ms ease-in-out both;
+      transform:scale(1.02); z-index:0; pointer-events:none; animation:kb 4200ms ease-in-out both;
     }
-    @keyframes kb{
-      from{ transform:scale(1.06) }
-      to  { transform:scale(1.00) }
-    }
+    @keyframes kb{ from{ transform:scale(1.06) } to{ transform:scale(1.00) } }
 
-    /* Deck dots */
     .ppt-dots{
       position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
       display:flex; gap:8px; z-index:2;
@@ -270,7 +257,7 @@
     .ppt-dot.active{ background:var(--brand-600); transform:scale(1.22) }
   </style>
 </head>
-<body>
+<body class="intro-play">
   <!-- Toasts -->
   <div id="toastWrap" class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
 
@@ -291,7 +278,7 @@
           loading="eager" decoding="async" fetchpriority="high"
           onerror="handleLogoError(this)"
         />
-        <strong id="brandText" style="display:none;color:#fff;font-weight:800">Sponge &amp; Soap</strong>
+        <strong id="brandText" style="display:none;color:var(--ink-900);font-weight:800">Sponge &amp; Soap</strong>
       </div>
     </div>
   </header>
@@ -302,7 +289,6 @@
       <div class="stage">
         <!-- 1) Welcome with PowerPoint Deck -->
         <section id="page1" class="page active" aria-label="الترحيب">
-          <h1 class="will-anim visually-hidden">عرض ترحيبي</h1>
           <div class="card text-center will-anim" style="background:transparent; box-shadow:none; padding:0;">
             <div id="pptDeck" class="ppt-deck" aria-live="polite">
               <div class="ppt-slide kb">
@@ -354,7 +340,6 @@
               </div>
             </div>
 
-            <!-- Spinner while service loads -->
             <div id="servicesLoading" class="load-overlay">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
               <strong>جاري تحميل الخدمات…</strong>
@@ -462,7 +447,7 @@
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-brand will-anim" aria-label="Nahl Marking">
-        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener" style="color:#fff;text-decoration:none">Nahl.app</a></span>
+        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a></span>
       </div>
       <div class="footer-actions will-anim">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
@@ -560,7 +545,7 @@
       const start=document.getElementById('page1-button');
 
       const onWelcome = i===0;
-      prev.classList.toggle('hidden', true);     // always hidden on first page
+      prev.classList.toggle('hidden', i===0);
       next.classList.toggle('hidden', onWelcome);
       start.classList.toggle('hidden', !onWelcome);
       if(onWelcome){ start.textContent='تخطي العرض'; }
@@ -653,7 +638,6 @@
       dotsWrap.innerHTML = slides.map((_,i)=>`<span class="ppt-dot${i===0?' active':''}"></span>`).join('');
       const dots = Array.from(dotsWrap.children);
 
-      // helper
       const setActive = (i, exiting=-1)=>{
         slides.forEach((s,idx)=>{
           s.classList.remove('is-active','is-exiting');
@@ -673,19 +657,15 @@
         const prev = deckIndex;
         deckIndex++;
         if(deckIndex >= slides.length){
-          // Auto advance to next page after last slide
           stopWelcomeDeck();
-          showPage(1);
+          showPage(1); // go to Service
           return;
         }
         setActive(deckIndex, prev);
         schedule();
       };
 
-      const schedule = ()=>{
-        deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS));
-      };
-
+      const schedule = ()=>{ deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS)); };
       schedule();
     }
 
@@ -750,17 +730,15 @@
 
       $('#rebook').on('click', ()=>location.href='/');
 
-      // initial progress + welcome footer state
-      syncProgress(0);
+      // welcome opening motion flag
+      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
 
       // Start PowerPoint show (respect reduced motion)
       const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(reduced){
-        // Fast auto-advance to service page
-        setTimeout(()=>showPage(1), 400);
-      }else{
-        startWelcomeDeck();
-      }
+      if(reduced){ setTimeout(()=>showPage(1), 400); } else { startWelcomeDeck(); }
+
+      // initial progress + welcome footer state
+      syncProgress(0);
     });
 
     // Footer nav + welcome Skip button
@@ -769,10 +747,7 @@
       const $next=document.getElementById('footer-next');
       const $start=document.getElementById('page1-button');
 
-      $start.addEventListener('click', ()=>{
-        stopWelcomeDeck();
-        showPage(1);
-      });
+      $start.addEventListener('click', ()=>{ stopWelcomeDeck(); showPage(1); });
 
       $next.addEventListener('click', async ()=>{
         const i=getActiveIndex(); const id=orderedPages[i];
@@ -829,16 +804,6 @@
 
       $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
-
-    /* ---------------- Opening Motion trigger + date min ---------------- */
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.body.classList.add('intro-play');
-      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
-
-      const today= luxon.DateTime.now().toFormat('yyyy-LL-dd');
-      const dateEl=document.getElementById('date');
-      if(dateEl){ dateEl.setAttribute('min',today); }
-    });
 
     /* ---------------- Google Map ---------------- */
     let map, marker;
