@@ -7,6 +7,8 @@
 
   <!-- UI libs -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
@@ -36,44 +38,32 @@
 
       /* Layout */
       --header-h:76px; --footer-h:78px;
-
-      /* Light glass theme */
-      --glass-bg: rgba(255,255,255,.72);
-      --glass-border: rgba(11,38,48,.10);
     }
 
     html,body{height:100%}
     body{
-      margin:0; font-family:'Cairo',sans-serif; color:var(--ink-900);
+      margin:0; font-family:'Cairo',sans-serif; color:#fff;
       background:
-        /* light scrim over the bright studio photo */
-        linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,255,255,.12)),
+        linear-gradient(180deg, rgba(11,38,48,.65), rgba(11,38,48,.35)),
         url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/lorenzo-hamers-n1SRvkP6bEk-unsplash%20(1).jpg") center/cover fixed;
       min-height:100vh; display:flex; flex-direction:column;
       padding-top:var(--header-h); padding-bottom:var(--footer-h);
-    }
-    /* subtle vignette to lift foreground */
-    body::before{
-      content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-      background:
-        radial-gradient(120% 70% at 50% -5%, rgba(255,255,255,.0) 0%, rgba(0,0,0,.06) 75%, rgba(0,0,0,.08) 100%),
-        linear-gradient(180deg, rgba(255,255,255,0), rgba(0,0,0,.05));
     }
 
     /* Header */
     header{
       position:sticky; top:0; z-index:50; height:var(--header-h);
-      background:var(--glass-bg); backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--glass-border);
+      background:rgba(11,38,48,.36); backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.15);
       display:flex; align-items:center; justify-content:center;
     }
     .header-inner{max-width:1120px; width:100%; padding:0 var(--sp-3); display:flex; align-items:center; justify-content:space-between}
     .brand{display:flex; align-items:center; gap:10px}
-    .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 2px 10px rgba(0,0,0,.08))}
+    .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:60%}
-    .mini-progress .bar{flex:1; height:8px; background:rgba(2,122,147,.20); border-radius:999px; overflow:hidden}
+    .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
-    .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md); color:var(--ink-900)}
+    .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
 
     /* Main */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
@@ -90,29 +80,25 @@
       .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease-decel) both; }
       .page.exit  { animation:pageOut var(--dur-sm) var(--ease-accel) both; }
     }
-    @keyframes pageIn{
-      from{opacity:0; transform:translateY(12px) scale(.992)}
-      to  {opacity:1; transform:translateY(0)    scale(1)}
-    }
-    @keyframes pageOut{
-      from{opacity:1; transform:translateY(0)    scale(1)}
-      to  {opacity:0; transform:translateY(14px) scale(.985)}
-    }
-    .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center; color:var(--ink-900)}
+    @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
+    @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
+    .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center}
 
     /* Cards + fields */
-    .card{background:rgba(255,255,255,.96); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:0 8px 32px rgba(11,38,48,.10); padding:var(--sp-6); width:100%; max-width:920px}
+    .card{background:var(--surface-000); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:var(--shadow-md); padding:var(--sp-6); width:100%; max-width:920px}
     .form-control, select, .select2-selection{
-      background:#fff; color:var(--ink-900);
-      border:1px solid var(--glass-border) !important; border-radius:var(--radius-md)!important;
+      background:var(--surface-000); color:#0B2630;
+      border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
       min-height:48px; text-align:center; font-size:var(--fs-md);
       transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
     }
     .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .select2-selection{height:48px !important; display:flex; align-items:center}
     .select2-selection__rendered{line-height:48px !important}
+
+    /* Select2 dropdown luxury open */
     .select2-container--open .select2-dropdown{
-      border:1px solid var(--glass-border); box-shadow:var(--shadow-sm); overflow:hidden;
+      border:1px solid var(--border-300); box-shadow:var(--shadow-sm); overflow:hidden;
       transform-origin:top center; animation:dropdownIn var(--dur-sm) var(--ease-decel) both;
     }
     @keyframes dropdownIn{ from{opacity:0; transform:translateY(6px) scale(.99)} to{opacity:1; transform:none} }
@@ -121,58 +107,44 @@
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-4)}
     @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
     .time-option{
-      background:#fff; color:var(--ink-900); font-weight:var(--fw-bold);
-      border:1px solid var(--glass-border); border-radius:var(--radius-md);
-      padding:14px 10px; min-height:56px; box-shadow:0 2px 8px rgba(11,38,48,.06);
+      background:#fff; color:#0B2630; font-weight:var(--fw-bold);
+      border:1px solid var(--border-300); border-radius:var(--radius-md);
+      padding:14px 10px; min-height:56px; box-shadow:var(--shadow-xs);
       transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
       display:flex; flex-direction:column; align-items:center; justify-content:center;
     }
-    .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:0 6px 18px rgba(11,38,48,.10)}
+    .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
     .time-option:active{transform:translateY(0) scale(.995)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
     /* Overlays */
-    .load-overlay{
-      position:absolute; inset:0; background:rgba(255,255,255,.85); color:var(--ink-900);
-      display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md);
-    }
+    .load-overlay{ position:absolute; inset:0; background:rgba(255,255,255,.85); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md); }
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
     @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
     /* Payment */
     .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4); width:100%; max-width:920px}
     .pay-card{
-      background:#fff; color:var(--ink-900); border:1px solid var(--glass-border); border-radius:var(--radius-md);
+      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md);
       padding:var(--sp-6); display:flex; justify-content:center; align-items:center; gap:var(--sp-4);
       min-height:64px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-      box-shadow:0 2px 8px rgba(11,38,48,.06);
     }
-    .pay-card:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(11,38,48,.10); background:var(--brand-050)}
+    .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
     .pay-card:active{transform:translateY(0) scale(.995)}
     .pay-card img{max-width:120px; height:auto}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
     /* Footer */
-    footer.sticky-nav{
-      position:sticky; bottom:0; z-index:40; height:var(--footer-h);
-      background:var(--glass-bg); backdrop-filter:blur(10px);
-      border-top:1px solid var(--glass-border);
-      display:flex; align-items:center; justify-content:center; color:var(--ink-900);
-    }
-    .footer-inner{max-width:1120px; width:100%; padding:8px 12px; display:flex; align-items:center; justify-content:space-between}
-    .footer-brand{ font-size:.95rem; color:var(--ink-900); opacity:.92 }
-    .footer-brand a{ color:var(--brand-700) !important; text-decoration:none }
+    footer.sticky-nav{ position:sticky; bottom:0; z-index:40; height:var(--footer-h); background:rgba(11,38,48,.45); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center; }
+    .footer-inner{ max-width:1120px; width:100%; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; }
+    .footer-brand{ font-size:.95rem; color:#fff; opacity:.92 }
     .footer-actions{display:flex; gap:12px}
-    .btn-footer{
-      flex:1; border:1px solid var(--glass-border); border-radius:var(--radius-md);
-      padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold);
-      background:#fff; color:var(--brand-700);
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
-    }
+    .btn-footer{ flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md); padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold); background:#fff; color:var(--brand-600); transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease); }
     .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
     .btn-footer:active{transform:translateY(0) scale(.995)}
-    .btn-footer.primary{background:var(--brand-700); color:#fff; border-color:var(--brand-700)}
+    .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
     .btn-footer.hidden{visibility:hidden}
+    .btn-footer.disabled, .btn-footer:disabled{opacity:.6; pointer-events:none}
 
     .form-block{margin-bottom:var(--sp-5)}
     .form-label{display:inline-block; margin-bottom:6px; font-size:var(--fs-sm); font-weight:var(--fw-bold); color:#224652}
@@ -204,6 +176,7 @@
 
       body.intro-play header .mini-progress { animation:introSlideDown var(--dur-sm) var(--ease-decel) 40ms both; }
       body.intro-play header .mini-progress .bar>span { animation:barGrow var(--dur-md) var(--ease-decel) 80ms both; }
+      body.intro-play #page1 h1 { animation:introFadeIn calc(var(--dur-sm) + 80ms) var(--ease) 80ms both; }
       body.intro-play #page1 .card { animation:introRiseZoom var(--dur-md) var(--ease-decel) 120ms both; }
       body.intro-play footer .footer-actions { animation:introSlideUp var(--dur-sm) var(--ease) 180ms both; }
       body.intro-play footer .footer-brand   { animation:introFadeIn var(--dur-sm) var(--ease) 220ms both; }
@@ -211,53 +184,35 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
       body.intro-play header .mini-progress,
+      body.intro-play #page1 h1,
       body.intro-play #page1 .card,
       body.intro-play footer .footer-actions,
       body.intro-play footer .footer-brand { animation:none !important; opacity:1; }
     }
 
     /* =================== PowerPoint-style Deck =================== */
-    .ppt-deck{
-      position:relative; width:100%; max-width:860px; min-height:220px;
-      margin:8px auto 0; overflow:hidden; border-radius:14px;
-      background:linear-gradient(180deg,#ffffff, #f6fbfd);
-      box-shadow:var(--shadow-md);
-    }
-    .ppt-slide{
-      position:absolute; inset:0; padding:28px 18px; display:flex;
-      flex-direction:column; align-items:center; justify-content:center; text-align:center;
-      opacity:0; transform:translateY(10px) scale(.995);
-    }
+    .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg,#ffffff, #f6fbfd); box-shadow:var(--shadow-md); }
+    .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
     .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .ppt-slide.is-active   { animation: pptIn var(--dur-md) var(--ease-decel) both; }
-      .ppt-slide.is-exiting  { animation: pptOut var(--dur-sm) var(--ease-accel) both; }
-      .ppt-slide .ppt-hero   { animation: heroFloat 1400ms var(--ease) 120ms both; }
-    }
+    /* Slide animations */
+    @media (prefers-reduced-motion: no-preference) { .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; } .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; } .ppt-slide .ppt-hero{ animation: heroFloat 1400ms var(--ease) 120ms both; } }
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
     @keyframes heroFloat{ from{ transform:translateY(6px) } to{ transform:translateY(0) } }
 
-    .ppt-slide.kb::before{
-      content:""; position:absolute; inset:-4%; background:radial-gradient(120% 120% at 50% 10%, rgba(2,122,147,.06), rgba(1,101,122,.02) 60%, transparent 100%);
-      transform:scale(1.02); z-index:0; pointer-events:none; animation:kb 4200ms ease-in-out both;
-    }
+    /* Ken Burns bg */
+    .ppt-slide.kb::before{ content:""; position:absolute; inset:-4%; background:radial-gradient(120% 120% at 50% 10%, rgba(2,122,147,.06), rgba(1,101,122,.02) 60%, transparent 100%); transform:scale(1.02); z-index:0; pointer-events:none; animation:kb 4200ms ease-in-out both; }
     @keyframes kb{ from{ transform:scale(1.06) } to{ transform:scale(1.00) } }
 
-    .ppt-dots{
-      position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
-      display:flex; gap:8px; z-index:2;
-    }
-    .ppt-dot{
-      width:8px; height:8px; border-radius:50%; background:#cfe6ee; box-shadow:0 0 0 2px rgba(2,122,147,.10) inset;
-      transition:transform var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-    }
+    /* Deck dots */
+    .ppt-dots{ position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:2; }
+    .ppt-dot{ width:8px; height:8px; border-radius:50%; background:#cfe6ee; box-shadow:0 0 0 2px rgba(2,122,147,.10) inset; transition:transform var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease); }
     .ppt-dot.active{ background:var(--brand-600); transform:scale(1.22) }
   </style>
 </head>
-<body class="intro-play">
+<body>
   <!-- Toasts -->
   <div id="toastWrap" class="toast-wrap" aria-live="polite" aria-atomic="true"></div>
 
@@ -269,16 +224,10 @@
         <div class="step" id="miniStepTitle">الترحيب</div>
       </div>
 
-      <!-- Brand (logo with robust fallbacks) -->
+      <!-- Brand -->
       <div class="brand">
-        <img
-          id="brandLogo"
-          alt="Sponge &amp; Soap"
-          src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png"
-          loading="eager" decoding="async" fetchpriority="high"
-          onerror="handleLogoError(this)"
-        />
-        <strong id="brandText" style="display:none;color:var(--ink-900);font-weight:800">Sponge &amp; Soap</strong>
+        <img id="brandLogo" alt="Sponge &amp; Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
+        <strong id="brandText" style="display:none;color:#fff;font-weight:800">Sponge &amp; Soap</strong>
       </div>
     </div>
   </header>
@@ -289,26 +238,12 @@
       <div class="stage">
         <!-- 1) Welcome with PowerPoint Deck -->
         <section id="page1" class="page active" aria-label="الترحيب">
+          <h1 class="will-anim visually-hidden">عرض ترحيبي</h1>
           <div class="card text-center will-anim" style="background:transparent; box-shadow:none; padding:0;">
             <div id="pptDeck" class="ppt-deck" aria-live="polite">
-              <div class="ppt-slide kb">
-                <div class="ppt-hero">
-                  <h2>✨ غسيل بدون طوابير</h2>
-                  <p>نجيك لين باب بيتك — جودة وفخامة بالتفاصيل الصغيرة</p>
-                </div>
-              </div>
-              <div class="ppt-slide kb">
-                <div class="ppt-hero">
-                  <h2>🧼 عناية مدروسة</h2>
-                  <p>واكس يحمي السيارة • فوط نظيفة • إسفنجة للكفرات</p>
-                </div>
-              </div>
-              <div class="ppt-slide kb">
-                <div class="ppt-hero">
-                  <h2>⏱️ حجز سريع</h2>
-                  <p>اختر المنطقة والخدمة والوقت — والباقي علينا</p>
-                </div>
-              </div>
+              <div class="ppt-slide kb"><div class="ppt-hero"><h2>✨ غسيل بدون طوابير</h2><p>نجيك لين باب بيتك — جودة وفخامة بالتفاصيل الصغيرة</p></div></div>
+              <div class="ppt-slide kb"><div class="ppt-hero"><h2>🧼 عناية مدروسة</h2><p>واكس يحمي السيارة • فوط نظيفة • إسفنجة للكفرات</p></div></div>
+              <div class="ppt-slide kb"><div class="ppt-hero"><h2>⏱️ حجز سريع</h2><p>اختر المنطقة والخدمة والوقت — والباقي علينا</p></div></div>
               <div class="ppt-dots" id="pptDots" aria-hidden="true"></div>
             </div>
           </div>
@@ -340,6 +275,10 @@
               </div>
             </div>
 
+            <!-- Department badge (optional trust cue) -->
+            <input id="departmentId" type="hidden"/>
+            <small class="text-muted d-block mt-2">القسم: <span id="departmentBadge">—</span></small>
+
             <div id="servicesLoading" class="load-overlay">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
               <strong>جاري تحميل الخدمات…</strong>
@@ -353,13 +292,13 @@
           <div class="card position-relative" id="timeCard">
             <div class="row g-3">
               <div class="col-12 col-md-5">
-                <label class="form-label">التاريخ</label>
+                <label class="form-label" for="date">التاريخ</label>
                 <input id="date" type="date" class="form-control"/>
               </div>
             </div>
 
             <div class="position-relative mt-3">
-              <div id="time-container" class="time-grid"></div>
+              <div id="time-container" class="time-grid" role="radiogroup" aria-label="اختيار الوقت"></div>
               <div id="timeLoading" class="load-overlay">
                 <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
                 <strong>جاري جلب المواعيد…</strong>
@@ -375,11 +314,11 @@
             <div class="row g-3">
               <div class="col-12 col-md-6 form-block">
                 <label for="name" class="form-label">الإسم</label>
-                <input id="name" type="text" class="form-control" placeholder="اسمك الكريم"/>
+                <input id="name" type="text" class="form-control" placeholder="اسمك الكريم" autocomplete="name"/>
               </div>
               <div class="col-12 col-md-6 form-block">
                 <label for="mobile" class="form-label">رقم الجوال</label>
-                <input id="mobile" type="tel" class="form-control" placeholder="+9665…"/>
+                <input id="mobile" type="tel" class="form-control" placeholder="+9665…" autocomplete="tel"/>
               </div>
             </div>
           </div>
@@ -388,32 +327,33 @@
           <div class="card">
             <div class="row g-3">
               <div class="col-12 col-md-4">
-                <label class="form-label">ماركة السيارة 🚘</label>
+                <label class="form-label" for="carBrand">ماركة السيارة 🚘</label>
                 <select id="carBrand" style="width:100%"></select>
               </div>
               <div class="col-12 col-md-4">
-                <label class="form-label">اسم السيارة</label>
-                <input id="carName" type="text" class="form-control" placeholder="كامري، إلنترا…"/>
+                <label class="form-label" for="carName">اسم السيارة</label>
+                <input id="carName" type="text" class="form-control" placeholder="كامري، إلنترا…" autocomplete="off"/>
               </div>
               <div class="col-12 col-md-4">
-                <label class="form-label">رقم اللوحة</label>
-                <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234"/>
+                <label class="form-label" for="plateNumber">آخر 4 أرقام من اللوحة <span aria-hidden="true" style="color:#dc2626">*</span></label>
+                <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234" required aria-required="true" autocomplete="off"/>
+                <small id="plateHelp" class="text-muted d-block mt-1" style="opacity:.85">نحتاج آخر ٤ أرقام للتأكيد فقط</small>
               </div>
               <input id="locationDescription" type="text" hidden/>
             </div>
           </div>
 
           <h1>طريقة الدفع</h1>
-          <div class="pay-grid">
-            <label class="pay-card" tabindex="0">
+          <div class="pay-grid" role="radiogroup" aria-label="طريقة الدفع" id="payGroup">
+            <label class="pay-card" tabindex="0" role="radio" aria-checked="false">
               <input type="radio" name="payingMethod" value="STC Pay" class="visually-hidden"/>
               <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay">
             </label>
-            <label class="pay-card" tabindex="0">
+            <label class="pay-card" tabindex="-1" role="radio" aria-checked="false">
               <input type="radio" name="payingMethod" value="Cash" class="visually-hidden"/>
               <strong>Cash</strong>
             </label>
-            <label class="pay-card" style="grid-column:1/-1" tabindex="0">
+            <label class="pay-card" style="grid-column:1/-1" tabindex="-1" role="radio" aria-checked="false">
               <input type="radio" name="payingMethod" value="MADA" class="visually-hidden"/>
               <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada">
             </label>
@@ -443,16 +383,15 @@
     </div>
   </main>
 
-  <!-- Footer nav (with Nahl marking + welcome Skip in footer) -->
+  <!-- Footer nav -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-brand will-anim" aria-label="Nahl Marking">
-        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a></span>
+        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener" style="color:#fff;text-decoration:none">Nahl.app</a></span>
       </div>
       <div class="footer-actions will-anim">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
-        <button id="footer-next" type="button" class="btn-footer primary">التالي</button>
-        <!-- On Welcome page this acts as "Skip show" -->
+        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>التالي</button>
         <button id="page1-button" class="btn-footer primary">تخطي العرض</button>
       </div>
     </div>
@@ -466,30 +405,18 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---------------- DEBUG SWITCH ---------------- */
-    const DEBUG = true;
-    const log = (...a)=>{ if(DEBUG) console.log(...a); };
-    const warn = (...a)=>{ if(DEBUG) console.warn(...a); };
-    const err  = (...a)=>{ if(DEBUG) console.error(...a); };
-
     /* ---------------- Logo fallback helper ---------------- */
     function handleLogoError(img){
       const fallbacks = [
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png",
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png",
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png",
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png",
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/logo.png",
         "https://dummyimage.com/180x54/027A93/ffffff.png&text=Sponge+%26+Soap"
       ];
       const i = Number(img.dataset.fidx||0);
-      if (i < fallbacks.length){
-        img.dataset.fidx = String(i+1);
-        img.src = fallbacks[i];
-      } else {
-        img.style.display = 'none';
-        const txt = document.getElementById('brandText');
-        if (txt) txt.style.display = 'block';
-      }
+      if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
+      else { img.style.display = 'none'; const txt = document.getElementById('brandText'); if (txt) txt.style.display = 'block'; }
     }
 
     /* ---------------- API ---------------- */
@@ -497,28 +424,12 @@
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
       let signal='';
-      const url = defaultLink2 + path;
-      const trace = Math.random().toString(16).slice(2);
-      if(abortable){
-        controllers.forEach(([c])=>c.abort()); controllers=[];
-        const controller=new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
-      }
+      if(abortable){ controllers.forEach(([c])=>c.abort()); controllers=[]; const controller=new AbortController(); signal=controller.signal; controllers.push([controller,signal]); }
       try{
-        log(`[API][${trace}] GET`, url, {abortable, retriesLeft:retries});
-        const res=await fetch(url,{method:'GET',redirect:'follow',...(abortable&&{signal})});
-        if(!res.ok){
-          warn(`[API][${trace}] Non-OK`, res.status, res.statusText);
-          if(retries>0) return callContent2(path,cb,abortable,retries-1);
-          throw new Error('Network');
-        }
-        const json = await res.json();
-        log(`[API][${trace}] OK`, {status:res.status, dataKeys:Object.keys(json||{})});
-        cb(json);
-      }catch(e){
-        if(String(e).includes('AbortError')){ warn(`[API][${trace}] Aborted`); return; }
-        err(`[API][${trace}] Error`, e);
-        if(retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),700);
-      }
+        const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal})});
+        if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network'); }
+        cb(await res.json());
+      }catch(e){ if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),700); }
     }
 
     /* ---------------- Toast ---------------- */
@@ -533,47 +444,48 @@
     /* ---------------- STATE ---------------- */
     const DateTime=luxon.DateTime;
     const orderedPages=["page1","page2","page4","page5","page6","page7"];
-    const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","التأكيد"];
+    const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","تم"];
     let selectedTime=null, positionUrl="";
     let servicesCache=null, categoriesCache=null, itiPhone=null;
 
-    const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
+    const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', departmentId:''};
 
+    /* ---------------- Helpers ---------------- */
     function showPage(idx){
       const cur=document.querySelector('.page.active');
       const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
-
-      log('[NAV] showPage ->', orderedPages[idx], {idx});
-
-      // stop deck if leaving welcome
       if(cur && cur.id==='page1'){ stopWelcomeDeck(); }
-
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
       requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260); });
       syncProgress(idx);
-
-      // ensure times load when landing on time page
-      if(orderedPages[idx]==='page4'){ fetchAndRenderTimes(); }
+      updateNextAvailability();
     }
     function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
     function syncProgress(i){
       const pct=((i+1)/orderedPages.length)*100;
       document.getElementById('miniBarFill').style.width=pct+'%';
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
-
       const prev=document.getElementById('footer-prev');
       const next=document.getElementById('footer-next');
       const start=document.getElementById('page1-button');
-
       const onWelcome = i===0;
-      prev.classList.toggle('hidden', i===0);
+      prev.classList.toggle('hidden', i === 0); // show back except on first page
       next.classList.toggle('hidden', onWelcome);
       start.classList.toggle('hidden', !onWelcome);
       if(onWelcome){ start.textContent='تخطي العرض'; }
     }
 
-    /* ---------------- Availability logic ---------------- */
+    // Date min: today
+    function enforceDateMinToday(){
+      const today = DateTime.now().toFormat('yyyy-LL-dd');
+      const dateEl = document.getElementById('date');
+      if(!dateEl) return;
+      dateEl.setAttribute('min', today);
+      if(!dateEl.value || dateEl.value < today) dateEl.value = today;
+    }
+
+    // Availability check
     function isAvailable(row){
       const raw = row?.TS_appintment_status ?? row?.TS_status ?? row?.status ?? '';
       const norm = String(raw).trim().toLowerCase();
@@ -583,31 +495,54 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
+    // Resolve department from selected service/category
+    function getDepartmentIdFromServiceId(sid){
+      if(!sid) return '';
+      const svc = (servicesCache || []).find(x => String(x.TS_service_id) === String(sid));
+      let dep = svc?.TS_appintment_department_id ?? svc?.department_id ?? svc?.TS_department_id ?? '';
+      if(dep) return String(dep);
+      const catId = nForm?.serviceCat;
+      const c = (categoriesCache||[]).find(k => String(k.TS_category_id) === String(catId));
+      dep = c?.TS_appintment_department_id ?? c?.department_id ?? c?.TS_department_id ?? '';
+      return dep ? String(dep) : '';
+    }
+
     function renderTimes(items){
       const cont = document.getElementById('time-container');
       cont.innerHTML = '';
       selectedTime = null;
+      if (!items.length){ cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>'; updateNextAvailability(); return; }
 
-      if (!items.length){
-        cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>';
-        log('[TIMES] No items to render');
-        return;
-      }
-
-      log('[TIMES] Rendering items', items.length, items.slice(0,5));
-      items.forEach(t=>{
+      items.forEach((t, idx)=>{
         const btn = document.createElement('button');
         btn.className = 'time-option';
         btn.type = 'button';
         btn.setAttribute('role','radio');
+        btn.setAttribute('aria-checked','false');
+        btn.setAttribute('tabindex', idx === 0 ? '0' : '-1');
         btn.textContent = t.ui;
-        btn.addEventListener('click', ()=>{
-          [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
+
+        const select = () => {
+          [...cont.children].forEach(x=>{ x.setAttribute('aria-checked','false'); x.setAttribute('tabindex','-1'); });
           btn.setAttribute('aria-checked','true');
+          btn.setAttribute('tabindex','0');
+          btn.focus();
           selectedTime = t;
-          nForm.time = t.iso.slice(0,5);
-          log('[TIMES] Selected', selectedTime);
+          nForm.time = t.iso.slice(0,5); // normalized HH:mm
+          updateNextAvailability();
+        };
+
+        btn.addEventListener('click', select);
+        btn.addEventListener('keydown', (e)=>{
+          const keys = ['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'];
+          if(!keys.includes(e.key)) return;
+          e.preventDefault();
+          const nodes = [...cont.children];
+          const i = nodes.indexOf(btn);
+          const nextI = (e.key==='ArrowRight'||e.key==='ArrowDown') ? Math.min(i+1,nodes.length-1) : Math.max(i-1,0);
+          nodes[nextI].focus();
         });
+
         cont.appendChild(btn);
       });
     }
@@ -618,19 +553,28 @@
       const loc=document.getElementById('area').value||'';
       const srv=document.getElementById('service').value||'';
 
+      // REQUIRE selections before fetching
       if(!loc || !srv){
         document.getElementById('time-container').innerHTML='<div class="text-center text-muted" style="grid-column:1/-1">اختر المنطقة والخدمة لعرض المواعيد</div>';
         setLoadingTimes(false);
-        warn('[TIMES] Missing location/service', {loc, srv});
+        updateNextAvailability();
         return;
       }
 
-      log('[TIMES] Fetching with', {startDate, location:loc, service:srv});
-      callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
-        const appts=(res?.data?.appointments||[]);
-        log('[TIMES] Raw appointments count', appts.length);
+      // Resolve department
+      const dept = (nForm.departmentId && String(nForm.departmentId)) || getDepartmentIdFromServiceId(srv);
+
+      // FETCH IS SCOPED TO ONE DAY ONLY
+      const qs = `/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}${dept ? `&departmentId=${encodeURIComponent(dept)}` : ''}`;
+
+      callContent2(qs, (res)=>{
+        let appts=(res?.data?.appointments||[]);
+        // KEEP ONLY SAME DEPARTMENT (defensive)
+        if(dept){ appts = appts.filter(a => String((a?.TS_appintment_department_id ?? a?.department_id ?? a?.TS_department_id) ?? '') === String(dept)); }
+
         const prepared = appts.map(a=>{
           if(!isAvailable(a)) return null;
+          // INVALID TIME STRINGS ARE DROPPED
           let t = luxon.DateTime.fromISO(a.TS_appointment_time || a.time || a.TS_time, { setZone:true });
           if (!t.isValid && a.TS_appointment_time) {
             t = luxon.DateTime.fromFormat(String(a.TS_appointment_time), 'HH:mm:ss', { setZone:true });
@@ -640,13 +584,9 @@
           return { ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso: t.toFormat('HH:mm') };
         }).filter(Boolean);
 
-        log('[TIMES] Prepared (available & parsed)', prepared.length, prepared.slice(0,5));
-
-        const uniq = {};
-        prepared.forEach(it=>{ if(!uniq[it.iso]) uniq[it.iso]=it; });
+        // DE-DUP BY HH:mm + SORT ASC
+        const uniq = {}; prepared.forEach(it=>{ if(!uniq[it.iso]) uniq[it.iso]=it; });
         const items = Object.values(uniq).sort((a,b)=>a.iso.localeCompare(b.iso));
-
-        log('[TIMES] Unique + sorted', items.length, items.slice(0,10));
         renderTimes(items);
         setLoadingTimes(false);
       }, true);
@@ -657,60 +597,37 @@
       return true;
     }
 
-    /* ---------------- PowerPoint Deck Controller ---------------- */
-    let deckTimers = [];
-    let deckIndex = 0;
-    let deckRunning = false;
-    const SLIDE_MS = 2600;  // per slide
-    const GAP_MS   = 180;   // gap between slides
+    // Plate validation
+    function validatePlate(){
+      const el = document.getElementById('plateNumber');
+      const ok = el.value && el.value.length === 4;
+      if(!ok){ showToast('error','رجاءً أدخل آخر ٤ أرقام من اللوحة'); el.focus(); }
+      return ok;
+    }
 
+    /* ---------------- PowerPoint Deck Controller ---------------- */
+    let deckTimers = []; let deckIndex = 0; let deckRunning = false;
+    const SLIDE_MS = 2600; const GAP_MS = 180;
     function startWelcomeDeck(){
-      const deck = document.getElementById('pptDeck');
-      if(!deck) return;
+      const deck = document.getElementById('pptDeck'); if(!deck) return;
       const slides = Array.from(deck.querySelectorAll('.ppt-slide'));
       const dotsWrap = document.getElementById('pptDots');
       dotsWrap.innerHTML = slides.map((_,i)=>`<span class="ppt-dot${i===0?' active':''}"></span>`).join('');
       const dots = Array.from(dotsWrap.children);
-
       const setActive = (i, exiting=-1)=>{
-        slides.forEach((s,idx)=>{
-          s.classList.remove('is-active','is-exiting');
-          if(idx===i){ s.style.zIndex=2; s.classList.add('is-active'); }
-          else if(idx===exiting){ s.style.zIndex=1; s.classList.add('is-exiting'); }
-          else{ s.style.zIndex=0; }
-        });
+        slides.forEach((s,idx)=>{ s.classList.remove('is-active','is-exiting'); if(idx===i){ s.style.zIndex=2; s.classList.add('is-active'); } else if(idx===exiting){ s.style.zIndex=1; s.classList.add('is-exiting'); } else{ s.style.zIndex=0; } });
         dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
       };
-
-      deckRunning = true;
-      deckIndex = 0;
-      setActive(0, -1);
-
-      const advance = ()=>{
-        if(!deckRunning) return;
-        const prev = deckIndex;
-        deckIndex++;
-        if(deckIndex >= slides.length){
-          stopWelcomeDeck();
-          showPage(1); // go to Service
-          return;
-        }
-        setActive(deckIndex, prev);
-        schedule();
-      };
-
+      deckRunning = true; deckIndex = 0; setActive(0, -1);
+      const advance = ()=>{ if(!deckRunning) return; const prev = deckIndex; deckIndex++; if(deckIndex >= slides.length){ stopWelcomeDeck(); showPage(1); return; } setActive(deckIndex, prev); schedule(); };
       const schedule = ()=>{ deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS)); };
       schedule();
     }
-
-    function stopWelcomeDeck(){
-      deckRunning = false;
-      deckTimers.forEach(t=>clearTimeout(t));
-      deckTimers = [];
-    }
+    function stopWelcomeDeck(){ deckRunning = false; deckTimers.forEach(t=>clearTimeout(t)); deckTimers = []; }
 
     /* ---------------- Init & bindings ---------------- */
     $(function(){
+      enforceDateMinToday();
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
@@ -719,66 +636,90 @@
       $('#service').select2({width:'100%',placeholder:'الخدمة'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة'});
 
-      itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
-        initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
-        utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
-      });
+      itiPhone=window.intlTelInput(document.querySelector('#mobile'),{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js' });
 
       setLoadingServices(true);
       callContent2(`/locations`, res=>{
         const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
-        $('#area').empty().select2({data:ds,width:'100%'}); 
+        $('#area').empty().select2({data:ds,width:'100%'});
         if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
         else { setLoadingServices(false); showToast('error','لا توجد مناطق متاحة حالياً'); }
       });
 
       $('#area').on('change', function(){
         nForm.location=this.value; setLoadingServices(true);
-        log('[AREA] changed ->', this.value);
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
           servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
-          $('#serviceCat').empty().select2({data:cats,width:'100%'}); 
+          $('#serviceCat').empty().select2({data:cats,width:'100%'});
           if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
           setLoadingServices(false);
+          updateNextAvailability();
         }, true);
       });
 
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
-        log('[CATEGORY] changed ->', cid);
         const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
-        $('#service').empty().select2({data:items,width:'100%'}); 
+        $('#service').empty().select2({data:items,width:'100%'});
         if(items.length){ $('#service').val(items[0].id).trigger('change'); }
+        updateNextAvailability();
       });
 
-      $('#service, #date').on('change', ()=>{
-        log('[SERVICE/DATE] changed', {service:$('#service').val(), date:$('#date').val()});
+      // Service change: store service + department, update badge, refresh times if on page4
+      $('#service').on('change', function(){
+        nForm.service = this.value || '';
+        nForm.departmentId = getDepartmentIdFromServiceId(this.value);
+        document.getElementById('departmentBadge').textContent = nForm.departmentId || '—';
+        document.getElementById('departmentId').setAttribute('value', nForm.departmentId || '');
         if(getActiveIndex()===2) fetchAndRenderTimes();
+        updateNextAvailability();
       });
 
+      // Date change -> enforce min + refetch if on page4
+      $('#date').on('change', function(){ enforceDateMinToday(); if(getActiveIndex()===2) fetchAndRenderTimes(); updateNextAvailability(); });
+
+      // Preload brands
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands,width:'100%'});
 
-      document.querySelectorAll('.pay-card').forEach(card=>{
-        card.addEventListener('click', ()=>{
-          document.querySelectorAll('.pay-card').forEach(c=>{c.setAttribute('aria-checked','false'); c.querySelector('input').checked=false;});
-          card.setAttribute('aria-checked','true'); card.querySelector('input').checked=true; nForm.paymentMethod=card.querySelector('input').value;
-          log('[PAYMENT] selected', nForm.paymentMethod);
+      // Payment radiogroup behavior + ARIA
+      const payGroup = document.getElementById('payGroup');
+      const payCards = [...payGroup.querySelectorAll('.pay-card')];
+      payCards.forEach((card, idx)=>{
+        const input = card.querySelector('input');
+        card.setAttribute('role','radio'); card.setAttribute('aria-checked','false'); card.setAttribute('tabindex', idx===0?'0':'-1');
+        const choose = () => {
+          payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; });
+          card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; nForm.paymentMethod=input.value; updateNextAvailability(); };
+        card.addEventListener('click', choose);
+        card.addEventListener('keydown', (e)=>{
+          if(e.key==='Enter' || e.key===' '){ e.preventDefault(); choose(); }
+          if(['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'].includes(e.key)){
+            e.preventDefault();
+            const i = payCards.indexOf(card);
+            const nextI = (e.key==='ArrowRight'||e.key==='ArrowDown') ? Math.min(i+1,payCards.length-1) : Math.max(i-1,0);
+            payCards[nextI].focus();
+          }
         });
       });
 
+      // Plate: digits only
+      $('#plateNumber').on('input', function(){ this.value = this.value.replace(/\D/g, '').slice(0,4); updateNextAvailability(); });
+
+      // Contact field triggers
+      $('#name, #mobile, #carName').on('input', updateNextAvailability);
+      $('#serviceCount, #serviceCat, #service, #area').on('change', updateNextAvailability);
+
+      // Rebook
       $('#rebook').on('click', ()=>location.href='/');
-
-      // welcome opening motion flag
-      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
-
-      // Start PowerPoint show (respect reduced motion)
-      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(reduced){ setTimeout(()=>showPage(1), 400); } else { startWelcomeDeck(); }
 
       // initial progress + welcome footer state
       syncProgress(0);
+
+      // Start Deck (respect reduced motion)
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduced){ setTimeout(()=>showPage(1), 400); } else { startWelcomeDeck(); }
     });
 
     // Footer nav + welcome Skip button
@@ -789,16 +730,16 @@
 
       $start.addEventListener('click', ()=>{ stopWelcomeDeck(); showPage(1); });
 
-      $next.addEventListener('click', async ()=>{
+      function gotoNext(){
         const i=getActiveIndex(); const id=orderedPages[i];
-        log('[NAV] next from', id);
 
         if(id==='page2'){
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          log('[FORM] service step', {location:nForm.location, category:nForm.serviceCat, service:nForm.service, count:nForm.serviceCount});
-          showPage(2);
+          // keep departmentId
+          nForm.departmentId = getDepartmentIdFromServiceId(nForm.service);
+          showPage(2); // go to time page (page4)
           fetchAndRenderTimes();
           return;
         }
@@ -806,25 +747,20 @@
         if(id==='page4'){
           if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; }
           nForm.date=$('#date').val();
-          log('[FORM] time step', {date:nForm.date, time:nForm.time});
           showPage(3);
           return;
         }
 
         if(id==='page5'){
           const name=$('#name').val().trim();
-          if(!name){ showToast('error','يرجى إدخال الاسم'); return; }
-          if(!validateMobile()) return;
+          if(!name){ showToast('error','يرجى إدخال الاسم'); document.getElementById('name').focus(); return; }
+          if(!validateMobile()) return; // swap to lenient if needed
+          if(!validatePlate()) return;
           if(!nForm.paymentMethod){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
 
           nForm.customerN=name;
           nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
-
-          log('[FORM] contact + vehicle step', {
-            name:nForm.customerN, mobile:nForm.customerM, payment:nForm.paymentMethod, desc:nForm.locationDescription
-          });
-
           showPage(4);
           return;
         }
@@ -832,28 +768,54 @@
         if(id==='page6'){
           if(!positionUrl){ showToast('error','الرجاء تحديد الموقع على الخريطة'); return; }
           nForm.urlLocation=positionUrl;
-
-          try{
-            log('[API] reserveAppointment -> payload', nForm);
-            const res=await fetch(defaultLink2 + '/reserveAppointment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nForm)});
-            const json=await res.json();
-            log('[API] reserveAppointment <- response', json);
-            if(json?.success){ showToast('success','تم إنشاء الحجز'); showPage(5); }
-            else { showToast('error', json?.msgAR || 'حدث خطأ غير متوقع'); }
-          }catch(e){
-            err('[API] reserveAppointment error', e);
-            showToast('error','عذرًا حصل خطأ غير متوقع، حاول لاحقًا');
-          }
+          (async()=>{
+            try{
+              const res=await fetch(defaultLink2 + '/reserveAppointment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nForm)});
+              const json=await res.json();
+              if(json?.success){ showToast('success','تم إنشاء الحجز'); showPage(5); }
+              else { showToast('error', json?.msgAR || 'حدث خطأ غير متوقع'); }
+            }catch(e){ showToast('error','عذرًا حصل خطأ غير متوقع، حاول لاحقًا'); }
+          })();
           return;
         }
 
         // default next
         const nextIndex=Math.min(i+1, orderedPages.length-1);
         showPage(nextIndex);
-      });
+      }
 
+      $next.addEventListener('click', gotoNext);
       $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
+
+    // Opening Motion trigger + date min
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.body.classList.add('intro-play');
+      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
+      enforceDateMinToday();
+    });
+
+    /* Enable/disable Next based on step validity */
+    function updateNextAvailability(){
+      const i = getActiveIndex();
+      const nextBtn = document.getElementById('footer-next');
+      let enable = true;
+      if(i === 1){ // page2: area+service
+        enable = !!($('#area').val() && $('#service').val());
+      } else if(i === 2){ // page4: time
+        enable = !!selectedTime;
+      } else if(i === 3){ // page5: contact + payment + plate
+        const nameOk = $('#name').val().trim().length > 0;
+        const phoneOk = (itiPhone && itiPhone.isValidNumber()); // swap to lenient if desired
+        const payOk = !!nForm.paymentMethod;
+        const plateOk = ($('#plateNumber').val()||'').length === 4;
+        enable = nameOk && phoneOk && payOk && plateOk;
+      } else if(i === 4){ // page6: map
+        enable = !!positionUrl;
+      }
+      nextBtn.disabled = !enable;
+      nextBtn.classList.toggle('disabled', !enable);
+    }
 
     /* ---------------- Google Map ---------------- */
     let map, marker;
@@ -861,38 +823,16 @@
       const def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-
-      const setPos=(latLng,pan=false)=>{
-        if(!latLng) return;
-        marker.setPosition(latLng);
-        if(pan) map.panTo(latLng);
-        map.setZoom(17);
-        positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
-        log('[MAP] setPos', positionUrl);
-      };
-
+      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; updateNextAvailability(); };
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
       map.addListener('click', ({latLng})=>setPos(latLng));
-
       const btn=document.getElementById('show-my-location');
-      if(btn){
-        btn.addEventListener('click', ()=>{
-          if(!navigator.geolocation){
-            showToast('error','المتصفح لا يدعم تحديد الموقع');
-            return;
-          }
-          navigator.geolocation.getCurrentPosition(
-            pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
-            e=>{ showToast('error','تعذر تحديد موقعك'); err('[MAP] geo error', e); },
-            { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
-          );
-        });
-      }
+      if(btn){ btn.addEventListener('click', ()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition( pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true), err=>{ const msg = err?.message || 'رجاءً فعّل الـ GPS وأذونات الموقع'; showToast('error','تعذر تحديد موقعك: '+msg); }, { enableHighAccuracy:true, timeout:10000, maximumAge:30000 } ); }); }
     }
     window.initMap = initMap;
   </script>
 
-  <!-- Google Maps (async recommended pattern) -->
+  <!-- Google Maps (async) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
 </body>
 </html>
