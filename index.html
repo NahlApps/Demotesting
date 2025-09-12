@@ -190,12 +190,11 @@
       body.intro-play footer .footer-brand { animation:none !important; opacity:1; }
     }
 
-    /* =================== PowerPoint-style Deck =================== */
+    /* Deck */
     .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg,#ffffff, #f6fbfd); box-shadow:var(--shadow-md); }
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
     .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
-
     @media (prefers-reduced-motion: no-preference) {
       .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; }
       .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; }
@@ -203,7 +202,6 @@
     }
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
-    @keyframes heroFloat{ from{ transform:translateY(6px) } to{ transform:translateY(0) } }
   </style>
 </head>
 <body>
@@ -230,7 +228,7 @@
   <main>
     <div id="app">
       <div class="stage">
-        <!-- 1) Welcome with PowerPoint Deck -->
+        <!-- 1) Welcome -->
         <section id="page1" class="page active" aria-label="الترحيب">
           <h1 class="will-anim visually-hidden">عرض ترحيبي</h1>
           <div class="card text-center will-anim" style="background:transparent; box-shadow:none; padding:0;">
@@ -279,7 +277,7 @@
           </div>
         </section>
 
-        <!-- 3) Time (selected date only) -->
+        <!-- 3) Time (selected date only & available only) -->
         <section id="page4" class="page" aria-label="اختيار الموعد">
           <h1>متى تحب نجيك؟</h1>
           <div class="card position-relative" id="timeCard">
@@ -426,7 +424,7 @@
         controllers.push([controller,signal]);
       }
       try{
-        await new Promise(r=>setTimeout(r, 300)); // tiny debounce for UX
+        await new Promise(r=>setTimeout(r, 300));
         const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal})});
         if(!res.ok){
           if(retries>0) return callContent2(path,cb,abortable,retries-1);
@@ -537,14 +535,40 @@
     }
     function stopWelcomeDeck(){ deckRunning = false; deckTimers.forEach(t=>clearTimeout(t)); deckTimers = []; }
 
-    /* ---------------- TIMES (Selected date only) ---------------- */
-    let dayTimes = [];       // [{label, actual12}]
+    /* ---------------- TIMES (Selected date & AVAILABLE ONLY + logs) ---------------- */
+    let dayTimes = [];       // [{label, actual12, hhmm}]
     let timesLoaded = false;
 
-    // Date change ⇒ fetch times
-    document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
+    // Detect availability from multiple possible fields/values
+    function isAvailable(row){
+      const raw =
+        row?.TS_appintment_status ??
+        row?.TS_appointment_status ??
+        row?.TS_status ??
+        row?.status ??
+        row?.TS_available ??
+        row?.available ??
+        row?.TS_appointment_available;
 
-    // Re-fetch when service/area changes (if we're on the time page)
+      if (typeof raw === 'boolean') return raw;
+      if (typeof raw === 'number')  return raw === 1;
+
+      const s = String(raw || '').trim().toLowerCase();
+      if (!s) return false;
+
+      // treat these as available
+      return (
+        s.includes('avail') || // available
+        s.includes('open')  ||
+        s.includes('free')  ||
+        s.includes('empty') ||
+        s.includes('متاح')  ||
+        s.includes('متاحة')
+      );
+    }
+
+    // listeners
+    document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
     document.getElementById('service').addEventListener('change', () => {
       if (getActiveIndex() === 2) fetchTimesForSelectedDate();
     });
@@ -552,7 +576,7 @@
       if (getActiveIndex() === 2) fetchTimesForSelectedDate();
     });
 
-    // Ensure default date is today & min
+    // init date min & default
     (function initDateMin(){
       const today = DateTime.now().toFormat('yyyy-LL-dd');
       const dateEl = document.getElementById('date');
@@ -581,20 +605,28 @@
           <span class="visually-hidden">Loading...</span>
         </div>`;
 
-      // No departmentId (matches original working behavior)
       const qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}`
                + `&location=${encodeURIComponent(loc)}`
                + `&service=${encodeURIComponent(srv)}`;
 
+      // logs
+      console.log('[Times] Request →', { startDate: selectedISO, location: loc, service: srv });
+
       callContent2(qs, (res) => {
         const rows = (res?.data?.appointments || []);
+        console.log('[Times] Raw rows:', rows);
+
         const list = [];
 
         rows.forEach((r) => {
-          // keep only exact selected date
+          // same date only
           const d = DateTime.fromISO(r.TS_appointment_date, { setZone: true });
           if (!d.isValid || d.toISODate() !== selectedISO) return;
 
+          // available only
+          if (!isAvailable(r)) return;
+
+          // parse time robustly
           const raw = String(r.TS_appointment_time || '').trim();
           let t = DateTime.fromISO(raw, { setZone: true });
           if (!t.isValid) t = DateTime.fromFormat(raw, 'HH:mm:ss', { setZone: true });
@@ -603,16 +635,22 @@
           if (!t.isValid) return;
 
           list.push({
-            label: t.toLocaleString(DateTime.TIME_SIMPLE), // e.g., 3:30 PM
-            actual12: t.toFormat('hh:mm a')                 // stable canonical
+            label: t.toLocaleString(DateTime.TIME_SIMPLE),
+            actual12: t.toFormat('hh:mm a'),
+            hhmm: t.toFormat('HH:mm')
           });
         });
 
         // De-dup & sort
         const seen = new Set();
         dayTimes = list
-          .filter(x => { if (seen.has(x.label)) return false; seen.add(x.label); return true; })
-          .sort((a,b)=> a.actual12.localeCompare(b.actual12));
+          .filter(x => { if (seen.has(x.hhmm)) return false; seen.add(x.hhmm); return true; })
+          .sort((a,b)=> a.hhmm.localeCompare(b.hhmm));
+
+        // logs
+        console.log('[Times] Available (same date) count:', dayTimes.length);
+        console.table(dayTimes.map(x => ({ label: x.label, hhmm: x.hhmm })));
+        console.log('[Times] Final labels:', dayTimes.map(x => x.label));
 
         timesLoaded = true;
         renderSelectedDateTimes(selectedISO);
@@ -659,10 +697,13 @@
 
           const parsed = DateTime.fromFormat(t.actual12, 'h:mm a');
           nForm.date = selectedISO;
-          nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
+          nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.hhmm;
 
+          // keep both vars for Next gating
           window.selectedTime = { ui: t.label, iso: nForm.time };
-          selectedTime        = window.selectedTime; // critical for Next gating
+          selectedTime        = window.selectedTime;
+
+          console.log('[Times] Selected →', { date: nForm.date, timeLabel: t.label, time24: nForm.time });
 
           updateNextAvailability?.();
           // Optionally: showPage(3);
@@ -672,13 +713,14 @@
       });
     }
 
-    // Compatibility helper (if some old code calls it)
+    // Compatibility helper if old code calls it
     function choosedDate(time12, dateISO /*, i */) {
       const parsed = DateTime.fromFormat(time12, "h:mm a");
       nForm.date = dateISO;
       nForm.time = parsed.isValid ? parsed.toFormat("HH:mm") : time12;
       window.selectedTime = { ui: time12, iso: nForm.time };
       selectedTime        = window.selectedTime;
+      console.log('[Times] choosedDate()', { date: nForm.date, timeLabel: time12, time24: nForm.time });
       updateNextAvailability?.();
     }
 
@@ -771,7 +813,7 @@
       // initial progress + welcome footer state
       syncProgress(0);
 
-      // Start Deck (respect reduced motion)
+      // Start Deck
       const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(reduced){ setTimeout(()=>showPage(1), 400); } else { startWelcomeDeck(); }
     });
@@ -793,7 +835,7 @@
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
           nForm.departmentId = getDepartmentIdFromServiceId(nForm.service); // badge only
           showPage(2); // to page4
-          document.getElementById('date').dispatchEvent(new Event('change')); // initial fetch for selected date
+          document.getElementById('date').dispatchEvent(new Event('change')); // initial fetch
           return;
         }
 
@@ -855,13 +897,13 @@
         enable = !!($('#area').val() && $('#service').val());
       } else if(i === 2){ // page4 (time)
         enable = !!selectedTime;
-      } else if(i === 3){ // page5 (contact+payment+plate)
+      } else if(i === 3){ // page5
         const nameOk = $('#name').val().trim().length > 0;
         const phoneOk = (itiPhone && itiPhone.isValidNumber());
         const payOk = !!nForm.paymentMethod;
         const plateOk = ($('#plateNumber').val()||'').length === 4;
         enable = nameOk && phoneOk && payOk && plateOk;
-      } else if(i === 4){ // page6 (map)
+      } else if(i === 4){ // page6
         enable = !!positionUrl;
       }
       nextBtn.disabled = !enable;
@@ -876,6 +918,7 @@
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
+      map.addEventListener?.('click', ({latLng})=>setPos(latLng)); // fallback
       map.addListener('click', ({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
       if(btn){
