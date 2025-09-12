@@ -244,6 +244,7 @@
           <h1 class="will-anim">✨ غسيل بدون طوابير</h1>
           <div class="card text-center will-anim">
             <p class="mb-3" style="color:#224652">واكس يحمي سيارتك • فوط نظيفة • إسفنجة للكفرات</p>
+            <!-- (kept text; original button moved to footer) -->
           </div>
         </section>
 
@@ -376,7 +377,7 @@
     </div>
   </main>
 
-  <!-- Footer nav (with Nahl marking) -->
+  <!-- Footer nav (with Nahl marking + page1-button moved here) -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-brand will-anim" aria-label="Nahl Marking">
@@ -385,6 +386,8 @@
       <div class="footer-actions will-anim">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary">التالي</button>
+        <!-- Original element preserved & relocated -->
+        <button id="page1-button" class="btn-footer primary">ابدأ الحجز</button>
       </div>
     </div>
   </footer>
@@ -429,7 +432,7 @@
     const orderedPages=["page1","page2","page4","page5","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","التأكيد"];
     let selectedTime=null, positionUrl="";
-    let servicesCache=null, categoriesCache=null, itiPhone=null; /* keep ONLY this declaration */
+    let servicesCache=null, categoriesCache=null, itiPhone=null;
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
@@ -446,9 +449,15 @@
       const pct=((i+1)/orderedPages.length)*100;
       document.getElementById('miniBarFill').style.width=pct+'%';
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
-      document.getElementById('footer-prev').classList.toggle('hidden', i===0);
-      const nextBtn=document.getElementById('footer-next');
-      nextBtn.textContent = (i===0) ? 'ابدأ الحجز' : 'التالي';
+
+      const prev=document.getElementById('footer-prev');
+      const next=document.getElementById('footer-next');
+      const start=document.getElementById('page1-button');
+
+      const onWelcome = i===0;
+      prev.classList.toggle('hidden', onWelcome || i===0);   // hidden on first page anyway
+      next.classList.toggle('hidden', onWelcome);            // hide Next on welcome
+      start.classList.toggle('hidden', !onWelcome);          // show Start only on welcome
     }
 
     /* ---------------- Availability logic ---------------- */
@@ -578,18 +587,20 @@
 
       $('#rebook').on('click', ()=>location.href='/');
 
+      // initial progress + welcome footer state
       syncProgress(0);
     });
 
-    // Footer nav
+    // Footer nav + welcome start button
     (function(){
       const $prev=document.getElementById('footer-prev');
       const $next=document.getElementById('footer-next');
+      const $start=document.getElementById('page1-button');
+
+      $start.addEventListener('click', ()=>showPage(1));
 
       $next.addEventListener('click', async ()=>{
         const i=getActiveIndex(); const id=orderedPages[i];
-
-        if(id==='page1'){ showPage(1); return; }
 
         if(id==='page2'){
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
@@ -636,7 +647,9 @@
           return;
         }
 
-        showPage(Math.min(i+1, orderedPages.length-1));
+        // default next
+        const nextIndex=Math.min(i+1, orderedPages.length-1);
+        showPage(nextIndex);
       });
 
       $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
@@ -667,7 +680,6 @@
         positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
       };
 
-      // Use Maps event helpers (cleaner)
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
       map.addListener('click', ({latLng})=>setPos(latLng));
 
@@ -689,11 +701,10 @@
         });
       }
     }
-    // ensure global for callback
     window.initMap = initMap;
   </script>
 
-  <!-- Google Maps (best-practice loading) -->
+  <!-- Google Maps (async recommended pattern) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
 </body>
 </html>
