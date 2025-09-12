@@ -52,7 +52,7 @@
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
     #app{width:100%; max-width:1120px}
 
-    /* Stage & pages (no steps/progress in body) */
+    /* Stage & pages */
     .stage{position:relative; min-height:540px; padding:8px 0 20px}
     .page{
       position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
@@ -111,16 +111,16 @@
     }
     .footer-inner{
       max-width:1120px; width:100%; padding:8px 12px;
-      display:flex; align-items:center; justify-content:space-between; /* updated */
+      display:flex; align-items:center; justify-content:space-between;
     }
-    .footer-brand{ font-size:.95rem; color:#fff; opacity:.92 }       /* new */
+    .footer-brand{ font-size:.95rem; color:#fff; opacity:.92 }
     .footer-actions{display:flex; gap:12px}
     .btn-footer{
       flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md);
       padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold);
-      background:#fff; color:var(--brand-600);
+      background:#fff; color:#027A93;
     }
-    .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
+    .btn-footer.primary{background:#027A93; color:#fff; border-color:#027A93}
     .btn-footer.hidden{visibility:hidden}
 
     .form-block{margin-bottom:var(--sp-5)}
@@ -140,6 +140,34 @@
 
     /* serviceCount full width */
     #serviceCount{ width:100% !important; }
+
+    /* ---------------- Opening Motion (Soft Zoom + Fade + Stagger) ---------------- */
+    @media (prefers-reduced-motion: no-preference) {
+      .will-anim { will-change: transform, opacity; }
+
+      @keyframes introSlideDown { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:none } }
+      @keyframes introFadeIn    { from { opacity:0 } to { opacity:1 } }
+      @keyframes introRiseZoom  { from { opacity:0; transform:translateY(14px) scale(.985) } to { opacity:1; transform:none } }
+      @keyframes introSlideUp   { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:none } }
+      @keyframes barGrow        { from { width:0% } to { width:16.7% } }
+
+      /* Play only on first load when .intro-play is on <body> */
+      body.intro-play header .mini-progress { animation:introSlideDown 420ms var(--ease) 40ms both; }
+      body.intro-play header .mini-progress .bar>span { animation:barGrow 480ms var(--ease) 80ms both; }
+
+      body.intro-play #page1 h1 { animation:introFadeIn 360ms var(--ease) 80ms both; }
+      body.intro-play #page1 .card { animation:introRiseZoom 520ms var(--ease) 120ms both; }
+
+      body.intro-play footer .footer-actions { animation:introSlideUp 420ms var(--ease) 180ms both; }
+      body.intro-play footer .footer-brand   { animation:introFadeIn 360ms var(--ease) 220ms both; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body.intro-play header .mini-progress,
+      body.intro-play #page1 h1,
+      body.intro-play #page1 .card,
+      body.intro-play footer .footer-actions,
+      body.intro-play footer .footer-brand { animation:none !important; opacity:1; }
+    }
   </style>
 </head>
 <body>
@@ -149,7 +177,7 @@
   <!-- Header -->
   <header>
     <div class="header-inner">
-      <div class="mini-progress" aria-hidden="true">
+      <div class="mini-progress will-anim" aria-hidden="true">
         <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
         <div class="step" id="miniStepTitle">الترحيب</div>
       </div>
@@ -166,10 +194,10 @@
       <div class="stage">
         <!-- 1) Welcome -->
         <section id="page1" class="page active" aria-label="الترحيب">
-          <h1>✨ غسيل بدون طوابير</h1>
-          <div class="card text-center">
+          <h1 class="will-anim">✨ غسيل بدون طوابير</h1>
+          <div class="card text-center will-anim">
             <p class="mb-3" style="color:#224652">واكس يحمي سيارتك • فوط نظيفة • إسفنجة للكفرات</p>
-            <!-- زر الترحيب أُلغي: سيتم استخدام زر الفوتر بدلاً منه -->
+            <!-- تمت إزالة زر الترحيب؛ سنستخدم زر الفوتر -->
           </div>
         </section>
 
@@ -190,8 +218,6 @@
                 <label class="form-label">الخدمة</label>
                 <select id="service" style="width:100%"></select>
               </div>
-
-              <!-- serviceCount بعرض 100% وعلى صف كامل -->
               <div class="col-12">
                 <label class="form-label">عدد السيارات</label>
                 <select id="serviceCount" class="form-select">
@@ -308,10 +334,10 @@
   <!-- Footer nav (with Nahl marking) -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
-      <div class="footer-brand" aria-label="Nahl Marking">
+      <div class="footer-brand will-anim" aria-label="Nahl Marking">
         <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener" style="color:#fff;text-decoration:none">Nahl.app</a></span>
       </div>
-      <div class="footer-actions">
+      <div class="footer-actions will-anim">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary">التالي</button>
       </div>
@@ -379,15 +405,10 @@
 
       // تبديل نص زر الفوتر في صفحة الترحيب
       const nextBtn=document.getElementById('footer-next');
-      if(i===0){
-        nextBtn.textContent='ابدأ الحجز';
-      }else{
-        nextBtn.textContent='التالي';
-      }
+      nextBtn.textContent = (i===0) ? 'ابدأ الحجز' : 'التالي';
     }
 
     /* ---------------- Availability logic ---------------- */
-    // strict: show ONLY rows where TS_appintment_status === "Available"
     function isAvailable(row){
       const raw = row?.TS_appintment_status ?? row?.TS_status ?? row?.status ?? '';
       const norm = String(raw).trim().toLowerCase();
@@ -403,7 +424,6 @@
       return [start, start.plus({ days: 1 }), start.plus({ days: 2 })];
     }
 
-    // Prepare buckets for ONLY Available rows
     function prepareTimeBuckets(apiJson, datesWindow) {
       const bucketsDisplay = [[], [], []];
       const bucketsActual  = [[], [], []];
@@ -441,7 +461,6 @@
         }
       }
 
-      // sort times per day
       for (let i = 0; i < 3; i++) {
         const zip = bucketsDisplay[i].map((d, k) => ({ d, a: bucketsActual[i][k] }));
         zip.sort((A,B) => A.a.localeCompare(B.a));
@@ -472,7 +491,7 @@
           [...cont.children].forEach(x=>x.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
           selectedTime = t;
-          nForm.time = t.iso.slice(0,5); // HH:mm
+          nForm.time = t.iso.slice(0,5);
         });
         cont.appendChild(btn);
       });
@@ -489,13 +508,9 @@
         return;
       }
       callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
-        const datesWindow = buildDatesWindowFromInput();
         const appts=(res?.data?.appointments||[]);
-        // transform -> available only
         const prepared = appts.map(a=>{
-          // skip unavailable rows early
           if(!isAvailable(a)) return null;
-
           let t = luxon.DateTime.fromISO(a.TS_appointment_time || a.time || a.TS_time, { setZone:true });
           if (!t.isValid && a.TS_appointment_time) {
             t = luxon.DateTime.fromFormat(String(a.TS_appointment_time), 'HH:mm:ss', { setZone:true });
@@ -503,13 +518,9 @@
           }
           if(!t.isValid) return null;
 
-          return {
-            ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE),
-            iso: t.toFormat('HH:mm')
-          };
+          return { ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso: t.toFormat('HH:mm') };
         }).filter(Boolean);
 
-        // de-duplicate by HH:mm (keep one)
         const uniq = {};
         prepared.forEach(it=>{ if(!uniq[it.iso]) uniq[it.iso]=it; });
         const items = Object.values(uniq).sort((a,b)=>a.iso.localeCompare(b.iso));
@@ -538,8 +549,6 @@
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
-
-      // (أُلغي زر الترحيب داخل الصفحة الأولى - نستخدم زر الفوتر)
 
       // load locations
       setLoadingServices(true);
@@ -588,6 +597,7 @@
       // rebook
       $('#rebook').on('click', ()=>location.href='/');
 
+      // initial progress state
       syncProgress(0);
     });
 
@@ -605,15 +615,15 @@
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          showPage(2);           // إلى صفحة الوقت
-          fetchAndRenderTimes(); // جلب المواعيد المتاحة فقط
+          showPage(2);
+          fetchAndRenderTimes();
           return;
         }
 
         if(id==='page4'){
           if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; }
           nForm.date=$('#date').val();
-          showPage(3);           // إلى صفحة البيانات
+          showPage(3);
           return;
         }
 
@@ -627,7 +637,7 @@
           nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
 
-          showPage(4);           // إلى صفحة الخريطة
+          showPage(4);
           return;
         }
 
@@ -652,6 +662,18 @@
       $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
 
+    /* ---------------- Opening Motion trigger + date min ---------------- */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // Play intro motion once
+      document.body.classList.add('intro-play');
+      setTimeout(()=>document.body.classList.remove('intro-play'), 800);
+
+      // ensure date min = today (safety if earlier init didn't run)
+      const today= luxon.DateTime.now().toFormat('yyyy-LL-dd');
+      const dateEl=document.getElementById('date');
+      if(dateEl){ dateEl.setAttribute('min',today); }
+    });
+
     /* ---------------- Google Map ---------------- */
     let map, marker;
     function initMap(){
@@ -669,11 +691,6 @@
       });
     }
     window.initMap=initMap;
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const today=DateTime.now().toFormat('yyyy-LL-dd');
-      document.getElementById('date').setAttribute('min',today);
-    });
   </script>
 
   <!-- Google Maps -->
