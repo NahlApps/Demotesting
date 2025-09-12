@@ -117,6 +117,10 @@
     .time-option:active{transform:translateY(0) scale(.995)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
+    /* Day pills */
+    .day-pill{ border-radius:999px }
+    .day-pill.active{ background:var(--brand-600); color:#fff; border-color:var(--brand-600) }
+
     /* Overlays */
     .load-overlay{ position:absolute; inset:0; background:rgba(255,255,255,.85); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md); }
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
@@ -170,7 +174,7 @@
       .will-anim { will-change: transform, opacity; }
       @keyframes introSlideDown { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:none } }
       @keyframes introFadeIn    { from { opacity:0 } to { opacity:1 } }
-      @keyframes introRiseZoom  { from { opacity:0; transform:translateY(14px) scale(.985) } to { opacity:1; transform:none } }
+      @keyframes introRiseZoom  { from { opacity:0; transform:translateY(14px) scale(.985) } to{ opacity:1; transform:none } }
       @keyframes introSlideUp   { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:none } }
       @keyframes barGrow        { from { width:0% } to { width:16.7% } }
 
@@ -297,6 +301,19 @@
               </div>
             </div>
 
+            <!-- Day pills header -->
+            <div id="daysHeader" class="d-flex gap-2 flex-wrap mt-3" role="tablist" aria-label="الأيام">
+              <button id="dayBtn1" class="btn btn-outline-secondary btn-sm day-pill active" type="button" role="tab" aria-selected="true">
+                <span id="day1">اليوم</span> • <small id="day1date">—</small>
+              </button>
+              <button id="dayBtn2" class="btn btn-outline-secondary btn-sm day-pill" type="button" role="tab" aria-selected="false">
+                <span id="day2">غداً</span> • <small id="day2date">—</small>
+              </button>
+              <button id="dayBtn3" class="btn btn-outline-secondary btn-sm day-pill" type="button" role="tab" aria-selected="false">
+                <span id="day3">بعد غد</span> • <small id="day3date">—</small>
+              </button>
+            </div>
+
             <div class="position-relative mt-3">
               <div id="time-container" class="time-grid" role="radiogroup" aria-label="اختيار الوقت"></div>
               <div id="timeLoading" class="load-overlay">
@@ -369,6 +386,7 @@
           <div class="card text-center">
             <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
           </div>
+          <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
         </section>
 
         <!-- 6) Done -->
@@ -507,91 +525,6 @@
       return dep ? String(dep) : '';
     }
 
-    function renderTimes(items){
-      const cont = document.getElementById('time-container');
-      cont.innerHTML = '';
-      selectedTime = null;
-      if (!items.length){ cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>'; updateNextAvailability(); return; }
-
-      items.forEach((t, idx)=>{
-        const btn = document.createElement('button');
-        btn.className = 'time-option';
-        btn.type = 'button';
-        btn.setAttribute('role','radio');
-        btn.setAttribute('aria-checked','false');
-        btn.setAttribute('tabindex', idx === 0 ? '0' : '-1');
-        btn.textContent = t.ui;
-
-        const select = () => {
-          [...cont.children].forEach(x=>{ x.setAttribute('aria-checked','false'); x.setAttribute('tabindex','-1'); });
-          btn.setAttribute('aria-checked','true');
-          btn.setAttribute('tabindex','0');
-          btn.focus();
-          selectedTime = t;
-          nForm.time = t.iso.slice(0,5); // normalized HH:mm
-          updateNextAvailability();
-        };
-
-        btn.addEventListener('click', select);
-        btn.addEventListener('keydown', (e)=>{
-          const keys = ['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'];
-          if(!keys.includes(e.key)) return;
-          e.preventDefault();
-          const nodes = [...cont.children];
-          const i = nodes.indexOf(btn);
-          const nextI = (e.key==='ArrowRight'||e.key==='ArrowDown') ? Math.min(i+1,nodes.length-1) : Math.max(i-1,0);
-          nodes[nextI].focus();
-        });
-
-        cont.appendChild(btn);
-      });
-    }
-
-    function fetchAndRenderTimes(){
-      setLoadingTimes(true);
-      const startDate=document.getElementById('date').value||DateTime.now().toFormat('yyyy-LL-dd');
-      const loc=document.getElementById('area').value||'';
-      const srv=document.getElementById('service').value||'';
-
-      // REQUIRE selections before fetching
-      if(!loc || !srv){
-        document.getElementById('time-container').innerHTML='<div class="text-center text-muted" style="grid-column:1/-1">اختر المنطقة والخدمة لعرض المواعيد</div>';
-        setLoadingTimes(false);
-        updateNextAvailability();
-        return;
-      }
-
-      // Resolve department
-      const dept = (nForm.departmentId && String(nForm.departmentId)) || getDepartmentIdFromServiceId(srv);
-
-      // FETCH IS SCOPED TO ONE DAY ONLY
-      const qs = `/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}${dept ? `&departmentId=${encodeURIComponent(dept)}` : ''}`;
-
-      callContent2(qs, (res)=>{
-        let appts=(res?.data?.appointments||[]);
-        // KEEP ONLY SAME DEPARTMENT (defensive)
-        if(dept){ appts = appts.filter(a => String((a?.TS_appintment_department_id ?? a?.department_id ?? a?.TS_department_id) ?? '') === String(dept)); }
-
-        const prepared = appts.map(a=>{
-          if(!isAvailable(a)) return null;
-          // INVALID TIME STRINGS ARE DROPPED
-          let t = luxon.DateTime.fromISO(a.TS_appointment_time || a.time || a.TS_time, { setZone:true });
-          if (!t.isValid && a.TS_appointment_time) {
-            t = luxon.DateTime.fromFormat(String(a.TS_appointment_time), 'HH:mm:ss', { setZone:true });
-            if (!t.isValid) t = luxon.DateTime.fromFormat(String(a.TS_appointment_time), 'H:mm', { setZone:true });
-          }
-          if(!t.isValid) return null;
-          return { ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso: t.toFormat('HH:mm') };
-        }).filter(Boolean);
-
-        // DE-DUP BY HH:mm + SORT ASC
-        const uniq = {}; prepared.forEach(it=>{ if(!uniq[it.iso]) uniq[it.iso]=it; });
-        const items = Object.values(uniq).sort((a,b)=>a.iso.localeCompare(b.iso));
-        renderTimes(items);
-        setLoadingTimes(false);
-      }, true);
-    }
-
     function validateMobile(){
       if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
       return true;
@@ -625,16 +558,197 @@
     }
     function stopWelcomeDeck(){ deckRunning = false; deckTimers.forEach(t=>clearTimeout(t)); deckTimers = []; }
 
+    /* ---------------- Times: 3-day window logic ---------------- */
+    let appointments = [[],[],[]];   // display labels per day
+    let ActualTimes  = [[],[],[]];   // "hh:mm a" per day
+    let timesLoaded  = false;
+    let datesWindow  = [];           // Luxon DateTimes for 3 days
+
+    // Arabic weekdays map (Luxon Monday=1..Sunday=7)
+    const weekdaysMap = {1:'الإثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت',7:'الأحد'};
+
+    function buildDatesWindowFromInput(){
+      const base = DateTime.fromISO(document.getElementById('date').value || DateTime.now().toFormat('yyyy-MM-dd'));
+      datesWindow = [base, base.plus({days:1}), base.plus({days:2})];
+    }
+    function updateDayHeaders(){
+      for (let i=0;i<3;i++){
+        document.getElementById(`day${i+1}`).innerText     = weekdaysMap[datesWindow[i].weekday];
+        document.getElementById(`day${i+1}date`).innerText = datesWindow[i].toFormat('yyyy-MM-dd');
+      }
+    }
+    function setActiveDay(idx){
+      [1,2,3].forEach(n=>{
+        const btn = document.getElementById(`dayBtn${n}`);
+        const active = (n-1)===idx;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active?'true':'false');
+      });
+      timesSetter(idx);
+    }
+
+    // Date change => fetch times
+    document.getElementById('date').onchange = () => {
+      const dateEl = document.getElementById('date');
+      dateEl.disabled = true;
+
+      const timeContainer = document.getElementById('time-container');
+      timeContainer.innerHTML = `
+        <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3;justify-self: center;">
+          <span class="visually-hidden">Loading...</span>
+        </div>`;
+
+      ActualTimes = [[],[],[]];
+      appointments = [[],[],[]];
+      timesLoaded  = false;
+
+      buildDatesWindowFromInput();
+      updateDayHeaders();
+
+      const loc = document.getElementById('area').value || '';
+      const srv = document.getElementById('service').value || '';
+      const dept = (nForm?.departmentId || '').trim();
+      if(!loc || !srv){
+        timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`;
+        dateEl.disabled = false;
+        return;
+      }
+
+      const qs = `/appointments?startDate=${datesWindow[0].toFormat('yyyy-MM-dd')}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}${dept?`&departmentId=${encodeURIComponent(dept)}`:''}`;
+
+      callContent2(qs, (res)=>{
+        timeContainer.innerHTML = `
+          <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3;justify-self: center;">
+            <span class="visually-hidden">Loading...</span>
+          </div>`;
+
+        const raw = (res?.data?.appointments || []);
+        const rows = typeof isAvailable === 'function' ? raw.filter(isAvailable) : raw;
+
+        for (let i=0;i<rows.length;i++){
+          const d = DateTime.fromISO(rows[i]['TS_appointment_date'], { setZone:true });
+          let t  = DateTime.fromISO(rows[i]['TS_appointment_time'], { setZone:true });
+          if(!t.isValid){
+            t = DateTime.fromFormat(String(rows[i]['TS_appointment_time']||'').trim(), 'HH:mm:ss', { setZone:true });
+            if(!t.isValid) t = DateTime.fromFormat(String(rows[i]['TS_appointment_time']||''), 'H:mm', { setZone:true });
+          }
+          if(!d.isValid || !t.isValid) continue;
+
+          const btnLabel = t.toLocaleString(DateTime.TIME_SIMPLE); // e.g., 3:30 PM
+          const actual12 = t.toFormat('hh:mm a');                  // e.g., 03:30 PM
+
+          if (d.toISODate() === datesWindow[0].toFormat('yyyy-MM-dd')) { appointments[0].push(btnLabel); ActualTimes[0].push(actual12); }
+          else if (d.toISODate() === datesWindow[1].toFormat('yyyy-MM-dd')) { appointments[1].push(btnLabel); ActualTimes[1].push(actual12); }
+          else if (d.toISODate() === datesWindow[2].toFormat('yyyy-MM-dd')) { appointments[2].push(btnLabel); ActualTimes[2].push(actual12); }
+        }
+
+        // De-dup + sort by actual time per day
+        for (let k=0;k<3;k++){
+          const seen = new Set();
+          const pairs = appointments[k].map((label, idx)=>({ label, actual: ActualTimes[k][idx] }))
+            .filter(p=>{ if(seen.has(p.label)) return false; seen.add(p.label); return true; })
+            .sort((a,b)=> a.actual.localeCompare(b.actual));
+          appointments[k] = pairs.map(p=>p.label);
+          ActualTimes[k]  = pairs.map(p=>p.actual);
+        }
+
+        timesLoaded = true;
+        setActiveDay(0);
+        dateEl.disabled = false;
+      }, true);
+    };
+
+    // Default date value (today) + min
+    (function initDate(){
+      const today = DateTime.now().toFormat('yyyy-MM-dd');
+      const dateEl = document.getElementById('date');
+      dateEl.value = today;
+      dateEl.setAttribute('min', today);
+    })();
+
+    // Re-fetch when service or area changes
+    document.getElementById('service').addEventListener('change', function () { document.getElementById('date').dispatchEvent(new Event('change')); });
+    document.getElementById('area').addEventListener('change', function () { document.getElementById('date').dispatchEvent(new Event('change')); });
+
+    // Render buttons for a given day
+    function timesSetter(index) {
+      const timeContainer = document.getElementById("time-container");
+      timeContainer.innerHTML = "";
+
+      if (!timesLoaded) {
+        timeContainer.innerHTML = `
+          <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3;justify-self: center;">
+            <span class="visually-hidden">Loading...</span>
+          </div>`;
+        return;
+      }
+
+      if (appointments[index].length === 0) {
+        timeContainer.innerHTML = `
+          <div style="grid-column-start: span 3;justify-self: center;" class="text-muted">
+            لا توجد مواعيد متاحة
+          </div>`;
+        window.selectedTime = null;
+        updateNextAvailability?.();
+        return;
+      }
+
+      appointments[index].forEach((label, y)=>{
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'time-option';
+        btn.setAttribute('role','radio');
+        btn.setAttribute('aria-checked','false');
+        btn.setAttribute('dir','ltr');
+        btn.textContent = label;
+
+        btn.addEventListener('click', ()=>{
+          [...timeContainer.children].forEach(el=>{ el.setAttribute('aria-checked','false'); });
+          btn.setAttribute('aria-checked','true');
+
+          const picked12 = ActualTimes[index][y];
+          const parsed = DateTime.fromFormat(picked12, "h:mm a");
+          nForm.date = document.getElementById(`day${index+1}date`).innerText;
+          nForm.time = parsed.isValid ? parsed.toFormat("HH:mm") : picked12;
+
+          window.selectedTime = { ui: label, iso: nForm.time };
+          updateNextAvailability?.();
+          // Optionally auto-advance: showPage(3);
+        });
+
+        timeContainer.appendChild(btn);
+      });
+    }
+
+    // Init day pills UI
+    (function initDaysUI(){
+      buildDatesWindowFromInput();
+      updateDayHeaders();
+      [1,2,3].forEach(n=>{
+        document.getElementById(`dayBtn${n}`).addEventListener('click', ()=> setActiveDay(n-1));
+      });
+    })();
+
+    // Compatibility function (optional)
+    function choosedDate(time12, dateISO /*, i */) {
+      const parsed = DateTime.fromFormat(time12, "h:mm a");
+      nForm.date = dateISO;
+      nForm.time = parsed.isValid ? parsed.toFormat("HH:mm") : time12;
+      window.selectedTime = { ui: time12, iso: nForm.time };
+      updateNextAvailability?.();
+      // showPage(3);
+    }
+
     /* ---------------- Init & bindings ---------------- */
     $(function(){
       enforceDateMinToday();
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
-      $('#area').select2({width:'100%',placeholder:'اختر المنطقة'});
-      $('#serviceCat').select2({width:'100%',placeholder:'التصنيف'});
-      $('#service').select2({width:'100%',placeholder:'الخدمة'});
-      $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة'});
+      $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
+      $('#serviceCat').select2({width:'100%',placeholder:'التصنيف', dir:'rtl'});
+      $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
+      $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js' });
 
@@ -666,18 +780,17 @@
         updateNextAvailability();
       });
 
-      // Service change: store service + department, update badge, refresh times if on page4
+      // Service change: store service + department, update badge, refetch if on time page
       $('#service').on('change', function(){
         nForm.service = this.value || '';
         nForm.departmentId = getDepartmentIdFromServiceId(this.value);
         document.getElementById('departmentBadge').textContent = nForm.departmentId || '—';
         document.getElementById('departmentId').setAttribute('value', nForm.departmentId || '');
-        if(getActiveIndex()===2) fetchAndRenderTimes();
+        if(getActiveIndex()===2) document.getElementById('date').dispatchEvent(new Event('change'));
         updateNextAvailability();
       });
 
-      // Date change -> enforce min + refetch if on page4
-      $('#date').on('change', function(){ enforceDateMinToday(); if(getActiveIndex()===2) fetchAndRenderTimes(); updateNextAvailability(); });
+      // Date change is already handled by native onchange (set above)
 
       // Preload brands
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
@@ -704,7 +817,7 @@
         });
       });
 
-      // Plate: digits only
+      // Plate: digits only + live validation
       $('#plateNumber').on('input', function(){ this.value = this.value.replace(/\D/g, '').slice(0,4); updateNextAvailability(); });
 
       // Contact field triggers
@@ -737,10 +850,9 @@
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          // keep departmentId
           nForm.departmentId = getDepartmentIdFromServiceId(nForm.service);
           showPage(2); // go to time page (page4)
-          fetchAndRenderTimes();
+          document.getElementById('date').dispatchEvent(new Event('change'));
           return;
         }
 
@@ -823,7 +935,7 @@
       const def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; updateNextAvailability(); };
+      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
       map.addListener('click', ({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
