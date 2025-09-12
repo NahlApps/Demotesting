@@ -109,7 +109,11 @@
       border-top:1px solid rgba(255,255,255,.15);
       display:flex; align-items:center; justify-content:center;
     }
-    .footer-inner{max-width:1120px; width:100%; padding:8px 12px}
+    .footer-inner{
+      max-width:1120px; width:100%; padding:8px 12px;
+      display:flex; align-items:center; justify-content:space-between; /* updated */
+    }
+    .footer-brand{ font-size:.95rem; color:#fff; opacity:.92 }       /* new */
     .footer-actions{display:flex; gap:12px}
     .btn-footer{
       flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md);
@@ -133,6 +137,9 @@
     .toast-error{background:#dc2626}
     .toast-info{background:#0284c7}
     .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;margin:-1px}
+
+    /* serviceCount full width */
+    #serviceCount{ width:100% !important; }
   </style>
 </head>
 <body>
@@ -148,7 +155,7 @@
       </div>
       <div class="brand">
         <img alt="Sponge & Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png"
-             onerror="this.src='https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png'"/>
+             onerror="this.src='https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png'"/>
       </div>
     </div>
   </header>
@@ -162,7 +169,7 @@
           <h1>✨ غسيل بدون طوابير</h1>
           <div class="card text-center">
             <p class="mb-3" style="color:#224652">واكس يحمي سيارتك • فوط نظيفة • إسفنجة للكفرات</p>
-            <button id="page1-button" class="btn btn-primary" type="button">ابدأ الحجز</button>
+            <!-- زر الترحيب أُلغي: سيتم استخدام زر الفوتر بدلاً منه -->
           </div>
         </section>
 
@@ -183,7 +190,9 @@
                 <label class="form-label">الخدمة</label>
                 <select id="service" style="width:100%"></select>
               </div>
-              <div class="col-12 col-md-4">
+
+              <!-- serviceCount بعرض 100% وعلى صف كامل -->
+              <div class="col-12">
                 <label class="form-label">عدد السيارات</label>
                 <select id="serviceCount" class="form-select">
                   <option value="1" selected>1</option><option value="2">2</option>
@@ -296,9 +305,12 @@
     </div>
   </main>
 
-  <!-- Footer nav -->
+  <!-- Footer nav (with Nahl marking) -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
+      <div class="footer-brand" aria-label="Nahl Marking">
+        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener" style="color:#fff;text-decoration:none">Nahl.app</a></span>
+      </div>
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary">التالي</button>
@@ -364,6 +376,14 @@
       document.getElementById('miniBarFill').style.width=pct+'%';
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
       document.getElementById('footer-prev').classList.toggle('hidden', i===0);
+
+      // تبديل نص زر الفوتر في صفحة الترحيب
+      const nextBtn=document.getElementById('footer-next');
+      if(i===0){
+        nextBtn.textContent='ابدأ الحجز';
+      }else{
+        nextBtn.textContent='التالي';
+      }
     }
 
     /* ---------------- Availability logic ---------------- */
@@ -519,8 +539,7 @@
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
 
-      // welcome -> service
-      $('#page1-button').on('click', ()=>showPage(1));
+      // (أُلغي زر الترحيب داخل الصفحة الأولى - نستخدم زر الفوتر)
 
       // load locations
       setLoadingServices(true);
