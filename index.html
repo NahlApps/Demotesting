@@ -96,7 +96,7 @@
     .select2-selection{height:48px !important; display:flex; align-items:center}
     .select2-selection__rendered{line-height:48px !important}
 
-    /* Select2 dropdown luxury open */
+    /* Select2 dropdown */
     .select2-container--open .select2-dropdown{
       border:1px solid var(--border-300); box-shadow:var(--shadow-sm); overflow:hidden;
       transform-origin:top center; animation:dropdownIn var(--dur-sm) var(--ease-decel) both;
@@ -116,10 +116,6 @@
     .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
     .time-option:active{transform:translateY(0) scale(.995)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
-
-    /* Day pills */
-    .day-pill{ border-radius:999px }
-    .day-pill.active{ background:var(--brand-600); color:#fff; border-color:var(--brand-600) }
 
     /* Overlays */
     .load-overlay{ position:absolute; inset:0; background:rgba(255,255,255,.85); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md); }
@@ -143,10 +139,10 @@
     .footer-inner{ max-width:1120px; width:100%; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; }
     .footer-brand{ font-size:.95rem; color:#fff; opacity:.92 }
     .footer-actions{display:flex; gap:12px}
-    .btn-footer{ flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md); padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold); background:#fff; color:var(--brand-600); transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease); }
+    .btn-footer{ flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md); padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold); background:#fff; color:#027A93; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease); }
     .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
     .btn-footer:active{transform:translateY(0) scale(.995)}
-    .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
+    .btn-footer.primary{background:#027A93; color:#fff; border-color:#027A93}
     .btn-footer.hidden{visibility:hidden}
     .btn-footer.disabled, .btn-footer:disabled{opacity:.6; pointer-events:none}
 
@@ -169,7 +165,7 @@
     /* serviceCount full width */
     #serviceCount{ width:100% !important; }
 
-    /* Opening Motion (Soft Luxury) for first paint */
+    /* Opening Motion */
     @media (prefers-reduced-motion: no-preference) {
       .will-anim { will-change: transform, opacity; }
       @keyframes introSlideDown { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:none } }
@@ -200,20 +196,14 @@
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
     .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
 
-    /* Slide animations */
-    @media (prefers-reduced-motion: no-preference) { .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; } .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; } .ppt-slide .ppt-hero{ animation: heroFloat 1400ms var(--ease) 120ms both; } }
+    @media (prefers-reduced-motion: no-preference) {
+      .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; }
+      .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; }
+      .ppt-slide .ppt-hero{ animation: heroFloat 1400ms var(--ease) 120ms both; }
+    }
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
     @keyframes heroFloat{ from{ transform:translateY(6px) } to{ transform:translateY(0) } }
-
-    /* Ken Burns bg */
-    .ppt-slide.kb::before{ content:""; position:absolute; inset:-4%; background:radial-gradient(120% 120% at 50% 10%, rgba(2,122,147,.06), rgba(1,101,122,.02) 60%, transparent 100%); transform:scale(1.02); z-index:0; pointer-events:none; animation:kb 4200ms ease-in-out both; }
-    @keyframes kb{ from{ transform:scale(1.06) } to{ transform:scale(1.00) } }
-
-    /* Deck dots */
-    .ppt-dots{ position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:2; }
-    .ppt-dot{ width:8px; height:8px; border-radius:50%; background:#cfe6ee; box-shadow:0 0 0 2px rgba(2,122,147,.10) inset; transition:transform var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease); }
-    .ppt-dot.active{ background:var(--brand-600); transform:scale(1.22) }
   </style>
 </head>
 <body>
@@ -279,7 +269,6 @@
               </div>
             </div>
 
-            <!-- Department badge (optional trust cue) -->
             <input id="departmentId" type="hidden"/>
             <small class="text-muted d-block mt-2">القسم: <span id="departmentBadge">—</span></small>
 
@@ -290,7 +279,7 @@
           </div>
         </section>
 
-        <!-- 3) Time -->
+        <!-- 3) Time (selected date only) -->
         <section id="page4" class="page" aria-label="اختيار الموعد">
           <h1>متى تحب نجيك؟</h1>
           <div class="card position-relative" id="timeCard">
@@ -299,19 +288,6 @@
                 <label class="form-label" for="date">التاريخ</label>
                 <input id="date" type="date" class="form-control"/>
               </div>
-            </div>
-
-            <!-- Day pills header -->
-            <div id="daysHeader" class="d-flex gap-2 flex-wrap mt-3" role="tablist" aria-label="الأيام">
-              <button id="dayBtn1" class="btn btn-outline-secondary btn-sm day-pill active" type="button" role="tab" aria-selected="true">
-                <span id="day1">اليوم</span> • <small id="day1date">—</small>
-              </button>
-              <button id="dayBtn2" class="btn btn-outline-secondary btn-sm day-pill" type="button" role="tab" aria-selected="false">
-                <span id="day2">غداً</span> • <small id="day2date">—</small>
-              </button>
-              <button id="dayBtn3" class="btn btn-outline-secondary btn-sm day-pill" type="button" role="tab" aria-selected="false">
-                <span id="day3">بعد غد</span> • <small id="day3date">—</small>
-              </button>
             </div>
 
             <div class="position-relative mt-3">
@@ -450,8 +426,7 @@
         controllers.push([controller,signal]);
       }
       try{
-        // a small debounce for UX parity with original
-        await new Promise(r=>setTimeout(r, 300));
+        await new Promise(r=>setTimeout(r, 300)); // tiny debounce for UX
         const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal})});
         if(!res.ok){
           if(retries>0) return callContent2(path,cb,abortable,retries-1);
@@ -519,14 +494,7 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    // OPTIONAL helper kept (not used in filtering)
-    function isAvailable(row){
-      const raw = row?.TS_appintment_status ?? row?.TS_status ?? row?.status ?? '';
-      const norm = String(raw).trim().toLowerCase();
-      return norm === 'available';
-    }
-
-    // Resolve department from selected service/category (for badge only)
+    // Resolve department (for badge only)
     function getDepartmentIdFromServiceId(sid){
       if(!sid) return '';
       const svc = (servicesCache || []).find(x => String(x.TS_service_id) === String(sid));
@@ -569,186 +537,142 @@
     }
     function stopWelcomeDeck(){ deckRunning = false; deckTimers.forEach(t=>clearTimeout(t)); deckTimers = []; }
 
-    /* ---------------- Times: 3-day window logic ---------------- */
-    let appointments = [[],[],[]];   // display labels per day
-    let ActualTimes  = [[],[],[]];   // "hh:mm a" per day
-    let timesLoaded  = false;
-    let datesWindow  = [];           // Luxon DateTimes for 3 days
+    /* ---------------- TIMES (Selected date only) ---------------- */
+    let dayTimes = [];       // [{label, actual12}]
+    let timesLoaded = false;
 
-    // Arabic weekdays map (Luxon Monday=1..Sunday=7)
-    const weekdaysMap = {1:'الإثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت',7:'الأحد'};
+    // Date change ⇒ fetch times
+    document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
 
-    function buildDatesWindowFromInput(){
-      const base = DateTime.fromISO(document.getElementById('date').value || DateTime.now().toFormat('yyyy-MM-dd'));
-      datesWindow = [base, base.plus({days:1}), base.plus({days:2})];
-    }
-    function updateDayHeaders(){
-      for (let i=0;i<3;i++){
-        document.getElementById(`day${i+1}`).innerText     = weekdaysMap[datesWindow[i].weekday];
-        document.getElementById(`day${i+1}date`).innerText = datesWindow[i].toFormat('yyyy-MM-dd');
-      }
-    }
-    function setActiveDay(idx){
-      [1,2,3].forEach(n=>{
-        const btn = document.getElementById(`dayBtn${n}`);
-        const active = (n-1)===idx;
-        btn.classList.toggle('active', active);
-        btn.setAttribute('aria-selected', active?'true':'false');
-      });
-      timesSetter(idx);
-    }
+    // Re-fetch when service/area changes (if we're on the time page)
+    document.getElementById('service').addEventListener('change', () => {
+      if (getActiveIndex() === 2) fetchTimesForSelectedDate();
+    });
+    document.getElementById('area').addEventListener('change', () => {
+      if (getActiveIndex() === 2) fetchTimesForSelectedDate();
+    });
 
-    // Date change => fetch times
-    document.getElementById('date').onchange = () => {
+    // Ensure default date is today & min
+    (function initDateMin(){
+      const today = DateTime.now().toFormat('yyyy-LL-dd');
       const dateEl = document.getElementById('date');
-      dateEl.disabled = true;
-
-      const timeContainer = document.getElementById('time-container');
-      timeContainer.innerHTML = `
-        <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3;justify-self: center;">
-          <span class="visually-hidden">Loading...</span>
-        </div>`;
-
-      ActualTimes = [[],[],[]];
-      appointments = [[],[],[]];
-      timesLoaded  = false;
-
-      buildDatesWindowFromInput();
-      updateDayHeaders();
-
-      const loc = document.getElementById('area').value || '';
-      const srv = document.getElementById('service').value || '';
-      if(!loc || !srv){
-        timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`;
-        dateEl.disabled = false;
-        return;
-      }
-
-      // IMPORTANT: no departmentId here (to match original behavior)
-      const qs = `/appointments?startDate=${datesWindow[0].toFormat('yyyy-MM-dd')}`
-               + `&location=${encodeURIComponent(loc)}`
-               + `&service=${encodeURIComponent(srv)}`;
-
-      callContent2(qs, (res)=>{
-        timeContainer.innerHTML = `
-          <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3;justify-self: center;">
-            <span class="visually-hidden">Loading...</span>
-          </div>`;
-
-        // DO NOT over-filter — keep as original working version
-        const rows = (res?.data?.appointments || []);
-
-        for (let i=0;i<rows.length;i++){
-          const d = DateTime.fromISO(rows[i]['TS_appointment_date'], { setZone:true });
-          let t  = DateTime.fromISO(rows[i]['TS_appointment_time'], { setZone:true });
-          if(!t.isValid){
-            // robust fallbacks
-            const raw = String(rows[i]['TS_appointment_time']||'').trim();
-            t = DateTime.fromFormat(raw, 'HH:mm:ss', { setZone:true });
-            if(!t.isValid) t = DateTime.fromFormat(raw, 'H:mm a', { setZone:true });
-            if(!t.isValid) t = DateTime.fromFormat(raw, 'H:mm',   { setZone:true });
-          }
-          if(!d.isValid || !t.isValid) continue;
-
-          const btnLabel = t.toLocaleString(DateTime.TIME_SIMPLE); // e.g., 3:30 PM
-          const actual12 = t.toFormat('hh:mm a');                  // e.g., 03:30 PM
-
-          if (d.toISODate() === datesWindow[0].toFormat('yyyy-MM-dd')) { appointments[0].push(btnLabel); ActualTimes[0].push(actual12); }
-          else if (d.toISODate() === datesWindow[1].toFormat('yyyy-MM-dd')) { appointments[1].push(btnLabel); ActualTimes[1].push(actual12); }
-          else if (d.toISODate() === datesWindow[2].toFormat('yyyy-MM-dd')) { appointments[2].push(btnLabel); ActualTimes[2].push(actual12); }
-        }
-
-        // De-dup + sort by actual time per day
-        for (let k=0;k<3;k++){
-          const seen = new Set();
-          const pairs = appointments[k].map((label, idx)=>({ label, actual: ActualTimes[k][idx] }))
-            .filter(p=>{ if(seen.has(p.label)) return false; seen.add(p.label); return true; })
-            .sort((a,b)=> a.actual.localeCompare(b.actual));
-          appointments[k] = pairs.map(p=>p.label);
-          ActualTimes[k]  = pairs.map(p=>p.actual);
-        }
-
-        timesLoaded = true;
-        setActiveDay(0);
-        dateEl.disabled = false;
-      }, true);
-    };
-
-    // Default date value (today) + min
-    (function initDate(){
-      const today = DateTime.now().toFormat('yyyy-MM-dd');
-      const dateEl = document.getElementById('date');
-      dateEl.value = today;
+      if (!dateEl.value) dateEl.value = today;
       dateEl.setAttribute('min', today);
     })();
 
-    // Re-fetch when service or area changes
-    document.getElementById('service').addEventListener('change', function () { document.getElementById('date').dispatchEvent(new Event('change')); });
-    document.getElementById('area').addEventListener('change', function () { document.getElementById('date').dispatchEvent(new Event('change')); });
+    function fetchTimesForSelectedDate(){
+      const dateEl = document.getElementById('date');
+      const timeContainer = document.getElementById('time-container');
+      const loc = document.getElementById('area').value || '';
+      const srv = document.getElementById('service').value || '';
+      const selectedISO = (dateEl.value || DateTime.now().toFormat('yyyy-LL-dd')).trim();
 
-    // Render buttons for a given day
-    function timesSetter(index) {
-      const timeContainer = document.getElementById("time-container");
-      timeContainer.innerHTML = "";
-
-      if (!timesLoaded) {
-        timeContainer.innerHTML = `
-          <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3;justify-self: center;">
-            <span class="visually-hidden">Loading...</span>
-          </div>`;
-        return;
-      }
-
-      if (appointments[index].length === 0) {
-        timeContainer.innerHTML = `
-          <div style="grid-column-start: span 3;justify-self: center;" class="text-muted">
-            لا توجد مواعيد متاحة
-          </div>`;
-        window.selectedTime = null;
-        selectedTime = null; // keep gating consistent
+      if (!loc || !srv) {
+        timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`;
+        window.selectedTime = null; selectedTime = null;
         updateNextAvailability?.();
         return;
       }
 
-      appointments[index].forEach((label, y)=>{
+      dateEl.disabled = true;
+      setLoadingTimes(true);
+      timeContainer.innerHTML = `
+        <div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;">
+          <span class="visually-hidden">Loading...</span>
+        </div>`;
+
+      // No departmentId (matches original working behavior)
+      const qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}`
+               + `&location=${encodeURIComponent(loc)}`
+               + `&service=${encodeURIComponent(srv)}`;
+
+      callContent2(qs, (res) => {
+        const rows = (res?.data?.appointments || []);
+        const list = [];
+
+        rows.forEach((r) => {
+          // keep only exact selected date
+          const d = DateTime.fromISO(r.TS_appointment_date, { setZone: true });
+          if (!d.isValid || d.toISODate() !== selectedISO) return;
+
+          const raw = String(r.TS_appointment_time || '').trim();
+          let t = DateTime.fromISO(raw, { setZone: true });
+          if (!t.isValid) t = DateTime.fromFormat(raw, 'HH:mm:ss', { setZone: true });
+          if (!t.isValid) t = DateTime.fromFormat(raw, 'H:mm a',   { setZone: true });
+          if (!t.isValid) t = DateTime.fromFormat(raw, 'H:mm',     { setZone: true });
+          if (!t.isValid) return;
+
+          list.push({
+            label: t.toLocaleString(DateTime.TIME_SIMPLE), // e.g., 3:30 PM
+            actual12: t.toFormat('hh:mm a')                 // stable canonical
+          });
+        });
+
+        // De-dup & sort
+        const seen = new Set();
+        dayTimes = list
+          .filter(x => { if (seen.has(x.label)) return false; seen.add(x.label); return true; })
+          .sort((a,b)=> a.actual12.localeCompare(b.actual12));
+
+        timesLoaded = true;
+        renderSelectedDateTimes(selectedISO);
+        dateEl.disabled = false;
+        setLoadingTimes(false);
+      }, true);
+    }
+
+    function renderSelectedDateTimes(selectedISO){
+      const timeContainer = document.getElementById('time-container');
+      timeContainer.innerHTML = '';
+
+      if (!timesLoaded) {
+        timeContainer.innerHTML = `
+          <div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;">
+            <span class="visually-hidden">Loading...</span>
+          </div>`;
+        return;
+      }
+
+      if (!dayTimes.length) {
+        timeContainer.innerHTML = `
+          <div style="grid-column:1/-1;justify-self:center" class="text-muted">
+            لا توجد مواعيد متاحة
+          </div>`;
+        window.selectedTime = null;
+        selectedTime = null;
+        updateNextAvailability?.();
+        return;
+      }
+
+      dayTimes.forEach((t) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'time-option';
         btn.setAttribute('role','radio');
         btn.setAttribute('aria-checked','false');
         btn.setAttribute('dir','ltr');
-        btn.textContent = label;
+        btn.textContent = t.label;
 
-        btn.addEventListener('click', ()=>{
-          [...timeContainer.children].forEach(el=>{ el.setAttribute('aria-checked','false'); });
+        btn.addEventListener('click', () => {
+          [...timeContainer.children].forEach(el => el.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
 
-          const picked12 = ActualTimes[index][y];
-          const parsed = DateTime.fromFormat(picked12, "h:mm a");
-          nForm.date = document.getElementById(`day${index+1}date`).innerText;
-          nForm.time = parsed.isValid ? parsed.toFormat("HH:mm") : picked12;
+          const parsed = DateTime.fromFormat(t.actual12, 'h:mm a');
+          nForm.date = selectedISO;
+          nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
 
-          window.selectedTime = { ui: label, iso: nForm.time };
-          selectedTime        = window.selectedTime; // <-- critical for Next button logic
+          window.selectedTime = { ui: t.label, iso: nForm.time };
+          selectedTime        = window.selectedTime; // critical for Next gating
 
           updateNextAvailability?.();
-          // Optionally auto-advance: showPage(3);
+          // Optionally: showPage(3);
         });
 
         timeContainer.appendChild(btn);
       });
     }
 
-    // Init day pills UI
-    (function initDaysUI(){
-      buildDatesWindowFromInput();
-      updateDayHeaders();
-      [1,2,3].forEach(n=>{
-        document.getElementById(`dayBtn${n}`).addEventListener('click', ()=> setActiveDay(n-1));
-      });
-    })();
-
-    // Compatibility function if needed by other parts
+    // Compatibility helper (if some old code calls it)
     function choosedDate(time12, dateISO /*, i */) {
       const parsed = DateTime.fromFormat(time12, "h:mm a");
       nForm.date = dateISO;
@@ -756,7 +680,6 @@
       window.selectedTime = { ui: time12, iso: nForm.time };
       selectedTime        = window.selectedTime;
       updateNextAvailability?.();
-      // showPage(3);
     }
 
     /* ---------------- Init & bindings ---------------- */
@@ -814,7 +737,7 @@
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands,width:'100%'});
 
-      // Payment radiogroup behavior + ARIA
+      // Payment ARIA
       const payGroup = document.getElementById('payGroup');
       const payCards = [...payGroup.querySelectorAll('.pay-card')];
       payCards.forEach((card, idx)=>{
@@ -869,14 +792,13 @@
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
           nForm.departmentId = getDepartmentIdFromServiceId(nForm.service); // badge only
-          showPage(2); // go to time page (page4)
-          document.getElementById('date').dispatchEvent(new Event('change'));
+          showPage(2); // to page4
+          document.getElementById('date').dispatchEvent(new Event('change')); // initial fetch for selected date
           return;
         }
 
         if(id==='page4'){
           if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; }
-          // Do NOT overwrite nForm.date here — it was set when the user picked a slot.
           showPage(3);
           return;
         }
@@ -909,7 +831,6 @@
           return;
         }
 
-        // default next
         const nextIndex=Math.min(i+1, orderedPages.length-1);
         showPage(nextIndex);
       }
@@ -930,17 +851,17 @@
       const i = getActiveIndex();
       const nextBtn = document.getElementById('footer-next');
       let enable = true;
-      if(i === 1){ // page2: area+service
+      if(i === 1){ // page2
         enable = !!($('#area').val() && $('#service').val());
-      } else if(i === 2){ // page4: time
+      } else if(i === 2){ // page4 (time)
         enable = !!selectedTime;
-      } else if(i === 3){ // page5: contact + payment + plate
+      } else if(i === 3){ // page5 (contact+payment+plate)
         const nameOk = $('#name').val().trim().length > 0;
         const phoneOk = (itiPhone && itiPhone.isValidNumber());
         const payOk = !!nForm.paymentMethod;
         const plateOk = ($('#plateNumber').val()||'').length === 4;
         enable = nameOk && phoneOk && payOk && plateOk;
-      } else if(i === 4){ // page6: map
+      } else if(i === 4){ // page6 (map)
         enable = !!positionUrl;
       }
       nextBtn.disabled = !enable;
@@ -955,7 +876,6 @@
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
-      map.addEventListener?.('click', ({latLng})=>setPos(latLng)); // fallback if newer API shape
       map.addListener('click', ({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
       if(btn){
