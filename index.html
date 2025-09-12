@@ -14,15 +14,30 @@
 
   <style>
     :root{
+      /* Brand */
       --brand-700:#01657A; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --ink-700:#224652; --surface-000:#FFF; --surface-100:#EDF3F6; --border-300:#D4E0E6;
+
+      /* Radius + Shadow */
       --radius-md:14px; --radius-pill:999px;
-      --shadow-sm:0 2px 8px rgba(11,38,48,.08); --shadow-md:0 10px 28px rgba(11,38,48,.14);
-      --ease:cubic-bezier(.22,.61,.36,1); --t-med:.28s var(--ease);
+      --shadow-xs:0 2px 6px rgba(11,38,48,.07);
+      --shadow-sm:0 3px 12px rgba(11,38,48,.09);
+      --shadow-md:0 10px 28px rgba(11,38,48,.14);
+
+      /* Motion tokens */
+      --ease:cubic-bezier(.22,.61,.36,1);
+      --ease-decel:cubic-bezier(0.2,0,0,1);     /* luxury decel in */
+      --ease-accel:cubic-bezier(0.3,1,0.8,1);   /* swift accel out */
+      --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms; --dur-lg:640ms;
+
+      /* Typography + spacing */
       --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
+
+      /* Layout */
       --header-h:76px; --footer-h:78px;
     }
+
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
@@ -45,33 +60,57 @@
     .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:60%}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
-    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--t-med)}
+    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
 
     /* Main */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
     #app{width:100%; max-width:1120px}
 
-    /* Stage & pages */
+    /* Stage & Pages */
     .stage{position:relative; min-height:540px; padding:8px 0 20px}
     .page{
       position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
-      padding:var(--sp-5) var(--sp-3) var(--sp-6); overflow:auto; opacity:0; transform:translateY(14px) scale(.99);
-      pointer-events:none; transition:opacity var(--t-med), transform var(--t-med);
+      padding:var(--sp-5) var(--sp-3) var(--sp-6); overflow:auto; opacity:0; transform:translateY(12px) scale(.992);
+      pointer-events:none;
     }
-    .page.active{position:relative; opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
-    .page.exit{opacity:0; transform:translateY(18px) scale(.985)}
+    /* Luxury page enter/exit using keyframes (transform/opacity only) */
+    @media (prefers-reduced-motion: no-preference){
+      .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease-decel) both; }
+      .page.exit  { animation:pageOut var(--dur-sm) var(--ease-accel) both; }
+    }
+    @keyframes pageIn{
+      from{opacity:0; transform:translateY(12px) scale(.992)}
+      to  {opacity:1; transform:translateY(0)    scale(1)}
+    }
+    @keyframes pageOut{
+      from{opacity:1; transform:translateY(0)    scale(1)}
+      to  {opacity:0; transform:translateY(14px) scale(.985)}
+    }
     .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center}
 
+    /* Cards + fields */
     .card{background:var(--surface-000); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:var(--shadow-md); padding:var(--sp-6); width:100%; max-width:920px}
-
     .form-control, select, .select2-selection{
       background:var(--surface-000); color:#0B2630;
       border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
       min-height:48px; text-align:center; font-size:var(--fs-md);
+      transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
     }
+    .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .select2-selection{height:48px !important; display:flex; align-items:center}
     .select2-selection__rendered{line-height:48px !important}
+
+    /* Select2 dropdown luxury open */
+    .select2-container--open .select2-dropdown{
+      border:1px solid var(--border-300); box-shadow:var(--shadow-sm); overflow:hidden;
+      transform-origin:top center;
+      animation:dropdownIn var(--dur-sm) var(--ease-decel) both;
+    }
+    @keyframes dropdownIn{
+      from{opacity:0; transform:translateY(6px) scale(.99)}
+      to  {opacity:1; transform:none}
+    }
 
     /* Time grid */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-4)}
@@ -79,10 +118,12 @@
     .time-option{
       background:#fff; color:#0B2630; font-weight:var(--fw-bold);
       border:1px solid var(--border-300); border-radius:var(--radius-md);
-      padding:14px 10px; min-height:56px; box-shadow:var(--shadow-sm); transition:.18s var(--ease);
+      padding:14px 10px; min-height:56px; box-shadow:var(--shadow-xs);
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
       display:flex; flex-direction:column; align-items:center; justify-content:center;
     }
-    .time-option:hover{transform:translateY(-1px); background:var(--brand-050)}
+    .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
+    .time-option:active{transform:translateY(0) scale(.995)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
     /* Overlays */
@@ -90,15 +131,18 @@
       position:absolute; inset:0; background:rgba(255,255,255,.85); color:#0B2630;
       display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md);
     }
-    .load-overlay.show{display:flex}
+    .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
+    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
     /* Payment */
     .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4); width:100%; max-width:920px}
     .pay-card{
       background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md);
       padding:var(--sp-6); display:flex; justify-content:center; align-items:center; gap:var(--sp-4);
-      min-height:64px; cursor:pointer; transition:.18s var(--ease);
+      min-height:64px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
     }
+    .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
+    .pay-card:active{transform:translateY(0) scale(.995)}
     .pay-card img{max-width:120px; height:auto}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
@@ -118,9 +162,12 @@
     .btn-footer{
       flex:1; border:1px solid var(--border-300); border-radius:var(--radius-md);
       padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold);
-      background:#fff; color:#027A93;
+      background:#fff; color:var(--brand-600);
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
     }
-    .btn-footer.primary{background:#027A93; color:#fff; border-color:#027A93}
+    .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
+    .btn-footer:active{transform:translateY(0) scale(.995)}
+    .btn-footer.primary{background:var(--brand-600); color:#fff; border-color:var(--brand-600)}
     .btn-footer.hidden{visibility:hidden}
 
     .form-block{margin-bottom:var(--sp-5)}
@@ -132,7 +179,8 @@
 
     /* Toast */
     .toast-wrap{position:fixed; top:10px; left:50%; transform:translateX(-50%); z-index:1050; display:flex; flex-direction:column; gap:8px}
-    .toast-msg{min-width:260px; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:var(--shadow-md)}
+    .toast-msg{min-width:260px; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:var(--shadow-md); animation:toastIn var(--dur-sm) var(--ease-decel) both}
+    @keyframes toastIn{ from{opacity:0; transform:translateY(-8px)} to{opacity:1; transform:none} }
     .toast-success{background:#16a34a}
     .toast-error{background:#dc2626}
     .toast-info{background:#0284c7}
@@ -141,7 +189,7 @@
     /* serviceCount full width */
     #serviceCount{ width:100% !important; }
 
-    /* ---------------- Opening Motion (Soft Zoom + Fade + Stagger) ---------------- */
+    /* ---------------- Opening Motion (Soft Luxury) ---------------- */
     @media (prefers-reduced-motion: no-preference) {
       .will-anim { will-change: transform, opacity; }
 
@@ -151,17 +199,17 @@
       @keyframes introSlideUp   { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:none } }
       @keyframes barGrow        { from { width:0% } to { width:16.7% } }
 
-      /* Play only on first load when .intro-play is on <body> */
-      body.intro-play header .mini-progress { animation:introSlideDown 420ms var(--ease) 40ms both; }
-      body.intro-play header .mini-progress .bar>span { animation:barGrow 480ms var(--ease) 80ms both; }
+      body.intro-play header .mini-progress { animation:introSlideDown var(--dur-sm) var(--ease-decel) 40ms both; }
+      body.intro-play header .mini-progress .bar>span { animation:barGrow var(--dur-md) var(--ease-decel) 80ms both; }
 
-      body.intro-play #page1 h1 { animation:introFadeIn 360ms var(--ease) 80ms both; }
-      body.intro-play #page1 .card { animation:introRiseZoom 520ms var(--ease) 120ms both; }
+      body.intro-play #page1 h1 { animation:introFadeIn calc(var(--dur-sm) + 80ms) var(--ease) 80ms both; }
+      body.intro-play #page1 .card { animation:introRiseZoom var(--dur-md) var(--ease-decel) 120ms both; }
 
-      body.intro-play footer .footer-actions { animation:introSlideUp 420ms var(--ease) 180ms both; }
-      body.intro-play footer .footer-brand   { animation:introFadeIn 360ms var(--ease) 220ms both; }
+      body.intro-play footer .footer-actions { animation:introSlideUp var(--dur-sm) var(--ease) 180ms both; }
+      body.intro-play footer .footer-brand   { animation:introFadeIn var(--dur-sm) var(--ease) 220ms both; }
     }
     @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
       body.intro-play header .mini-progress,
       body.intro-play #page1 h1,
       body.intro-play #page1 .card,
@@ -197,7 +245,7 @@
           <h1 class="will-anim">✨ غسيل بدون طوابير</h1>
           <div class="card text-center will-anim">
             <p class="mb-3" style="color:#224652">واكس يحمي سيارتك • فوط نظيفة • إسفنجة للكفرات</p>
-            <!-- تمت إزالة زر الترحيب؛ سنستخدم زر الفوتر -->
+            <!-- زر الترحيب أُلغي؛ نستخدم زر الفوتر -->
           </div>
         </section>
 
@@ -376,7 +424,7 @@
       const div=document.createElement('div');
       div.className='toast-msg '+(type==='error'?'toast-error':type==='success'?'toast-success':'toast-info');
       div.textContent=msg; wrap.appendChild(div);
-      setTimeout(()=>{ div.style.opacity='0'; setTimeout(()=>div.remove(),300); }, 2200);
+      setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2200);
     }
 
     /* ---------------- STATE ---------------- */
@@ -390,10 +438,20 @@
 
     function showPage(idx){
       const cur=document.querySelector('.page.active');
-      const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
+      const next=document.getElementById(orderedPages[idx]);
+      if(!next || cur===next) return;
+
+      // Exit current with luxury animation class
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
+
+      // Prepare next
       next.style.display='flex';
-      requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} },280); });
+      requestAnimationFrame(()=>{
+        next.classList.add('active');
+        // clear exit after animation end (sync with CSS var --dur-sm)
+        setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260);
+      });
+
       syncProgress(idx);
     }
     function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
@@ -417,59 +475,6 @@
 
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
-
-    function buildDatesWindowFromInput() {
-      const dateEl = document.getElementById('date');
-      const start = DateTime.fromISO(dateEl.value || DateTime.now().toFormat('yyyy-LL-dd'));
-      return [start, start.plus({ days: 1 }), start.plus({ days: 2 })];
-    }
-
-    function prepareTimeBuckets(apiJson, datesWindow) {
-      const bucketsDisplay = [[], [], []];
-      const bucketsActual  = [[], [], []];
-
-      if (!apiJson || !apiJson.data || !Array.isArray(apiJson.data.appointments)) {
-        return { appointments: bucketsDisplay, actualTimes: bucketsActual };
-      }
-
-      const rows = apiJson.data.appointments;
-
-      for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        if (!isAvailable(row)) continue;
-
-        const d = luxon.DateTime.fromISO(row.TS_appointment_date ?? row.date ?? '', { setZone: true });
-        let t = luxon.DateTime.fromISO(row.TS_appointment_time ?? row.time ?? '', { setZone: true });
-
-        if (!t.isValid && row.TS_appointment_time) {
-          t = luxon.DateTime.fromFormat(String(row.TS_appointment_time), 'HH:mm:ss', { setZone: true });
-          if (!t.isValid) t = luxon.DateTime.fromFormat(String(row.TS_appointment_time), 'H:mm', { setZone: true });
-        }
-
-        if (!d.isValid || !t.isValid) continue;
-
-        const isoDate = d.toISODate();
-        const display = t.toLocaleString(luxon.DateTime.TIME_SIMPLE);
-        const actual  = t.toFormat('hh:mm a');
-
-        for (let idx = 0; idx < 3; idx++) {
-          if (isoDate === datesWindow[idx].toFormat('yyyy-LL-dd')) {
-            bucketsDisplay[idx].push(display);
-            bucketsActual[idx].push(actual);
-            break;
-          }
-        }
-      }
-
-      for (let i = 0; i < 3; i++) {
-        const zip = bucketsDisplay[i].map((d, k) => ({ d, a: bucketsActual[i][k] }));
-        zip.sort((A,B) => A.a.localeCompare(B.a));
-        bucketsDisplay[i] = zip.map(z => z.d);
-        bucketsActual[i]  = zip.map(z => z.a);
-      }
-
-      return { appointments: bucketsDisplay, actualTimes: bucketsActual };
-    }
 
     function renderTimes(items){
       const cont = document.getElementById('time-container');
@@ -517,14 +522,13 @@
             if (!t.isValid) t = luxon.DateTime.fromFormat(String(a.TS_appointment_time), 'H:mm', { setZone:true });
           }
           if(!t.isValid) return null;
-
           return { ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso: t.toFormat('HH:mm') };
         }).filter(Boolean);
 
+        // de-duplicate by HH:mm
         const uniq = {};
         prepared.forEach(it=>{ if(!uniq[it.iso]) uniq[it.iso]=it; });
         const items = Object.values(uniq).sort((a,b)=>a.iso.localeCompare(b.iso));
-
         renderTimes(items);
         setLoadingTimes(false);
       }, true);
@@ -536,6 +540,7 @@
     }
 
     /* ---------------- Init & bindings ---------------- */
+    let itiPhone;
     $(function(){
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
@@ -666,9 +671,9 @@
     document.addEventListener('DOMContentLoaded', ()=>{
       // Play intro motion once
       document.body.classList.add('intro-play');
-      setTimeout(()=>document.body.classList.remove('intro-play'), 800);
+      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
 
-      // ensure date min = today (safety if earlier init didn't run)
+      // ensure date min = today
       const today= luxon.DateTime.now().toFormat('yyyy-LL-dd');
       const dateEl=document.getElementById('date');
       if(dateEl){ dateEl.setAttribute('min',today); }
