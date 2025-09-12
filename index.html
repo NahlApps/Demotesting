@@ -466,6 +466,12 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+    /* ---------------- DEBUG SWITCH ---------------- */
+    const DEBUG = true;
+    const log = (...a)=>{ if(DEBUG) console.log(...a); };
+    const warn = (...a)=>{ if(DEBUG) console.warn(...a); };
+    const err  = (...a)=>{ if(DEBUG) console.error(...a); };
+
     /* ---------------- Logo fallback helper ---------------- */
     function handleLogoError(img){
       const fallbacks = [
@@ -491,16 +497,27 @@
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
       let signal='';
+      const url = defaultLink2 + path;
+      const trace = Math.random().toString(16).slice(2);
       if(abortable){
         controllers.forEach(([c])=>c.abort()); controllers=[];
         const controller=new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
       }
       try{
-        const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal})});
-        if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network'); }
-        cb(await res.json());
+        log(`[API][${trace}] GET`, url, {abortable, retriesLeft:retries});
+        const res=await fetch(url,{method:'GET',redirect:'follow',...(abortable&&{signal})});
+        if(!res.ok){
+          warn(`[API][${trace}] Non-OK`, res.status, res.statusText);
+          if(retries>0) return callContent2(path,cb,abortable,retries-1);
+          throw new Error('Network');
+        }
+        const json = await res.json();
+        log(`[API][${trace}] OK`, {status:res.status, dataKeys:Object.keys(json||{})});
+        cb(json);
       }catch(e){
-        if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),700);
+        if(String(e).includes('AbortError')){ warn(`[API][${trace}] Aborted`); return; }
+        err(`[API][${trace}] Error`, e);
+        if(retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),700);
       }
     }
 
@@ -526,6 +543,8 @@
       const cur=document.querySelector('.page.active');
       const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
 
+      log('[NAV] showPage ->', orderedPages[idx], {idx});
+
       // stop deck if leaving welcome
       if(cur && cur.id==='page1'){ stopWelcomeDeck(); }
 
@@ -533,6 +552,9 @@
       next.style.display='flex';
       requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260); });
       syncProgress(idx);
+
+      // ensure times load when landing on time page
+      if(orderedPages[idx]==='page4'){ fetchAndRenderTimes(); }
     }
     function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
     function syncProgress(i){
@@ -568,9 +590,11 @@
 
       if (!items.length){
         cont.innerHTML = '<div class="text-center text-muted" style="grid-column:1/-1">لا توجد مواعيد متاحة</div>';
+        log('[TIMES] No items to render');
         return;
       }
 
+      log('[TIMES] Rendering items', items.length, items.slice(0,5));
       items.forEach(t=>{
         const btn = document.createElement('button');
         btn.className = 'time-option';
@@ -582,6 +606,7 @@
           btn.setAttribute('aria-checked','true');
           selectedTime = t;
           nForm.time = t.iso.slice(0,5);
+          log('[TIMES] Selected', selectedTime);
         });
         cont.appendChild(btn);
       });
@@ -592,13 +617,18 @@
       const startDate=document.getElementById('date').value||DateTime.now().toFormat('yyyy-LL-dd');
       const loc=document.getElementById('area').value||'';
       const srv=document.getElementById('service').value||'';
+
       if(!loc || !srv){
         document.getElementById('time-container').innerHTML='<div class="text-center text-muted" style="grid-column:1/-1">اختر المنطقة والخدمة لعرض المواعيد</div>';
         setLoadingTimes(false);
+        warn('[TIMES] Missing location/service', {loc, srv});
         return;
       }
+
+      log('[TIMES] Fetching with', {startDate, location:loc, service:srv});
       callContent2(`/appointments?startDate=${startDate}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}`, (res)=>{
         const appts=(res?.data?.appointments||[]);
+        log('[TIMES] Raw appointments count', appts.length);
         const prepared = appts.map(a=>{
           if(!isAvailable(a)) return null;
           let t = luxon.DateTime.fromISO(a.TS_appointment_time || a.time || a.TS_time, { setZone:true });
@@ -610,9 +640,13 @@
           return { ui: t.toLocaleString(luxon.DateTime.TIME_SIMPLE), iso: t.toFormat('HH:mm') };
         }).filter(Boolean);
 
+        log('[TIMES] Prepared (available & parsed)', prepared.length, prepared.slice(0,5));
+
         const uniq = {};
         prepared.forEach(it=>{ if(!uniq[it.iso]) uniq[it.iso]=it; });
         const items = Object.values(uniq).sort((a,b)=>a.iso.localeCompare(b.iso));
+
+        log('[TIMES] Unique + sorted', items.length, items.slice(0,10));
         renderTimes(items);
         setLoadingTimes(false);
       }, true);
@@ -700,6 +734,7 @@
 
       $('#area').on('change', function(){
         nForm.location=this.value; setLoadingServices(true);
+        log('[AREA] changed ->', this.value);
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
           servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
@@ -711,12 +746,16 @@
 
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
+        log('[CATEGORY] changed ->', cid);
         const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
         $('#service').empty().select2({data:items,width:'100%'}); 
         if(items.length){ $('#service').val(items[0].id).trigger('change'); }
       });
 
-      $('#service, #date').on('change', ()=>{ if(getActiveIndex()===2) fetchAndRenderTimes(); });
+      $('#service, #date').on('change', ()=>{
+        log('[SERVICE/DATE] changed', {service:$('#service').val(), date:$('#date').val()});
+        if(getActiveIndex()===2) fetchAndRenderTimes();
+      });
 
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands,width:'100%'});
@@ -725,6 +764,7 @@
         card.addEventListener('click', ()=>{
           document.querySelectorAll('.pay-card').forEach(c=>{c.setAttribute('aria-checked','false'); c.querySelector('input').checked=false;});
           card.setAttribute('aria-checked','true'); card.querySelector('input').checked=true; nForm.paymentMethod=card.querySelector('input').value;
+          log('[PAYMENT] selected', nForm.paymentMethod);
         });
       });
 
@@ -751,11 +791,13 @@
 
       $next.addEventListener('click', async ()=>{
         const i=getActiveIndex(); const id=orderedPages[i];
+        log('[NAV] next from', id);
 
         if(id==='page2'){
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
+          log('[FORM] service step', {location:nForm.location, category:nForm.serviceCat, service:nForm.service, count:nForm.serviceCount});
           showPage(2);
           fetchAndRenderTimes();
           return;
@@ -764,6 +806,7 @@
         if(id==='page4'){
           if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; }
           nForm.date=$('#date').val();
+          log('[FORM] time step', {date:nForm.date, time:nForm.time});
           showPage(3);
           return;
         }
@@ -778,6 +821,10 @@
           nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
 
+          log('[FORM] contact + vehicle step', {
+            name:nForm.customerN, mobile:nForm.customerM, payment:nForm.paymentMethod, desc:nForm.locationDescription
+          });
+
           showPage(4);
           return;
         }
@@ -787,11 +834,14 @@
           nForm.urlLocation=positionUrl;
 
           try{
+            log('[API] reserveAppointment -> payload', nForm);
             const res=await fetch(defaultLink2 + '/reserveAppointment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nForm)});
             const json=await res.json();
+            log('[API] reserveAppointment <- response', json);
             if(json?.success){ showToast('success','تم إنشاء الحجز'); showPage(5); }
             else { showToast('error', json?.msgAR || 'حدث خطأ غير متوقع'); }
           }catch(e){
+            err('[API] reserveAppointment error', e);
             showToast('error','عذرًا حصل خطأ غير متوقع، حاول لاحقًا');
           }
           return;
@@ -818,6 +868,7 @@
         if(pan) map.panTo(latLng);
         map.setZoom(17);
         positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
+        log('[MAP] setPos', positionUrl);
       };
 
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
@@ -832,10 +883,7 @@
           }
           navigator.geolocation.getCurrentPosition(
             pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
-            err=>{
-              const msg = err?.message || 'رجاءً فعّل الـ GPS وأذونات الموقع';
-              showToast('error','تعذر تحديد موقعك: '+msg);
-            },
+            e=>{ showToast('error','تعذر تحديد موقعك'); err('[MAP] geo error', e); },
             { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
           );
         });
