@@ -54,47 +54,24 @@
       font-family:'Cairo', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:linear-gradient(180deg, rgba(2,138,167,.92), rgba(72,181,208,.92)), url("https://www.dropbox.com/s/s9bxuykl0w49dqa/background2.jpg?raw=1") center/cover no-repeat fixed;
       color:#fff;
+      display:flex; justify-content:center; align-items:stretch;
       min-height:100vh;
-      display:flex;
-      flex-direction:column;
     }
 
-    /* ======= HEADER / MAIN / FOOTER LAYOUT ======= */
-    header{
-      width:100%;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      padding:28px 14px 8px;
-    }
-    header .brand img{ width:190px; filter: drop-shadow(0 6px 20px rgba(0,0,0,.25)); }
-
-    main{
-      flex:1 0 auto;
-      display:flex;
-      justify-content:center;
-      align-items:stretch;
-      padding:0 10px 10px;
-    }
-
-    footer{
-      flex-shrink:0;
-      text-align:center;
-      padding:14px 10px 24px;
-      opacity:.95;
-    }
-
-    /* ======= APP SHELL ======= */
+    /* Shell */
     #app{
       width:100%;
       max-width:1120px;
       background:transparent;
       box-shadow:var(--shadow-lg);
     }
+    .header{ text-align:center; padding:28px 14px 8px; }
+    .header img{ width:190px }
+    .header h1{ font-size:36px; margin:10px 0 0 }
 
     /* Steps + progress */
     .steps-wrap{ padding:6px 18px 0 }
-    nav[aria-label="Progress"]{ display:block; }
+    nav[aria-label="Progress"]{ display:block }
     .steps{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; padding:0; margin:0; list-style:none }
     .step-pill{
       background:rgba(255,255,255,.25); color:#fff; font-weight:800; font-size:.95rem;
@@ -222,273 +199,268 @@
 </head>
 <body>
 
-  <!-- ======================= HEADER ======================= -->
-  <header>
-    <div class="brand">
+  <div id="app">
+    <!-- Header -->
+    <div class="header">
       <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20Soap/spong&Soap%20-%20logo.png" alt="Sponge & Soap"/>
     </div>
-  </header>
 
-  <!-- ======================== MAIN ======================== -->
-  <main>
-    <div id="app" role="application" aria-label="حجوزات المواعيد">
-      <!-- Steps -->
-      <div class="steps-wrap">
-        <nav aria-label="Progress">
-          <ol class="steps" role="list">
-            <li class="step-pill active" id="s1" aria-current="step">الخدمة</li>
-            <li class="step-pill" id="s2">الوقت</li>
-            <li class="step-pill" id="s3">البيانات</li>
-            <li class="step-pill" id="s4">الموقع</li>
-            <li class="step-pill" id="s5">التأكيد</li>
-          </ol>
-        </nav>
-        <div class="progress-line" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <span id="progressFill"></span>
-        </div>
-      </div>
-
-      <!-- Live region for errors -->
-      <div id="ariaErrors" class="visually-hidden" aria-live="assertive"></div>
-
-      <!-- Stage (transitions happen here) -->
-      <div class="stage">
-
-        <!-- Page 1 -->
-        <section id="page1" class="page active">
-          <h1>✨ واكس يحمي سيارتك</h1>
-          <h3>🧼 فوط نظيفة & لمعان مضمون • 🛞 إسفنجة للكفرات<br/>… نهتم بكل التفاصيل</h3>
-          <div class="actions">
-            <button id="page1-button" class="btn-pill primary">احجز موعدك</button>
-          </div>
-        </section>
-
-        <!-- Page 2: المنطقة + الخدمة -->
-        <section id="page2" class="page" aria-labelledby="p2-title">
-          <h1 id="p2-title">وين تحب نجيك؟<br/>اختيار المنطقة والخدمة</h1>
-
-          <div class="card-pane">
-            <div class="mb-2">
-              <label class="form-label">المنطقة</label>
-              <select id="area" class="js-example-basic-single"></select>
-            </div>
-
-            <div class="row g-2">
-              <div class="col-12 col-md-6">
-                <label class="form-label">القسم</label>
-                <select id="serviceCat" class="form-control"></select>
-              </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label">الخدمة</label>
-                <select id="service" class="form-control"></select>
-              </div>
-            </div>
-
-            <div class="mt-2">
-              <label class="form-label">عدد السيارات</label>
-              <select id="serviceCount" class="form-control">
-                <option selected value="1">1</option>
-                <option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                <option value="5">5</option><option value="6">6</option><option value="7">7</option>
-                <option value="8">8</option><option value="9">9</option><option value="10">10</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Price Preview -->
-          <div id="pricePreview" class="card-pane mt-2 summary-pane" style="display:none">
-            <div class="row">
-              <div class="col fw-bold">الخدمة</div>
-              <div id="sumServiceName" class="col text-end"></div>
-            </div>
-            <div class="row">
-              <div class="col fw-bold">السعر بدون ضريبة</div>
-              <div id="sumPriceNoVat" class="col text-end"></div>
-            </div>
-            <div class="row">
-              <div class="col fw-bold">الضريبة</div>
-              <div id="sumVat" class="col text-end"></div>
-            </div>
-            <div class="row">
-              <div class="col fw-bold">الإجمالي</div>
-              <div id="sumTotal" class="col text-end fw-bold"></div>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button id="page2-button" class="btn-pill primary">التالي</button>
-          </div>
-        </section>
-
-        <!-- Page 3: loading times -->
-        <section id="page3" class="page" aria-labelledby="p3-title">
-          <div class="card-pane text-center">
-            <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
-            <p id="p3-title" class="mt-3 mb-0">جاري جلب المواعيد…</p>
-          </div>
-          <div class="actions">
-            <button id="page3-return" class="btn-pill">السابق</button>
-            <button id="page3-button" class="btn-pill primary">التالي</button>
-          </div>
-        </section>
-
-        <!-- Page 4: التاريخ + الأوقات -->
-        <section id="page4" class="page" aria-labelledby="p4-title">
-          <h1 id="p4-title">متى تحب نجيك؟<br/>اختيار الموعد</h1>
-
-          <div class="card-pane">
-            <input type="date" id="date" class="form-control mb-3" style="max-width:400px; margin-inline:auto"/>
-            <!-- Radiogroup for times -->
-            <div id="timeRadios" class="time-container" role="radiogroup" aria-label="أوقات متاحة"></div>
-            <div id="fail-alert-3" class="alert alert-danger mt-3" style="display:none"></div>
-          </div>
-
-          <div class="actions">
-            <button id="page4-return" class="btn-pill">السابق</button>
-          </div>
-        </section>
-
-        <!-- Page 5: معلومات الاتصال -->
-        <section id="page5" class="page" aria-labelledby="p5-title">
-          <h1 id="p5-title">معلومات الاتصال</h1>
-
-          <form id="page5-form" onsubmit="return false;" style="width:100%; max-width:900px">
-            <div class="mb-3">
-              <label for="name" class="form-label">الإسم</label>
-              <input id="name" class="form-control" type="text" autocomplete="name" required>
-              <div class="helper">أكتب اسمك الأول والأخير.</div>
-              <div id="err-name" class="error-msg"></div>
-            </div>
-
-            <div class="mb-3">
-              <label for="mobile" class="form-label">رقم الجوال</label>
-              <input id="mobile" type="tel" class="form-control" autocomplete="tel" required>
-              <div class="helper">صيغة السعودية: 05XXXXXXXX</div>
-              <div id="err-mobile" class="error-msg"></div>
-            </div>
-
-            <h2 class="mt-2">معلومات المركبة</h2>
-
-            <div class="mb-3">
-              <label for="carBrand" class="form-label">ماركة السيارة</label>
-              <select id="carBrand" class="form-control"></select>
-              <div class="helper">اختر الماركة من القائمة أو اكتب للبحث.</div>
-            </div>
-
-            <div class="row g-2">
-              <div class="col-12 col-md-6">
-                <label for="carName" class="form-label">اسم السيارة</label>
-                <input type="text" id="carName" class="form-control" placeholder="مثل: كامري، إلنترا" oninput="updateLocationDescription()">
-              </div>
-              <div class="col-12 col-md-6">
-                <label for="plateNumber" class="form-label">رقم اللوحة</label>
-                <input type="text" id="plateNumber" class="form-control" maxlength="4" inputmode="numeric" pattern="^\\d{1,4}$" placeholder="1234" required>
-                <div class="helper">أرقام فقط (حتى 4 خانات).</div>
-                <div id="err-plate" class="error-msg"></div>
-              </div>
-            </div>
-
-            <input type="text" id="locationDescription" hidden readonly>
-
-            <h2 class="mt-2">طريقة الدفع</h2>
-            <div id="payRadios" class="pay-grid" role="radiogroup" aria-label="طرق الدفع">
-              <button class="pay-card" type="button" role="radio" aria-checked="false" data-value="STC Pay">
-                <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay"/>
-              </button>
-              <button class="pay-card" type="button" role="radio" aria-checked="false" data-value="Cash">
-                <span style="font-weight:800; font-size:1.2rem;">Cash</span>
-              </button>
-              <button class="pay-card" type="button" role="radio" aria-checked="false" data-value="MADA" style="grid-column:1 / -1;">
-                <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="MADA" style="max-width:180px"/>
-              </button>
-            </div>
-
-            <div class="remember-wrap">
-              <input type="checkbox" id="rememberMe"/>
-              <label for="rememberMe" style="margin:0">تذكّر بياناتي على هذا الجهاز للحجوزات القادمة</label>
-            </div>
-          </form>
-
-          <div class="actions">
-            <button id="page5-return" class="btn-pill">السابق</button>
-            <button id="page5-button" class="btn-pill primary">التالي</button>
-          </div>
-        </section>
-
-        <!-- Page 6: ملخص + الخريطة -->
-        <section id="page6" class="page" aria-labelledby="p6-title">
-          <h1 id="p6-title">راجع تفاصيل الحجز وحدد موقعك</h1>
-
-          <!-- Summary -->
-          <div id="orderSummary" class="card-pane summary-pane">
-            <div class="row"><div class="col fw-bold">المنطقة</div><div id="sumArea" class="col text-end"></div></div>
-            <div class="row"><div class="col fw-bold">الخدمة</div><div id="sumService" class="col text-end"></div></div>
-            <div class="row"><div class="col fw-bold">عدد السيارات</div><div id="sumCount" class="col text-end"></div></div>
-            <div class="row"><div class="col fw-bold">التاريخ</div><div id="sumDate" class="col text-end"></div></div>
-            <div class="row"><div class="col fw-bold">الوقت</div><div id="sumTime" class="col text-end"></div></div>
-            <div class="row"><div class="col fw-bold">طريقة الدفع</div><div id="sumPay" class="col text-end"></div></div>
-            <div class="row"><div class="col fw-bold">الملخص السعري</div><div id="sumTotalInline" class="col text-end fw-bold"></div></div>
-            <div class="text-center mt-2">
-              <button class="btn btn-outline-primary btn-sm me-1" id="editService">تعديل الخدمة</button>
-              <button class="btn btn-outline-primary btn-sm me-1" id="editTime">تعديل الوقت</button>
-              <button class="btn btn-outline-primary btn-sm" id="editContact">تعديل البيانات</button>
-            </div>
-          </div>
-
-          <!-- Address preview -->
-          <div class="addr-chip" id="addressPreview" style="display:none;">
-            <i class="fa-solid fa-location-dot"></i>
-            <span id="addressText">—</span>
-          </div>
-
-          <!-- Map -->
-          <div class="card-pane map-shell loading" id="mapShell">
-            <div class="mb-2">
-              <input id="placeSearch" class="form-control" placeholder="ابحث بالعنوان أو اسم المكان"/>
-            </div>
-            <div id="googleMap"></div>
-            <div id="mapError" class="alert alert-danger mt-2" style="display:none">تعذر تحميل الخريطة. جرّب إعادة التحميل.</div>
-          </div>
-
-          <div class="poly-hint">يجب أن يكون موقعك داخل النطاق المحدد. سيظهر تحذير إذا خرجت عن الحدود.</div>
-          <div class="poly-error" id="polyError">الموقع الحالي خارج نطاق الخدمة. انقل الدبوس إلى داخل المنطقة.</div>
-
-          <div class="actions">
-            <button id="page6-return" class="btn-pill">السابق</button>
-            <button id="show-my-location" class="btn-pill">اظهار موقعي</button>
-            <button id="page6-button" class="btn-pill primary" disabled>تأكيد</button>
-          </div>
-
-          <div id="page6-spinner" class="d-flex flex-column align-items-center" style="display:none">
-            <div class="spinner-border text-light mt-1" role="status" aria-hidden="true"></div>
-            <span class="mt-2">جار تأكيد الحجز…</span>
-          </div>
-          <div id="fail-alert-5" class="alert alert-danger mt-3" style="display:none"></div>
-        </section>
-
-        <!-- Page 7: النجاح -->
-        <section id="page7" class="page" aria-labelledby="p7-title">
-          <h1 id="p7-title">شكراً لكم</h1>
-          <h3>تم حجز الموعد، وراح نأكده لكم على الواتساب</h3>
-
-          <div class="card-pane text-center">
-            <a id="addToCalendar" class="btn btn-outline-primary m-1" download="booking.ics">📅 أضف إلى التقويم</a>
-            <a id="shareWhatsApp" class="btn btn-success m-1" target="_blank" rel="noopener">📲 مشاركة على واتساب</a>
-          </div>
-
-          <div class="actions">
-            <button id="rebook" class="btn-pill primary">🔁 حجز جديد</button>
-          </div>
-        </section>
+    <!-- Steps -->
+    <div class="steps-wrap">
+      <nav aria-label="Progress">
+        <ol class="steps" role="list">
+          <li class="step-pill active" id="s1" aria-current="step">الخدمة</li>
+          <li class="step-pill" id="s2">الوقت</li>
+          <li class="step-pill" id="s3">البيانات</li>
+          <li class="step-pill" id="s4">الموقع</li>
+          <li class="step-pill" id="s5">التأكيد</li>
+        </ol>
+      </nav>
+      <div class="progress-line" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="progressFill"></span>
       </div>
     </div>
-  </main>
 
-  <!-- ======================= FOOTER ======================= -->
-  <footer>
-    <div>Sponge & Soap</div>
-    <a target="_blank" href="https://www.instagram.com/nahl.app">Made with Nahl Perfection</a>
-  </footer>
+    <!-- Live region for errors -->
+    <div id="ariaErrors" class="visually-hidden" aria-live="assertive"></div>
+
+    <!-- Stage (transitions happen here) -->
+    <div class="stage">
+
+      <!-- Page 1 -->
+      <section id="page1" class="page active">
+        <h1>✨ واكس يحمي سيارتك</h1>
+        <h3>🧼 فوط نظيفة & لمعان مضمون • 🛞 إسفنجة للكفرات<br/>… نهتم بكل التفاصيل</h3>
+        <div class="actions">
+          <button id="page1-button" class="btn-pill primary">احجز موعدك</button>
+        </div>
+      </section>
+
+      <!-- Page 2: المنطقة + الخدمة -->
+      <section id="page2" class="page" aria-labelledby="p2-title">
+        <h1 id="p2-title">وين تحب نجيك؟<br/>اختيار المنطقة والخدمة</h1>
+
+        <div class="card-pane">
+          <div class="mb-2">
+            <label class="form-label">المنطقة</label>
+            <select id="area" class="js-example-basic-single"></select>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <label class="form-label">القسم</label>
+              <select id="serviceCat" class="form-control"></select>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">الخدمة</label>
+              <select id="service" class="form-control"></select>
+            </div>
+          </div>
+
+          <div class="mt-2">
+            <label class="form-label">عدد السيارات</label>
+            <select id="serviceCount" class="form-control">
+              <option selected value="1">1</option>
+              <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+              <option value="5">5</option><option value="6">6</option><option value="7">7</option>
+              <option value="8">8</option><option value="9">9</option><option value="10">10</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Price Preview -->
+        <div id="pricePreview" class="card-pane mt-2 summary-pane" style="display:none">
+          <div class="row">
+            <div class="col fw-bold">الخدمة</div>
+            <div id="sumServiceName" class="col text-end"></div>
+          </div>
+          <div class="row">
+            <div class="col fw-bold">السعر بدون ضريبة</div>
+            <div id="sumPriceNoVat" class="col text-end"></div>
+          </div>
+          <div class="row">
+            <div class="col fw-bold">الضريبة</div>
+            <div id="sumVat" class="col text-end"></div>
+          </div>
+          <div class="row">
+            <div class="col fw-bold">الإجمالي</div>
+            <div id="sumTotal" class="col text-end fw-bold"></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="page2-button" class="btn-pill primary">التالي</button>
+        </div>
+      </section>
+
+      <!-- Page 3: loading times -->
+      <section id="page3" class="page" aria-labelledby="p3-title">
+        <div class="card-pane text-center">
+          <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+          <p id="p3-title" class="mt-3 mb-0">جاري جلب المواعيد…</p>
+        </div>
+        <div class="actions">
+          <button id="page3-return" class="btn-pill">السابق</button>
+          <button id="page3-button" class="btn-pill primary">التالي</button>
+        </div>
+      </section>
+
+      <!-- Page 4: التاريخ + الأوقات -->
+      <section id="page4" class="page" aria-labelledby="p4-title">
+        <h1 id="p4-title">متى تحب نجيك؟<br/>اختيار الموعد</h1>
+
+        <div class="card-pane">
+          <input type="date" id="date" class="form-control mb-3" style="max-width:400px; margin-inline:auto"/>
+          <!-- Radiogroup for times -->
+          <div id="timeRadios" class="time-container" role="radiogroup" aria-label="أوقات متاحة"></div>
+          <div id="fail-alert-3" class="alert alert-danger mt-3" style="display:none"></div>
+        </div>
+
+        <div class="actions">
+          <button id="page4-return" class="btn-pill">السابق</button>
+        </div>
+      </section>
+
+      <!-- Page 5: معلومات الاتصال -->
+      <section id="page5" class="page" aria-labelledby="p5-title">
+        <h1 id="p5-title">معلومات الاتصال</h1>
+
+        <form id="page5-form" onsubmit="return false;" style="width:100%; max-width:900px">
+          <div class="mb-3">
+            <label for="name" class="form-label">الإسم</label>
+            <input id="name" class="form-control" type="text" autocomplete="name" required>
+            <div class="helper">أكتب اسمك الأول والأخير.</div>
+            <div id="err-name" class="error-msg"></div>
+          </div>
+
+          <div class="mb-3">
+            <label for="mobile" class="form-label">رقم الجوال</label>
+            <input id="mobile" type="tel" class="form-control" autocomplete="tel" required>
+            <div class="helper">صيغة السعودية: 05XXXXXXXX</div>
+            <div id="err-mobile" class="error-msg"></div>
+          </div>
+
+          <h2 class="mt-2">معلومات المركبة</h2>
+
+          <div class="mb-3">
+            <label for="carBrand" class="form-label">ماركة السيارة</label>
+            <select id="carBrand" class="form-control"></select>
+            <div class="helper">اختر الماركة من القائمة أو اكتب للبحث.</div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-12 col-md-6">
+              <label for="carName" class="form-label">اسم السيارة</label>
+              <input type="text" id="carName" class="form-control" placeholder="مثل: كامري، إلنترا" oninput="updateLocationDescription()">
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="plateNumber" class="form-label">رقم اللوحة</label>
+              <input type="text" id="plateNumber" class="form-control" maxlength="4" inputmode="numeric" pattern="^\\d{1,4}$" placeholder="1234" required>
+              <div class="helper">أرقام فقط (حتى 4 خانات).</div>
+              <div id="err-plate" class="error-msg"></div>
+            </div>
+          </div>
+
+          <input type="text" id="locationDescription" hidden readonly>
+
+          <h2 class="mt-2">طريقة الدفع</h2>
+          <div id="payRadios" class="pay-grid" role="radiogroup" aria-label="طرق الدفع">
+            <button class="pay-card" type="button" role="radio" aria-checked="false" data-value="STC Pay">
+              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay"/>
+            </button>
+            <button class="pay-card" type="button" role="radio" aria-checked="false" data-value="Cash">
+              <span style="font-weight:800; font-size:1.2rem;">Cash</span>
+            </button>
+            <button class="pay-card" type="button" role="radio" aria-checked="false" data-value="MADA" style="grid-column:1 / -1;">
+              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="MADA" style="max-width:180px"/>
+            </button>
+          </div>
+
+          <div class="remember-wrap">
+            <input type="checkbox" id="rememberMe"/>
+            <label for="rememberMe" style="margin:0">تذكّر بياناتي على هذا الجهاز للحجوزات القادمة</label>
+          </div>
+        </form>
+
+        <div class="actions">
+          <button id="page5-return" class="btn-pill">السابق</button>
+          <button id="page5-button" class="btn-pill primary">التالي</button>
+        </div>
+      </section>
+
+      <!-- Page 6: ملخص + الخريطة -->
+      <section id="page6" class="page" aria-labelledby="p6-title">
+        <h1 id="p6-title">راجع تفاصيل الحجز وحدد موقعك</h1>
+
+        <!-- Summary -->
+        <div id="orderSummary" class="card-pane summary-pane">
+          <div class="row"><div class="col fw-bold">المنطقة</div><div id="sumArea" class="col text-end"></div></div>
+          <div class="row"><div class="col fw-bold">الخدمة</div><div id="sumService" class="col text-end"></div></div>
+          <div class="row"><div class="col fw-bold">عدد السيارات</div><div id="sumCount" class="col text-end"></div></div>
+          <div class="row"><div class="col fw-bold">التاريخ</div><div id="sumDate" class="col text-end"></div></div>
+          <div class="row"><div class="col fw-bold">الوقت</div><div id="sumTime" class="col text-end"></div></div>
+          <div class="row"><div class="col fw-bold">طريقة الدفع</div><div id="sumPay" class="col text-end"></div></div>
+          <div class="row"><div class="col fw-bold">الملخص السعري</div><div id="sumTotalInline" class="col text-end fw-bold"></div></div>
+          <div class="text-center mt-2">
+            <button class="btn btn-outline-primary btn-sm me-1" id="editService">تعديل الخدمة</button>
+            <button class="btn btn-outline-primary btn-sm me-1" id="editTime">تعديل الوقت</button>
+            <button class="btn btn-outline-primary btn-sm" id="editContact">تعديل البيانات</button>
+          </div>
+        </div>
+
+        <!-- Address preview -->
+        <div class="addr-chip" id="addressPreview" style="display:none;">
+          <i class="fa-solid fa-location-dot"></i>
+          <span id="addressText">—</span>
+        </div>
+
+        <!-- Map -->
+        <div class="card-pane map-shell loading" id="mapShell">
+          <div class="mb-2">
+            <input id="placeSearch" class="form-control" placeholder="ابحث بالعنوان أو اسم المكان"/>
+          </div>
+          <div id="googleMap"></div>
+          <div id="mapError" class="alert alert-danger mt-2" style="display:none">تعذر تحميل الخريطة. جرّب إعادة التحميل.</div>
+        </div>
+
+        <div class="poly-hint">يجب أن يكون موقعك داخل النطاق المحدد. سيظهر تحذير إذا خرجت عن الحدود.</div>
+        <div class="poly-error" id="polyError">الموقع الحالي خارج نطاق الخدمة. انقل الدبوس إلى داخل المنطقة.</div>
+
+        <div class="actions">
+          <button id="page6-return" class="btn-pill">السابق</button>
+          <button id="show-my-location" class="btn-pill">اظهار موقعي</button>
+          <button id="page6-button" class="btn-pill primary" disabled>تأكيد</button>
+        </div>
+
+        <div id="page6-spinner" class="d-flex flex-column align-items-center" style="display:none">
+          <div class="spinner-border text-light mt-1" role="status" aria-hidden="true"></div>
+          <span class="mt-2">جار تأكيد الحجز…</span>
+        </div>
+        <div id="fail-alert-5" class="alert alert-danger mt-3" style="display:none"></div>
+      </section>
+
+      <!-- Page 7: النجاح -->
+      <section id="page7" class="page" aria-labelledby="p7-title">
+        <h1 id="p7-title">شكراً لكم</h1>
+        <h3>تم حجز الموعد، وراح نأكده لكم على الواتساب</h3>
+
+        <div class="card-pane text-center">
+          <a id="addToCalendar" class="btn btn-outline-primary m-1" download="booking.ics">📅 أضف إلى التقويم</a>
+          <a id="shareWhatsApp" class="btn btn-success m-1" target="_blank" rel="noopener">📲 مشاركة على واتساب</a>
+        </div>
+
+        <div class="actions">
+          <button id="rebook" class="btn-pill primary">🔁 حجز جديد</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center pb-3" style="opacity:.95">
+      <div>Sponge & Soap</div>
+      <a target="_blank" href="https://www.instagram.com/nahl.app">Made with Nahl Perfection</a>
+    </footer>
+  </div>
 
   <!-- Social FABs -->
   <a target="_blank" href="https://wa.me/966503668222" class="social-fab whatsapp-button" aria-label="واتساب"><i class="fab fa-whatsapp"></i></a>
@@ -534,6 +506,7 @@
        CONFIG + STATE
     ============================================================ */
     const DateTime = luxon.DateTime;
+    // Keep your existing endpoint
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/33e0d05d-d771-46f4-a7e7-7c634b4e3a9e/form`;
 
     const stage = document.querySelector('.stage');
@@ -554,6 +527,7 @@
       if(activeIx>=0 && activeIx<=4) stepPills[activeIx].setAttribute('aria-current', 'step');
     }
 
+    // Transition helper (fade/slide)
     function goTo(pageId){
       if(!pageId || pageId === currentPage.id) return;
       const next = document.getElementById(pageId);
@@ -566,10 +540,12 @@
         currentPage = next;
         setProgress(pageId);
 
+        // Lazy-load Google Maps once when we enter page6
         if(pageId==='page6') loadGoogleMapsOnce();
       }, 320);
     }
 
+    // Toast helper
     function toast(msg, type='info'){
       const wrap = document.getElementById('toastWrap');
       const id = 't'+Date.now();
@@ -591,13 +567,13 @@
     };
     let appointments=[[],[],[]], ActualTimes=[[],[],[]], timesLoaded=false;
 
-    // Price index for preview
-    let servicesIndexById = {}; // { serviceId: {name, price, vat, total} }
+    // Keep a map of services for price preview (filled after /services call)
+    let servicesIndexById = {}; // { serviceId: {name, priceNoVat, vat, total} }
     let chosenServiceReadable = '';
     let chosenAreaReadable = '';
 
     /* ============================================================
-       API helper
+       API (with small retry)
     ============================================================ */
     async function callContent2(path, cb, retries=2){
       try{
@@ -649,6 +625,7 @@
         });
         catSel.trigger('change');
 
+        // Build service price index for preview
         servicesIndexById = {};
         svcs.forEach(s=>{
           const name = s.TS_service_arabic_name || s.TS_service_english_name || 'الخدمة';
@@ -666,6 +643,7 @@
           svcSel.trigger('change');
         });
 
+        // Show price preview when service changes
         $('#service').off('change').on('change', ()=>{
           const id = $('#service').val();
           const data = servicesIndexById[id];
@@ -706,13 +684,14 @@
     document.getElementById('page3-button').onclick = ()=> goTo('page4');
 
     /* ============================================================
-       APPOINTMENTS (PAGE 4)
+       APPOINTMENTS (PAGE 4) with radiogroup
     ============================================================ */
     function renderTimeOptions(arr, dateISO){
       const group = document.getElementById('timeRadios');
       group.innerHTML = '';
       if(!arr.length){ group.innerHTML = '<div class="text-center text-muted">لا توجد مواعيد متاحة</div>'; return; }
 
+      // Filter out past times if user chooses today
       const now = DateTime.now();
       const isToday = DateTime.fromISO(dateISO).hasSame(now, 'day');
 
@@ -721,7 +700,7 @@
         if(isToday){
           const t24 = d.toFormat('HH:mm');
           const current24 = now.toFormat('HH:mm');
-          if (t24 <= current24) return;
+          if (t24 <= current24) return; // skip past times
         }
         const btn = document.createElement('button');
         btn.type='button';
@@ -731,12 +710,14 @@
         btn.dir='ltr';
         btn.textContent = human;
         btn.addEventListener('click', ()=>{
+          // uncheck others
           [...group.querySelectorAll('[role="radio"]')].forEach(b=> b.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
           const t = DateTime.fromFormat(machine, "h:mm a");
           nForm.date = dateISO;
           nForm.time = t.toFormat('HH:mm');
           toast('تم اختيار الوقت', 'success');
+          // forward to contact page
           setTimeout(()=> goTo('page5'), 250);
         });
         group.appendChild(btn);
@@ -748,12 +729,25 @@
       const group=document.getElementById('timeRadios');
       group.innerHTML='<div class="text-center text-muted">…</div>';
       callContent2(`/appointments?startDate=${isoDate}&location=${area}&service=${svc}`, data=>{
+        appointments=[[],[],[]]; ActualTimes=[[],[],[]];
         const list = data?.data?.appointments || [];
-        const normalized = list.map(rec=>{
+        const day1 = DateTime.fromISO(isoDate);
+        const day2 = day1.plus({days:1}).toISODate();
+        const day3 = day1.plus({days:2}).toISODate();
+
+        // Normalize list
+        const normalized = [];
+        list.forEach(rec=>{
           const d = DateTime.fromISO(rec.TS_appointment_date, { setZone:true }).toISODate();
           const t = DateTime.fromISO(rec.TS_appointment_time, { setZone:true });
-          return { date:d, human:t.toLocaleString(DateTime.TIME_SIMPLE).replace(' ',' '), machine:t.toFormat('h:mm a') };
+          normalized.push({
+            date: d,
+            human: t.toLocaleString(DateTime.TIME_SIMPLE).replace(' ', ' '),
+            machine: t.toFormat('h:mm a')
+          });
         });
+
+        // Render only selected day's slots (day1)
         const slots = normalized.filter(x=> x.date===isoDate);
         renderTimeOptions(slots, isoDate);
       });
@@ -818,6 +812,7 @@
       $('#locationDescription').val(desc);
     }
 
+    // Payment radiogroup
     let selectedPay = '';
     document.querySelectorAll('#payRadios .pay-card').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -827,6 +822,7 @@
       });
     });
 
+    // Remember
     try{
       if(localStorage.getItem('remember')==='1'){
         $('#rememberMe').prop('checked', true);
@@ -860,6 +856,7 @@
         }
       }catch(_){}
 
+      // Prepare summary values for the next page
       updateOrderSummary();
       goTo('page6');
     });
@@ -925,6 +922,7 @@
         marker.addListener("dragend", (e)=> validateAndSetPosition(e.latLng));
         map.addListener("click", (e)=> validateAndSetPosition(e.latLng));
 
+        // Places search
         placesAC = new google.maps.places.Autocomplete(document.getElementById('placeSearch'), { fields:['geometry'] });
         placesAC.addListener('place_changed', ()=>{
           const p = placesAC.getPlace();
@@ -932,6 +930,7 @@
           validateAndSetPosition(p.geometry.location);
         });
 
+        // set polygon by selected area (if any)
         setBoundaries();
       }catch(err){
         document.getElementById('mapError').style.display='block';
@@ -1016,6 +1015,7 @@
 
     $('#area').on('change', ()=>{ if(map) setBoundaries(); });
 
+    // Locate me
     function detectMyLocation(){
       if(!map){ toast('الخريطة لم تكتمل بعد', 'error'); return; }
       if(navigator.geolocation){
@@ -1034,8 +1034,10 @@
       infoWindow.open(map);
     }
 
+    // Page 6 buttons
     document.getElementById('page6-return').onclick = ()=> goTo('page5');
     document.getElementById('page6-button').onclick = ()=>{
+      if(submitting) return;
       if (!position || !insideServiceArea){
         toast("حدّد موقعًا داخل نطاق الخدمة أولاً.", 'error'); ariaErrors.textContent="حدّد موقعًا داخل نطاق الخدمة أولاً."; return;
       }
@@ -1048,7 +1050,7 @@
     };
 
     function submitReservation(){
-      document.getElementById("page6-button").disabled = true;
+      submitting=true; setNextEnabled(false);
       document.getElementById("page6-spinner").style.display="flex";
       nForm.urlLocation = position;
 
@@ -1057,29 +1059,32 @@
         body: JSON.stringify(nForm)
       })
       .then(async res=>{
-        document.getElementById("page6-spinner").style.display="none";
+        submitting=false; document.getElementById("page6-spinner").style.display="none";
         if(!res.ok){ const j=await res.json().catch(()=>({})); throw j; }
+        // Prepare success actions (ICS + WhatsApp)
         wireSuccessActions();
         goTo('page7');
       })
       .catch(err=>{
-        document.getElementById("page6-spinner").style.display="none";
-        document.getElementById("page6-button").disabled = false;
+        submitting=false; document.getElementById("page6-spinner").style.display="none";
         const msgAR = err?.msgAR || "عذرًا حصل خطأ غير متوقع الرجاء التواصل معنا";
         const fail = document.getElementById("fail-alert-5");
         fail.style.display='block'; fail.textContent = msgAR;
         toast(msgAR, 'error');
-        goTo('page4');
+        goTo('page4'); // back to time selection
         $('#date').trigger('change');
       });
     }
 
+    // Edit links in summary
     document.getElementById('editService').onclick = ()=> goTo('page2');
     document.getElementById('editTime').onclick = ()=> goTo('page4');
     document.getElementById('editContact').onclick = ()=> goTo('page5');
 
+    // Page 7
     document.getElementById('rebook').onclick = ()=> location.href = "https://www.spongnsoap.com/";
 
+    // ICS + WhatsApp prep
     function wireSuccessActions(){
       const start = DateTime.fromISO(nForm.date + 'T' + nForm.time);
       const end = start.plus({ minutes: 60 });
