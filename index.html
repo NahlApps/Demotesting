@@ -753,7 +753,7 @@
       $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
-      // ===== Mobile field (intl-tel-input) enhanced =====
+      // ===== Mobile field (intl-tel-input) enhanced — FIXED =====
       const phoneEl = document.querySelector('#mobile');
       itiPhone = window.intlTelInput(phoneEl, {
         initialCountry: 'sa',
@@ -767,19 +767,14 @@
         useFullscreenPopup: true,
         utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
-      function updatePhonePlaceholder(){
-        const ex = itiPhone.getNumberPlaceholder();
-        if (ex) phoneEl.placeholder = ex.replace(/\u200E|\u200F/g,'');
-      }
-      updatePhonePlaceholder();
+
+      // أرقام فقط + تحقق لحظي
       phoneEl.addEventListener('input', function(){
         this.value = this.value.replace(/[^\d]/g,'');
         validateMobileInline();
       });
-      phoneEl.addEventListener('countrychange', function(){
-        validateMobileInline();
-        updatePhonePlaceholder();
-      });
+      // عند تغيير الدولة نعيد التحقق فقط
+      phoneEl.addEventListener('countrychange', validateMobileInline);
 
       setLoadingServices(true);
       callContent2(`/locations`, function(res){
@@ -796,8 +791,7 @@
           servicesCache=res && res.data ? res.data.services||[] : [];
           categoriesCache=res && res.data ? res.data.servicesCat||[] : [];
           var cats=categoriesCache.map(function(c){ return {id:c.TS_category_id, text:c.TS_category_arabic_name}; });
-          $('#serviceCat').empty().select2({data:cats,width:'100%'});
-          if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
+          $('#serviceCat').empty().select2({data:cats,width:'100%'}); if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
           setLoadingServices(false);
           updateNextAvailability();
         }, true);
