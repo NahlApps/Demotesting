@@ -83,6 +83,8 @@
     @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
     @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
     .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center}
+    @keyframes nudge { 0%{transform:translateY(0)} 40%{transform:translateY(-3px)} 100%{transform:translateY(0)} }
+    .page.active h1{ animation:nudge 600ms var(--ease) 120ms 1 }
 
     /* Cards + fields */
     .card{background:var(--surface-000); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:var(--shadow-md); padding:var(--sp-6); width:100%; max-width:920px}
@@ -179,6 +181,34 @@
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
     @keyframes heroFloat{ from{ transform:translateY(6px) } to{ transform:translateY(0) } }
+
+    /* ====== NEW: Summary bar + Chips + Inline errors ====== */
+    .summary-container{ display:flex; justify-content:center; padding:8px 12px 0 }
+    .summary-bar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      background:rgba(255,255,255,.92); color:#0B2630;
+      border:1px solid var(--border-300); border-radius:var(--radius-md);
+      padding:10px 12px; box-shadow:var(--shadow-xs);
+      max-width:1120px; width:100%;
+    }
+    .summary-bar .chip{
+      display:flex; align-items:center; gap:8px;
+      background:#fff; border:1px solid var(--border-300); border-radius:999px;
+      padding:6px 10px; font-size:.92rem; box-shadow:var(--shadow-xs)
+    }
+    .summary-bar i{opacity:.8}
+
+    .chips-wrap{display:flex; gap:8px; flex-wrap:wrap}
+    .chip-filter{
+      background:#fff; color:#0B2630; border:1px solid var(--border-300);
+      border-radius:999px; padding:8px 12px; font-weight:700; box-shadow:var(--shadow-xs);
+      transition:background var(--dur-xs) var(--ease), transform var(--dur-xs) var(--ease);
+    }
+    .chip-filter:hover{ background:var(--brand-050); transform:translateY(-1px) }
+    .chip-filter.is-active{ outline:3px solid var(--brand-600); outline-offset:2px }
+
+    .is-invalid{ border-color:#ef4444 !important; box-shadow:0 0 0 4px rgba(239,68,68,.12) }
+    .invalid-hint{ color:#ef4444; font-size:.85rem; margin-top:6px }
   </style>
 </head>
 <body>
@@ -262,6 +292,25 @@
               <div class="col-12 col-md-5">
                 <label class="form-label" for="date">التاريخ</label>
                 <input id="date" type="date" class="form-control"/>
+              </div>
+            </div>
+
+            <!-- NEW: Quick dates + time filters -->
+            <div class="row g-2 mt-2">
+              <div class="col-12 col-md-7">
+                <div id="quickDates" class="chips-wrap" role="group" aria-label="تواريخ سريعة">
+                  <button type="button" class="chip-filter" data-shift="0">اليوم</button>
+                  <button type="button" class="chip-filter" data-shift="1">غداً</button>
+                  <button type="button" class="chip-filter" data-shift="2">بعد غد</button>
+                </div>
+              </div>
+              <div class="col-12 col-md-5">
+                <div id="timeFilters" class="chips-wrap" role="group" aria-label="فلترة الفترة">
+                  <button type="button" class="chip-filter is-active" data-period="all">الكل</button>
+                  <button type="button" class="chip-filter" data-period="morning">صباح</button>
+                  <button type="button" class="chip-filter" data-period="noon">ظهر</button>
+                  <button type="button" class="chip-filter" data-period="evening">مساء</button>
+                </div>
               </div>
             </div>
 
@@ -352,6 +401,17 @@
     </div>
   </main>
 
+  <!-- NEW: Summary bar (فوق الفوتر) -->
+  <div class="summary-container">
+    <div id="bookingSummary" class="summary-bar" aria-live="polite">
+      <span class="chip"><i class="fa-solid fa-location-dot"></i> <b id="sumArea">—</b></span>
+      <span class="chip"><i class="fa-solid fa-screwdriver-wrench"></i> <b id="sumService">—</b></span>
+      <span class="chip"><i class="fa-regular fa-calendar"></i> <b id="sumDate">—</b></span>
+      <span class="chip"><i class="fa-regular fa-clock"></i> <b id="sumTime">—</b></span>
+      <span class="chip"><i class="fa-regular fa-credit-card"></i> <b id="sumPay">—</b></span>
+    </div>
+  </div>
+
   <!-- Footer nav -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
@@ -387,11 +447,10 @@
       else { img.style.display = 'none'; const txt = document.getElementById('brandText'); if (txt) txt.style.display = 'block'; }
     }
 
-    /* ---------------- API ---------------- */
-    // NOTE: reserveAppointment lives at server/api/app/AM/general/[appid]/form/reserveAppointment.post.ts
+    /* ---------------- API (unchanged) ---------------- */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
-    const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;                   // correct path with /form
-    const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`; // safety only if 404
+    const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
+    const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     let controllers=[];
 
@@ -427,7 +486,6 @@
       }
     }
 
-    // POST helper — send as text/plain (server does readBody + JSON.parse)
     async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
       console.groupCollapsed('%c[POST reserve]','color:#a855f7;font-weight:700', url, 'CT=', contentType);
       console.log('payload:', payload);
@@ -455,13 +513,10 @@
     }
 
     async function postReservation(payload){
-      // 1) text/plain (no preflight)
       let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
-      // If server insists on application/json (or proxy blocks text/plain), retry with application/json
       if(!r.ok && (r.status===415 || r.status===406 || r.status===0)){
         r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
       }
-      // If route mismatch (some envs), try fallback path (without /form) — only if 404
       if(!r.ok && r.status===404){
         console.warn('[reserve] 404 on /form path — trying fallback without /form once…');
         r = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
@@ -637,7 +692,7 @@
       const now = DateTime.now().setZone('Asia/Riyadh');
       const isToday = selectedISO === now.toISODate();
 
-      // ask API for only available
+      // ask API for only available (unchanged)
       const qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}`
                + `&location=${encodeURIComponent(loc)}`
                + `&service=${encodeURIComponent(srv)}`
@@ -702,6 +757,32 @@
       }, true);
     }
 
+    /* NEW: time-of-day filter state */
+    let timeFilter = 'all'; // all|morning|noon|evening
+    // Delegation for quickDates inside the Time card
+    $('#quickDates').on('click', '.chip-filter', function(){
+      $('#quickDates .chip-filter').removeClass('is-active'); $(this).addClass('is-active');
+      const shift = Number(this.dataset.shift||0);
+      const d = DateTime.now().plus({days:shift}).toFormat('yyyy-LL-dd');
+      $('#date').val(d).trigger('change');
+    });
+    // Global delegation for CTA chips that appear in empty state (outside #quickDates)
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.chip-filter[data-shift]');
+      if(!btn) return;
+      const shift = Number(btn.dataset.shift||0);
+      const d = DateTime.now().plus({days:shift}).toFormat('yyyy-LL-dd');
+      const inTimePage = getActiveIndex()===2;
+      $('#date').val(d).trigger('change');
+      if(inTimePage) window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    $('#timeFilters').on('click', '.chip-filter', function(){
+      $('#timeFilters .chip-filter').removeClass('is-active'); $(this).addClass('is-active');
+      timeFilter = this.dataset.period || 'all';
+      renderSelectedDateTimes($('#date').val());
+    });
+
     function renderSelectedDateTimes(selectedISO){
       const timeContainer = document.getElementById('time-container');
       timeContainer.innerHTML = '';
@@ -714,15 +795,25 @@
         return;
       }
 
-      console.groupCollapsed('%cRender times','color:#0B2630;font-weight:700');
-      console.log('Date:', selectedISO, '| Slots:', dayTimes.length);
-      console.table(dayTimes);
-      console.groupEnd();
+      // Apply time-of-day filter
+      const filteredByPeriod = dayTimes.filter(t=>{
+        const hh = Number(DateTime.fromFormat(t.actual12,'h:mm a').toFormat('HH'));
+        if(timeFilter==='morning') return hh>=5 && hh<12;
+        if(timeFilter==='noon')    return hh>=12 && hh<17;
+        if(timeFilter==='evening') return hh>=17 && hh<=22;
+        return true; // all
+      });
 
-      if (!dayTimes.length) {
+      const useList = filteredByPeriod;
+
+      if (!useList.length) {
         timeContainer.innerHTML = `
-          <div style="grid-column:1/-1;justify-self:center" class="text-muted">
-            لا توجد مواعيد متاحة
+          <div style="grid-column:1/-1;justify-self:center;text-align:center">
+            <div class="text-muted mb-2">لا توجد مواعيد متاحة بهذه الفترة</div>
+            <div class="chips-wrap" style="justify-content:center">
+              <button type="button" class="chip-filter" data-shift="1">جرّب غداً</button>
+              <button type="button" class="chip-filter" data-shift="2">أو بعد غد</button>
+            </div>
           </div>`;
         window.selectedTime = null;
         selectedTime = null;
@@ -730,7 +821,12 @@
         return;
       }
 
-      dayTimes.forEach((t) => {
+      console.groupCollapsed('%cRender times','color:#0B2630;font-weight:700');
+      console.log('Date:', selectedISO, '| Slots (after filter):', useList.length);
+      console.table(useList);
+      console.groupEnd();
+
+      useList.forEach((t) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'time-option';
@@ -748,7 +844,7 @@
           nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
 
           window.selectedTime = { ui: t.label, iso: nForm.time };
-          selectedTime        = window.selectedTime; // gate Next
+          selectedTime        = window.selectedTime;
 
           console.log('Selected time =>', window.selectedTime);
           updateNextAvailability?.();
@@ -849,7 +945,7 @@
 
       // Contact field triggers
       $('#name, #mobile, #carName').on('input', updateNextAvailability);
-      $('#serviceCount, #serviceCat, #service, #area').on('change', updateNextAvailability);
+      $('#serviceCount, #serviceCat, #service, #area, #date').on('change', updateNextAvailability);
 
       // Rebook
       $('#rebook').on('click', ()=>location.href='/');
@@ -857,6 +953,7 @@
       // initial progress + welcome footer state
       syncProgress(0);
       startWelcomeDeck();
+      renderSummary();
     });
 
     // Footer nav + welcome Skip button
@@ -866,6 +963,11 @@
       const $start=document.getElementById('page1-button');
 
       $start.addEventListener('click', ()=>{ stopWelcomeDeck(); showPage(1); });
+
+      function focusFirstInvalid(){
+        const invalid = document.querySelector('.is-invalid');
+        if(invalid){ invalid.focus({preventScroll:false}); invalid.scrollIntoView({behavior:'smooth', block:'center'}); }
+      }
 
       async function gotoNext(){
         const i=getActiveIndex(); const id=orderedPages[i];
@@ -888,10 +990,18 @@
 
         if(id==='page5'){
           const name=$('#name').val().trim();
-          if(!name){ showToast('error','يرجى إدخال الاسم'); document.getElementById('name').focus(); return; }
-          if(!validateMobile()) return;
-          if(!validatePlate()) return;
-          if(!nForm.paymentMethod){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
+          const phoneOk=(itiPhone && itiPhone.isValidNumber());
+          const plateOk=(($('#plateNumber').val()||'').length===4);
+          const payOk=!!nForm.paymentMethod;
+
+          if(!name){ $('#name').addClass('is-invalid'); } else { $('#name').removeClass('is-invalid'); }
+          if(!phoneOk){ $('#mobile').addClass('is-invalid'); } else { $('#mobile').removeClass('is-invalid'); }
+          if(!plateOk){ $('#plateNumber').addClass('is-invalid'); } else { $('#plateNumber').removeClass('is-invalid'); }
+
+          if(!name){ showToast('error','يرجى إدخال الاسم'); focusFirstInvalid(); return; }
+          if(!phoneOk){ showToast('error','الرجاء إدخال رقم جوال صحيح'); focusFirstInvalid(); return; }
+          if(!plateOk){ showToast('error','رجاءً أدخل آخر ٤ أرقام من اللوحة'); focusFirstInvalid(); return; }
+          if(!payOk){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
 
           nForm.customerN=name;
           nForm.customerM=itiPhone.getNumber().replace(/^\+/, '');
@@ -923,7 +1033,6 @@
 
           if(r.ok && r.data?.success){
             if(r.data?.otp){
-              // UI has no OTP (per your request). If server still asks, surface a clear message.
               console.warn('[reserve] Server responded otp:true while OTP UI is disabled.');
               showToast('error','الخادم يطلب رمز تحقق (OTP). عطّل خيار OTP في إعدادات التطبيق.');
               return;
@@ -957,11 +1066,12 @@
       enforceDateMinToday();
     });
 
-    /* Enable/disable Next based on step validity */
+    /* Enable/disable Next based on step validity + Summary refresh */
     function updateNextAvailability(){
       const i = getActiveIndex();
       const nextBtn = document.getElementById('footer-next');
       let enable = true;
+
       if(i === 1){ // page2
         enable = !!($('#area').val() && $('#service').val());
       } else if(i === 2){ // page4 (time)
@@ -971,12 +1081,30 @@
         const phoneOk = (itiPhone && itiPhone.isValidNumber());
         const payOk = !!nForm.paymentMethod;
         const plateOk = ($('#plateNumber').val()||'').length === 4;
+
+        $('#name').toggleClass('is-invalid', !nameOk);
+        $('#mobile').toggleClass('is-invalid', !phoneOk);
+        $('#plateNumber').toggleClass('is-invalid', !plateOk);
+
         enable = nameOk && phoneOk && payOk && plateOk;
       } else if(i === 4){ // page6 (map)
         enable = !!positionUrl;
       }
+
       nextBtn.disabled = !enable;
       nextBtn.classList.toggle('disabled', !enable);
+
+      // Always refresh summary
+      renderSummary();
+    }
+
+    /* --------- Summary renderer --------- */
+    function renderSummary(){
+      document.getElementById('sumArea').textContent    = $('#area').find(':selected').text() || '—';
+      document.getElementById('sumService').textContent = $('#service').find(':selected').text() || '—';
+      document.getElementById('sumDate').textContent    = ($('#date').val() || '—');
+      document.getElementById('sumTime').textContent    = (window.selectedTime?.ui || '—');
+      document.getElementById('sumPay').textContent     = (nForm.paymentMethod || '—');
     }
 
     /* ---------------- Google Map ---------------- */
