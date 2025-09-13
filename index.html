@@ -65,15 +65,12 @@
     .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
 
-    /* Clear brand badge (makes logo readable on busy backgrounds) */
+    /* Brand (logo without frame) */
     .brand{ display:flex; align-items:center; justify-content:flex-end; flex:0 0 auto; }
-    .brand-badge{
-      background:#ffffff; border:1px solid rgba(0,0,0,.06);
-      border-radius:18px; padding:6px 10px;
-      box-shadow:0 8px 20px rgba(0,0,0,.12);
-      display:flex; align-items:center; justify-content:center;
+    .brand img{
+      height:92px; width:auto; object-fit:contain; display:block;
+      filter: drop-shadow(0 6px 18px rgba(0,0,0,.35)) drop-shadow(0 2px 6px rgba(0,0,0,.25));
     }
-    .brand img{height:92px; width:auto; object-fit:contain; display:block}
     @media (max-width:640px){ .brand img{height:84px} }
 
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
@@ -259,9 +256,7 @@
           <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
         <div class="brand">
-          <div class="brand-badge">
-            <img id="brandLogo" alt="Nahl" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
-          </div>
+          <img id="brandLogo" alt="Nahl" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
         </div>
       </div>
 
