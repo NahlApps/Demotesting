@@ -40,9 +40,8 @@
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
 
-      /* Layout */
-      --header-h:76px; --footer-h:78px;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      /* Layout (قيمة ابتدائية؛ سنحدّثها برمجيًا) */
+      --header-h:120px; --footer-h:78px;
     }
 
     html,body{height:100%}
@@ -52,24 +51,53 @@
         linear-gradient(180deg, rgba(11,38,48,.65), rgba(11,38,48,.35)),
         url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/lorenzo-hamers-n1SRvkP6bEk-unsplash%20(1).jpg") center/cover fixed;
       min-height:100vh; display:flex; flex-direction:column;
-      padding-top:var(--header-h); padding-bottom:calc(var(--footer-h) + 12px + var(--safe-bottom));
+      padding-top:var(--header-h); padding-bottom:var(--footer-h);
       color-scheme: light;
     }
 
-    /* Header */
+    /* Header (أصبح بارتفاع تلقائي) */
     header{
-      position:sticky; top:0; z-index:50; height:var(--header-h);
+      position:sticky; top:0; z-index:50;
       background:rgba(11,38,48,.42); backdrop-filter:blur(10px);
       border-bottom:1px solid rgba(255,255,255,.18);
-      display:flex; align-items:center; justify-content:center;
+      display:flex; align-items:stretch; justify-content:center;
     }
-    .header-inner{max-width:1120px; width:100%; padding:0 var(--sp-3); display:flex; align-items:center; justify-content:space-between}
+    .header-inner{
+      max-width:1120px; width:100%;
+      padding:10px var(--sp-3) 12px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .header-top{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
-    .mini-progress{display:flex; align-items:center; gap:var(--sp-3); width:60%}
+    .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
+
+    /* Summary chips أسفل شريط التقدم */
+    .header-summary{ display:flex; justify-content:center }
+    .summary-bar{
+      display:flex; gap:8px; flex-wrap:nowrap; align-items:center;
+      background:rgba(255,255,255,.98); color:#0B2630;
+      border:1px solid var(--border-300); border-radius:12px;
+      padding:8px 10px; box-shadow:var(--shadow-sm);
+      max-width:1120px; width:100%;
+      overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    }
+    .summary-bar::-webkit-scrollbar{ display:none }
+    .summary-bar .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      background:#fff; border:1px solid var(--border-300); border-radius:999px;
+      padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap;
+    }
+    .summary-bar i{opacity:.85}
+    @media (max-width: 480px){
+      .summary-bar{ padding:6px 8px }
+      .summary-bar .chip{ padding:5px 8px; font-size:.84rem }
+    }
 
     /* Main */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
@@ -101,58 +129,33 @@
     .form-control::placeholder{color:#6b7280}
     .form-control:focus{ border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) }
 
-    /* ================= Select2 — Contrast Fixes ================= */
-    /* الحقل المختار (rendered + placeholder) */
+    /* ========== Select2 — Contrast Fixes ========== */
     .select2-container--default .select2-selection--single{
       background:#ffffff !important; border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
     }
     .select2-container--default .select2-selection--single .select2-selection__rendered{
       color:#0B2630 !important; line-height:48px !important; padding-inline:42px 42px !important;
     }
-    .select2-container--default .select2-selection--single .select2-selection__placeholder{
-      color:#667085 !important;
-    }
-    /* عند التركيز */
+    .select2-container--default .select2-selection--single .select2-selection__placeholder{ color:#667085 !important; }
     .select2-container--default.select2-container--focus .select2-selection--single{
       border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important;
     }
-    /* السهم */
-    .select2-container--default .select2-selection--single .select2-selection__arrow{
-      height:48px !important;
-    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow{ height:48px !important; }
     .select2-container--default .select2-selection--single .select2-selection__arrow b{
       border-color:#0B2630 transparent transparent transparent !important;
     }
-    /* القائمة */
     .select2-dropdown{
       background:#fff !important; color:#0B2630 !important;
       border:1px solid var(--border-300) !important; box-shadow:var(--shadow-sm);
     }
-    .select2-container--default .select2-results__option{
-      color:#0B2630 !important; background:#fff !important; padding:10px 12px;
-    }
+    .select2-container--default .select2-results__option{ color:#0B2630 !important; background:#fff !important; padding:10px 12px; }
     .select2-results__options{max-height:280px}
-    /* تحويم / محدد — تباين أعلى */
     .select2-container--default .select2-results__option--highlighted[aria-selected],
-    .select2-container--default .select2-results__option--highlighted{
-      background:#E6F4F7 !important; color:#0B2630 !important;
-    }
-    .select2-container--default .select2-results__option[aria-selected="true"]{
-      background:#D8EEF3 !important; color:#0B2630 !important;
-    }
-    /* معطّل */
-    .select2-container--default .select2-results__option[aria-disabled="true"]{
-      color:#9aa7ad !important;
-    }
+    .select2-container--default .select2-results__option--highlighted{ background:#E6F4F7 !important; color:#0B2630 !important; }
+    .select2-container--default .select2-results__option[aria-selected="true"]{ background:#D8EEF3 !important; color:#0B2630 !important; }
+    .select2-container--default .select2-results__option[aria-disabled="true"]{ color:#9aa7ad !important; }
     .select2-container--default .select2-selection--single[aria-disabled="true"],
-    .select2-container--disabled .select2-selection--single{
-      background:#f5f7f9 !important; color:#6b7280 !important; opacity:.9;
-    }
-    /* أنيميشن القائمة */
-    .select2-container--open .select2-dropdown{
-      transform-origin:top center; animation:dropdownIn var(--dur-sm) var(--ease-decel) both;
-    }
-    @keyframes dropdownIn{ from{opacity:0; transform:translateY(6px) scale(.99)} to{opacity:1; transform:none} }
+    .select2-container--disabled .select2-selection--single{ background:#f5f7f9 !important; color:#6b7280 !important; opacity:.9; }
 
     /* Time grid */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-4)}
@@ -187,7 +190,7 @@
 
     /* Footer nav */
     footer.sticky-nav{ position:sticky; bottom:0; z-index:40; height:var(--footer-h); background:rgba(11,38,48,.55); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; }
-    .footer-inner{ max-width:1120px; width:100%; padding:8px 12px calc(8px + var(--safe-bottom)); display:flex; align-items:center; justify-content:space-between; }
+    .footer-inner{ max-width:1120px; width:100%; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; }
     .footer-brand{ font-size:.95rem; color:#fff; opacity:.95 }
     .footer-actions{display:flex; gap:12px}
     .btn-footer{ flex:1; border:1px solid rgba(255,255,255,.28); border-radius:var(--radius-md); padding:12px 16px; min-height:48px; font-size:var(--fs-md); font-weight:var(--fw-bold); background:#ffffff; color:#015a6c; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease); }
@@ -216,7 +219,7 @@
     /* serviceCount full width */
     #serviceCount{ width:100% !important; }
 
-    /* =================== Deck =================== */
+    /* Deck */
     .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg,#ffffff, #f6fbfd); box-shadow:var(--shadow-md); }
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
@@ -228,29 +231,7 @@
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
 
-    /* ====== Summary bar anchored in footer ====== */
-    .summary-container{ position:fixed; left:0; right:0; bottom:calc(var(--footer-h) + var(--safe-bottom) + 6px); z-index:48; display:flex; justify-content:center; padding:0 12px; }
-    .summary-bar{
-      display:flex; gap:8px; flex-wrap:nowrap; align-items:center;
-      background:rgba(255,255,255,.98); color:#0B2630;
-      border:1px solid var(--border-300); border-radius:12px;
-      padding:8px 10px; box-shadow:var(--shadow-sm);
-      max-width:1120px; width:100%;
-      overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    }
-    .summary-bar::-webkit-scrollbar{ display:none }
-    .summary-bar .chip{
-      display:inline-flex; align-items:center; gap:6px;
-      background:#fff; border:1px solid var(--border-300); border-radius:999px;
-      padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap;
-    }
-    .summary-bar i{opacity:.85}
-    @media (max-width: 480px){
-      .summary-bar{ padding:6px 8px }
-      .summary-bar .chip{ padding:5px 8px; font-size:.84rem }
-    }
-
-    /* ====== Thank-you hero & Rebook CTA ====== */
+    /* Thank-you + CTA */
     .success-hero{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:10px}
     .success-icon{
       width:92px;height:92px;border-radius:50%;
@@ -263,11 +244,8 @@
       color:#fff; position:absolute; inset:0; display:grid; place-items:center; font-size:40px;
       transform:scale(.7); opacity:0; animation:popIn .5s var(--ease-decel) .1s forwards;
     }
-    @keyframes popIn{to{transform:scale(1);opacity:1}}
-
     .thanks-title{font-size:1.35rem;font-weight:800;color:#0b2630;margin:0}
     .thanks-copy{color:#33545f;margin:0;opacity:.95}
-
     .rebook-btn{
       display:inline-flex;align-items:center;gap:10px;justify-content:center;
       background:linear-gradient(135deg,var(--brand-600),var(--brand-700));
@@ -287,15 +265,26 @@
   <!-- Header -->
   <header>
     <div class="header-inner">
-      <div class="mini-progress" aria-hidden="true">
-        <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
-        <div class="step" id="miniStepTitle">الترحيب</div>
+      <div class="header-top">
+        <div class="mini-progress" aria-hidden="true">
+          <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
+          <div class="step" id="miniStepTitle">الترحيب</div>
+        </div>
+        <div class="brand">
+          <img id="brandLogo" alt="Sponge &amp; Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
+          <strong id="brandText" style="display:none;color:#fff;font-weight:800">Sponge &amp; Soap</strong>
+        </div>
       </div>
 
-      <!-- Brand -->
-      <div class="brand">
-        <img id="brandLogo" alt="Sponge &amp; Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
-        <strong id="brandText" style="display:none;color:#fff;font-weight:800">Sponge &amp; Soap</strong>
+      <!-- Summary chips: أسفل شريط التقدم -->
+      <div class="header-summary">
+        <div id="bookingSummary" class="summary-bar" aria-live="polite">
+          <span class="chip"><i class="fa-solid fa-location-dot"></i> <b id="sumArea">—</b></span>
+          <span class="chip"><i class="fa-solid fa-screwdriver-wrench"></i> <b id="sumService">—</b></span>
+          <span class="chip"><i class="fa-regular fa-calendar"></i> <b id="sumDate">—</b></span>
+          <span class="chip"><i class="fa-regular fa-clock"></i> <b id="sumTime">—</b></span>
+          <span class="chip"><i class="fa-regular fa-credit-card"></i> <b id="sumPay">—</b></span>
+        </div>
       </div>
     </div>
   </header>
@@ -446,7 +435,9 @@
                 <p id="thanksCopy" class="thanks-copy">راح نرسل لك التأكيد على الواتساب خلال دقائق.</p>
               </div>
             </div>
+
             <div id="thanksSummary" class="chips-wrap centered" aria-live="polite"></div>
+
             <div style="margin-top:18px">
               <button id="rebook" class="rebook-btn" type="button">
                 <i class="fa-solid fa-rotate-right"></i>
@@ -458,17 +449,6 @@
       </div>
     </div>
   </main>
-
-  <!-- Summary bar (ثابت بالفوتر) -->
-  <div class="summary-container" aria-hidden="false">
-    <div id="bookingSummary" class="summary-bar" aria-live="polite">
-      <span class="chip"><i class="fa-solid fa-location-dot"></i> <b id="sumArea">—</b></span>
-      <span class="chip"><i class="fa-solid fa-screwdriver-wrench"></i> <b id="sumService">—</b></span>
-      <span class="chip"><i class="fa-regular fa-calendar"></i> <b id="sumDate">—</b></span>
-      <span class="chip"><i class="fa-regular fa-clock"></i> <b id="sumTime">—</b></span>
-      <span class="chip"><i class="fa-regular fa-credit-card"></i> <b id="sumPay">—</b></span>
-    </div>
-  </div>
 
   <!-- Footer nav -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
@@ -509,49 +489,38 @@
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
     const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
+
     let controllers=[];
 
     async function callContent2(path, cb, abortable=false, retries=3){
       let signal='';
       if(abortable){
-        controllers.forEach(([c])=>c.abort());
-        controllers=[];
-        const controller=new AbortController();
-        signal=controller.signal;
+        controllers.forEach(([c])=>c.abort()); controllers=[];
+        const controller=new AbortController(); signal=controller.signal;
         controllers.push([controller,signal]);
       }
       try{
         await new Promise(r=>setTimeout(r, 200));
         const fullUrl = defaultLink2+path;
         const res=await fetch(fullUrl,{method:'GET',redirect:'follow',...(abortable&&{signal}), cache:'no-store'});
-        if(!res.ok){
-          if(retries>0) return callContent2(path,cb,abortable,retries-1);
-          throw new Error('Network');
-        }
+        if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network'); }
         const json=await res.json(); cb(json);
       }catch(e){
-        if(!String(e).includes('AbortError') && retries>0)
-          setTimeout(()=>callContent2(path,cb,abortable,retries-1),600);
+        if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),600);
       }
     }
 
     async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
       try{
         const res = await fetch(url, {
-          method:'POST',
-          mode:'cors',
-          cache:'no-store',
-          credentials:'omit',
-          referrerPolicy:'no-referrer',
+          method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
           headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
           body: JSON.stringify(payload)
         });
         const raw = await res.text();
         let data=null; try{ data = JSON.parse(raw); }catch(_){}
         return { ok: res.ok, status: res.status, data, raw };
-      }catch(err){
-        return { ok:false, status:0, error:String(err) };
-      }
+      }catch(err){ return { ok:false, status:0, error:String(err) }; }
     }
 
     async function postReservation(payload){
@@ -584,6 +553,11 @@
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
     /* ---------------- Helpers ---------------- */
+    function syncHeaderHeight(){
+      const h = document.querySelector('header')?.offsetHeight || 120;
+      document.documentElement.style.setProperty('--header-h', h+'px');
+    }
+
     function showPage(idx){
       const cur=document.querySelector('.page.active');
       const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
@@ -607,6 +581,7 @@
       next.classList.toggle('hidden', onWelcome);
       start.classList.toggle('hidden', !onWelcome);
       if(onWelcome){ start.textContent='تخطي العرض'; }
+      syncHeaderHeight();
     }
 
     function enforceDateMinToday(){
@@ -843,9 +818,12 @@
 
       $('#rebook').on('click', ()=>location.href='/');
 
+      // حساب ارتفاع الهيدر بعد التهيئة
       syncProgress(0);
       startWelcomeDeck();
       renderSummary();
+      syncHeaderHeight();
+      window.addEventListener('resize', syncHeaderHeight);
     });
 
     // Footer nav
@@ -936,6 +914,7 @@
       document.body.classList.add('intro-play');
       setTimeout(()=>document.body.classList.remove('intro-play'), 820);
       enforceDateMinToday();
+      syncHeaderHeight();
     });
 
     function updateNextAvailability(){
@@ -968,6 +947,7 @@
       document.getElementById('sumDate').textContent    = ($('#date').val() || '—');
       document.getElementById('sumTime').textContent    = (window.selectedTime?.ui || '—');
       document.getElementById('sumPay').textContent     = (nForm.paymentMethod || '—');
+      syncHeaderHeight();
     }
 
     function renderThankYou(){
