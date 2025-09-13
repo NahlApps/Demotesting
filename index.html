@@ -16,32 +16,26 @@
 
   <style>
     :root{
-      /* Brand & surfaces */
       --brand-700:#015a6c; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --ink-700:#224652;
       --surface-000:#fff; --border-300:#D4E0E6;
 
-      /* Radius + Shadow */
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.08);
       --shadow-sm:0 3px 12px rgba(11,38,48,.12);
       --shadow-md:0 10px 28px rgba(11,38,48,.16);
 
-      /* Motion tokens */
       --ease:cubic-bezier(.22,.61,.36,1);
       --ease-decel:cubic-bezier(0.2,0,0,1);
       --ease-accel:cubic-bezier(0.3,1,0.8,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
 
-      /* Typography + spacing */
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
 
-      /* Layout */
       --header-h:120px;
       --footer-h:96px;
 
-      /* Cards (glass) */
       --card-alpha:.86; --card-blur:8px; --card-border:rgba(255,255,255,.55);
     }
     @media (max-width:640px){ :root{ --footer-h: calc(118px + env(safe-area-inset-bottom)); } }
@@ -70,14 +64,24 @@
     header{position:sticky; top:0; z-index:50; background:rgba(11,38,48,.42); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.18); padding-top:env(safe-area-inset-top);}
     .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .brand img{height:92px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
-    @media (max-width:640px){ .brand img{height:80px} }
+
+    /* Clear brand badge (makes logo readable on busy backgrounds) */
+    .brand{ display:flex; align-items:center; justify-content:flex-end; flex:0 0 auto; }
+    .brand-badge{
+      background:#ffffff; border:1px solid rgba(0,0,0,.06);
+      border-radius:18px; padding:6px 10px;
+      box-shadow:0 8px 20px rgba(0,0,0,.12);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .brand img{height:92px; width:auto; object-fit:contain; display:block}
+    @media (max-width:640px){ .brand img{height:84px} }
+
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
 
-    /* Summary chips */
+    /* Summary chips (under progress) */
     .header-summary{ display:flex; justify-content:center }
     .summary-bar{ display:flex; gap:8px; align-items:center; width:100%; max-width:1120px; background:transparent; border:0; box-shadow:none; flex-wrap:wrap; }
     .summary-bar .chip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border-300); border-radius:999px; padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap; box-shadow:var(--shadow-xs); }
@@ -151,16 +155,27 @@
     .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
-    /* Overlays (in-card) */
+    /* Overlays */
     .load-overlay{ position:absolute; inset:0; background:rgba(255,255,255,.9); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md); }
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
     @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
-    /* Payment */
-    .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4); width:100%; max-width:920px}
-    .pay-card{ background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md); padding:var(--sp-6); display:flex; justify-content:center; align-items:center; gap:var(--sp-4); min-height:64px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease); }
+    /* Payment — adjusted sizing */
+    .pay-grid{
+      display:grid; gap:var(--sp-4); width:100%; max-width:920px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width:560px){ .pay-grid{ grid-template-columns: 1fr 1fr; } }
+    @media (min-width:900px){ .pay-grid{ grid-template-columns: 1fr 1fr 1fr; } }
+
+    .pay-card{
+      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md);
+      padding:22px; display:flex; justify-content:center; align-items:center; gap:var(--sp-4);
+      min-height:88px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+    }
     .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
+    .pay-card img{ max-height:38px; width:auto; object-fit:contain; }
 
     /* Footer (bigger on mobile) */
     footer.sticky-nav{ position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.62); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; min-height:var(--footer-h); }
@@ -183,7 +198,7 @@
       .footer-social a{ width:42px; height:42px; }
     }
 
-    /* PPT deck (static) */
+    /* PPT deck */
     .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(244,250,252,.92)); border:1px solid rgba(255,255,255,.55); box-shadow:var(--shadow-md); }
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
@@ -215,11 +230,11 @@
     .iti__arrow{ border-top-color:#0B2630 !important; }
   </style>
 
-  <!-- Logo fallback (يستعمل الرابط المطلوب أولًا) -->
+  <!-- Logo fallback -->
   <script>
     function handleLogoError(img){
       var fallbacks = [
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_14_40%20PM.png",
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png",
         "https://dummyimage.com/240x92/027A93/ffffff.png&text=Nahl.app"
       ];
       var i = Number(img.dataset.fidx||0);
@@ -244,9 +259,12 @@
           <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
         <div class="brand">
-          <img id="brandLogo" alt="Nahl" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_14_40%20PM.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
+          <div class="brand-badge">
+            <img id="brandLogo" alt="Nahl" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
+          </div>
         </div>
       </div>
+
       <div class="header-summary">
         <div id="bookingSummary" class="summary-bar" aria-live="polite" role="list">
           <span class="chip" data-sum-chip="area"    role="listitem"><i class="fa-solid fa-location-dot"></i> <b id="sumArea">—</b></span>
@@ -389,7 +407,7 @@
                 <input type="radio" name="payingMethod" value="Cash" class="visually-hidden"/>
                 <strong>Cash</strong>
               </label>
-              <label class="pay-card" style="grid-column:1/-1" tabindex="-1" role="radio" aria-checked="false">
+              <label class="pay-card" tabindex="-1" role="radio" aria-checked="false">
                 <input type="radio" name="payingMethod" value="MADA" class="visually-hidden"/>
                 <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada">
               </label>
@@ -515,7 +533,6 @@
     let selectedTime=null;
     let servicesCache=null, categoriesCache=null;
 
-    // intlTelInput instance (defensive)
     window.itiPhone = null;
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
@@ -647,7 +664,7 @@
     function validateTimeInline(){ const msgEl=document.getElementById('err-time'); if(!selectedTime){ msgEl.textContent='الرجاء اختيار وقت مناسب'; return false; } msgEl.textContent=''; return true; }
     function validatePayInline(){ const msgEl=document.getElementById('err-pay'); if(!nForm.paymentMethod){ msgEl.textContent='الرجاء اختيار طريقة الدفع'; return false; } msgEl.textContent=''; return true; }
 
-    /* --- كشف “رقم لوحة مميّز” --- */
+    /* Special plate */
     function detectSpecialPlate(s){
       if(!/^\d{4}$/.test(s)) return null;
       const d=[...s].map(x=>+x);
@@ -787,7 +804,7 @@
           [...timeContainer.children].forEach(el => el.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
 
-          const parsed = DateTime.fromFormat(t.actual12, 'h:mm a');
+          const parsed = luxon.DateTime.fromFormat(t.actual12, 'h:mm a');
           nForm.date = selectedISO;
           nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
 
@@ -802,8 +819,8 @@
       });
     }
 
-    /* ------------ Locations & Services loader (spinner صفحة 2 فقط) ------------ */
-    let servicesVersion = 0; // تجاهل استجابات قديمة
+    /* ------------ Locations & Services loader ------------ */
+    let servicesVersion = 0;
     function loadLocationsAndFirstServices(){
       setLoadingServices(true);
       callContent2(`/locations`, res=>{
@@ -874,7 +891,6 @@
 
         updateMobileHelp();
 
-        // sanitize & validate on input
         phoneEl.addEventListener('input', function(){
           const cur = this.value;
           const clean = cur.replace(/[^\d]/g,'');
@@ -887,7 +903,7 @@
           validateMobileInline();
         });
       } else {
-        updateMobileHelp(); // default example if lib not ready
+        updateMobileHelp();
       }
 
       loadLocationsAndFirstServices();
@@ -939,7 +955,6 @@
       initHeaderRO();
       setStepBackground(0);
 
-      // تحميل أولي للأوقات عندما يصل المستخدم لصفحة الوقت
       document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
     });
 
@@ -1078,7 +1093,7 @@
     }
   </script>
 
-  <!-- Google Maps: initMap عالمي -->
+  <!-- Google Maps -->
   <script>
     let map, marker;
     window.positionUrl = window.positionUrl ?? "";
