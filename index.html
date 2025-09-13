@@ -108,23 +108,25 @@
     .form-control::placeholder{color:#6b7280}
     .form-control:focus{ border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) }
 
-    /* Field errors */
+    /* Field errors & notes */
     .field-msg{ margin-top:6px; font-size:.85rem; color:#dc2626; min-height:1.2em; }
     .is-invalid{ border-color:#dc2626 !important; box-shadow:0 0 0 3px rgba(220,38,38,.15) !important; }
+    .field-note{ margin-top:6px; font-size:.86rem; padding:8px 10px; border-radius:10px; display:none; align-items:center; gap:8px }
+    .note-info{ background:#E6F4F7; border:1px solid #B3E0EA; color:#0B2630; display:flex }
+    .field-note i{ opacity:.8 }
 
     /* Select2 contrast */
     .select2-container--default .select2-selection--single{ background:#ffffff !important; border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered{ color:#0B2630 !important; line-height:48px !important; padding-inline:42px 42px !important; }
     .select2-container--default .select2-selection--single .select2-selection__placeholder{ color:#667085 !important; }
-    .select2-container--default.select2-container--focus .select2-selection--single{ border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important; }
+    .select2-container--default.select2-container--focus .select2-selection--single{ border-color:#0891b2 !重要; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important; }
     .select2-container--default .select2-selection--single .select2-selection__arrow{ height:48px !important; }
     .select2-container--default .select2-selection--single .select2-selection__arrow b{ border-color:#0B2630 transparent transparent transparent !important; }
     .select2-dropdown{ background:#fff !important; color:#0B2630 !important; border:1px solid var(--border-300) !important; box-shadow:var(--shadow-sm); }
     .select2-container--default .select2-results__option{ color:#0B2630 !important; background:#fff !important; padding:10px 12px; }
     .select2-results__options{max-height:280px}
     .select2-container--default .select2-results__option--highlighted[aria-selected],
-    .select2-container--default .select2-results__option--highlighted{ background:#E6F4F7 !important; color:#0B2630 !important; }
-    .select2-container--default .select2-results__option[aria-selected="true"]{ background:#D8EEF3 !important; color:#0B2630 !important; }
+    .select2-container--default .select2-results__option--highlighted{ background:#DDF2F7 !important; color:#0B2630 !important; }
 
     /* Time grid */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-4)}
@@ -197,7 +199,7 @@
   </style>
 
   <script>
-    /* Logo fallback */
+    /* Logo fallback (الشعار المطلوب) */
     function handleLogoError(img){
       var fallbacks = [
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design.png",
@@ -323,8 +325,9 @@
               </div>
               <div class="col-12 col-md-6 form-block">
                 <label for="mobile" class="form-label">رقم الجوال</label>
-                <input id="mobile" type="tel" class="form-control" placeholder="+966…" autocomplete="tel"/>
+                <input id="mobile" type="tel" class="form-control" placeholder="+966…" autocomplete="tel" inputmode="tel"/>
                 <div id="err-mobile" class="field-msg" aria-live="polite"></div>
+                <small id="mobileHelp" class="text-muted d-block mt-1">مثال: 5XXXXXXXX</small>
               </div>
             </div>
           </div>
@@ -344,7 +347,12 @@
                 <label class="form-label" for="plateNumber">آخر 4 أرقام من اللوحة</label>
                 <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234" autocomplete="off"/>
                 <div id="err-plate" class="field-msg" aria-live="polite"></div>
-                <small class="text-muted d-block mt-1" style="opacity:.9">نحتاج آخر ٤ أرقام للتأكيد فقط (اختياري).</small>
+                <!-- ملاحظة “رقم مميز” -->
+                <div id="note-plate" class="field-note note-info" role="status" aria-live="polite">
+                  <i class="fa-solid fa-stars"></i>
+                  <span id="note-plate-text"></span>
+                </div>
+                <small class="text-muted d-block mt-1" style="opacity:.9">الحقل اختياري — نستخدم الأرقام كمرجع للتأكيد فقط.</small>
               </div>
               <input id="locationDescription" type="text" hidden/>
             </div>
@@ -377,7 +385,7 @@
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
           <div class="card">
-            <div id="googleMap" style="width:100%;height:420px;border-radius:14px;overflow:hidden"></div>
+            <div id="googleMap" style="width:100%;height:420px;border-radius:14px;overflow:hidden;position:relative"></div>
           </div>
           <div class="card text-center">
             <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
@@ -538,7 +546,7 @@
       if(cur && cur.id==='page1'){ stopWelcomeDeck(); }
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
-      requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260); });
+      requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} const h1 = next.querySelector('h1, [role="heading"]'); const firstInput = next.querySelector('input, select, button, [tabindex="0"]'); (h1 || firstInput)?.focus?.(); }, 260); });
       hideOverlays();
       syncProgress(idx);
       updateNextAvailability();
@@ -575,9 +583,53 @@
     function clearFieldError(inputEl, msgEl){ if(inputEl){ inputEl.classList.remove('is-invalid'); inputEl.removeAttribute('aria-invalid'); } if(msgEl){ msgEl.textContent=''; msgEl.style.display=''; } }
     function validateMobileInline(){ const el=document.getElementById('mobile'); const msgEl=document.getElementById('err-mobile'); if(!itiPhone || !itiPhone.isValidNumber()){ showFieldError(el, msgEl, 'الرجاء إدخال رقم جوال صحيح'); return false; } clearFieldError(el, msgEl); return true; }
     function validateNameInline(){ const el=document.getElementById('name'); const msgEl=document.getElementById('err-name'); const ok=(el.value||'').trim().length>0; if(!ok){ showFieldError(el,msgEl,'الاسم مطلوب'); return false; } clearFieldError(el,msgEl); return true; }
-    function validatePlateInline(){ const el=document.getElementById('plateNumber'); const msgEl=document.getElementById('err-plate'); const ok=!el.value || el.value.length===4; if(!ok){ showFieldError(el,msgEl,'رجاءً أدخل آخر ٤ أرقام (اختياري، لكن إن أدخلت فليكن ٤ أرقام)'); return false; } clearFieldError(el,msgEl); return true; }
+    function validatePlateInline(){ const el=document.getElementById('plateNumber'); const msgEl=document.getElementById('err-plate'); const val=(el.value||'').trim(); const ok=!val || /^\d{4}$/.test(val); if(!ok){ showFieldError(el,msgEl,'رجاءً أدخل ٤ أرقام أو اتركه فارغًا'); return false; } clearFieldError(el,msgEl); return true; }
     function validateTimeInline(){ const msgEl=document.getElementById('err-time'); if(!selectedTime){ msgEl.textContent='الرجاء اختيار وقت مناسب'; return false; } msgEl.textContent=''; return true; }
     function validatePayInline(){ const msgEl=document.getElementById('err-pay'); if(!nForm.paymentMethod){ msgEl.textContent='الرجاء اختيار طريقة الدفع'; return false; } msgEl.textContent=''; return true; }
+
+    /* --- كشف “رقم لوحة مميّز” (آخر 4 أرقام) --- */
+    function detectSpecialPlate(s){
+      if(!/^\d{4}$/.test(s)) return null;
+      const d=[...s].map(x=>+x);
+      const allSame = d.every(x=>x===d[0]);
+      if(allSame) return {type:'same', label:'مميّز جدًا (أرقام متطابقة)'};
+
+      const asc = d[1]===d[0]+1 && d[2]===d[1]+1 && d[3]===d[2]+1;
+      const desc= d[1]===d[0]-1 && d[2]===d[1]-1 && d[3]===d[2]-1;
+      if(asc)  return {type:'asc',  label:'متسلسل تصاعديًا'};
+      if(desc) return {type:'desc', label:'متسلسل تنازليًا'};
+
+      const pairs = (d[0]===d[1] && d[2]===d[3] && d[1]!==d[2]);
+      if(pairs) return {type:'pairs', label:'زوجي مكرر (##-##)'};
+
+      const pal = (d[0]===d[3] && d[1]===d[2] && !(d[0]===d[1] && d[1]===d[2])); // استبعد 1111
+      if(pal) return {type:'pal', label:'متناظر'};
+
+      // ثلاثي مثل 1112 أو 2111
+      const counts={};
+      d.forEach(x=>counts[x]=(counts[x]||0)+1);
+      if(Object.values(counts).some(c=>c===3)) return {type:'triple', label:'ثلاثي مكرر'};
+
+      // نمط مزدوج آخر (مثل 1212)
+      if(d[0]===d[2] && d[1]===d[3] && d[0]!==d[1]) return {type:'alt-pairs', label:'نمط متناوب (ABAB)'};
+
+      return null;
+    }
+    function updatePlateNote(){
+      const el=document.getElementById('plateNumber');
+      const note=document.getElementById('note-plate');
+      const textEl=document.getElementById('note-plate-text');
+      if(!el || !note || !textEl) return;
+      const v=(el.value||'').trim();
+      const info = detectSpecialPlate(v);
+      if(info){
+        note.style.display='flex';
+        textEl.textContent = `يبدو رقمًا مميّزًا: ${info.label}`;
+      }else{
+        note.style.display='none';
+        textEl.textContent = '';
+      }
+    }
 
     /* Welcome deck */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false; const SLIDE_MS=2600; const GAP_MS=180;
@@ -801,7 +853,8 @@
       });
 
       $('#name').on('input', validateNameInline);
-      $('#plateNumber').on('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); validatePlateInline(); updateNextAvailability(); });
+      $('#plateNumber').on('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); validatePlateInline(); updatePlateNote(); updateNextAvailability(); });
+
       $('#serviceCount, #serviceCat, #service, #area, #date').on('change', updateNextAvailability);
 
       $('#rebook').on('click', ()=>location.href='/');
@@ -901,7 +954,7 @@
         const nameOk = $('#name').val().trim().length > 0;
         const phoneOk = (itiPhone && itiPhone.isValidNumber());
         const plateVal = $('#plateNumber').val()||'';
-        const plateOk  = (plateVal.length===0 || plateVal.length===4);
+        const plateOk  = (plateVal.length===0 || /^\d{4}$/.test(plateVal));
         enable = nameOk && phoneOk && plateOk;
       } else if(i === 4){ // page5b
         enable = !!nForm.paymentMethod;
@@ -915,23 +968,25 @@
       renderSummary();
     }
 
+    function setChip(id, text){
+      const chip = document.querySelector(`[data-sum-chip="${id}"]`);
+      const el = document.getElementById('sum'+id[0].toUpperCase()+id.slice(1));
+      const t = (text||'').trim();
+      if(!chip || !el) return;
+      if(!t || t==='—'){ chip.style.display='none'; el.textContent='—'; }
+      else { chip.style.display='inline-flex'; el.textContent=t; chip.title=t; }
+    }
     function renderSummary(){
-      const areaTxt=$('#area').find(':selected').text()||'—';
-      const svcTxt =$('#service').find(':selected').text()||'—';
-      const dateTxt=$('#date').val()||'—';
-      const timeTxt=(window.selectedTime && window.selectedTime.ui) || '—';
-      const payTxt =(nForm.paymentMethod||'—');
-      let el;
-      el=document.getElementById('sumArea');    if(el) el.textContent=areaTxt;
-      el=document.getElementById('sumService'); if(el) el.textContent=svcTxt;
-      el=document.getElementById('sumDate');    if(el) el.textContent=dateTxt;
-      el=document.getElementById('sumTime');    if(el) el.textContent=timeTxt;
-      el=document.getElementById('sumPay');     if(el) el.textContent=payTxt;
-      el=document.querySelector('[data-sum-chip="area"]');    if(el) el.setAttribute('title', areaTxt);
-      el=document.querySelector('[data-sum-chip="service"]'); if(el) el.setAttribute('title', svcTxt);
-      el=document.querySelector('[data-sum-chip="date"]');    if(el) el.setAttribute('title', dateTxt);
-      el=document.querySelector('[data-sum-chip="time"]');    if(el) el.setAttribute('title', timeTxt);
-      el=document.querySelector('[data-sum-chip="pay"]');     if(el) el.setAttribute('title', payTxt);
+      const areaTxt=$('#area').find(':selected').text()||'';
+      const svcTxt =$('#service').find(':selected').text()||'';
+      const dateTxt=$('#date').val()||'';
+      const timeTxt=(window.selectedTime && window.selectedTime.ui) || '';
+      const payTxt =(nForm.paymentMethod||'');
+      setChip('area', areaTxt);
+      setChip('service', svcTxt);
+      setChip('date', dateTxt);
+      setChip('time', timeTxt);
+      setChip('pay',  payTxt);
     }
 
     function renderThankYou(){
