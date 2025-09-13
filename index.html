@@ -193,7 +193,7 @@
     /* =================== PowerPoint-style Deck =================== */
     .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg,#ffffff, #f6fbfd); box-shadow:var(--shadow-md); }
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
-    .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
+    .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:#0B2630; margin:0 0 8px; letter-spacing:.2px }
     .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
 
     @media (prefers-reduced-motion: no-preference) {
@@ -441,6 +441,55 @@
       }
     }
 
+    /* ---------- POST helpers + 404 fallback submit (full logging) ---------- */
+    async function postJSONAbs(url, body, retries = 0){
+      console.groupCollapsed('%c[API] POST','color:#a855f7;font-weight:700', url);
+      console.log('payload:', body);
+      try{
+        const res = await fetch(url, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(body),
+        });
+        const raw = await res.text();
+        console.log('status:', res.status, res.statusText);
+        console.log('raw:', raw);
+        let data = null;
+        try { data = JSON.parse(raw); } catch(e){ /* keep raw */ }
+        console.groupEnd();
+        return { ok: res.ok, status: res.status, data, raw };
+      }catch(err){
+        console.log('error:', err);
+        console.groupEnd();
+        if(retries > 0) return postJSONAbs(url, body, retries - 1);
+        return { ok:false, status:0, error:String(err) };
+      }
+    }
+    function stripTrailingForm(base){ return base.replace(/\/form\/?$/,''); }
+    const RESERVE_ENDPOINTS = [
+      '/reserveAppointment',
+      '/appointments/reserve',
+      '/appointments',
+      '/reserve'
+    ];
+    async function reserveAppointmentWithFallback(payload){
+      const bases = [ defaultLink2, stripTrailingForm(defaultLink2) ];
+      for (const base of bases){
+        for (const ep of RESERVE_ENDPOINTS){
+          const url = base + ep;
+          const r = await postJSONAbs(url, payload);
+          if (r.ok && (r.data?.success !== false)) {
+            console.info('[reserve] success using:', url);
+            return { success:true, url, response:r.data ?? r.raw };
+          }
+          if (r.status === 404){ console.warn('[reserve] 404 on', url); continue; }
+          if (r.status >= 500){ console.warn('[reserve] 5xx on', url); continue; }
+          if (r.status >= 400){ return { success:false, url, error:'Client error', details:r.data ?? r.raw }; }
+        }
+      }
+      return { success:false, error:'No matching endpoint found' };
+    }
+
     /* ---------------- Toast ---------------- */
     function showToast(type='info', msg=''){
       const wrap=document.getElementById('toastWrap');
@@ -547,12 +596,8 @@
     document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
 
     // Re-fetch when service/area changes (if we're on the time page)
-    document.getElementById('service').addEventListener('change', () => {
-      if (getActiveIndex() === 2) fetchTimesForSelectedDate();
-    });
-    document.getElementById('area').addEventListener('change', () => {
-      if (getActiveIndex() === 2) fetchTimesForSelectedDate();
-    });
+    document.getElementById('service').addEventListener('change', () => { if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
+    document.getElementById('area').addEventListener('change', () => { if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
 
     // Ensure default date is today & min
     (function initDateMin(){
@@ -562,7 +607,6 @@
       dateEl.setAttribute('min', today);
     })();
 
-    // ---- FIXED: helper to parse a slot time robustly
     function parseTimeToLuxon(rawTime){
       let t = DateTime.fromISO(String(rawTime||'').trim(), { setZone:true });
       if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'HH:mm:ss', { setZone:true });
@@ -570,28 +614,22 @@
       if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'H:mm',     { setZone:true });
       return t.isValid ? t : null;
     }
-
-    // ---- FIXED: normalize availability fields across different schemas
     function normalizeAvailability(r){
       const status = String(r.TS_status || r.status || r.TS_appointment_status || '').toLowerCase();
       const availableFlag = (typeof r.isAvailable === 'boolean') ? r.isAvailable : undefined;
-
       const booked   = Number(r.booked ?? r.TS_booked);
       const capacity = Number(r.capacity ?? r.TS_capacity);
       let remaining  = Number(r.remaining ?? r.TS_remaining);
       if (!Number.isFinite(remaining) && Number.isFinite(capacity) && Number.isFinite(booked)){
         remaining = capacity - booked;
       }
-
       const looksOpen =
         availableFlag === true ||
         ['available','open','free','empty','vacant'].includes(status) ||
         (Number.isFinite(remaining) ? remaining > 0 : (availableFlag !== false && !status));
-
       return { looksOpen, remaining, status, availableFlag };
     }
 
-    // ---- FIXED: fetch + filter ONLY available slots, with detailed console logs
     function fetchTimesForSelectedDate(){
       const dateEl = document.getElementById('date');
       const timeContainer = document.getElementById('time-container');
@@ -616,11 +654,10 @@
       const now = DateTime.now().setZone('Asia/Riyadh');
       const isToday = selectedISO === now.toISODate();
 
-      // (Optional) if backend supports it, ask for only-available
       const qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}`
                + `&location=${encodeURIComponent(loc)}`
                + `&service=${encodeURIComponent(srv)}`
-               + `&onlyAvailable=1`; // safe even if ignored by backend
+               + `&onlyAvailable=1`; // backend may ignore; front-end still filters
 
       callContent2(qs, (res) => {
         console.groupCollapsed('%cAppointments fetch','color:#027A93;font-weight:700');
@@ -641,41 +678,30 @@
           );
         }
 
-        // Filter pipeline
         const filtered = rowsRaw.filter(r => {
-          // 1) exact date match
           const d = DateTime.fromISO(r.TS_appointment_date, { setZone: true });
           if (!d.isValid || d.toISODate() !== selectedISO) return false;
 
-          // 2) parse time
           const t = parseTimeToLuxon(r.TS_appointment_time);
           if (!t) return false;
 
-          // 3) availability
           const { looksOpen } = normalizeAvailability(r);
           if (!looksOpen) return false;
 
-          // 4) for today, hide past times (5-min guard)
           if (isToday) {
             const slot = now.set({ hour: t.hour, minute: t.minute, second: 0 });
             if (slot < now.plus({ minutes: 5 })) return false;
           }
-
           return true;
         });
 
         console.log('Filtered available rows count:', filtered.length);
 
-        // Build UI list
         const list = filtered.map(r => {
           const t = parseTimeToLuxon(r.TS_appointment_time);
-          return {
-            label: t.toLocaleString(DateTime.TIME_SIMPLE), // UI label (e.g., 3:30 PM)
-            actual12: t.toFormat('hh:mm a')                 // canonical for sorting & dedup
-          };
+          return { label: t.toLocaleString(DateTime.TIME_SIMPLE), actual12: t.toFormat('hh:mm a') };
         });
 
-        // De-dup & sort
         const seen = new Set();
         dayTimes = list
           .filter(x => { if (seen.has(x.actual12)) return false; seen.add(x.actual12); return true; })
@@ -708,7 +734,6 @@
         return;
       }
 
-      // ---- FIXED: Log rendering info
       console.groupCollapsed('%cRender times','color:#0B2630;font-weight:700');
       console.log('Date:', selectedISO, '| Slots:', dayTimes.length);
       console.table(dayTimes);
@@ -753,8 +778,7 @@
       });
     }
 
-    // Compatibility helper (if some old code calls it)
-    function choosedDate(time12, dateISO /*, i */) {
+    function choosedDate(time12, dateISO) {
       const parsed = DateTime.fromFormat(time12, "h:mm a");
       nForm.date = dateISO;
       nForm.time = parsed.isValid ? parsed.toFormat("HH:mm") : time12;
@@ -804,7 +828,6 @@
         updateNextAvailability();
       });
 
-      // Service change: store service + department (badge only), refetch if on time page
       $('#service').on('change', function(){
         nForm.service = this.value || '';
         nForm.departmentId = getDepartmentIdFromServiceId(this.value);
@@ -814,11 +837,9 @@
         updateNextAvailability();
       });
 
-      // Preload brands
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands,width:'100%'});
 
-      // Payment ARIA
       const payGroup = document.getElementById('payGroup');
       const payCards = [...payGroup.querySelectorAll('.pay-card')];
       payCards.forEach((card, idx)=>{
@@ -839,20 +860,15 @@
         });
       });
 
-      // Plate: digits only + live validation
       $('#plateNumber').on('input', function(){ this.value = this.value.replace(/\D/g, '').slice(0,4); updateNextAvailability(); });
 
-      // Contact field triggers
       $('#name, #mobile, #carName').on('input', updateNextAvailability);
       $('#serviceCount, #serviceCat, #service, #area').on('change', updateNextAvailability);
 
-      // Rebook
       $('#rebook').on('click', ()=>location.href='/');
 
-      // initial progress + welcome footer state
       syncProgress(0);
 
-      // Start Deck (respect reduced motion)
       const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(reduced){ setTimeout(()=>showPage(1), 400); } else { startWelcomeDeck(); }
     });
@@ -865,16 +881,16 @@
 
       $start.addEventListener('click', ()=>{ stopWelcomeDeck(); showPage(1); });
 
-      function gotoNext(){
+      async function gotoNext(){     // <-- async for await submit
         const i=getActiveIndex(); const id=orderedPages[i];
 
         if(id==='page2'){
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          nForm.departmentId = getDepartmentIdFromServiceId(nForm.service); // badge only
+          nForm.departmentId = getDepartmentIdFromServiceId(nForm.service);
           showPage(2); // to page4
-          document.getElementById('date').dispatchEvent(new Event('change')); // initial fetch for selected date
+          document.getElementById('date').dispatchEvent(new Event('change'));
           return;
         }
 
@@ -901,14 +917,21 @@
         if(id==='page6'){
           if(!positionUrl){ showToast('error','الرجاء تحديد الموقع على الخريطة'); return; }
           nForm.urlLocation=positionUrl;
-          (async()=>{
-            try{
-              const res=await fetch(defaultLink2 + '/reserveAppointment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nForm)});
-              const json=await res.json();
-              if(json?.success){ showToast('success','تم إنشاء الحجز'); showPage(5); }
-              else { showToast('error', json?.msgAR || 'حدث خطأ غير متوقع'); }
-            }catch(e){ showToast('error','عذرًا حصل خطأ غير متوقع، حاول لاحقًا'); }
-          })();
+          try{
+            const result = await reserveAppointmentWithFallback(nForm);
+            if(result.success){
+              showToast('success','تم إنشاء الحجز');
+              console.log('[reserve] OK:', result);
+              showPage(5);
+            }else{
+              console.error('[reserve] failed:', result);
+              showToast('error','تعذر إنشاء الحجز: لم أجد المسار المناسب (404).');
+              showToast('info','تلميح: راجع مسار الحجز في الخادم (مثلاً /appointments/reserve)');
+            }
+          }catch(e){
+            console.error('[reserve] exception:', e);
+            showToast('error','عذرًا حصل خطأ غير متوقع أثناء إنشاء الحجز');
+          }
           return;
         }
 
@@ -957,7 +980,6 @@
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
-      map.addEventListener?.('click', ({latLng})=>setPos(latLng)); // safety if google maps version changes
       map.addListener?.('click', ({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
       if(btn){
