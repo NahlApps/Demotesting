@@ -191,9 +191,27 @@
     .rebook-btn{display:inline-flex;align-items:center;gap:10px;justify-content:center;background:linear-gradient(135deg,var(--brand-600),var(--brand-700));color:#fff;border:0;border-radius:999px;padding:14px 24px;min-height:52px;font-weight:800;font-size:1.05rem;letter-spacing:.2px;box-shadow:0 10px 24px rgba(2,122,147,.28);transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), filter var(--dur-xs) var(--ease)}
     .rebook-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);filter:saturate(1.05)}
     .rebook-btn:active{transform:translateY(0) scale(.99)}
+
+    /* ===== Mobile (intl-tel-input) — RTL & contrast fixes ===== */
+    .iti{ width:100% !important; }
+    #mobile.form-control{
+      height:48px; line-height:48px;
+      direction:ltr;             /* أرقام يسار */
+      text-align:left;
+    }
+    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ right:12px; left:auto; }
+    html[dir="rtl"] .iti--separate-dial-code .iti__selected-flag{ right:12px; left:auto; border-right:1px solid var(--border-300); }
+    html[dir="rtl"] .iti--allow-dropdown input#mobile,
+    html[dir="rtl"] .iti--separate-dial-code input#mobile{
+      padding-right:108px; padding-left:12px;
+    }
+    .iti__country-list{ text-align:right; }
+    .iti__selected-flag{ background-color:transparent !important; padding:0 10px; }
+    .iti__arrow{ border-top-color:#0B2630 !important; }
+    #err-mobile.field-msg{ margin-top:6px; font-size:.85rem; color:#dc2626; }
   </style>
 
-  <!-- fallback للشعار مبكرًا -->
+  <!-- Logo fallback early -->
   <script>
     function handleLogoError(img){
       var fallbacks = [
@@ -209,8 +227,8 @@
   </script>
 </head>
 <body>
-  <!-- Toasts (لا زالت موجودة للحالات العامة) -->
-  <div id="toastWrap" class="toast-wrap" aria-live="polite" aria-atomic="true" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
+  <!-- Toasts -->
+  <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Header -->
   <header id="siteHeader">
@@ -225,7 +243,6 @@
           <strong id="brandText" style="display:none;color:#fff;font-weight:800">Sponge &amp; Soap</strong>
         </div>
       </div>
-
       <!-- Summary chips -->
       <div class="header-summary">
         <div id="bookingSummary" class="summary-bar" aria-live="polite" role="list">
@@ -322,7 +339,7 @@
               </div>
               <div class="col-12 col-md-6 form-block">
                 <label for="mobile" class="form-label">رقم الجوال</label>
-                <input id="mobile" type="tel" class="form-control" placeholder="+9665…" autocomplete="tel"/>
+                <input id="mobile" type="tel" class="form-control" placeholder="+966…" autocomplete="tel"/>
                 <div id="err-mobile" class="field-msg" aria-live="polite"></div>
               </div>
             </div>
@@ -350,7 +367,7 @@
           </div>
         </section>
 
-        <!-- 4.5) Payment (صفحة مستقلة) -->
+        <!-- 4.5) Payment -->
         <section id="page5b" class="page" aria-label="طريقة الدفع">
           <h1>طريقة الدفع</h1>
           <div class="card">
@@ -424,7 +441,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---------------- API helpers (لا تغيير خادمي) ---------------- */
+    /* ---------------- API helpers (client-only, server untouched) ---------------- */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
     const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
@@ -446,9 +463,8 @@
           return res.json();
         }).then(function(json){ cb(json); }).catch(function(e){
           console.error('[GET] failed:', e);
-          if(String(path||'').includes('/locations') || String(path||'').includes('/services')){
-            setLoadingServices(false);
-          }
+          // make sure overlays are not stuck
+          setLoadingServices(false); setLoadingTimes(false);
           if(retries>0 && String(e).indexOf('AbortError')===-1){
             setTimeout(function(){ callContent2(path,cb,abortable,retries-1); }, 600);
           }
@@ -490,7 +506,6 @@
 
     /* ---------------- STATE ---------------- */
     var DateTime=luxon.DateTime;
-    // أضفنا صفحة دفع مستقلة
     var orderedPages=["page1","page2","page4","page5","page5b","page6","page7"];
     var STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","تم"];
     var selectedTime=null, positionUrl="";
@@ -499,7 +514,7 @@
     var nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
     /* ---------------- Helpers ---------------- */
-    // ResizeObserver: يحدّث padding-top تلقائيًا
+    // ResizeObserver: يحدّث ارتفاع الهيدر تلقائيًا
     var headerRO;
     function initHeaderRO(){
       var header=document.getElementById('siteHeader');
@@ -621,8 +636,7 @@
     var dayTimes=[]; var timesLoaded=false;
 
     document.addEventListener('DOMContentLoaded', function(){
-      var dateEl = document.getElementById('date');
-      dateEl.addEventListener('change', fetchTimesForSelectedDate);
+      document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
     });
     document.getElementById('service').addEventListener('change', function(){ if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
     document.getElementById('area').addEventListener('change', function(){ if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
@@ -739,7 +753,33 @@
       $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
-      itiPhone=window.intlTelInput(document.querySelector('#mobile'),{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js' });
+      // ===== Mobile field (intl-tel-input) enhanced =====
+      const phoneEl = document.querySelector('#mobile');
+      itiPhone = window.intlTelInput(phoneEl, {
+        initialCountry: 'sa',
+        onlyCountries: ['sa','ae','bh','kw','om','qa'],
+        separateDialCode: true,
+        nationalMode: false,
+        autoPlaceholder: 'aggressive',
+        setPlaceholderNumberType: 'MOBILE',
+        formatOnDisplay: true,
+        autoInsertDialCode: true,
+        useFullscreenPopup: true,
+        utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
+      });
+      function updatePhonePlaceholder(){
+        const ex = itiPhone.getNumberPlaceholder();
+        if (ex) phoneEl.placeholder = ex.replace(/\u200E|\u200F/g,'');
+      }
+      updatePhonePlaceholder();
+      phoneEl.addEventListener('input', function(){
+        this.value = this.value.replace(/[^\d]/g,'');
+        validateMobileInline();
+      });
+      phoneEl.addEventListener('countrychange', function(){
+        validateMobileInline();
+        updatePhonePlaceholder();
+      });
 
       setLoadingServices(true);
       callContent2(`/locations`, function(res){
@@ -801,11 +841,9 @@
         });
       });
 
-      // Inline validation listeners
+      // Inline validation
       $('#name').on('input', validateNameInline);
-      $('#mobile').on('input', validateMobileInline);
       $('#plateNumber').on('input', function(){ this.value = this.value.replace(/\D/g, '').slice(0,4); validatePlateInline(); updateNextAvailability(); });
-
       $('#serviceCount, #serviceCat, #service, #area, #date').on('change', updateNextAvailability);
 
       $('#rebook').on('click', function(){ location.href='/'; });
@@ -845,7 +883,7 @@
           nForm.customerN=$('#name').val().trim();
           nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
-          showPage(4); // إلى صفحة الدفع
+          showPage(4); // الدفع
           return;
         }
 
@@ -897,7 +935,7 @@
         var phoneOk = (itiPhone && itiPhone.isValidNumber());
         var plateOk = ($('#plateNumber').val()||'').length === 4;
         enable = nameOk && phoneOk && plateOk;
-      } else if(i === 4){ // صفحة الدفع
+      } else if(i === 4){ // الدفع
         enable = !!nForm.paymentMethod;
       } else if(i === 5){
         enable = !!positionUrl;
@@ -930,8 +968,10 @@
 
     function renderThankYou(){
       var first = (nForm.customerN||'').trim().split(' ')[0];
-      document.getElementById('thanksTitle').textContent = first ? ('تم حجز موعدك بنجاح، '+first+'! 🎉') : 'تم حجز موعدك بنجاح 🎉';
-      document.getElementById('thanksCopy').textContent = 'وصلنا طلبك، وسنرسل لك التأكيد واللوكيشن على الواتساب قريباً.';
+      var tTitle = document.getElementById('thanksTitle');
+      var tCopy  = document.getElementById('thanksCopy');
+      if(tTitle) tTitle.textContent = first ? ('تم حجز موعدك بنجاح، '+first+'! 🎉') : 'تم حجز موعدك بنجاح 🎉';
+      if(tCopy)  tCopy.textContent  = 'وصلنا طلبك، وسنرسل لك التأكيد واللوكيشن على الواتساب قريباً.';
       var info = [
         {icon:'fa-location-dot',       text: $('#area').find(':selected').text()||'—'},
         {icon:'fa-screwdriver-wrench', text: $('#service').find(':selected').text()||'—'},
@@ -939,8 +979,8 @@
         {icon:'fa-clock',              text: (window.selectedTime && window.selectedTime.ui) || '—'},
         {icon:'fa-credit-card',        text: nForm.paymentMethod || '—'}
       ];
-      document.getElementById('thanksSummary').innerHTML =
-        info.map(function(i){return '<span class="chip"><i class="fa-solid '+i.icon+'"></i> '+i.text+'</span>';}).join('');
+      var wrap=document.getElementById('thanksSummary');
+      if(wrap) wrap.innerHTML = info.map(function(i){return '<span class="chip"><i class="fa-solid '+i.icon+'"></i> '+i.text+'</span>';}).join('');
     }
   </script>
 
