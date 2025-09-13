@@ -16,30 +16,19 @@
 
   <style>
     :root{
-      /* Brand */
       --brand-700:#015a6c; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
-
-      /* Ink / Surfaces */
       --ink-900:#0B2630; --ink-800:#173944; --ink-700:#224652;
       --surface-000:#ffffff; --surface-100:#EDF3F6; --border-300:#D4E0E6;
-
-      /* Shape */
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.08);
       --shadow-sm:0 3px 12px rgba(11,38,48,.12);
       --shadow-md:0 10px 28px rgba(11,38,48,.16);
-
-      /* Motion */
       --ease:cubic-bezier(.22,.61,.36,1);
       --ease-decel:cubic-bezier(0.2,0,0,1);
       --ease-accel:cubic-bezier(0.3,1,0.8,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms; --dur-lg:640ms;
-
-      /* Type + spacing */
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
-
-      /* Layout (تُحدَّث برمجيًا) */
       --header-h:120px; --footer-h:78px;
     }
 
@@ -54,18 +43,14 @@
       color-scheme: light;
     }
 
-    /* ---------- Header ---------- */
+    /* Header */
     header{
       position:sticky; top:0; z-index:50;
       background:rgba(11,38,48,.42); backdrop-filter:blur(10px);
       border-bottom:1px solid rgba(255,255,255,.18);
       display:flex; align-items:stretch; justify-content:center;
     }
-    .header-inner{
-      max-width:1120px; width:100%;
-      padding:10px var(--sp-3) 12px;
-      display:flex; flex-direction:column; gap:10px;
-    }
+    .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
@@ -74,47 +59,31 @@
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
 
-    /* ---------- Header Summary (شفاف) ---------- */
+    /* Header Summary – شفاف */
     .header-summary{ display:flex; justify-content:center }
-    .summary-bar{
-      display:flex; gap:8px; align-items:center; width:100%; max-width:1120px;
-      background:transparent; border:0; box-shadow:none;
-      flex-wrap:wrap;
-    }
-    .summary-bar .chip{
-      display:inline-flex; align-items:center; gap:6px;
-      background:#fff; border:1px solid var(--border-300); border-radius:999px;
-      padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap;
-      box-shadow:var(--shadow-xs);
-    }
+    .summary-bar{ display:flex; gap:8px; align-items:center; width:100%; max-width:1120px; background:transparent; border:0; box-shadow:none; flex-wrap:wrap; }
+    .summary-bar .chip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border-300); border-radius:999px; padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap; box-shadow:var(--shadow-xs); }
     .summary-bar i{opacity:.85}
     @media (max-width:560px){
-      .summary-bar{ gap:6px; }
-      .summary-bar .chip{ flex:1 1 calc(50% - 6px); min-width:0; padding:6px 8px; font-size:.82rem; justify-content:center; }
-      .summary-bar .chip b{ display:inline-block; max-width:12ch; overflow:hidden; text-overflow:ellipsis; }
+      .summary-bar{ gap:6px }
+      .summary-bar .chip{ flex:1 1 calc(50% - 6px); min-width:0; padding:6px 8px; font-size:.82rem; justify-content:center }
+      .summary-bar .chip b{ display:inline-block; max-width:12ch; overflow:hidden; text-overflow:ellipsis }
     }
     @media (min-width:561px){
-      .summary-bar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+      .summary-bar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none }
       .summary-bar::-webkit-scrollbar{ display:none }
     }
 
-    /* ---------- Main ---------- */
+    /* Main */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
     #app{width:100%; max-width:1120px}
 
-    /* Pages */
     .stage{position:relative; min-height:540px; padding:8px 0 20px}
-    .page{
-      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
-      padding:var(--sp-5) var(--sp-3) var(--sp-6); overflow:auto; opacity:0; transform:translateY(12px) scale(.992);
-      pointer-events:none;
-    }
-    @media (prefers-reduced-motion: no-preference){
-      .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease-decel) both; }
-      .page.exit  { animation:pageOut var(--dur-sm) var(--ease-accel) both; }
-    }
+    .page{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-5); padding:var(--sp-5) var(--sp-3) var(--sp-6); overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;}
     @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
     @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
+    .page.active{animation:pageIn var(--dur-md) var(--ease-decel) both; pointer-events:auto}
+    .page.exit{animation:pageOut var(--dur-sm) var(--ease-accel) both}
     .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center; color:var(--ink-900)}
 
     /* Cards + fields */
@@ -140,21 +109,14 @@
       border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important;
     }
     .select2-container--default .select2-selection--single .select2-selection__arrow{ height:48px !important; }
-    .select2-container--default .select2-selection--single .select2-selection__arrow b{
-      border-color:#0B2630 transparent transparent transparent !important;
-    }
-    .select2-dropdown{
-      background:#fff !important; color:#0B2630 !important;
-      border:1px solid var(--border-300) !important; box-shadow:var(--shadow-sm);
-    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow b{ border-color:#0B2630 transparent transparent transparent !important; }
+    .select2-dropdown{ background:#fff !important; color:#0B2630 !important; border:1px solid var(--border-300) !important; box-shadow:var(--shadow-sm); }
     .select2-container--default .select2-results__option{ color:#0B2630 !important; background:#fff !important; padding:10px 12px; }
     .select2-results__options{max-height:280px}
     .select2-container--default .select2-results__option--highlighted[aria-selected],
     .select2-container--default .select2-results__option--highlighted{ background:#E6F4F7 !important; color:#0B2630 !important; }
     .select2-container--default .select2-results__option[aria-selected="true"]{ background:#D8EEF3 !important; color:#0B2630 !important; }
     .select2-container--default .select2-results__option[aria-disabled="true"]{ color:#9aa7ad !important; }
-    .select2-container--default .select2-selection--single[aria-disabled="true"],
-    .select2-container--disabled .select2-selection--single{ background:#f5f7f9 !important; color:#6b7280 !important; opacity:.9; }
 
     /* Time grid */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-4)}
@@ -210,10 +172,8 @@
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
     .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
-    @media (prefers-reduced-motion: no-preference) {
-      .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; }
-      .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; }
-    }
+    .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; }
+    .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; }
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
 
@@ -228,6 +188,21 @@
     .rebook-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);filter:saturate(1.05)}
     .rebook-btn:active{transform:translateY(0) scale(.99)}
   </style>
+
+  <!-- ضع دالة fallback للشعار مبكرًا حتى تعمل onerror -->
+  <script>
+    function handleLogoError(img){
+      const fallbacks = [
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png",
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png",
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/logo.png",
+        "https://dummyimage.com/180x54/027A93/ffffff.png&text=Sponge+%26+Soap"
+      ];
+      var i = Number(img.dataset.fidx||0);
+      if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
+      else { img.style.display = 'none'; var txt = document.getElementById('brandText'); if (txt) txt.style.display = 'block'; }
+    }
+  </script>
 </head>
 <body>
   <!-- Toasts -->
@@ -279,11 +254,9 @@
         <!-- 2) Service & Location -->
         <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
           <h1>وين تحب نجيك؟</h1>
-
           <div class="card position-relative" id="servicesCard">
             <label class="form-label">اختيار المنطقة</label>
             <select id="area" style="width:100%"></select>
-
             <div class="row g-3 mt-3">
               <div class="col-12 col-md-6">
                 <label class="form-label">التصنيف</label>
@@ -301,7 +274,6 @@
                 </select>
               </div>
             </div>
-
             <div id="servicesLoading" class="load-overlay">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
               <strong>جاري تحميل الخدمات…</strong>
@@ -319,7 +291,6 @@
                 <input id="date" type="date" class="form-control"/>
               </div>
             </div>
-
             <div class="position-relative mt-3">
               <div id="time-container" class="time-grid" role="radiogroup" aria-label="اختيار الوقت"></div>
               <div id="timeLoading" class="load-overlay">
@@ -407,9 +378,7 @@
             </div>
             <div id="thanksSummary" class="chips-wrap centered" aria-live="polite"></div>
             <div style="margin-top:18px">
-              <button id="rebook" class="rebook-btn" type="button">
-                <i class="fa-solid fa-rotate-right"></i> احجز موعدًا آخر
-              </button>
+              <button id="rebook" class="rebook-btn" type="button"><i class="fa-solid fa-rotate-right"></i> احجز موعدًا آخر</button>
             </div>
           </div>
         </section>
@@ -437,66 +406,49 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---------------- Logo fallback ---------------- */
-    function handleLogoError(img){
-      const fallbacks = [
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png",
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png",
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/logo.png",
-        "https://dummyimage.com/180x54/027A93/ffffff.png&text=Sponge+%26+Soap"
-      ];
-      const i = Number(img.dataset.fidx||0);
-      if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
-      else { img.style.display = 'none'; const txt = document.getElementById('brandText'); if (txt) txt.style.display = 'block'; }
-    }
-
-    /* ---------------- API (لا تغيير خادمي) ---------------- */
+    /* ---------------- API helpers (لا تغيير خادمي) ---------------- */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
     const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
-    let controllers=[];
+    var controllers=[];
 
-    async function callContent2(path, cb, abortable=false, retries=3){
-      let signal='';
+    function callContent2(path, cb, abortable=false, retries=3){
+      var signal;
       if(abortable){
-        controllers.forEach(([c])=>c.abort()); controllers=[];
-        const controller=new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
+        controllers.forEach(function(c){ c[0].abort(); });
+        controllers=[];
+        var controller=new AbortController();
+        signal=controller.signal;
+        controllers.push([controller,signal]);
       }
-      try{
-        await new Promise(r=>setTimeout(r, 200)); // UX debounce
-        const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal}), cache:'no-store'});
-        if(!res.ok){
-          if(retries>0) return callContent2(path,cb,abortable,retries-1);
-          throw new Error('Network');
-        }
-        const json=await res.json(); cb(json);
-      }catch(e){
-        console.error('[GET] failed:', e);
-        // لو فشل جلب المواقع/الخدمات، اخفِ التحميل
-        if(String(path||'').includes('/locations') || String(path||'').includes('/services')){
-          setLoadingServices(false);
-        }
-        if(!String(e).includes('AbortError') && retries>0)
-          setTimeout(()=>callContent2(path,cb,abortable,retries-1),600);
-      }
+      setTimeout(function(){
+        fetch(defaultLink2+path,{method:'GET',redirect:'follow',signal:signal, cache:'no-store'}).then(function(res){
+          if(!res.ok){ if(retries>0){ callContent2(path,cb,abortable,retries-1); return; } throw new Error('Network'); }
+          return res.json();
+        }).then(function(json){ cb(json); }).catch(function(e){
+          console.error('[GET] failed:', e);
+          if(String(path||'').includes('/locations') || String(path||'').includes('/services')){
+            setLoadingServices(false);
+          }
+          if(retries>0 && String(e).indexOf('AbortError')===-1){
+            setTimeout(function(){ callContent2(path,cb,abortable,retries-1); }, 600);
+          }
+        });
+      }, 200);
     }
 
-    async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
-      try{
-        const res = await fetch(url, {
-          method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
-          headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const raw = await res.text();
-        let data=null; try{ data = JSON.parse(raw); }catch(_){}
-        return { ok: res.ok, status: res.status, data, raw };
-      }catch(err){ return { ok:false, status:0, error:String(err) }; }
+    function postReservationTry(url, payload, contentType){
+      return fetch(url, {
+        method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
+        headers:{ 'Content-Type': contentType || 'text/plain;charset=UTF-8', 'Accept':'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(res){ return res.text().then(function(raw){ var data=null; try{ data=JSON.parse(raw);}catch(_){ } return { ok:res.ok, status:res.status, data:data, raw:raw }; }); })
+      .catch(function(err){ return { ok:false, status:0, error:String(err) }; });
     }
 
     async function postReservation(payload){
-      let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
+      var r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
       if(!r.ok && (r.status===415 || r.status===406 || r.status===0)){
         r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
       }
@@ -507,196 +459,164 @@
     }
 
     /* ---------------- Toast ---------------- */
-    function showToast(type='info', msg=''){
-      const wrap=document.getElementById('toastWrap');
-      const div=document.createElement('div');
+    function showToast(type, msg){
+      type = type || 'info';
+      msg = msg || '';
+      var wrap=document.getElementById('toastWrap');
+      var div=document.createElement('div');
       div.className='toast-msg '+(type==='error'?'toast-error':type==='success'?'toast-success':'toast-info');
       div.textContent=msg; wrap.appendChild(div);
-      setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2400);
+      setTimeout(function(){ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(function(){div.remove();}, 180); }, 2400);
     }
 
     /* ---------------- STATE ---------------- */
-    const DateTime=luxon.DateTime;
-    const orderedPages=["page1","page2","page4","page5","page6","page7"];
-    const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","تم"];
-    let selectedTime=null, positionUrl="";
-    let servicesCache=null, categoriesCache=null, itiPhone=null;
+    var DateTime=luxon.DateTime;
+    var orderedPages=["page1","page2","page4","page5","page6","page7"];
+    var STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","تم"];
+    var selectedTime=null, positionUrl="";
+    var servicesCache=null, categoriesCache=null, itiPhone=null;
 
-    const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
+    var nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
     /* ---------------- Helpers ---------------- */
     function syncHeaderHeight(){
-      const h = document.querySelector('header')?.offsetHeight || 120;
+      var h = (document.querySelector('header') || {}).offsetHeight || 120;
       document.documentElement.style.setProperty('--header-h', h+'px');
     }
-
     function hideOverlays(){
-      document.getElementById('servicesLoading')?.classList.remove('show');
-      document.getElementById('timeLoading')?.classList.remove('show');
+      var a=document.getElementById('servicesLoading'); if(a) a.classList.remove('show');
+      var b=document.getElementById('timeLoading'); if(b) b.classList.remove('show');
     }
-
     function showPage(idx){
-      const cur=document.querySelector('.page.active');
-      const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
+      var cur=document.querySelector('.page.active');
+      var next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
       if(cur && cur.id==='page1'){ stopWelcomeDeck(); }
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
-      requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260); });
-      hideOverlays();          // تأكد من إخفاء أي طبقات تحميل
+      requestAnimationFrame(function(){ next.classList.add('active'); setTimeout(function(){ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260); });
+      hideOverlays();
       syncProgress(idx);
       updateNextAvailability();
     }
-    function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
+    function getActiveIndex(){ var id=(document.querySelector('.page.active')||{}).id; return Math.max(0, orderedPages.indexOf(id)); }
     function syncProgress(i){
-      const pct=((i+1)/orderedPages.length)*100;
+      var pct=((i+1)/orderedPages.length)*100;
       document.getElementById('miniBarFill').style.width=pct+'%';
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
-      const prev=document.getElementById('footer-prev');
-      const next=document.getElementById('footer-next');
-      const start=document.getElementById('page1-button');
-      const onWelcome = i===0;
+      var prev=document.getElementById('footer-prev');
+      var next=document.getElementById('footer-next');
+      var start=document.getElementById('page1-button');
+      var onWelcome = i===0;
       prev.classList.toggle('hidden', i === 0);
       next.classList.toggle('hidden', onWelcome);
       start.classList.toggle('hidden', !onWelcome);
       if(onWelcome){ start.textContent='تخطي العرض'; }
       syncHeaderHeight();
     }
-
     function enforceDateMinToday(){
-      const today = DateTime.now().toFormat('yyyy-LL-dd');
-      const dateEl = document.getElementById('date');
+      var today = DateTime.now().toFormat('yyyy-LL-dd');
+      var dateEl = document.getElementById('date');
       if(!dateEl) return;
       dateEl.setAttribute('min', today);
       if(!dateEl.value || dateEl.value < today) dateEl.value = today;
     }
-
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
+    function validateMobile(){ if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; } return true; }
+    function validatePlate(){ var el=document.getElementById('plateNumber'); var ok=el.value && el.value.length===4; if(!ok){ showToast('error','رجاءً أدخل آخر ٤ أرقام من اللوحة'); el.focus(); } return ok; }
 
-    function validateMobile(){
-      if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
-      return true;
-    }
-    function validatePlate(){
-      const el = document.getElementById('plateNumber');
-      const ok = el.value && el.value.length === 4;
-      if(!ok){ showToast('error','رجاءً أدخل آخر ٤ أرقام من اللوحة'); el.focus(); }
-      return ok;
-    }
-
-    /* ---------------- Deck ---------------- */
-    let deckTimers = []; let deckIndex = 0; let deckRunning = false;
-    const SLIDE_MS = 2600; const GAP_MS = 180;
+    /* ---------------- Welcome Deck ---------------- */
+    var deckTimers = []; var deckIndex = 0; var deckRunning = false;
+    var SLIDE_MS = 2600; var GAP_MS = 180;
     function startWelcomeDeck(){
-      const deck = document.getElementById('pptDeck'); if(!deck) return;
-      const slides = Array.from(deck.querySelectorAll('.ppt-slide'));
+      var deck = document.getElementById('pptDeck'); if(!deck) return;
+      var slides = Array.prototype.slice.call(deck.querySelectorAll('.ppt-slide'));
       deckRunning = true; deckIndex = 0;
-      slides[0]?.classList.add('is-active');
-      const advance = ()=>{
+      if(slides[0]) slides[0].classList.add('is-active');
+      function advance(){
         if(!deckRunning) return;
-        const prev = deckIndex; deckIndex++;
+        var prev = deckIndex; deckIndex++;
         if(deckIndex>=slides.length){ stopWelcomeDeck(); showPage(1); return; }
-        slides.forEach((s,i)=>{ s.classList.remove('is-active','is-exiting'); if(i===prev) s.classList.add('is-exiting'); if(i===deckIndex) s.classList.add('is-active'); });
+        slides.forEach(function(s,i){ s.classList.remove('is-active','is-exiting'); if(i===prev) s.classList.add('is-exiting'); if(i===deckIndex) s.classList.add('is-active'); });
         deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS));
-      };
+      }
       deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS));
     }
-    function stopWelcomeDeck(){ deckRunning = false; deckTimers.forEach(t=>clearTimeout(t)); deckTimers = []; }
+    function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(function(t){clearTimeout(t);}); deckTimers=[]; }
 
     /* ---------------- TIMES ---------------- */
-    let dayTimes = [];       // [{label, actual12}]
-    let timesLoaded = false;
+    var dayTimes=[]; var timesLoaded=false;
 
-    document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
-    document.getElementById('service').addEventListener('change', () => { if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
-    document.getElementById('area').addEventListener('change', () => { if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
+    document.addEventListener('DOMContentLoaded', function(){
+      var dateEl = document.getElementById('date');
+      dateEl.addEventListener('change', fetchTimesForSelectedDate);
+    });
+    document.getElementById('service').addEventListener('change', function(){ if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
+    document.getElementById('area').addEventListener('change', function(){ if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
 
-    (function initDateMin(){
-      const today = DateTime.now().toFormat('yyyy-LL-dd');
-      const dateEl = document.getElementById('date');
-      if (!dateEl.value) dateEl.value = today;
-      dateEl.setAttribute('min', today);
-    })();
+    (function initDateMin(){ var today=DateTime.now().toFormat('yyyy-LL-dd'); var el=document.getElementById('date'); if(!el.value) el.value=today; el.setAttribute('min',today); })();
 
     function parseTimeToLuxon(rawTime){
-      let t = DateTime.fromISO(String(rawTime||'').trim(), { setZone:true });
+      var t = DateTime.fromISO(String(rawTime||'').trim(), { setZone:true });
       if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'HH:mm:ss', { setZone:true });
       if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'H:mm a',   { setZone:true });
       if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'H:mm',     { setZone:true });
       return t.isValid ? t : null;
     }
     function normalizeAvailability(r){
-      const status = String(r.TS_status || r.status || r.TS_appointment_status || '').toLowerCase();
-      const availableFlag = (typeof r.isAvailable === 'boolean') ? r.isAvailable : undefined;
-      const booked   = Number(r.booked ?? r.TS_booked);
-      const capacity = Number(r.capacity ?? r.TS_capacity);
-      let remaining  = Number(r.remaining ?? r.TS_remaining);
-      if (!Number.isFinite(remaining) && Number.isFinite(capacity) && Number.isFinite(booked)){
-        remaining = capacity - booked;
-      }
-      const looksOpen =
-        availableFlag === true ||
-        ['available','open','free','empty','vacant','canceled'].includes(status) ||
-        (Number.isFinite(remaining) ? remaining > 0 : (availableFlag !== false && !status));
-      return { looksOpen, remaining, status, availableFlag };
+      var status = String(r.TS_status || r.status || r.TS_appointment_status || '').toLowerCase();
+      var availableFlag = (typeof r.isAvailable === 'boolean') ? r.isAvailable : undefined;
+      var booked   = Number(r.booked ?? r.TS_booked);
+      var capacity = Number(r.capacity ?? r.TS_capacity);
+      var remaining  = Number(r.remaining ?? r.TS_remaining);
+      if (!Number.isFinite(remaining) && Number.isFinite(capacity) && Number.isFinite(booked)){ remaining = capacity - booked; }
+      var looksOpen = availableFlag === true || ['available','open','free','empty','vacant','canceled'].includes(status) || (Number.isFinite(remaining) ? remaining > 0 : (availableFlag !== false && !status));
+      return { looksOpen:looksOpen, remaining:remaining, status:status, availableFlag:availableFlag };
     }
 
     function fetchTimesForSelectedDate(){
-      const dateEl = document.getElementById('date');
-      const timeContainer = document.getElementById('time-container');
-      const loc = document.getElementById('area').value || '';
-      const srv = document.getElementById('service').value || '';
-      const selectedISO = (dateEl.value || DateTime.now().toFormat('yyyy-LL-dd')).trim();
+      var dateEl = document.getElementById('date');
+      var timeContainer = document.getElementById('time-container');
+      var loc = document.getElementById('area').value || '';
+      var srv = document.getElementById('service').value || '';
+      var selectedISO = (dateEl.value || DateTime.now().toFormat('yyyy-LL-dd')).trim();
 
       if (!loc || !srv) {
         timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`;
         window.selectedTime = null; selectedTime = null;
-        updateNextAvailability?.();
+        updateNextAvailability();
         return;
       }
 
       dateEl.disabled = true;
       setLoadingTimes(true);
-      timeContainer.innerHTML = `
-        <div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;">
-          <span class="visually-hidden">Loading...</span>
-        </div>`;
+      timeContainer.innerHTML = `<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"><span class="visually-hidden">Loading...</span></div>`;
 
-      const now = DateTime.now().setZone('Asia/Riyadh');
-      const isToday = selectedISO === now.toISODate();
+      var now = DateTime.now().setZone('Asia/Riyadh');
+      var isToday = selectedISO === now.toISODate();
 
-      const qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}&onlyAvailable=1`;
+      var qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}&onlyAvailable=1`;
 
-      callContent2(qs, (res) => {
-        const rowsRaw = (res?.data?.appointments || []);
+      callContent2(qs, function(res){
+        var rowsRaw = (res && res.data && res.data.appointments) ? res.data.appointments : [];
 
-        const filtered = rowsRaw.filter(r => {
-          const d = DateTime.fromISO(r.TS_appointment_date, { setZone: true });
+        var filtered = rowsRaw.filter(function(r){
+          var d = DateTime.fromISO(r.TS_appointment_date, { setZone: true });
           if (!d.isValid || d.toISODate() !== selectedISO) return false;
-
-          const t = parseTimeToLuxon(r.TS_appointment_time);
-          if (!t) return false;
-
-          const { looksOpen } = normalizeAvailability(r);
-          if (!looksOpen) return false;
-
-          if (isToday) {
-            const slot = now.set({ hour: t.hour, minute: t.minute, second: 0 });
-            if (slot < now.plus({ minutes: 5 })) return false;
-          }
+          var t = parseTimeToLuxon(r.TS_appointment_time); if (!t) return false;
+          var looksOpen = normalizeAvailability(r).looksOpen; if (!looksOpen) return false;
+          if (isToday) { var slot = now.set({ hour: t.hour, minute: t.minute, second: 0 }); if (slot < now.plus({ minutes: 5 })) return false; }
           return true;
         });
 
-        const list = filtered.map(r => {
-          const t = parseTimeToLuxon(r.TS_appointment_time);
+        var list = filtered.map(function(r){
+          var t = parseTimeToLuxon(r.TS_appointment_time);
           return { label: t.toLocaleString(DateTime.TIME_SIMPLE), actual12: t.toFormat('hh:mm a') };
         });
 
-        // De-dup & sort
-        const seen = new Set();
-        dayTimes = list
-          .filter(x => { if (seen.has(x.actual12)) return false; seen.add(x.actual12); return true; })
-          .sort((a,b)=> a.actual12.localeCompare(b.actual12));
+        var seen = new Set();
+        dayTimes = list.filter(function(x){ if (seen.has(x.actual12)) return false; seen.add(x.actual12); return true; })
+                       .sort(function(a,b){ return a.actual12.localeCompare(b.actual12); });
 
         timesLoaded = true;
         renderSelectedDateTimes(selectedISO);
@@ -706,123 +626,99 @@
     }
 
     function renderSelectedDateTimes(selectedISO){
-      const timeContainer = document.getElementById('time-container');
+      var timeContainer = document.getElementById('time-container');
       timeContainer.innerHTML = '';
 
       if (!timesLoaded) {
-        timeContainer.innerHTML = `
-          <div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;">
-            <span class="visually-hidden">Loading...</span>
-          </div>`;
+        timeContainer.innerHTML = `<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"><span class="visually-hidden">Loading...</span></div>`;
         return;
       }
-
       if (!dayTimes.length) {
-        timeContainer.innerHTML = `
-          <div style="grid-column:1/-1;justify-self:center" class="text-muted">
-            لا توجد مواعيد متاحة
-          </div>`;
-        window.selectedTime = null;
-        selectedTime = null;
-        updateNextAvailability?.();
-        return;
+        timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد متاحة</div>`;
+        window.selectedTime = null; selectedTime = null; updateNextAvailability(); return;
       }
 
-      dayTimes.forEach((t) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'time-option';
-        btn.setAttribute('role','radio');
-        btn.setAttribute('aria-checked','false');
-        btn.setAttribute('dir','ltr');
-        btn.textContent = t.label;
-
-        btn.addEventListener('click', () => {
-          [...timeContainer.children].forEach(el => el.setAttribute('aria-checked','false'));
+      dayTimes.forEach(function(t){
+        var btn=document.createElement('button');
+        btn.type='button'; btn.className='time-option'; btn.setAttribute('role','radio'); btn.setAttribute('aria-checked','false'); btn.setAttribute('dir','ltr'); btn.textContent=t.label;
+        btn.addEventListener('click', function(){
+          Array.prototype.forEach.call(timeContainer.children, function(el){ el.setAttribute('aria-checked','false'); });
           btn.setAttribute('aria-checked','true');
-
-          const parsed = DateTime.fromFormat(t.actual12, 'h:mm a');
-          nForm.date = selectedISO;
-          nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
-
-          window.selectedTime = { ui: t.label, iso: nForm.time };
-          selectedTime        = window.selectedTime; // gate Next
-          updateNextAvailability?.();
+          var parsed=DateTime.fromFormat(t.actual12,'h:mm a');
+          nForm.date=selectedISO; nForm.time=parsed.isValid?parsed.toFormat('HH:mm'):t.actual12;
+          window.selectedTime={ui:t.label, iso:nForm.time}; selectedTime=window.selectedTime;
+          updateNextAvailability();
         });
-
         timeContainer.appendChild(btn);
       });
     }
 
     /* ---------------- Init & bindings ---------------- */
-    $(function(){
+    (function(){
       enforceDateMinToday();
-      const today=DateTime.now().toFormat('yyyy-LL-dd');
-      $('#date').val(today).attr('min',today);
+      var today=DateTime.now().toFormat('yyyy-LL-dd');
+      document.getElementById('date').value=today;
+      document.getElementById('date').setAttribute('min',today);
 
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'التصنيف', dir:'rtl'});
       $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
-      itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
-        initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
-        utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
-      });
+      itiPhone=window.intlTelInput(document.querySelector('#mobile'),{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js' });
 
       setLoadingServices(true);
-      callContent2(`/locations`, res=>{
-        const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
+      callContent2(`/locations`, function(res){
+        var list=res && res.data ? res.data : [];
+        var ds=list.map(function(l){ return {id:l.id, text:l.TS_location_arabic_name}; });
         $('#area').empty().select2({data:ds,width:'100%'});
-        setLoadingServices(false);                   // ← لا تترك overlay معلّقة
+        setLoadingServices(false);
         if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
         else { showToast('error','لا توجد مناطق متاحة حالياً'); }
       });
 
       $('#area').on('change', function(){
         nForm.location=this.value; setLoadingServices(true);
-        callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
-          servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
-          const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
-          $('#serviceCat').empty().select2({data:cats,width:'100%'});
-          if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
-          setLoadingServices(false);                 // ← اخفاء overlay بعد الخدمات
+        callContent2(`/services?location=${encodeURIComponent(this.value)}`, function(res){
+          servicesCache=res && res.data ? res.data.services||[] : [];
+          categoriesCache=res && res.data ? res.data.servicesCat||[] : [];
+          var cats=categoriesCache.map(function(c){ return {id:c.TS_category_id, text:c.TS_category_arabic_name}; });
+          $('#serviceCat').empty().select2({data:cats,width:'100%'}); if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
+          setLoadingServices(false);
           updateNextAvailability();
         }, true);
       });
 
       $('#serviceCat').on('change', function(){
-        nForm.serviceCat=this.value; const cid=Number(this.value);
-        const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
-        $('#service').empty().select2({data:items,width:'100%'});
-        if(items.length){ $('#service').val(items[0].id).trigger('change'); }
+        nForm.serviceCat=this.value; var cid=Number(this.value);
+        var items=(servicesCache||[]).filter(function(s){return Number(s.TS_category_id)===cid;})
+          .sort(function(a,b){return a.TS_service_id-b.TS_service_id;})
+          .map(function(s){return {id:s.TS_service_id, text:s.TS_service_arabic_name};});
+        $('#service').empty().select2({data:items,width:'100%'}); if(items.length){ $('#service').val(items[0].id).trigger('change'); }
         updateNextAvailability();
       });
 
-      $('#service').on('change', function(){
-        nForm.service = this.value || '';
-        if(getActiveIndex()===2) document.getElementById('date').dispatchEvent(new Event('change'));
-        updateNextAvailability();
-      });
+      $('#service').on('change', function(){ nForm.service=this.value||''; if(getActiveIndex()===2){ document.getElementById('date').dispatchEvent(new Event('change')); } updateNextAvailability(); });
 
-      const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
+      var brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(function(b){return {id:b,text:b};});
       $('#carBrand').empty().select2({data:brands,width:'100%'});
 
-      const payGroup = document.getElementById('payGroup');
-      const payCards = [...payGroup.querySelectorAll('.pay-card')];
-      payCards.forEach((card, idx)=>{
-        const input = card.querySelector('input');
+      var payGroup = document.getElementById('payGroup');
+      var payCards = Array.prototype.slice.call(payGroup.querySelectorAll('.pay-card'));
+      payCards.forEach(function(card, idx){
+        var input = card.querySelector('input');
         card.setAttribute('role','radio'); card.setAttribute('aria-checked','false'); card.setAttribute('tabindex', idx===0?'0':'-1');
-        const choose = () => {
-          payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; });
-          card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; nForm.paymentMethod=input.value; updateNextAvailability(); };
+        function choose(){
+          payCards.forEach(function(c){ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; });
+          card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; nForm.paymentMethod=input.value; updateNextAvailability();
+        }
         card.addEventListener('click', choose);
-        card.addEventListener('keydown', (e)=>{
+        card.addEventListener('keydown', function(e){
           if(e.key==='Enter' || e.key===' '){ e.preventDefault(); choose(); }
-          if(['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'].includes(e.key)){
+          if(['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'].indexOf(e.key)>-1){
             e.preventDefault();
-            const i = payCards.indexOf(card);
-            const nextI = (e.key==='ArrowRight'||e.key==='ArrowDown') ? Math.min(i+1,payCards.length-1) : Math.max(i-1,0);
+            var i = payCards.indexOf(card);
+            var nextI = (e.key==='ArrowRight'||e.key==='ArrowDown') ? Math.min(i+1,payCards.length-1) : Math.max(i-1,0);
             payCards[nextI].focus();
           }
         });
@@ -832,81 +728,59 @@
       $('#name, #mobile, #carName').on('input', updateNextAvailability);
       $('#serviceCount, #serviceCat, #service, #area, #date').on('change', updateNextAvailability);
 
-      $('#rebook').on('click', ()=>location.href='/');
+      $('#rebook').on('click', function(){ location.href='/'; });
 
-      // initial progress + welcome
       syncProgress(0);
       startWelcomeDeck();
       renderSummary();
       syncHeaderHeight();
       window.addEventListener('resize', syncHeaderHeight);
-    });
+    })();
 
-    // Footer nav + welcome Skip
+    /* Footer nav */
     (function(){
-      const $prev=document.getElementById('footer-prev');
-      const $next=document.getElementById('footer-next');
-      const $start=document.getElementById('page1-button');
+      var $prev=document.getElementById('footer-prev');
+      var $next=document.getElementById('footer-next');
+      var $start=document.getElementById('page1-button');
 
-      $start.addEventListener('click', ()=>{ stopWelcomeDeck(); showPage(1); });
+      $start.addEventListener('click', function(){ stopWelcomeDeck(); showPage(1); });
 
       async function gotoNext(){
-        const i=getActiveIndex(); const id=orderedPages[i];
+        var i=getActiveIndex(); var id=orderedPages[i];
 
         if(id==='page2'){
           if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
           if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
           nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          showPage(2); document.getElementById('date').dispatchEvent(new Event('change'));
-          return;
+          showPage(2); document.getElementById('date').dispatchEvent(new Event('change')); return;
         }
 
-        if(id==='page4'){
-          if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; }
-          showPage(3); return;
-        }
+        if(id==='page4'){ if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; } showPage(3); return; }
 
         if(id==='page5'){
-          const name=$('#name').val().trim();
+          var name=$('#name').val().trim();
           if(!name){ showToast('error','يرجى إدخال الاسم'); document.getElementById('name').focus(); return; }
           if(!validateMobile()) return;
           if(!validatePlate()) return;
           if(!nForm.paymentMethod){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
-
           nForm.customerN=name;
-          nForm.customerM=itiPhone.getNumber().replace(/^\+/, '');
+          nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
-          showPage(4);
-          return;
+          showPage(4); return;
         }
 
         if(id==='page6'){
           if(!positionUrl){ showToast('error','الرجاء تحديد الموقع على الخريطة'); return; }
           nForm.urlLocation=positionUrl;
-
-          const payload = {
-            date: nForm.date, time: nForm.time, location: nForm.location,
-            service: nForm.service, serviceCount: nForm.serviceCount, serviceCat: nForm.serviceCat,
-            customerM: nForm.customerM, customerN: nForm.customerN, paymentMethod: nForm.paymentMethod,
-            urlLocation: nForm.urlLocation, locationDescription: nForm.locationDescription || '',
-            locale: 'ar'
-          };
-
-          const r = await postReservation(payload);
-
-          if(r.ok && r.data?.success){
-            if(r.data?.otp){
-              showToast('error','الخادم يطلب رمز تحقق (OTP). عطّل خيار OTP في إعدادات التطبيق.');
-              return;
-            }
+          var payload = { date:nForm.date,time:nForm.time,location:nForm.location,service:nForm.service,serviceCount:nForm.serviceCount,serviceCat:nForm.serviceCat,customerM:nForm.customerM,customerN:nForm.customerN,paymentMethod:nForm.paymentMethod,urlLocation:nForm.urlLocation,locationDescription:nForm.locationDescription||'',locale:'ar' };
+          var r = await postReservation(payload);
+          if(r.ok && r.data && r.data.success){
+            if(r.data.otp){ showToast('error','الخادم يطلب رمز تحقق (OTP). عطّل خيار OTP في إعدادات التطبيق.'); return; }
             showToast('success','تم إنشاء الحجز');
             showPage(5);
             renderThankYou();
-          } else {
-            const msg = r?.data?.msgAR
-              || (r.status===404 ? 'المسار غير موجود: تأكد من /form/reserveAppointment'
-                                 : r.status===0   ? 'تعذر الاتصال بالخادم (تحقق من CORS/الشبكة)'
-                                                  : 'تعذر إنشاء الحجز');
+          }else{
+            var msg = (r.data && r.data.msgAR) || (r.status===404 ? 'المسار غير موجود: تأكد من /form/reserveAppointment' : r.status===0 ? 'تعذر الاتصال بالخادم (تحقق من CORS/الشبكة)' : 'تعذر إنشاء الحجز');
             showToast('error', msg);
           }
           return;
@@ -916,27 +790,27 @@
       }
 
       $next.addEventListener('click', gotoNext);
-      $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
+      $prev.addEventListener('click', function(){ var i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
 
-    document.addEventListener('DOMContentLoaded', ()=>{
+    document.addEventListener('DOMContentLoaded', function(){
       document.body.classList.add('intro-play');
-      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
+      setTimeout(function(){document.body.classList.remove('intro-play');}, 820);
       enforceDateMinToday();
       syncHeaderHeight();
     });
 
     function updateNextAvailability(){
-      const i = getActiveIndex();
-      const nextBtn = document.getElementById('footer-next');
-      let enable = true;
+      var i = getActiveIndex();
+      var nextBtn = document.getElementById('footer-next');
+      var enable = true;
       if(i === 1){ enable = !!($('#area').val() && $('#service').val()); }
       else if(i === 2){ enable = !!selectedTime; }
       else if(i === 3){
-        const nameOk = $('#name').val().trim().length > 0;
-        const phoneOk = (itiPhone && itiPhone.isValidNumber());
-        const payOk = !!nForm.paymentMethod;
-        const plateOk = ($('#plateNumber').val()||'').length === 4;
+        var nameOk = $('#name').val().trim().length > 0;
+        var phoneOk = (itiPhone && itiPhone.isValidNumber());
+        var payOk = !!nForm.paymentMethod;
+        var plateOk = ($('#plateNumber').val()||'').length === 4;
         enable = nameOk && phoneOk && payOk && plateOk;
       } else if(i === 4){ enable = !!positionUrl; }
       nextBtn.disabled = !enable;
@@ -945,44 +819,41 @@
     }
 
     function renderSummary(){
-      const areaTxt=$('#area').find(':selected').text()||'—';
-      const svcTxt =$('#service').find(':selected').text()||'—';
-      const dateTxt=$('#date').val()||'—';
-      const timeTxt=(window.selectedTime?.ui||'—');
-      const payTxt =(nForm.paymentMethod||'—');
+      var areaTxt=$('#area').find(':selected').text()||'—';
+      var svcTxt =$('#service').find(':selected').text()||'—';
+      var dateTxt=$('#date').val()||'—';
+      var timeTxt=(window.selectedTime && window.selectedTime.ui) || '—';
+      var payTxt =(nForm.paymentMethod||'—');
 
-      // نصوص
-      document.getElementById('sumArea')?.textContent=areaTxt;
-      document.getElementById('sumService')?.textContent=svcTxt;
-      document.getElementById('sumDate')?.textContent=dateTxt;
-      document.getElementById('sumTime')?.textContent=timeTxt;
-      document.getElementById('sumPay')?.textContent=payTxt;
+      var el;
+      el=document.getElementById('sumArea');    if(el) el.textContent=areaTxt;
+      el=document.getElementById('sumService'); if(el) el.textContent=svcTxt;
+      el=document.getElementById('sumDate');    if(el) el.textContent=dateTxt;
+      el=document.getElementById('sumTime');    if(el) el.textContent=timeTxt;
+      el=document.getElementById('sumPay');     if(el) el.textContent=payTxt;
 
-      // Tooltips على الحاويات (حارس null)
-      document.querySelector('[data-sum-chip="area"]')   ?.setAttribute('title', areaTxt);
-      document.querySelector('[data-sum-chip="service"]')?.setAttribute('title', svcTxt);
-      document.querySelector('[data-sum-chip="date"]')   ?.setAttribute('title', dateTxt);
-      document.querySelector('[data-sum-chip="time"]')   ?.setAttribute('title', timeTxt);
-      document.querySelector('[data-sum-chip="pay"]')    ?.setAttribute('title', payTxt);
+      el=document.querySelector('[data-sum-chip="area"]');    if(el) el.setAttribute('title', areaTxt);
+      el=document.querySelector('[data-sum-chip="service"]'); if(el) el.setAttribute('title', svcTxt);
+      el=document.querySelector('[data-sum-chip="date"]');    if(el) el.setAttribute('title', dateTxt);
+      el=document.querySelector('[data-sum-chip="time"]');    if(el) el.setAttribute('title', timeTxt);
+      el=document.querySelector('[data-sum-chip="pay"]');     if(el) el.setAttribute('title', payTxt);
 
-      syncHeaderHeight?.();
+      syncHeaderHeight();
     }
 
     function renderThankYou(){
-      const first = (nForm.customerN||'').trim().split(' ')[0];
-      document.getElementById('thanksTitle').textContent =
-        first ? `تم حجز موعدك بنجاح، ${first}! 🎉` : `تم حجز موعدك بنجاح 🎉`;
-      document.getElementById('thanksCopy').textContent =
-        'وصلنا طلبك، وسنرسل لك التأكيد واللوكيشن على الواتساب قريباً.';
-      const info = [
-        {icon:'fa-location-dot',        text: $('#area').find(':selected').text()||'—'},
-        {icon:'fa-screwdriver-wrench',  text: $('#service').find(':selected').text()||'—'},
-        {icon:'fa-calendar-day',        text: nForm.date || $('#date').val() || '—'},
-        {icon:'fa-clock',               text: (window.selectedTime?.ui || '—')},
-        {icon:'fa-credit-card',         text: nForm.paymentMethod || '—'}
+      var first = (nForm.customerN||'').trim().split(' ')[0];
+      document.getElementById('thanksTitle').textContent = first ? ('تم حجز موعدك بنجاح، '+first+'! 🎉') : 'تم حجز موعدك بنجاح 🎉';
+      document.getElementById('thanksCopy').textContent = 'وصلنا طلبك، وسنرسل لك التأكيد واللوكيشن على الواتساب قريباً.';
+      var info = [
+        {icon:'fa-location-dot',       text: $('#area').find(':selected').text()||'—'},
+        {icon:'fa-screwdriver-wrench', text: $('#service').find(':selected').text()||'—'},
+        {icon:'fa-calendar-day',       text: nForm.date || $('#date').val() || '—'},
+        {icon:'fa-clock',              text: (window.selectedTime && window.selectedTime.ui) || '—'},
+        {icon:'fa-credit-card',        text: nForm.paymentMethod || '—'}
       ];
       document.getElementById('thanksSummary').innerHTML =
-        info.map(i=>`<span class="chip"><i class="fa-solid ${i.icon}"></i> ${i.text}</span>`).join('');
+        info.map(function(i){return '<span class="chip"><i class="fa-solid '+i.icon+'"></i> '+i.text+'</span>';}).join('');
     }
   </script>
 
@@ -990,22 +861,29 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
   <script>
     /* Google Map init */
-    let map, marker, positionUrl="";
+    var map, marker;
     function initMap(){
-      const def={lat:26.34165524787632,lng:50.11524831545726};
+      var def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
-      marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
-      marker.addListener('dragend', ({latLng})=>setPos(latLng));
-      map.addListener?.('click', ({latLng})=>setPos(latLng));
-      map.addListener?.('click', ({latLng})=>setPos(latLng));
-      const btn=document.getElementById('show-my-location');
+      marker=new google.maps.Marker({position:def,map:map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
+      function setPos(latLng,pan){
+        if(!latLng) return;
+        marker.setPosition(latLng);
+        if(pan) map.panTo(latLng);
+        map.setZoom(17);
+        positionUrl='https://www.google.com/maps/search/?api=1&query='+latLng.lat()+','+latLng.lng();
+        document.getElementById('mapHint').innerHTML='تم اختيار الموقع: <strong>'+latLng.lat().toFixed(5)+', '+latLng.lng().toFixed(5)+'</strong>';
+        updateNextAvailability();
+      }
+      google.maps.event.addListener(marker,'dragend',function(ev){ setPos(ev.latLng); });
+      google.maps.event.addListener(map,'click',function(ev){ setPos(ev.latLng); });
+      var btn=document.getElementById('show-my-location');
       if(btn){
-        btn.addEventListener('click', ()=>{
+        btn.addEventListener('click', function(){
           if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
           navigator.geolocation.getCurrentPosition(
-            pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
-            err=>{ const msg = err?.message || 'رجاءً فعّل الـ GPS وأذونات الموقع'; showToast('error','تعذر تحديد موقعك: '+msg); },
+            function(pos){ setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true); },
+            function(err){ var msg = (err && err.message) || 'رجاءً فعّل الـ GPS وأذونات الموقع'; showToast('error','تعذر تحديد موقعك: '+msg); },
             { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
           );
         });
