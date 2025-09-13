@@ -65,13 +65,13 @@
     .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
 
-    /* Brand logo (no frame) */
+    /* Brand (logo without frame) */
     .brand{ display:flex; align-items:center; justify-content:flex-end; flex:0 0 auto; }
     .brand img{
-      height:96px; width:auto; object-fit:contain; display:block;
+      height:92px; width:auto; object-fit:contain; display:block;
       filter: drop-shadow(0 6px 18px rgba(0,0,0,.35)) drop-shadow(0 2px 6px rgba(0,0,0,.25));
     }
-    @media (max-width:640px){ .brand img{height:88px} }
+    @media (max-width:640px){ .brand img{height:84px} }
 
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
@@ -225,9 +225,6 @@
     .iti__country-list{ text-align:right; }
     .iti__selected-flag{ background-color:transparent !important; padding:0 10px; }
     .iti__arrow{ border-top-color:#0B2630 !important; }
-
-    /* Utility */
-    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;margin:-1px}
   </style>
 
   <!-- Logo fallback -->
@@ -235,7 +232,7 @@
     function handleLogoError(img){
       var fallbacks = [
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png",
-        "https://dummyimage.com/240x96/027A93/ffffff.png&text=Nahl.app"
+        "https://dummyimage.com/240x92/027A93/ffffff.png&text=Nahl.app"
       ];
       var i = Number(img.dataset.fidx||0);
       if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
@@ -476,7 +473,7 @@
 
   <script>
     /* ---------- API ---------- */
-    const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
+    const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'21eddbf5-efe5-4a5d-9134-b581717b17ff'}/form`;
     const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
@@ -501,17 +498,15 @@
     function postReservationTry(url, payload, contentType){
       return fetch(url, {
         method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
-        headers:{ 'Content-Type': contentType || 'application/json;charset=UTF-8', 'Accept':'application/json' },
+        headers:{ 'Content-Type': contentType || 'text/plain;charset=UTF-8', 'Accept':'application/json' },
         body: JSON.stringify(payload)
       }).then(res=>res.text().then(raw=>{ let data=null; try{ data=JSON.parse(raw);}catch(_){ } return { ok:res.ok, status:res.status, data, raw }; }))
       .catch(err=>({ ok:false, status:0, error:String(err) }));
     }
     async function postReservation(payload){
-      // ارسل كـ JSON مباشرة لتفادي التباس المحتوى
-      let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
-      if(!r.ok && r.status===404){
-        r = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'application/json;charset=UTF-8');
-      }
+      let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
+      if(!r.ok && (r.status===415 || r.status===406 || r.status===0)){ r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8'); }
+      if(!r.ok && r.status===404){ r = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8'); }
       return r;
     }
 
@@ -819,7 +814,7 @@
       });
     }
 
-    /* ------------ Services helpers ------------ */
+    /* ------------ Locations & Services loader ------------ */
     let servicesVersion = 0;
     function loadLocationsAndFirstServices(){
       setLoadingServices(true);
@@ -859,43 +854,6 @@
         if(closeSpinner){ setLoadingServices(false); }
         updateNextAvailability();
       }, true);
-    }
-
-    /* ---------- Build payload & resolve department ---------- */
-    function resolveDepartmentId(serviceId){
-      const svc = (servicesCache || []).find(s => String(s.TS_service_id) === String(serviceId));
-      let dep = svc?.TS_appintment_department_id ?? svc?.department_id ?? svc?.TS_department_id ?? '';
-      if(!dep){
-        const c = (categoriesCache||[]).find(k => String(k.TS_category_id) === String(nForm.serviceCat));
-        dep = c?.TS_appintment_department_id ?? c?.department_id ?? c?.TS_department_id ?? '';
-      }
-      return dep ? String(dep) : '';
-    }
-
-    function buildPayload(){
-      const phoneE164 = (window.itiPhone && typeof window.itiPhone.getNumber === 'function')
-        ? window.itiPhone.getNumber()
-        : (nForm.customerM || '');
-
-      const payload = {
-        date: nForm.date,
-        time: nForm.time,
-        location: Number(nForm.location) || nForm.location,
-        service: Number(nForm.service) || nForm.service,
-        serviceCount: Number(nForm.serviceCount) || 1,
-        serviceCat: Number(nForm.serviceCat) || nForm.serviceCat,
-        customerM: phoneE164,
-        customerN: nForm.customerN,
-        paymentMethod: nForm.paymentMethod,
-        urlLocation: nForm.urlLocation,
-        locationDescription: nForm.locationDescription || '',
-        locale: 'ar'
-      };
-
-      const dep = resolveDepartmentId(nForm.service);
-      if(dep) payload.departmentId = dep;
-
-      return payload;
     }
 
     /* Init & bindings */
@@ -1022,7 +980,7 @@
           const okN=validateNameInline(), okM=validateMobileInline(), okP=validatePlateInline();
           if(!(okN && okM && okP)) return;
           nForm.customerN=$('#name').val().trim();
-          const phoneNum = (window.itiPhone && typeof window.itiPhone.getNumber==='function') ? window.itiPhone.getNumber() : '';
+          const phoneNum = (window.itiPhone && typeof window.itiPhone.getNumber==='function') ? window.itiPhone.getNumber().replace(/^\+/,'') : '';
           nForm.customerM=phoneNum;
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
           showPage(4); return; // الدفع
@@ -1037,29 +995,25 @@
           if(!window.positionUrl){ showToast('error','الرجاء تحديد الموقع على الخريطة'); return; }
           nForm.urlLocation=window.positionUrl;
 
-          const payload = buildPayload();
-          console.groupCollapsed('%c[reserve] payload','color:#a855f7;font-weight:700'); console.log(payload); console.groupEnd();
+          const payload = {
+            date: nForm.date, time: nForm.time, location: nForm.location, service: nForm.service,
+            serviceCount: nForm.serviceCount, serviceCat: nForm.serviceCat, customerM: nForm.customerM,
+            customerN: nForm.customerN, paymentMethod: nForm.paymentMethod, urlLocation: nForm.urlLocation,
+            locationDescription: nForm.locationDescription || '', locale: 'ar'
+          };
 
           const r = await postReservation(payload);
 
           if(r.ok && r.data?.success){
-            if(r.data?.otp){ showToast('error','الخادم يطلب OTP. عطّل OTP في الإعدادات.'); return; }
+            if(r.data?.otp){ showToast('error','الخادم يطلب رمز تحقق (OTP). عطّل خيار OTP في إعدادات التطبيق.'); return; }
             showToast('success','تم إنشاء الحجز');
             showPage(6); renderThankYou();
           } else {
-            const serverMsg = r?.data?.msgAR || r?.data?.message || r?.data?.error || 'تعذر إنشاء الحجز (تحقق من البيانات)';
-            showToast('error', serverMsg);
-
-            const errs = r?.data?.errors || r?.data?.fields || null;
-            if(errs){
-              if(errs.customerN) showFieldError(document.getElementById('name'), document.getElementById('err-name'), errs.customerN);
-              if(errs.customerM) showFieldError(document.getElementById('mobile'), document.getElementById('err-mobile'), errs.customerM);
-              if(errs.date)      showFieldError(document.getElementById('date'), document.getElementById('err-date'), errs.date);
-              if(errs.time)      document.getElementById('err-time').textContent = errs.time;
-              if(errs.paymentMethod) document.getElementById('err-pay').textContent = errs.paymentMethod;
-            }
-
-            console.warn('[reserve] rejected:', r);
+            const msg = r?.data?.msgAR
+              || (r.status===404 ? 'المسار غير موجود: تأكد من /form/reserveAppointment'
+                                 : r.status===0   ? 'تعذر الاتصال بالخادم (تحقق من CORS/الشبكة)'
+                                                  : 'تعذر إنشاء الحجز');
+            showToast('error', msg);
           }
           return;
         }
