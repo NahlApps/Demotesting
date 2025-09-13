@@ -182,7 +182,7 @@
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
     @keyframes heroFloat{ from{ transform:translateY(6px) } to{ transform:translateY(0) } }
 
-    /* ====== NEW: Summary bar + Chips + Inline errors ====== */
+    /* ====== Summary bar + Chips ====== */
     .summary-container{ display:flex; justify-content:center; padding:8px 12px 0 }
     .summary-bar{
       display:flex; gap:10px; flex-wrap:wrap; align-items:center;
@@ -199,6 +199,11 @@
     .summary-bar i{opacity:.8}
 
     .chips-wrap{display:flex; gap:8px; flex-wrap:wrap}
+    .chips-wrap.centered{justify-content:center;margin-top:10px}
+    .chips-wrap.centered .chip{
+      background:#fff;border:1px solid var(--border-300);border-radius:999px;padding:6px 10px;
+      display:flex;gap:8px;align-items:center;box-shadow:var(--shadow-xs)
+    }
     .chip-filter{
       background:#fff; color:#0B2630; border:1px solid var(--border-300);
       border-radius:999px; padding:8px 12px; font-weight:700; box-shadow:var(--shadow-xs);
@@ -207,8 +212,39 @@
     .chip-filter:hover{ background:var(--brand-050); transform:translateY(-1px) }
     .chip-filter.is-active{ outline:3px solid var(--brand-600); outline-offset:2px }
 
+    /* Inline errors */
     .is-invalid{ border-color:#ef4444 !important; box-shadow:0 0 0 4px rgba(239,68,68,.12) }
     .invalid-hint{ color:#ef4444; font-size:.85rem; margin-top:6px }
+
+    /* ====== Thank-you hero & Rebook CTA ====== */
+    .success-hero{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:10px}
+    .success-icon{
+      width:92px;height:92px;border-radius:50%;
+      background:linear-gradient(135deg,var(--brand-600),#12b3cf);
+      box-shadow:0 10px 24px rgba(2,122,147,.25), inset 0 0 0 6px rgba(255,255,255,.35);
+      position:relative;
+    }
+    .success-icon::after{
+      content:"\f00c"; font-family:"Font Awesome 6 Free"; font-weight:900;
+      color:#fff; position:absolute; inset:0; display:grid; place-items:center; font-size:40px;
+      transform:scale(.7); opacity:0; animation:popIn .5s var(--ease-decel) .1s forwards;
+    }
+    @keyframes popIn{to{transform:scale(1);opacity:1}}
+
+    .thanks-title{font-size:1.35rem;font-weight:800;color:#0b2630;margin:0}
+    .thanks-copy{color:#33545f;margin:0;opacity:.95}
+
+    .rebook-btn{
+      display:inline-flex;align-items:center;gap:10px;justify-content:center;
+      background:linear-gradient(135deg,var(--brand-600),var(--brand-700));
+      color:#fff;border:0;border-radius:999px;padding:14px 24px;min-height:52px;
+      font-weight:800;font-size:1.05rem;letter-spacing:.2px;
+      box-shadow:0 10px 24px rgba(2,122,147,.28);
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), filter var(--dur-xs) var(--ease);
+    }
+    .rebook-btn i{font-size:1.1rem}
+    .rebook-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);filter:saturate(1.05)}
+    .rebook-btn:active{transform:translateY(0) scale(.99)}
   </style>
 </head>
 <body>
@@ -295,7 +331,7 @@
               </div>
             </div>
 
-            <!-- NEW: Quick dates + time filters -->
+            <!-- Quick dates + time filters -->
             <div class="row g-2 mt-2">
               <div class="col-12 col-md-7">
                 <div id="quickDates" class="chips-wrap" role="group" aria-label="تواريخ سريعة">
@@ -391,17 +427,32 @@
 
         <!-- 6) Done -->
         <section id="page7" class="page" aria-label="تم الحجز">
-          <h1>شكراً لكم</h1>
+          <h1 class="visually-hidden">تم الحجز</h1>
           <div class="card text-center">
-            <p class="mb-3" style="color:#224652">تم حجز الموعد، وراح نأكده لكم على الواتساب</p>
-            <button id="rebook" class="btn btn-primary" type="button">🔁 حجز جديد</button>
+            <div class="success-hero">
+              <div class="success-icon" aria-hidden="true"></div>
+              <div>
+                <h2 id="thanksTitle" class="thanks-title">تم حجز موعدك بنجاح 🎉</h2>
+                <p id="thanksCopy" class="thanks-copy">راح نرسل لك التأكيد على الواتساب خلال دقائق.</p>
+              </div>
+            </div>
+
+            <!-- ملخص الحجز -->
+            <div id="thanksSummary" class="chips-wrap centered" aria-live="polite"></div>
+
+            <div style="margin-top:18px">
+              <button id="rebook" class="rebook-btn" type="button">
+                <i class="fa-solid fa-rotate-right"></i>
+                احجز موعدًا آخر
+              </button>
+            </div>
           </div>
         </section>
       </div>
     </div>
   </main>
 
-  <!-- NEW: Summary bar (فوق الفوتر) -->
+  <!-- Summary bar (فوق الفوتر) -->
   <div class="summary-container">
     <div id="bookingSummary" class="summary-bar" aria-live="polite">
       <span class="chip"><i class="fa-solid fa-location-dot"></i> <b id="sumArea">—</b></span>
@@ -757,16 +808,17 @@
       }, true);
     }
 
-    /* NEW: time-of-day filter state */
+    /* Time-of-day filter state */
     let timeFilter = 'all'; // all|morning|noon|evening
-    // Delegation for quickDates inside the Time card
+
+    // Quick dates
     $('#quickDates').on('click', '.chip-filter', function(){
       $('#quickDates .chip-filter').removeClass('is-active'); $(this).addClass('is-active');
       const shift = Number(this.dataset.shift||0);
       const d = DateTime.now().plus({days:shift}).toFormat('yyyy-LL-dd');
       $('#date').val(d).trigger('change');
     });
-    // Global delegation for CTA chips that appear in empty state (outside #quickDates)
+    // Global delegation for chips in empty state
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.chip-filter[data-shift]');
       if(!btn) return;
@@ -801,7 +853,7 @@
         if(timeFilter==='morning') return hh>=5 && hh<12;
         if(timeFilter==='noon')    return hh>=12 && hh<17;
         if(timeFilter==='evening') return hh>=17 && hh<=22;
-        return true; // all
+        return true;
       });
 
       const useList = filteredByPeriod;
@@ -1039,7 +1091,8 @@
             }
             showToast('success','تم إنشاء الحجز');
             console.log('[reserve] OK:', r);
-            showPage(5);
+            showPage(5);           // إلى صفحة "تم"
+            renderThankYou();      // ← توليد رسالة الشكر والملخص
           } else {
             console.error('[reserve] failed:', r);
             const msg = r?.data?.msgAR
@@ -1055,8 +1108,8 @@
         showPage(nextIndex);
       }
 
-      $next.addEventListener('click', gotoNext);
-      $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
+      document.getElementById('footer-next').addEventListener('click', gotoNext);
+      document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
 
     // Opening Motion trigger + date min
@@ -1105,6 +1158,26 @@
       document.getElementById('sumDate').textContent    = ($('#date').val() || '—');
       document.getElementById('sumTime').textContent    = (window.selectedTime?.ui || '—');
       document.getElementById('sumPay').textContent     = (nForm.paymentMethod || '—');
+    }
+
+    /* --------- Thank you renderer (NEW) --------- */
+    function renderThankYou(){
+      // اسم مختصر إن وجد
+      const first = (nForm.customerN||'').trim().split(' ')[0];
+      document.getElementById('thanksTitle').textContent =
+        first ? `تم حجز موعدك بنجاح، ${first}! 🎉` : `تم حجز موعدك بنجاح 🎉`;
+      document.getElementById('thanksCopy').textContent =
+        'وصلنا طلبك، وسنرسل لك التأكيد واللوكيشن على الواتساب قريباً.';
+
+      const info = [
+        {icon:'fa-location-dot',        text: $('#area').find(':selected').text()||'—'},
+        {icon:'fa-screwdriver-wrench',  text: $('#service').find(':selected').text()||'—'},
+        {icon:'fa-calendar-day',        text: nForm.date || $('#date').val() || '—'},
+        {icon:'fa-clock',               text: (window.selectedTime?.ui || '—')},
+        {icon:'fa-credit-card',         text: nForm.paymentMethod || '—'}
+      ];
+      document.getElementById('thanksSummary').innerHTML =
+        info.map(i=>`<span class="chip"><i class="fa-solid ${i.icon}"></i> ${i.text}</span>`).join('');
     }
 
     /* ---------------- Google Map ---------------- */
