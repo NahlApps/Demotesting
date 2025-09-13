@@ -16,83 +16,58 @@
 
   <style>
     :root{
-      /* Brand */
       --brand-700:#015a6c; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --ink-800:#173944; --ink-700:#224652;
-
-      /* Surfaces / Borders */
       --surface-000:#ffffff; --surface-100:#EDF3F6; --border-300:#D4E0E6;
-
-      /* Radius + Shadow */
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.08);
       --shadow-sm:0 3px 12px rgba(11,38,48,.12);
       --shadow-md:0 10px 28px rgba(11,38,48,.16);
-
-      /* Motion tokens */
       --ease:cubic-bezier(.22,.61,.36,1);
       --ease-decel:cubic-bezier(0.2,0,0,1);
       --ease-accel:cubic-bezier(0.3,1,0.8,1);
-      --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms; --dur-lg:640ms;
-
-      /* Typography + spacing */
+      --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
-
-      /* Dynamic Layout */
       --header-h:120px;
-      --footer-h:92px;           /* default desktop */
-      /* Glass cards */
+      --footer-h:92px;
       --card-alpha:.86; --card-blur:8px; --card-border:rgba(255,255,255,.55);
     }
-    /* Bigger footer for mobile + safe-area */
-    @media (max-width: 640px){
-      :root{
-        --footer-h: calc(112px + env(safe-area-inset-bottom));
-      }
-    }
+    @media (max-width:640px){ :root{ --footer-h: calc(112px + env(safe-area-inset-bottom)); } }
 
-    /* FULLSCREEN baseline */
     html,body{height:100%; min-height:100vh;}
-    @supports (height: 100dvh){
-      html,body{ min-height:100dvh; }
-    }
+    @supports (height:100dvh){ html,body{min-height:100dvh;} }
     body{
       margin:0; font-family:'Cairo',sans-serif;
-      min-height:100vh; display:flex; flex-direction:column;
+      display:flex; flex-direction:column;
       padding-top:var(--header-h); padding-bottom:var(--footer-h);
       color:#fff; background:#0b2630;
     }
-    @supports (height: 100dvh){ body{ min-height:100dvh; } }
 
-    /* Step Background (no motion) */
-    #bgStage{
-      position:fixed; inset:0; z-index:-1; pointer-events:none;
-      width:100%; height:100vh; background-position:center; background-repeat:no-repeat; background-size:cover;
-      background-attachment:fixed;
-    }
-    @supports (height: 100dvh){ #bgStage{ height:100dvh; } }
-    @media (max-width:768px){ #bgStage{ background-attachment:scroll; } }
-    #bgStage::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)); }
+    /* Fullscreen step background */
+    #bgStage{position:fixed; inset:0; z-index:-1; background-position:center; background-size:cover; background-repeat:no-repeat; width:100%; height:100vh; background-attachment:fixed;}
+    @supports (height:100dvh){ #bgStage{height:100dvh;} }
+    @media (max-width:768px){ #bgStage{background-attachment:scroll;} }
+    #bgStage::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34));}
+
+    /* Global loading */
+    .global-loading{position:fixed; inset:0; z-index:1200; background:rgba(11,38,48,.6); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; }
+    .global-loading.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
+    @keyframes fadeIn{from{opacity:0} to{opacity:1}}
 
     /* Header */
-    header{
-      position:sticky; top:0; z-index:50;
-      background:rgba(11,38,48,.42); backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.18);
-      padding-top:env(safe-area-inset-top);
-    }
+    header{position:sticky; top:0; z-index:50; background:rgba(11,38,48,.42); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.18); padding-top:env(safe-area-inset-top);}
     .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
-    @media (max-width:640px){ .brand img{ height:46px; } }
+    @media (max-width:640px){ .brand img{height:46px} }
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
 
-    /* Summary chips below progress */
+    /* Summary chips */
     .header-summary{ display:flex; justify-content:center }
     .summary-bar{ display:flex; gap:8px; align-items:center; width:100%; max-width:1120px; background:transparent; border:0; box-shadow:none; flex-wrap:wrap; }
     .summary-bar .chip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border-300); border-radius:999px; padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap; box-shadow:var(--shadow-xs); }
@@ -102,15 +77,11 @@
       .summary-bar .chip{ flex:1 1 calc(50% - 6px); min-width:0; padding:6px 8px; font-size:.82rem; justify-content:center }
       .summary-bar .chip b{ display:inline-block; max-width:12ch; overflow:hidden; text-overflow:ellipsis }
     }
-    @media (min-width:561px){
-      .summary-bar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none }
-      .summary-bar::-webkit-scrollbar{ display:none }
-    }
+    @media (min-width:561px){ .summary-bar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none } .summary-bar::-webkit-scrollbar{ display:none } }
 
-    /* Main */
+    /* Main & pages */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
     #app{width:100%; max-width:1120px}
-
     .stage{position:relative; min-height:540px; padding:8px 0 20px}
     .page{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-5); padding:var(--sp-5) var(--sp-3) var(--sp-6); overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;}
     .page.active{animation:pageIn var(--dur-md) var(--ease-decel) both; pointer-events:auto}
@@ -143,21 +114,15 @@
     .form-control::placeholder{color:#6b7280}
     .form-control:focus{ border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) }
 
-    /* Inline field error */
+    /* Field errors */
     .field-msg{ margin-top:6px; font-size:.85rem; color:#dc2626; min-height:1.2em; }
     .is-invalid{ border-color:#dc2626 !important; box-shadow:0 0 0 3px rgba(220,38,38,.15) !important; }
 
     /* Select2 contrast */
-    .select2-container--default .select2-selection--single{
-      background:#ffffff !important; border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__rendered{
-      color:#0B2630 !important; line-height:48px !important; padding-inline:42px 42px !important;
-    }
+    .select2-container--default .select2-selection--single{ background:#ffffff !important; border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered{ color:#0B2630 !important; line-height:48px !important; padding-inline:42px 42px !important; }
     .select2-container--default .select2-selection--single .select2-selection__placeholder{ color:#667085 !important; }
-    .select2-container--default.select2-container--focus .select2-selection--single{
-      border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important;
-    }
+    .select2-container--default.select2-container--focus .select2-selection--single{ border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important; }
     .select2-container--default .select2-selection--single .select2-selection__arrow{ height:48px !important; }
     .select2-container--default .select2-selection--single .select2-selection__arrow b{ border-color:#0B2630 transparent transparent transparent !important; }
     .select2-dropdown{ background:#fff !important; color:#0B2630 !important; border:1px solid var(--border-300) !important; box-shadow:var(--shadow-sm); }
@@ -170,62 +135,34 @@
     /* Time grid */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:var(--sp-4)}
     @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
-    .time-option{
-      background:#fff; color:#0B2630; font-weight:var(--fw-bold);
-      border:1px solid var(--border-300); border-radius:var(--radius-md);
-      padding:14px 10px; min-height:56px; box-shadow:var(--shadow-xs);
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-    }
+    .time-option{ background:#fff; color:#0B2630; font-weight:var(--fw-bold); border:1px solid var(--border-300); border-radius:var(--radius-md); padding:14px 10px; min-height:56px; box-shadow:var(--shadow-xs); transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease); display:flex; flex-direction:column; align-items:center; justify-content:center; }
     .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
-    .time-option:active{transform:translateY(0) scale(.995)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
-    /* Overlays */
+    /* Overlays in cards */
     .load-overlay{ position:absolute; inset:0; background:rgba(255,255,255,.9); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md); }
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
 
     /* Payment */
     .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4); width:100%; max-width:920px}
-    .pay-card{
-      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md);
-      padding:var(--sp-6); display:flex; justify-content:center; align-items:center; gap:var(--sp-4);
-      min-height:64px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-    }
+    .pay-card{ background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md); padding:var(--sp-6); display:flex; justify-content:center; align-items:center; gap:var(--sp-4); min-height:64px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease); }
     .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
-    .pay-card:active{transform:translateY(0) scale(.995)}
-    .pay-card img{max-width:120px; height:auto}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
-    /* Footer — larger & touch-friendly on mobile */
-    footer.sticky-nav{
-      position:sticky; bottom:0; z-index:40;
-      background:rgba(11,38,48,.62); backdrop-filter:blur(10px);
-      border-top:1px solid rgba(255,255,255,.22);
-      display:flex; align-items:center; justify-content:center;
-      min-height:var(--footer-h);
-    }
+    /* Footer */
+    footer.sticky-nav{ position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.62); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; min-height:var(--footer-h); }
     .footer-inner{ max-width:1120px; width:100%; padding:10px 12px calc(8px + env(safe-area-inset-bottom)); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
     .footer-left{display:flex; align-items:center; gap:12px; flex:0 0 auto}
     .footer-brand a{ font-size:.98rem; color:#fff; opacity:.98; text-decoration:none; font-weight:800 }
     .footer-social{ display:flex; gap:10px; align-items:center }
     .footer-social a{ color:#fff; opacity:.95; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.28); }
     .footer-social a:hover{ opacity:1; box-shadow:0 2px 10px rgba(0,0,0,.18) }
-
     .footer-actions{display:flex; gap:12px; flex:1; justify-content:flex-end}
-    .btn-footer{
-      flex:0 0 auto; border:1px solid rgba(255,255,255,.28); border-radius:16px;
-      padding:12px 18px; min-height:50px; font-size:1rem; font-weight:var(--fw-bold);
-      background:#ffffff; color:#015a6c;
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
-    }
+    .btn-footer{ flex:0 0 auto; border:1px solid rgba(255,255,255,.28); border-radius:16px; padding:12px 18px; min-height:50px; font-size:1rem; font-weight:var(--fw-bold); background:#ffffff; color:#015a6c; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease); }
     .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
-    .btn-footer:active{transform:translateY(0) scale(.995)}
     .btn-footer.primary{background:#015a6c; color:#fff; border-color:#015a6c}
     .btn-footer.hidden{display:none !important}
     .btn-footer.disabled, .btn-footer:disabled{opacity:.6; pointer-events:none}
-
-    /* Mobile sizing for footer buttons & social icons */
     @media (max-width:640px){
       .footer-left{ width:100%; justify-content:space-between; }
       .footer-actions{ order:3; width:100%; justify-content:space-between; gap:10px }
@@ -233,28 +170,26 @@
       .footer-social a{ width:40px; height:40px; }
     }
 
-    /* PPT deck (unchanged, no motion bg) */
+    /* PPT deck */
     .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(244,250,252,.92)); border:1px solid rgba(255,255,255,.55); box-shadow:var(--shadow-md); }
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
     .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
-    .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; }
-    .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; }
+    .ppt-slide.is-active{ animation:pptIn var(--dur-md) var(--ease-decel) both; }
+    .ppt-slide.is-exiting{ animation:pptOut var(--dur-sm) var(--ease-accel) both; }
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
 
-    /* Success */
     .success-hero{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:10px}
     .success-icon{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,var(--brand-600),#12b3cf);box-shadow:0 10px 24px rgba(2,122,147,.25), inset 0 0 0 6px rgba(255,255,255,.35);position:relative}
     .success-icon::after{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;color:#fff;position:absolute;inset:0;display:grid;place-items:center;font-size:40px;transform:scale(.7);opacity:0;animation:popIn .5s var(--ease-decel) .1s forwards}
     @keyframes popIn{to{transform:scale(1);opacity:1}}
     .thanks-title{font-size:1.35rem;font-weight:800;color:#0b2630;margin:0}
     .thanks-copy{color:#33545f;margin:0;opacity:.95}
+
     .rebook-btn{display:inline-flex;align-items:center;gap:10px;justify-content:center;background:linear-gradient(135deg,var(--brand-600),var(--brand-700));color:#fff;border:0;border-radius:999px;padding:14px 24px;min-height:52px;font-weight:800;font-size:1.05rem;letter-spacing:.2px;box-shadow:0 10px 24px rgba(2,122,147,.28);transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), filter var(--dur-xs) var(--ease)}
     .rebook-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);filter:saturate(1.05)}
-    .rebook-btn:active{transform:translateY(0) scale(.99)}
 
-    /* Phone input */
     .iti{ width:100% !important; }
     #mobile.form-control{ height:48px; line-height:48px; direction:ltr; text-align:left; }
     html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ right:12px; left:auto; }
@@ -264,26 +199,32 @@
     .iti__country-list{ text-align:right; }
     .iti__selected-flag{ background-color:transparent !important; padding:0 10px; }
     .iti__arrow{ border-top-color:#0B2630 !important; }
-    #err-mobile.field-msg{ margin-top:6px; font-size:.85rem; color:#dc2626; }
   </style>
 
   <script>
     /* Logo fallback */
     function handleLogoError(img){
       var fallbacks = [
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png",
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png",
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/logo.png",
-        "https://dummyimage.com/180x54/027A93/ffffff.png&text=Sponge+%26+Soap"
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design.png",
+        "https://dummyimage.com/180x54/027A93/ffffff.png&text=Nahl.app"
       ];
       var i = Number(img.dataset.fidx||0);
       if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
-      else { img.style.display = 'none'; var txt = document.getElementById('brandText'); if (txt) txt.style.display = 'block'; }
+      else { img.style.display = 'none'; }
     }
   </script>
 </head>
 <body>
+  <!-- Fullscreen step background -->
   <div id="bgStage" aria-hidden="true"></div>
+
+  <!-- GLOBAL LOADING (يظهر حتى اكتمال تحميل المناطق + الخدمات لأول مرة) -->
+  <div id="globalLoading" class="global-loading">
+    <div class="text-center">
+      <div class="spinner-border text-light" role="status" aria-hidden="true" style="width:3rem;height:3rem"></div>
+      <div class="mt-3 fw-bold">جاري التحميل…</div>
+    </div>
+  </div>
 
   <!-- Toasts -->
   <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px" aria-live="polite" aria-atomic="true"></div>
@@ -297,8 +238,7 @@
           <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
         <div class="brand">
-          <img id="brandLogo" alt="Sponge &amp; Soap" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
-          <strong id="brandText" style="display:none;color:#fff;font-weight:800">Sponge &amp; Soap</strong>
+          <img id="brandLogo" alt="Nahl" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
         </div>
       </div>
       <div class="header-summary">
@@ -413,8 +353,8 @@
                 <input id="carName" type="text" class="form-control" placeholder="كامري، إلنترا…" autocomplete="off"/>
               </div>
               <div class="col-12 col-md-4">
-                <label class="form-label" for="plateNumber">آخر 4 أرقام من اللوحة <span aria-hidden="true" style="color:#dc2626">*</span></label>
-                <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234" required aria-required="true" autocomplete="off"/>
+                <label class="form-label" for="plateNumber">آخر 4 أرقام من اللوحة</label>
+                <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234" autocomplete="off"/>
                 <div id="err-plate" class="field-msg" aria-live="polite"></div>
                 <small class="text-muted d-block mt-1" style="opacity:.9">نحتاج آخر ٤ أرقام للتأكيد فقط</small>
               </div>
@@ -485,9 +425,9 @@
           <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a>
         </div>
         <div class="footer-social" aria-label="تابعنا">
-          <a href="https://wa.me/" target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-          <a href="https://www.tiktok.com/@yourhandle" target="_blank" rel="noopener" title="TikTok" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-          <a href="https://www.instagram.com/yourhandle" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://wa.me/966509027172" target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="https://www.tiktok.com/@nahl.app?_t=ZS-8zgmzEQTSQW&_r=1" target="_blank" rel="noopener" title="TikTok" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="https://www.instagram.com/nahl.app?igsh=ZmljaXNncGtudjJ2." target="_blank" rel="noopener" title="Instagram" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
         </div>
       </div>
       <div class="footer-actions">
@@ -506,12 +446,12 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ======================= API HELPERS ======================= */
+    /* ---------- API ---------- */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
     const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
-    var controllers=[];
 
+    var controllers=[];
     function callContent2(path, cb, abortable=false, retries=3){
       var signal;
       if(abortable){
@@ -522,17 +462,11 @@
         controllers.push([controller,signal]);
       }
       setTimeout(function(){
-        fetch(defaultLink2+path,{method:'GET',redirect:'follow',signal:signal, cache:'no-store'}).then(function(res){
-          if(!res.ok){ if(retries>0){ callContent2(path,cb,abortable,retries-1); return; } throw new Error('Network'); }
-          return res.json();
-        }).then(function(json){ cb(json); }).catch(function(e){
-          console.error('[GET] failed:', e);
-          setLoadingServices(false); setLoadingTimes(false);
-          if(retries>0 && String(e).indexOf('AbortError')===-1){
-            setTimeout(function(){ callContent2(path,cb,abortable,retries-1); }, 600);
-          }
-        });
-      }, 200);
+        fetch(defaultLink2+path,{method:'GET',redirect:'follow',signal:signal, cache:'no-store'})
+          .then(function(res){ if(!res.ok){ if(retries>0){ callContent2(path,cb,abortable,retries-1); return; } throw new Error('Network'); } return res.json(); })
+          .then(function(json){ cb(json); })
+          .catch(function(e){ console.error('[GET] failed:', e); setLoadingServices(false); setLoadingTimes(false); forceStopGlobal(); });
+      }, 150);
     }
 
     function postReservationTry(url, payload, contentType){
@@ -543,19 +477,14 @@
       }).then(function(res){ return res.text().then(function(raw){ var data=null; try{ data=JSON.parse(raw);}catch(_){ } return { ok:res.ok, status:res.status, data:data, raw:raw }; }); })
       .catch(function(err){ return { ok:false, status:0, error:String(err) }; });
     }
-
     async function postReservation(payload){
       var r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
-      if(!r.ok && (r.status===415 || r.status===406 || r.status===0)){
-        r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
-      }
-      if(!r.ok && r.status===404){
-        r = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
-      }
+      if(!r.ok && (r.status===415 || r.status===406 || r.status===0)){ r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8'); }
+      if(!r.ok && r.status===404){ r = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8'); }
       return r;
     }
 
-    /* ======================= TOAST ======================= */
+    /* ---------- Toast ---------- */
     function showToast(type, msg){
       type = type || 'info'; msg = msg || '';
       var wrap=document.getElementById('toastWrap');
@@ -567,7 +496,7 @@
       setTimeout(function(){ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(function(){div.remove();}, 180); }, 2400);
     }
 
-    /* ======================= STATE ======================= */
+    /* ---------- State ---------- */
     var DateTime=luxon.DateTime;
     var orderedPages=["page1","page2","page4","page5","page5b","page6","page7"];
     var STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","تم"];
@@ -585,14 +514,14 @@
       "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg",
       "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"
     ];
-    (function preloadBG(){ STEP_BG.forEach(function(src){ var img=new Image(); img.decoding='async'; img.src=src; }); })();
+    STEP_BG.forEach(function(src){ var im=new Image(); im.decoding='async'; im.src=src; });
     function setStepBackground(stepIndex){
       var url = STEP_BG[Math.min(stepIndex, STEP_BG.length-1)];
       var stage = document.getElementById('bgStage');
       if(stage){ stage.style.backgroundImage = 'url("'+url+'")'; }
     }
 
-    /* Header ResizeObserver -> CSS var */
+    /* Header ResizeObserver */
     var headerRO;
     function initHeaderRO(){
       var header=document.getElementById('siteHeader');
@@ -610,10 +539,8 @@
       document.documentElement.style.setProperty('--header-h', h+'px');
     }
 
-    function hideOverlays(){
-      var a=document.getElementById('servicesLoading'); if(a) a.classList.remove('show');
-      var b=document.getElementById('timeLoading'); if(b) b.classList.remove('show');
-    }
+    function hideOverlays(){ var a=document.getElementById('servicesLoading'); if(a) a.classList.remove('show'); var b=document.getElementById('timeLoading'); if(b) b.classList.remove('show'); }
+
     function showPage(idx){
       var cur=document.querySelector('.page.active');
       var next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
@@ -636,7 +563,6 @@
       var start=document.getElementById('page1-button');
       var isWelcome = i===0;
       var isLast = i === (orderedPages.length-1);
-
       start.classList.toggle('hidden', !isWelcome);
       prev.classList.toggle('hidden', isWelcome || isLast);
       next.classList.toggle('hidden', isWelcome || isLast);
@@ -653,12 +579,18 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* Inline validation helpers */
+    /* Global boot loading (first locations + first services) */
+    var initialBoot=true, bootPending=0;
+    function startGlobal(){ bootPending++; document.getElementById('globalLoading').classList.add('show'); }
+    function finishGlobal(){ bootPending=Math.max(0,bootPending-1); if(bootPending===0){ document.getElementById('globalLoading').classList.remove('show'); } }
+    function forceStopGlobal(){ bootPending=0; var el=document.getElementById('globalLoading'); if(el) el.classList.remove('show'); }
+
+    /* Inline validation */
     function showFieldError(inputEl, msgEl, msg){ if(inputEl){ inputEl.classList.add('is-invalid'); inputEl.setAttribute('aria-invalid','true'); } if(msgEl){ msgEl.textContent = msg || ''; msgEl.style.display='block'; } }
     function clearFieldError(inputEl, msgEl){ if(inputEl){ inputEl.classList.remove('is-invalid'); inputEl.removeAttribute('aria-invalid'); } if(msgEl){ msgEl.textContent=''; msgEl.style.display=''; } }
     function validateMobileInline(){ var el=document.getElementById('mobile'); var msgEl=document.getElementById('err-mobile'); if(!itiPhone || !itiPhone.isValidNumber()){ showFieldError(el, msgEl, 'الرجاء إدخال رقم جوال صحيح'); return false; } clearFieldError(el, msgEl); return true; }
     function validateNameInline(){ var el=document.getElementById('name'); var msgEl=document.getElementById('err-name'); var ok=(el.value||'').trim().length>0; if(!ok){ showFieldError(el,msgEl,'الاسم مطلوب'); return false; } clearFieldError(el,msgEl); return true; }
-    function validatePlateInline(){ var el=document.getElementById('plateNumber'); var msgEl=document.getElementById('err-plate'); var ok=el.value && el.value.length===4; if(!ok){ showFieldError(el,msgEl,'رجاءً أدخل آخر ٤ أرقام من اللوحة'); return false; } clearFieldError(el,msgEl); return true; }
+    function validatePlateInline(){ var el=document.getElementById('plateNumber'); var msgEl=document.getElementById('err-plate'); var ok=!el.value || el.value.length===4; if(!ok){ showFieldError(el,msgEl,'رجاءً أدخل آخر ٤ أرقام (اختياري، لكن إن أدخلت فليكن ٤ أرقام)'); return false; } clearFieldError(el,msgEl); return true; }
     function validateTimeInline(){ var msgEl=document.getElementById('err-time'); if(!selectedTime){ msgEl.textContent='الرجاء اختيار وقت مناسب'; return false; } msgEl.textContent=''; return true; }
     function validatePayInline(){ var msgEl=document.getElementById('err-pay'); if(!nForm.paymentMethod){ msgEl.textContent='الرجاء اختيار طريقة الدفع'; return false; } msgEl.textContent=''; return true; }
 
@@ -766,12 +698,20 @@
       phoneEl.addEventListener('input', function(){ this.value=this.value.replace(/[^\d]/g,''); validateMobileInline(); });
       phoneEl.addEventListener('countrychange', validateMobileInline);
 
-      setLoadingServices(true);
+      /* Global spinner until (locations + first services) finish */
+      startGlobal();
       callContent2(`/locations`, function(res){
         var list=res && res.data ? res.data : [];
         var ds=list.map(function(l){ return {id:l.id,text:l.TS_location_arabic_name}; });
-        $('#area').empty().select2({data:ds,width:'100%'}); setLoadingServices(false);
-        if(ds.length){ $('#area').val(ds[0].id).trigger('change'); } else { showToast('error','لا توجد مناطق متاحة حالياً'); }
+        $('#area').empty().select2({data:ds,width:'100%'}); 
+        if(ds.length){ 
+          // start global again for first services load
+          startGlobal();
+          $('#area').val(ds[0].id).trigger('change'); 
+        } else { 
+          showToast('error','لا توجد مناطق متاحة حالياً'); 
+          finishGlobal(); 
+        }
       });
 
       $('#area').on('change', function(){
@@ -781,7 +721,10 @@
           categoriesCache=res && res.data ? res.data.servicesCat||[] : [];
           var cats=categoriesCache.map(function(c){ return {id:c.TS_category_id,text:c.TS_category_arabic_name}; });
           $('#serviceCat').empty().select2({data:cats,width:'100%'}); if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
-          setLoadingServices(false); updateNextAvailability();
+          setLoadingServices(false);
+          // close the global boot spinner after first services load
+          if(initialBoot){ finishGlobal(); initialBoot=false; }
+          updateNextAvailability();
         }, true);
       });
 
@@ -824,7 +767,6 @@
       startWelcomeDeck();
       renderSummary();
       initHeaderRO();
-
       setStepBackground(0);
     })();
 
@@ -902,11 +844,11 @@
       else if(i===3){
         var nameOk=$('#name').val().trim().length>0;
         var phoneOk=(itiPhone && itiPhone.isValidNumber());
-        var plateOk=($('#plateNumber').val()||'').length===4;
+        var plateVal=$('#plateNumber').val()||''; var plateOk=(plateVal.length===0 || plateVal.length===4); /* optional */
         enable=nameOk && phoneOk && plateOk;
       } else if(i===4){ enable=!!nForm.paymentMethod; }
       else if(i===5){ enable=!!positionUrl; }
-      else if(i===6){ enable=false; } /* thank page */
+      else if(i===6){ enable=false; }
       nextBtn.disabled=!enable;
       nextBtn.classList.toggle('disabled', !enable);
       renderSummary();
@@ -918,14 +860,12 @@
       var dateTxt=$('#date').val()||'—';
       var timeTxt=(window.selectedTime && window.selectedTime.ui) || '—';
       var payTxt =(nForm.paymentMethod||'—');
-
       var el;
       el=document.getElementById('sumArea');    if(el) el.textContent=areaTxt;
       el=document.getElementById('sumService'); if(el) el.textContent=svcTxt;
       el=document.getElementById('sumDate');    if(el) el.textContent=dateTxt;
       el=document.getElementById('sumTime');    if(el) el.textContent=timeTxt;
       el=document.getElementById('sumPay');     if(el) el.textContent=payTxt;
-
       el=document.querySelector('[data-sum-chip="area"]');    if(el) el.setAttribute('title', areaTxt);
       el=document.querySelector('[data-sum-chip="service"]'); if(el) el.setAttribute('title', svcTxt);
       el=document.querySelector('[data-sum-chip="date"]');    if(el) el.setAttribute('title', dateTxt);
