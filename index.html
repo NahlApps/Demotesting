@@ -30,10 +30,10 @@
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
       --header-h:120px;
-      --footer-h:92px;
+      --footer-h:96px;
       --card-alpha:.86; --card-blur:8px; --card-border:rgba(255,255,255,.55);
     }
-    @media (max-width:640px){ :root{ --footer-h: calc(112px + env(safe-area-inset-bottom)); } }
+    @media (max-width:640px){ :root{ --footer-h: calc(118px + env(safe-area-inset-bottom)); } }
 
     html,body{height:100%; min-height:100vh;}
     @supports (height:100dvh){ html,body{min-height:100dvh;} }
@@ -54,8 +54,8 @@
     header{position:sticky; top:0; z-index:50; background:rgba(11,38,48,.42); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.18); padding-top:env(safe-area-inset-top);}
     .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .brand img{height:72px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
-    @media (max-width:640px){ .brand img{height:62px} }
+    .brand img{height:82px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
+    @media (max-width:640px){ .brand img{height:72px} }
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
@@ -119,7 +119,7 @@
     .select2-container--default .select2-selection--single{ background:#ffffff !important; border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered{ color:#0B2630 !important; line-height:48px !important; padding-inline:42px 42px !important; }
     .select2-container--default .select2-selection--single .select2-selection__placeholder{ color:#667085 !important; }
-    .select2-container--default.select2-container--focus .select2-selection--single{ border-color:#0891b2 !重要; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important; }
+    .select2-container--default.select2-container--focus .select2-selection--single{ border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) !important; }
     .select2-container--default .select2-selection--single .select2-selection__arrow{ height:48px !important; }
     .select2-container--default .select2-selection--single .select2-selection__arrow b{ border-color:#0B2630 transparent transparent transparent !important; }
     .select2-dropdown{ background:#fff !important; color:#0B2630 !important; border:1px solid var(--border-300) !important; box-shadow:var(--shadow-sm); }
@@ -148,14 +148,14 @@
 
     /* Footer */
     footer.sticky-nav{ position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.62); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; min-height:var(--footer-h); }
-    .footer-inner{ max-width:1120px; width:100%; padding:10px 12px calc(8px + env(safe-area-inset-bottom)); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
+    .footer-inner{ max-width:1120px; width:100%; padding:12px 12px calc(10px + env(safe-area-inset-bottom)); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
     .footer-left{display:flex; align-items:center; gap:12px; flex:0 0 auto}
     .footer-brand a{ font-size:.98rem; color:#fff; opacity:.98; text-decoration:none; font-weight:800 }
     .footer-social{ display:flex; gap:10px; align-items:center }
-    .footer-social a{ color:#fff; opacity:.95; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.28); }
+    .footer-social a{ color:#fff; opacity:.95; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; border:1px solid rgba(255,255,255,.28); }
     .footer-social a:hover{ opacity:1; box-shadow:0 2px 10px rgba(0,0,0,.18) }
     .footer-actions{display:flex; gap:12px; flex:1; justify-content:flex-end}
-    .btn-footer{ flex:0 0 auto; border:1px solid rgba(255,255,255,.28); border-radius:16px; padding:12px 18px; min-height:50px; font-size:1rem; font-weight:var(--fw-bold); background:#ffffff; color:#015a6c; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease); }
+    .btn-footer{ flex:0 0 auto; border:1px solid rgba(255,255,255,.28); border-radius:16px; padding:12px 18px; min-height:54px; font-size:1rem; font-weight:var(--fw-bold); background:#ffffff; color:#015a6c; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease); }
     .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
     .btn-footer.primary{background:#015a6c; color:#fff; border-color:#015a6c}
     .btn-footer.hidden{display:none !important}
@@ -163,11 +163,11 @@
     @media (max-width:640px){
       .footer-left{ width:100%; justify-content:space-between; }
       .footer-actions{ order:3; width:100%; justify-content:space-between; gap:10px }
-      .btn-footer{ flex:1 1 48%; min-height:56px; font-size:1.05rem; }
-      .footer-social a{ width:40px; height:40px; }
+      .btn-footer{ flex:1 1 48%; min-height:60px; font-size:1.06rem; }
+      .footer-social a{ width:42px; height:42px; }
     }
 
-    /* PPT deck */
+    /* PPT deck (static background) */
     .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(244,250,252,.92)); border:1px solid rgba(255,255,255,.55); box-shadow:var(--shadow-md); }
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
@@ -199,11 +199,11 @@
   </style>
 
   <script>
-    /* Logo fallback (الشعار المطلوب) */
+    /* Logo fallback (يستعمل الرابط المطلوب أولًا) */
     function handleLogoError(img){
       var fallbacks = [
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design.png",
-        "https://dummyimage.com/200x72/027A93/ffffff.png&text=Nahl.app"
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_14_40%20PM.png",
+        "https://dummyimage.com/220x82/027A93/ffffff.png&text=Nahl.app"
       ];
       var i = Number(img.dataset.fidx||0);
       if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
@@ -227,7 +227,7 @@
           <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
         <div class="brand">
-          <img id="brandLogo" alt="Nahl" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
+          <img id="brandLogo" alt="Nahl" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_14_40%20PM.png" loading="eager" decoding="async" fetchpriority="high" onerror="handleLogoError(this)"/>
         </div>
       </div>
       <div class="header-summary">
@@ -347,7 +347,6 @@
                 <label class="form-label" for="plateNumber">آخر 4 أرقام من اللوحة</label>
                 <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234" autocomplete="off"/>
                 <div id="err-plate" class="field-msg" aria-live="polite"></div>
-                <!-- ملاحظة “رقم مميز” -->
                 <div id="note-plate" class="field-note note-info" role="status" aria-live="polite">
                   <i class="fa-solid fa-stars"></i>
                   <span id="note-plate-text"></span>
@@ -578,10 +577,49 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* Inline validation */
+    /* ---- Inline validation helpers ---- */
     function showFieldError(inputEl, msgEl, msg){ if(inputEl){ inputEl.classList.add('is-invalid'); inputEl.setAttribute('aria-invalid','true'); } if(msgEl){ msgEl.textContent = msg || ''; msgEl.style.display='block'; } }
     function clearFieldError(inputEl, msgEl){ if(inputEl){ inputEl.classList.remove('is-invalid'); inputEl.removeAttribute('aria-invalid'); } if(msgEl){ msgEl.textContent=''; msgEl.style.display=''; } }
-    function validateMobileInline(){ const el=document.getElementById('mobile'); const msgEl=document.getElementById('err-mobile'); if(!itiPhone || !itiPhone.isValidNumber()){ showFieldError(el, msgEl, 'الرجاء إدخال رقم جوال صحيح'); return false; } clearFieldError(el, msgEl); return true; }
+
+    /* Mobile validation – improved */
+    const GCC_HELP = { sa:'5XXXXXXXX', ae:'5XXXXXXXX', bh:'3XXXXXXX', kw:'5XXXXXXX', om:'9XXXXXXX', qa:'3XXXXXXX' };
+    function updateMobileHelp(){
+      if(!window.itiPhone) return;
+      const c = itiPhone.getSelectedCountryData()?.iso2 || 'sa';
+      const ex = GCC_HELP[c] || '5XXXXXXXX';
+      const help = document.getElementById('mobileHelp');
+      if(help) help.textContent = 'مثال: ' + ex;
+    }
+    function sanitizeMobileForCountry(raw){
+      const c = itiPhone.getSelectedCountryData()?.iso2 || 'sa';
+      let v = (raw||'').replace(/[^\d]/g,'');
+      // في السعودية: إزالة الصفر الأول وفرض البدء بـ 5 إن وجد 0 في البداية
+      if(c==='sa'){
+        if(v.startsWith('0')) v = v.replace(/^0+/, '');
+        // فقط تنسيق إرشادي، لا نفرض 5 تلقائيًا حتى لا نغيّر نية المستخدم
+      }
+      return v;
+    }
+    function mobileValidationMessage(){
+      const code = itiPhone.getValidationError?.() ?? null;
+      if(code===2) return 'الرقم قصير جدًا';
+      if(code===3) return 'الرقم طويل جدًا';
+      if(code===1) return 'رمز الدولة غير صحيح';
+      if(code===4) return 'المدخل ليس رقم هاتف';
+      return 'الرجاء إدخال رقم جوال صحيح';
+    }
+    function validateMobileInline(){
+      const el=document.getElementById('mobile');
+      const msgEl=document.getElementById('err-mobile');
+      if(!window.itiPhone){ clearFieldError(el,msgEl); return true; }
+      // تنظيف خفيف دون إتلاف الكتابة
+      const sanitized = sanitizeMobileForCountry(el.value);
+      if(el.value !== sanitized){ el.value = sanitized; }
+      const ok = itiPhone.isValidNumber?.() === true;
+      if(!ok){ showFieldError(el, msgEl, mobileValidationMessage()); return false; }
+      clearFieldError(el, msgEl); return true;
+    }
+
     function validateNameInline(){ const el=document.getElementById('name'); const msgEl=document.getElementById('err-name'); const ok=(el.value||'').trim().length>0; if(!ok){ showFieldError(el,msgEl,'الاسم مطلوب'); return false; } clearFieldError(el,msgEl); return true; }
     function validatePlateInline(){ const el=document.getElementById('plateNumber'); const msgEl=document.getElementById('err-plate'); const val=(el.value||'').trim(); const ok=!val || /^\d{4}$/.test(val); if(!ok){ showFieldError(el,msgEl,'رجاءً أدخل ٤ أرقام أو اتركه فارغًا'); return false; } clearFieldError(el,msgEl); return true; }
     function validateTimeInline(){ const msgEl=document.getElementById('err-time'); if(!selectedTime){ msgEl.textContent='الرجاء اختيار وقت مناسب'; return false; } msgEl.textContent=''; return true; }
@@ -591,28 +629,16 @@
     function detectSpecialPlate(s){
       if(!/^\d{4}$/.test(s)) return null;
       const d=[...s].map(x=>+x);
-      const allSame = d.every(x=>x===d[0]);
-      if(allSame) return {type:'same', label:'مميّز جدًا (أرقام متطابقة)'};
-
+      const allSame = d.every(x=>x===d[0]); if(allSame) return {type:'same', label:'مميّز جدًا (أرقام متطابقة)'};
       const asc = d[1]===d[0]+1 && d[2]===d[1]+1 && d[3]===d[2]+1;
       const desc= d[1]===d[0]-1 && d[2]===d[1]-1 && d[3]===d[2]-1;
       if(asc)  return {type:'asc',  label:'متسلسل تصاعديًا'};
       if(desc) return {type:'desc', label:'متسلسل تنازليًا'};
-
-      const pairs = (d[0]===d[1] && d[2]===d[3] && d[1]!==d[2]);
-      if(pairs) return {type:'pairs', label:'زوجي مكرر (##-##)'};
-
-      const pal = (d[0]===d[3] && d[1]===d[2] && !(d[0]===d[1] && d[1]===d[2])); // استبعد 1111
-      if(pal) return {type:'pal', label:'متناظر'};
-
-      // ثلاثي مثل 1112 أو 2111
-      const counts={};
-      d.forEach(x=>counts[x]=(counts[x]||0)+1);
+      const pairs = (d[0]===d[1] && d[2]===d[3] && d[1]!==d[2]); if(pairs) return {type:'pairs', label:'زوجي مكرر (##-##)'};
+      const pal = (d[0]===d[3] && d[1]===d[2] && !(d[0]===d[1] && d[1]===d[2])); if(pal) return {type:'pal', label:'متناظر'};
+      const counts={}; d.forEach(x=>counts[x]=(counts[x]||0)+1);
       if(Object.values(counts).some(c=>c===3)) return {type:'triple', label:'ثلاثي مكرر'};
-
-      // نمط مزدوج آخر (مثل 1212)
       if(d[0]===d[2] && d[1]===d[3] && d[0]!==d[1]) return {type:'alt-pairs', label:'نمط متناوب (ABAB)'};
-
       return null;
     }
     function updatePlateNote(){
@@ -644,10 +670,6 @@
 
     /* Times */
     let dayTimes=[]; let timesLoaded=false;
-    document.addEventListener('DOMContentLoaded', ()=>{ document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate); });
-    document.getElementById('service').addEventListener('change', ()=>{ if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
-    document.getElementById('area').addEventListener('change', ()=>{ if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
-    (function initDateMin(){ const today=DateTime.now().toFormat('yyyy-LL-dd'); const el=document.getElementById('date'); if(!el.value) el.value=today; el.setAttribute('min',today); })();
 
     function parseTimeToLuxon(raw){ let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true}); return t.isValid?t:null; }
     function normalizeAvailability(r){
@@ -811,10 +833,35 @@
       $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
+      // intl-tel-input – mobile validation improved
       const phoneEl=document.querySelector('#mobile');
-      window.itiPhone=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], separateDialCode:true, nationalMode:false, autoPlaceholder:'aggressive', setPlaceholderNumberType:'MOBILE', formatOnDisplay:true, autoInsertDialCode:true, useFullscreenPopup:true, utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js' });
-      phoneEl.addEventListener('input', function(){ this.value=this.value.replace(/[^\d]/g,''); validateMobileInline(); });
-      phoneEl.addEventListener('countrychange', validateMobileInline);
+      window.itiPhone=window.intlTelInput(phoneEl,{
+        initialCountry:'sa',
+        onlyCountries:['sa','ae','bh','kw','om','qa'],
+        separateDialCode:true,
+        nationalMode:false,
+        autoPlaceholder:'aggressive',
+        setPlaceholderNumberType:'MOBILE',
+        formatOnDisplay:true,
+        autoInsertDialCode:true,
+        useFullscreenPopup:true,
+        utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
+      });
+      // sanitize & validate on input
+      phoneEl.addEventListener('input', function(){
+        // أرقام فقط
+        const cur = this.value;
+        const clean = cur.replace(/[^\d]/g,'');
+        if(cur !== clean) this.value = clean;
+        validateMobileInline();
+      });
+      phoneEl.addEventListener('blur', validateMobileInline);
+      phoneEl.addEventListener('countrychange', function(){
+        // تحديث مثال الدولة + إعادة التحقق
+        updateMobileHelp();
+        validateMobileInline();
+      });
+      updateMobileHelp();
 
       loadLocationsAndFirstServices();
 
@@ -952,7 +999,7 @@
         enable = !!selectedTime;
       } else if(i === 3){ // page5
         const nameOk = $('#name').val().trim().length > 0;
-        const phoneOk = (itiPhone && itiPhone.isValidNumber());
+        const phoneOk = (itiPhone && itiPhone.isValidNumber && itiPhone.isValidNumber());
         const plateVal = $('#plateNumber').val()||'';
         const plateOk  = (plateVal.length===0 || /^\d{4}$/.test(plateVal));
         enable = nameOk && phoneOk && plateOk;
