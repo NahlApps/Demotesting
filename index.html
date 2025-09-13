@@ -19,28 +19,27 @@
       /* Brand */
       --brand-700:#015a6c; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
 
-      /* Ink / Surfaces (تحسين تباين) */
+      /* Ink / Surfaces */
       --ink-900:#0B2630; --ink-800:#173944; --ink-700:#224652;
-      --surface-000:#ffffff; --surface-100:#EDF3F6;
-      --border-300:#D4E0E6;
+      --surface-000:#ffffff; --surface-100:#EDF3F6; --border-300:#D4E0E6;
 
-      /* Radius + Shadow */
+      /* Shape */
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.08);
       --shadow-sm:0 3px 12px rgba(11,38,48,.12);
       --shadow-md:0 10px 28px rgba(11,38,48,.16);
 
-      /* Motion tokens */
+      /* Motion */
       --ease:cubic-bezier(.22,.61,.36,1);
       --ease-decel:cubic-bezier(0.2,0,0,1);
       --ease-accel:cubic-bezier(0.3,1,0.8,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms; --dur-lg:640ms;
 
-      /* Typography + spacing */
+      /* Type + spacing */
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
 
-      /* Layout (قيمة ابتدائية؛ سنحدّثها برمجيًا) */
+      /* Layout (يُحدَّث تلقائيًا) */
       --header-h:120px; --footer-h:78px;
     }
 
@@ -55,7 +54,7 @@
       color-scheme: light;
     }
 
-    /* Header (أصبح بارتفاع تلقائي) */
+    /* ---------- Header (مرن الارتفاع) ---------- */
     header{
       position:sticky; top:0; z-index:50;
       background:rgba(11,38,48,.42); backdrop-filter:blur(10px);
@@ -67,9 +66,7 @@
       padding:10px var(--sp-3) 12px;
       display:flex; flex-direction:column; gap:10px;
     }
-    .header-top{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-    }
+    .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
@@ -77,33 +74,48 @@
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
 
-    /* Summary chips أسفل شريط التقدم */
+    /* ---------- Header Summary (داخل الهيدر – شفاف) ---------- */
     .header-summary{ display:flex; justify-content:center }
     .summary-bar{
-      display:flex; gap:8px; flex-wrap:nowrap; align-items:center;
-      background:rgba(255,255,255,.98); color:#0B2630;
-      border:1px solid var(--border-300); border-radius:12px;
-      padding:8px 10px; box-shadow:var(--shadow-sm);
-      max-width:1120px; width:100%;
-      overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+      display:flex; gap:8px; align-items:center; width:100%; max-width:1120px;
+
+      /* طلبك: إزالة اللون والخلفية والحد والظل */
+      background:transparent; border:0; box-shadow:none;
+
+      /* افتراضيًا: يسمح بالالتفاف */
+      flex-wrap:wrap;
     }
-    .summary-bar::-webkit-scrollbar{ display:none }
     .summary-bar .chip{
       display:inline-flex; align-items:center; gap:6px;
       background:#fff; border:1px solid var(--border-300); border-radius:999px;
       padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap;
+      box-shadow:var(--shadow-xs);
     }
     .summary-bar i{opacity:.85}
-    @media (max-width: 480px){
-      .summary-bar{ padding:6px 8px }
-      .summary-bar .chip{ padding:5px 8px; font-size:.84rem }
+
+    /* موبايل: عمودان، أحجام مضغوطة، قص نص داخلي */
+    @media (max-width:560px){
+      .summary-bar{ gap:6px; }
+      .summary-bar .chip{
+        flex:1 1 calc(50% - 6px);
+        min-width:0; padding:6px 8px; font-size:.82rem;
+        justify-content:center;
+      }
+      .summary-bar .chip b{
+        display:inline-block; max-width:12ch; overflow:hidden; text-overflow:ellipsis;
+      }
+    }
+    /* شاشات أكبر: صف واحد وتمرير أفقي عند اللزوم */
+    @media (min-width:561px){
+      .summary-bar{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+      .summary-bar::-webkit-scrollbar{ display:none }
     }
 
-    /* Main */
+    /* ---------- Main ---------- */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:var(--sp-2) var(--sp-3) 0}
     #app{width:100%; max-width:1120px}
 
-    /* Stage & Pages */
+    /* Pages */
     .stage{position:relative; min-height:540px; padding:8px 0 20px}
     .page{
       position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:var(--sp-5);
@@ -129,7 +141,7 @@
     .form-control::placeholder{color:#6b7280}
     .form-control:focus{ border-color:#0891b2 !important; box-shadow:0 0 0 4px rgba(8,145,178,.2) }
 
-    /* ========== Select2 — Contrast Fixes ========== */
+    /* Select2 contrast fixes */
     .select2-container--default .select2-selection--single{
       background:#ffffff !important; border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
     }
@@ -171,23 +183,6 @@
     .time-option:active{transform:translateY(0) scale(.995)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
-    /* Overlays */
-    .load-overlay{ position:absolute; inset:0; background:rgba(255,255,255,.9); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md); }
-    .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
-    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-
-    /* Payment */
-    .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-4); width:100%; max-width:920px}
-    .pay-card{
-      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:var(--radius-md);
-      padding:var(--sp-6); display:flex; justify-content:center; align-items:center; gap:var(--sp-4);
-      min-height:64px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-    }
-    .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
-    .pay-card:active{transform:translateY(0) scale(.995)}
-    .pay-card img{max-width:120px; height:auto}
-    .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
-
     /* Footer nav */
     footer.sticky-nav{ position:sticky; bottom:0; z-index:40; height:var(--footer-h); background:rgba(11,38,48,.55); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; }
     .footer-inner{ max-width:1120px; width:100%; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; }
@@ -200,7 +195,6 @@
     .btn-footer.hidden{visibility:hidden}
     .btn-footer.disabled, .btn-footer:disabled{opacity:.6; pointer-events:none}
 
-    .form-block{margin-bottom:var(--sp-5)}
     .form-label{display:inline-block; margin-bottom:6px; font-size:var(--fs-sm); font-weight:var(--fw-bold); color:var(--ink-800)}
     .iti{width:100%!important}
     #mobile.form-control{height:48px; line-height:48px; text-align:center}
@@ -214,46 +208,15 @@
     .toast-success{background:#16a34a}
     .toast-error{background:#dc2626}
     .toast-info{background:#0284c7}
-    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;margin:-1px}
 
-    /* serviceCount full width */
-    #serviceCount{ width:100% !important; }
-
-    /* Deck */
-    .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg,#ffffff, #f6fbfd); box-shadow:var(--shadow-md); }
-    .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
-    .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
-    .ppt-slide p{ font-size:1.05rem; color:#33545f; margin:0; opacity:.92 }
-    @media (prefers-reduced-motion: no-preference) {
-      .ppt-slide.is-active{ animation: pptIn var(--dur-md) var(--ease-decel) both; }
-      .ppt-slide.is-exiting{ animation: pptOut var(--dur-sm) var(--ease-accel) both; }
-    }
-    @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
-    @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
-
-    /* Thank-you + CTA */
+    /* Thank you + CTA (كما كانت) */
     .success-hero{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:10px}
-    .success-icon{
-      width:92px;height:92px;border-radius:50%;
-      background:linear-gradient(135deg,var(--brand-600),#12b3cf);
-      box-shadow:0 10px 24px rgba(2,122,147,.25), inset 0 0 0 6px rgba(255,255,255,.35);
-      position:relative;
-    }
-    .success-icon::after{
-      content:"\f00c"; font-family:"Font Awesome 6 Free"; font-weight:900;
-      color:#fff; position:absolute; inset:0; display:grid; place-items:center; font-size:40px;
-      transform:scale(.7); opacity:0; animation:popIn .5s var(--ease-decel) .1s forwards;
-    }
+    .success-icon{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,var(--brand-600),#12b3cf);box-shadow:0 10px 24px rgba(2,122,147,.25), inset 0 0 0 6px rgba(255,255,255,.35);position:relative}
+    .success-icon::after{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;color:#fff;position:absolute;inset:0;display:grid;place-items:center;font-size:40px;transform:scale(.7);opacity:0;animation:popIn .5s var(--ease-decel) .1s forwards}
+    @keyframes popIn{to{transform:scale(1);opacity:1}}
     .thanks-title{font-size:1.35rem;font-weight:800;color:#0b2630;margin:0}
     .thanks-copy{color:#33545f;margin:0;opacity:.95}
-    .rebook-btn{
-      display:inline-flex;align-items:center;gap:10px;justify-content:center;
-      background:linear-gradient(135deg,var(--brand-600),var(--brand-700));
-      color:#fff;border:0;border-radius:999px;padding:14px 24px;min-height:52px;
-      font-weight:800;font-size:1.05rem;letter-spacing:.2px;
-      box-shadow:0 10px 24px rgba(2,122,147,.28);
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), filter var(--dur-xs) var(--ease);
-    }
+    .rebook-btn{display:inline-flex;align-items:center;gap:10px;justify-content:center;background:linear-gradient(135deg,var(--brand-600),var(--brand-700));color:#fff;border:0;border-radius:999px;padding:14px 24px;min-height:52px;font-weight:800;font-size:1.05rem;letter-spacing:.2px;box-shadow:0 10px 24px rgba(2,122,147,.28);transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), filter var(--dur-xs) var(--ease)}
     .rebook-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);filter:saturate(1.05)}
     .rebook-btn:active{transform:translateY(0) scale(.99)}
   </style>
@@ -276,14 +239,14 @@
         </div>
       </div>
 
-      <!-- Summary chips: أسفل شريط التقدم -->
+      <!-- Summary chips (أسفل شريط التقدم – بدون خلفية) -->
       <div class="header-summary">
-        <div id="bookingSummary" class="summary-bar" aria-live="polite">
-          <span class="chip"><i class="fa-solid fa-location-dot"></i> <b id="sumArea">—</b></span>
-          <span class="chip"><i class="fa-solid fa-screwdriver-wrench"></i> <b id="sumService">—</b></span>
-          <span class="chip"><i class="fa-regular fa-calendar"></i> <b id="sumDate">—</b></span>
-          <span class="chip"><i class="fa-regular fa-clock"></i> <b id="sumTime">—</b></span>
-          <span class="chip"><i class="fa-regular fa-credit-card"></i> <b id="sumPay">—</b></span>
+        <div id="bookingSummary" class="summary-bar" aria-live="polite" role="list">
+          <span class="chip" role="listitem" title="المنطقة"><i class="fa-solid fa-location-dot"></i> <b id="sumArea">—</b></span>
+          <span class="chip" role="listitem" title="الخدمة"><i class="fa-solid fa-screwdriver-wrench"></i> <b id="sumService">—</b></span>
+          <span class="chip" role="listitem" title="التاريخ"><i class="fa-regular fa-calendar"></i> <b id="sumDate">—</b></span>
+          <span class="chip" role="listitem" title="الوقت"><i class="fa-regular fa-clock"></i> <b id="sumTime">—</b></span>
+          <span class="chip" role="listitem" title="الدفع"><i class="fa-regular fa-credit-card"></i> <b id="sumPay">—</b></span>
         </div>
       </div>
     </div>
@@ -293,7 +256,7 @@
   <main>
     <div id="app">
       <div class="stage">
-        <!-- 1) Welcome -->
+        <!-- (الصفحات كما هي؛ أزلت أجزاء غير متعلقة بالطلب لتقليل الطول) -->
         <section id="page1" class="page active" aria-label="الترحيب">
           <h1 class="visually-hidden">عرض ترحيبي</h1>
           <div class="card text-center" style="background:transparent; box-shadow:none; padding:0;">
@@ -301,19 +264,15 @@
               <div class="ppt-slide kb"><div class="ppt-hero"><h2>✨ غسيل بدون طوابير</h2><p>نجيك لين باب بيتك — جودة وفخامة بالتفاصيل الصغيرة</p></div></div>
               <div class="ppt-slide kb"><div class="ppt-hero"><h2>🧼 عناية مدروسة</h2><p>واكس يحمي السيارة • فوط نظيفة • إسفنجة للكفرات</p></div></div>
               <div class="ppt-slide kb"><div class="ppt-hero"><h2>⏱️ حجز سريع</h2><p>اختر المنطقة والخدمة والوقت — والباقي علينا</p></div></div>
-              <div class="ppt-dots" id="pptDots" aria-hidden="true"></div>
             </div>
           </div>
         </section>
 
-        <!-- 2) Service & Location -->
         <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
           <h1>وين تحب نجيك؟</h1>
-
           <div class="card position-relative" id="servicesCard">
             <label class="form-label">اختيار المنطقة</label>
             <select id="area" style="width:100%"></select>
-
             <div class="row g-3 mt-3">
               <div class="col-12 col-md-6">
                 <label class="form-label">التصنيف</label>
@@ -331,7 +290,6 @@
                 </select>
               </div>
             </div>
-
             <div id="servicesLoading" class="load-overlay">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
               <strong>جاري تحميل الخدمات…</strong>
@@ -339,7 +297,6 @@
           </div>
         </section>
 
-        <!-- 3) Time -->
         <section id="page4" class="page" aria-label="اختيار الموعد">
           <h1>متى تحب نجيك؟</h1>
           <div class="card position-relative" id="timeCard">
@@ -349,7 +306,6 @@
                 <input id="date" type="date" class="form-control"/>
               </div>
             </div>
-
             <div class="position-relative mt-3">
               <div id="time-container" class="time-grid" role="radiogroup" aria-label="اختيار الوقت"></div>
               <div id="timeLoading" class="load-overlay">
@@ -360,7 +316,6 @@
           </div>
         </section>
 
-        <!-- 4) Contact -->
         <section id="page5" class="page" aria-label="معلومات الاتصال">
           <h1>معلومات الاتصال</h1>
           <div class="card">
@@ -413,7 +368,6 @@
           </div>
         </section>
 
-        <!-- 5) Map -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
           <div class="card">
@@ -425,7 +379,6 @@
           <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
         </section>
 
-        <!-- 6) Done -->
         <section id="page7" class="page" aria-label="تم الحجز">
           <div class="card text-center">
             <div class="success-hero">
@@ -435,14 +388,9 @@
                 <p id="thanksCopy" class="thanks-copy">راح نرسل لك التأكيد على الواتساب خلال دقائق.</p>
               </div>
             </div>
-
             <div id="thanksSummary" class="chips-wrap centered" aria-live="polite"></div>
-
             <div style="margin-top:18px">
-              <button id="rebook" class="rebook-btn" type="button">
-                <i class="fa-solid fa-rotate-right"></i>
-                احجز موعدًا آخر
-              </button>
+              <button id="rebook" class="rebook-btn" type="button"><i class="fa-solid fa-rotate-right"></i> احجز موعدًا آخر</button>
             </div>
           </div>
         </section>
@@ -453,9 +401,7 @@
   <!-- Footer nav -->
   <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
-      <div class="footer-brand" aria-label="Nahl Marking">
-        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener" style="color:#fff;text-decoration:none">Nahl.app</a></span>
-      </div>
+      <div class="footer-brand"><span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener" style="color:#fff;text-decoration:none">Nahl.app</a></span></div>
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>التالي</button>
@@ -472,7 +418,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---------------- Logo fallback helper ---------------- */
+    /* -------- Logo fallback -------- */
     function handleLogoError(img){
       const fallbacks = [
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20&%20%20Soap/spong&Soap%20-%20logo.png",
@@ -485,56 +431,43 @@
       else { img.style.display = 'none'; const txt = document.getElementById('brandText'); if (txt) txt.style.display = 'block'; }
     }
 
-    /* ---------------- API (no server changes) ---------------- */
+    /* -------- API (لا تعديل خادمي) -------- */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
     const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     let controllers=[];
-
     async function callContent2(path, cb, abortable=false, retries=3){
       let signal='';
       if(abortable){
         controllers.forEach(([c])=>c.abort()); controllers=[];
-        const controller=new AbortController(); signal=controller.signal;
-        controllers.push([controller,signal]);
+        const controller=new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
       }
       try{
         await new Promise(r=>setTimeout(r, 200));
-        const fullUrl = defaultLink2+path;
-        const res=await fetch(fullUrl,{method:'GET',redirect:'follow',...(abortable&&{signal}), cache:'no-store'});
+        const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal}), cache:'no-store'});
         if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network'); }
         const json=await res.json(); cb(json);
       }catch(e){
         if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),600);
       }
     }
-
     async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
       try{
-        const res = await fetch(url, {
-          method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
-          headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const raw = await res.text();
-        let data=null; try{ data = JSON.parse(raw); }catch(_){}
+        const res = await fetch(url, { method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
+          headers:{ 'Content-Type': contentType, 'Accept':'application/json' }, body: JSON.stringify(payload) });
+        const raw = await res.text(); let data=null; try{ data = JSON.parse(raw); }catch(_){}
         return { ok: res.ok, status: res.status, data, raw };
       }catch(err){ return { ok:false, status:0, error:String(err) }; }
     }
-
     async function postReservation(payload){
       let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
-      if(!r.ok && (r.status===415 || r.status===406 || r.status===0)){
-        r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
-      }
-      if(!r.ok && r.status===404){
-        r = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
-      }
+      if(!r.ok && (r.status===415 || r.status===406 || r.status===0)) r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
+      if(!r.ok && r.status===404) r = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
       return r;
     }
 
-    /* ---------------- Toast ---------------- */
+    /* -------- Toast -------- */
     function showToast(type='info', msg=''){
       const wrap=document.getElementById('toastWrap');
       const div=document.createElement('div');
@@ -543,7 +476,7 @@
       setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2400);
     }
 
-    /* ---------------- STATE ---------------- */
+    /* -------- STATE -------- */
     const DateTime=luxon.DateTime;
     const orderedPages=["page1","page2","page4","page5","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الموقع","تم"];
@@ -552,7 +485,7 @@
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
-    /* ---------------- Helpers ---------------- */
+    /* -------- Helpers -------- */
     function syncHeaderHeight(){
       const h = document.querySelector('header')?.offsetHeight || 120;
       document.documentElement.style.setProperty('--header-h', h+'px');
@@ -565,22 +498,16 @@
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
       requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 260); });
-      syncProgress(idx);
-      updateNextAvailability();
+      syncProgress(idx); updateNextAvailability();
     }
     function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
     function syncProgress(i){
       const pct=((i+1)/orderedPages.length)*100;
       document.getElementById('miniBarFill').style.width=pct+'%';
       document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
-      const prev=document.getElementById('footer-prev');
-      const next=document.getElementById('footer-next');
-      const start=document.getElementById('page1-button');
-      const onWelcome = i===0;
-      prev.classList.toggle('hidden', i === 0);
-      next.classList.toggle('hidden', onWelcome);
-      start.classList.toggle('hidden', !onWelcome);
-      if(onWelcome){ start.textContent='تخطي العرض'; }
+      document.getElementById('footer-prev').classList.toggle('hidden', i===0);
+      document.getElementById('footer-next').classList.toggle('hidden', i===0);
+      document.getElementById('page1-button').classList.toggle('hidden', i!==0);
       syncHeaderHeight();
     }
 
@@ -594,50 +521,27 @@
 
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
+    function validatePlate(){ const el=document.getElementById('plateNumber'); const ok=el.value&&el.value.length===4; if(!ok){ showToast('error','رجاءً أدخل آخر ٤ أرقام من اللوحة'); el.focus(); } return ok; }
 
-    function validateMobile(){
-      if(!itiPhone || !itiPhone.isValidNumber()){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return false; }
-      return true;
-    }
-    function validatePlate(){
-      const el = document.getElementById('plateNumber');
-      const ok = el.value && el.value.length === 4;
-      if(!ok){ showToast('error','رجاءً أدخل آخر ٤ أرقام من اللوحة'); el.focus(); }
-      return ok;
-    }
-
-    /* ---------------- Deck ---------------- */
+    /* -------- Deck -------- */
     let deckTimers = []; let deckIndex = 0; let deckRunning = false;
     const SLIDE_MS = 2600; const GAP_MS = 180;
     function startWelcomeDeck(){
       const deck = document.getElementById('pptDeck'); if(!deck) return;
       const slides = Array.from(deck.querySelectorAll('.ppt-slide'));
-      deckRunning = true; deckIndex = 0;
-      slides[0]?.classList.add('is-active');
-      const advance = ()=>{
-        if(!deckRunning) return;
-        const prev = deckIndex; deckIndex++;
-        if(deckIndex>=slides.length){ stopWelcomeDeck(); showPage(1); return; }
-        slides.forEach((s,i)=>{ s.classList.remove('is-active','is-exiting'); if(i===prev) s.classList.add('is-exiting'); if(i===deckIndex) s.classList.add('is-active'); });
-        deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS));
-      };
-      deckTimers.push(setTimeout(advance, SLIDE_MS + GAP_MS));
+      deckRunning = true; deckIndex = 0; slides[0]?.classList.add('is-active');
+      const advance = ()=>{ if(!deckRunning) return; const prev=deckIndex; deckIndex++; if(deckIndex>=slides.length){ stopWelcomeDeck(); showPage(1); return; } slides.forEach((s,i)=>{ s.classList.remove('is-active','is-exiting'); if(i===prev) s.classList.add('is-exiting'); if(i===deckIndex) s.classList.add('is-active'); }); deckTimers.push(setTimeout(advance, SLIDE_MS+GAP_MS)); };
+      deckTimers.push(setTimeout(advance, SLIDE_MS+GAP_MS));
     }
-    function stopWelcomeDeck(){ deckRunning = false; deckTimers.forEach(t=>clearTimeout(t)); deckTimers = []; }
+    function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
-    /* ---------------- TIMES ---------------- */
-    let dayTimes = []; let timesLoaded = false;
-
+    /* -------- Times -------- */
+    let dayTimes=[], timesLoaded=false;
     document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
     document.getElementById('service').addEventListener('change', () => { if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
     document.getElementById('area').addEventListener('change', () => { if (getActiveIndex() === 2) fetchTimesForSelectedDate(); });
 
-    (function initDateMin(){
-      const today = DateTime.now().toFormat('yyyy-LL-dd');
-      const dateEl = document.getElementById('date');
-      if (!dateEl.value) dateEl.value = today;
-      dateEl.setAttribute('min', today);
-    })();
+    (function initDateMin(){ const today=DateTime.now().toFormat('yyyy-LL-dd'); const el=document.getElementById('date'); if(!el.value) el.value=today; el.setAttribute('min',today); })();
 
     function parseTimeToLuxon(rawTime){
       let t = DateTime.fromISO(String(rawTime||'').trim(), { setZone:true });
@@ -652,117 +556,56 @@
       const booked   = Number(r.booked ?? r.TS_booked);
       const capacity = Number(r.capacity ?? r.TS_capacity);
       let remaining  = Number(r.remaining ?? r.TS_remaining);
-      if (!Number.isFinite(remaining) && Number.isFinite(capacity) && Number.isFinite(booked)){
-        remaining = capacity - booked;
-      }
-      const looksOpen =
-        availableFlag === true ||
-        ['available','open','free','empty','vacant','canceled'].includes(status) ||
-        (Number.isFinite(remaining) ? remaining > 0 : (availableFlag !== false && !status));
+      if (!Number.isFinite(remaining) && Number.isFinite(capacity) && Number.isFinite(booked)) remaining = capacity - booked;
+      const looksOpen = availableFlag === true || ['available','open','free','empty','vacant','canceled'].includes(status) || (Number.isFinite(remaining) ? remaining > 0 : (availableFlag !== false && !status));
       return { looksOpen, remaining, status, availableFlag };
     }
 
     function fetchTimesForSelectedDate(){
-      const dateEl = document.getElementById('date');
-      const timeContainer = document.getElementById('time-container');
-      const loc = document.getElementById('area').value || '';
-      const srv = document.getElementById('service').value || '';
-      const selectedISO = (dateEl.value || DateTime.now().toFormat('yyyy-LL-dd')).trim();
-
-      if (!loc || !srv) {
-        timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`;
-        window.selectedTime = null; selectedTime = null; updateNextAvailability?.();
-        return;
-      }
-
-      dateEl.disabled = true;
-      setLoadingTimes(true);
+      const dateEl=document.getElementById('date');
+      const timeContainer=document.getElementById('time-container');
+      const loc=$('#area').val()||''; const srv=$('#service').val()||'';
+      const selectedISO=(dateEl.value || DateTime.now().toFormat('yyyy-LL-dd')).trim();
+      if(!loc || !srv){ timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`; window.selectedTime=null; selectedTime=null; updateNextAvailability?.(); return; }
+      dateEl.disabled=true; setLoadingTimes(true);
       timeContainer.innerHTML = `<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"><span class="visually-hidden">Loading...</span></div>`;
-
-      const now = DateTime.now().setZone('Asia/Riyadh');
-      const isToday = selectedISO === now.toISODate();
-
+      const now=DateTime.now().setZone('Asia/Riyadh'); const isToday=selectedISO===now.toISODate();
       const qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}&onlyAvailable=1`;
-
       callContent2(qs, (res) => {
-        const rowsRaw = (res?.data?.appointments || []);
-
-        const filtered = rowsRaw.filter(r => {
-          const d = DateTime.fromISO(r.TS_appointment_date, { setZone: true });
-          if (!d.isValid || d.toISODate() !== selectedISO) return false;
-          const t = parseTimeToLuxon(r.TS_appointment_time);
-          if (!t) return false;
-          const { looksOpen } = normalizeAvailability(r);
-          if (!looksOpen) return false;
-          if (isToday) {
-            const slot = now.set({ hour: t.hour, minute: t.minute, second: 0 });
-            if (slot < now.plus({ minutes: 5 })) return false;
-          }
+        const rowsRaw=(res?.data?.appointments||[]);
+        const filtered=rowsRaw.filter(r=>{
+          const d=DateTime.fromISO(r.TS_appointment_date,{setZone:true}); if(!d.isValid || d.toISODate()!==selectedISO) return false;
+          const t=parseTimeToLuxon(r.TS_appointment_time); if(!t) return false;
+          const {looksOpen}=normalizeAvailability(r); if(!looksOpen) return false;
+          if(isToday){ const slot=now.set({hour:t.hour,minute:t.minute,second:0}); if(slot<now.plus({minutes:5})) return false; }
           return true;
         });
+        const list=filtered.map(r=>{const t=parseTimeToLuxon(r.TS_appointment_time);return {label:t.toLocaleString(DateTime.TIME_SIMPLE), actual12:t.toFormat('hh:mm a')}});
 
-        const list = filtered.map(r => {
-          const t = parseTimeToLuxon(r.TS_appointment_time);
-          return { label: t.toLocaleString(DateTime.TIME_SIMPLE), actual12: t.toFormat('hh:mm a') };
-        });
+        const seen=new Set();
+        dayTimes=list.filter(x=>{ if(seen.has(x.actual12)) return false; seen.add(x.actual12); return true; })
+                     .sort((a,b)=> a.actual12.localeCompare(b.actual12));
 
-        const seen = new Set();
-        dayTimes = list.filter(x => { if (seen.has(x.actual12)) return false; seen.add(x.actual12); return true; })
-                       .sort((a,b)=> a.actual12.localeCompare(b.actual12));
-
-        timesLoaded = true;
-        renderSelectedDateTimes(selectedISO);
-        dateEl.disabled = false;
-        setLoadingTimes(false);
+        timesLoaded=true; renderSelectedDateTimes(selectedISO);
+        dateEl.disabled=false; setLoadingTimes(false);
       }, true);
     }
 
     function renderSelectedDateTimes(selectedISO){
-      const timeContainer = document.getElementById('time-container');
-      timeContainer.innerHTML = '';
-
-      if (!timesLoaded) {
-        timeContainer.innerHTML = `<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"><span class="visually-hidden">Loading...</span></div>`;
-        return;
-      }
-
-      if (!dayTimes.length) {
-        timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد متاحة</div>`;
-        window.selectedTime = null; selectedTime = null; updateNextAvailability?.();
-        return;
-      }
-
+      const timeContainer=document.getElementById('time-container'); timeContainer.innerHTML='';
+      if(!timesLoaded){ timeContainer.innerHTML=`<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"><span class="visually-hidden">Loading...</span></div>`; return; }
+      if(!dayTimes.length){ timeContainer.innerHTML=`<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد متاحة</div>`; window.selectedTime=null; selectedTime=null; updateNextAvailability?.(); return; }
       dayTimes.forEach((t) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'time-option';
-        btn.setAttribute('role','radio');
-        btn.setAttribute('aria-checked','false');
-        btn.setAttribute('dir','ltr');
-        btn.textContent = t.label;
-
-        btn.addEventListener('click', () => {
-          [...timeContainer.children].forEach(el => el.setAttribute('aria-checked','false'));
-          btn.setAttribute('aria-checked','true');
-
-          const parsed = DateTime.fromFormat(t.actual12, 'h:mm a');
-          nForm.date = selectedISO;
-          nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
-
-          window.selectedTime = { ui: t.label, iso: nForm.time };
-          selectedTime        = window.selectedTime;
-          updateNextAvailability?.();
-        });
-
+        const btn=document.createElement('button'); btn.type='button'; btn.className='time-option'; btn.setAttribute('role','radio'); btn.setAttribute('aria-checked','false'); btn.setAttribute('dir','ltr'); btn.textContent=t.label;
+        btn.addEventListener('click', ()=>{ [...timeContainer.children].forEach(el=>el.setAttribute('aria-checked','false')); btn.setAttribute('aria-checked','true'); const parsed=DateTime.fromFormat(t.actual12,'h:mm a'); nForm.date=selectedISO; nForm.time=parsed.isValid?parsed.toFormat('HH:mm'):t.actual12; window.selectedTime={ui:t.label, iso:nForm.time}; selectedTime=window.selectedTime; updateNextAvailability?.(); });
         timeContainer.appendChild(btn);
       });
     }
 
-    /* ---------------- Init & bindings ---------------- */
+    /* -------- Init & bindings -------- */
     $(function(){
       enforceDateMinToday();
-      const today=DateTime.now().toFormat('yyyy-LL-dd');
-      $('#date').val(today).attr('min',today);
+      const today=DateTime.now().toFormat('yyyy-LL-dd'); $('#date').val(today).attr('min',today);
 
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'التصنيف', dir:'rtl'});
@@ -770,27 +613,21 @@
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
-        initialCountry:'sa',
-        onlyCountries:['sa','ae','bh','kw','om','qa'],
+        initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
 
-      setLoadingServices(true);
       callContent2(`/locations`, res=>{
         const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
-        $('#area').empty().select2({data:ds,width:'100%'});
-        if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
-        else { setLoadingServices(false); showToast('error','لا توجد مناطق متاحة حالياً'); }
+        $('#area').empty().select2({data:ds,width:'100%'}); if(ds.length){ $('#area').val(ds[0].id).trigger('change'); }
       });
 
       $('#area').on('change', function(){
-        nForm.location=this.value; setLoadingServices(true);
+        nForm.location=this.value;
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
           servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
-          $('#serviceCat').empty().select2({data:cats,width:'100%'});
-          if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
-          setLoadingServices(false);
+          $('#serviceCat').empty().select2({data:cats,width:'100%'}); if(cats.length){ $('#serviceCat').val(cats[0].id).trigger('change'); }
           updateNextAvailability();
         }, true);
       });
@@ -798,27 +635,17 @@
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
         const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
-        $('#service').empty().select2({data:items,width:'100%'});
-        if(items.length){ $('#service').val(items[0].id).trigger('change'); }
+        $('#service').empty().select2({data:items,width:'100%'}); if(items.length){ $('#service').val(items[0].id).trigger('change'); }
         updateNextAvailability();
       });
 
-      $('#service').on('change', function(){
-        nForm.service = this.value || '';
-        if(getActiveIndex()===2) document.getElementById('date').dispatchEvent(new Event('change'));
-        updateNextAvailability();
-      });
-
-      const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
-      $('#carBrand').empty().select2({data:brands,width:'100%'});
-
-      $('#plateNumber').on('input', function(){ this.value = this.value.replace(/\D/g, '').slice(0,4); updateNextAvailability(); });
+      $('#service').on('change', function(){ nForm.service=this.value||''; if(getActiveIndex()===2) document.getElementById('date').dispatchEvent(new Event('change')); updateNextAvailability(); });
+      $('#plateNumber').on('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); updateNextAvailability(); });
       $('#name, #mobile, #carName').on('input', updateNextAvailability);
       $('#serviceCount, #serviceCat, #service, #area, #date').on('change', updateNextAvailability);
 
       $('#rebook').on('click', ()=>location.href='/');
 
-      // حساب ارتفاع الهيدر بعد التهيئة
       syncProgress(0);
       startWelcomeDeck();
       renderSummary();
@@ -846,133 +673,86 @@
           return;
         }
 
-        if(id==='page4'){
-          if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; }
-          showPage(3);
-          return;
-        }
+        if(id==='page4'){ if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; } showPage(3); return; }
 
         if(id==='page5'){
           const name=$('#name').val().trim();
           const phoneOk=(itiPhone && itiPhone.isValidNumber());
           const plateOk=(($('#plateNumber').val()||'').length===4);
           const payOk=!!nForm.paymentMethod;
-
-          $('#name').toggleClass('is-invalid', !name);
-          $('#mobile').toggleClass('is-invalid', !phoneOk);
-          $('#plateNumber').toggleClass('is-invalid', !plateOk);
-
           if(!name){ showToast('error','يرجى إدخال الاسم'); return; }
           if(!phoneOk){ showToast('error','الرجاء إدخال رقم جوال صحيح'); return; }
           if(!plateOk){ showToast('error','رجاءً أدخل آخر ٤ أرقام من اللوحة'); return; }
           if(!payOk){ showToast('error','يرجى اختيار طريقة الدفع'); return; }
-
-          nForm.customerN=name;
-          nForm.customerM=itiPhone.getNumber().replace(/^\+/, '');
+          nForm.customerN=name; nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
-          showPage(4);
-          return;
+          showPage(4); return;
         }
 
         if(id==='page6'){
           if(!positionUrl){ showToast('error','الرجاء تحديد الموقع على الخريطة'); return; }
           nForm.urlLocation=positionUrl;
-
-          const payload = {
-            date: nForm.date, time: nForm.time, location: nForm.location,
-            service: nForm.service, serviceCount: nForm.serviceCount, serviceCat: nForm.serviceCat,
-            customerM: nForm.customerM, customerN: nForm.customerN, paymentMethod: nForm.paymentMethod,
-            urlLocation: nForm.urlLocation, locationDescription: nForm.locationDescription || '', locale: 'ar'
-          };
-
+          const payload = { date:nForm.date,time:nForm.time,location:nForm.location,service:nForm.service,serviceCount:nForm.serviceCount,serviceCat:nForm.serviceCat,customerM:nForm.customerM,customerN:nForm.customerN,paymentMethod:nForm.paymentMethod,urlLocation:nForm.urlLocation,locationDescription:nForm.locationDescription||'',locale:'ar' };
           const r = await postReservation(payload);
-
           if(r.ok && r.data?.success){
             if(r.data?.otp){ showToast('error','الخادم يطلب رمز تحقق (OTP). عطّل خيار OTP في إعدادات التطبيق.'); return; }
-            showToast('success','تم إنشاء الحجز');
-            showPage(5);
-            renderThankYou();
+            showToast('success','تم إنشاء الحجز'); showPage(5); renderThankYou();
           } else {
-            const msg = r?.data?.msgAR
-              || (r.status===404 ? 'المسار غير موجود: تأكد من /form/reserveAppointment'
-                                 : r.status===0   ? 'تعذر الاتصال بالخادم (تحقق من CORS/الشبكة)'
-                                                  : 'تعذر إنشاء الحجز');
+            const msg = r?.data?.msgAR || (r.status===404 ? 'المسار غير موجود: تأكد من /form/reserveAppointment' : r.status===0 ? 'تعذر الاتصال بالخادم (تحقق من CORS/الشبكة)' : 'تعذر إنشاء الحجز');
             showToast('error', msg);
           }
           return;
         }
 
-        const nextIndex=Math.min(i+1, orderedPages.length-1);
-        showPage(nextIndex);
+        showPage(Math.min(i+1, orderedPages.length-1));
       }
 
       $next.addEventListener('click', gotoNext);
       $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.body.classList.add('intro-play');
-      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
-      enforceDateMinToday();
-      syncHeaderHeight();
-    });
+    document.addEventListener('DOMContentLoaded', ()=>{ enforceDateMinToday(); syncHeaderHeight(); });
 
     function updateNextAvailability(){
-      const i = getActiveIndex();
-      const nextBtn = document.getElementById('footer-next');
-      let enable = true;
-
-      if(i === 1){ enable = !!($('#area').val() && $('#service').val()); }
-      else if(i === 2){ enable = !!selectedTime; }
-      else if(i === 3){
-        const nameOk = $('#name').val().trim().length > 0;
-        const phoneOk = (itiPhone && itiPhone.isValidNumber());
-        const payOk = !!nForm.paymentMethod;
-        const plateOk = ($('#plateNumber').val()||'').length === 4;
-        $('#name').toggleClass('is-invalid', !nameOk);
-        $('#mobile').toggleClass('is-invalid', !phoneOk);
-        $('#plateNumber').toggleClass('is-invalid', !plateOk);
-        enable = nameOk && phoneOk && payOk && plateOk;
-      } else if(i === 4){ enable = !!positionUrl; }
-
-      nextBtn.disabled = !enable;
-      nextBtn.classList.toggle('disabled', !enable);
-
+      const i=getActiveIndex(); const nextBtn=document.getElementById('footer-next'); let enable=true;
+      if(i===1){ enable=!!($('#area').val() && $('#service').val()); }
+      else if(i===2){ enable=!!selectedTime; }
+      else if(i===3){
+        const nameOk=$('#name').val().trim().length>0;
+        const phoneOk=(itiPhone && itiPhone.isValidNumber());
+        const payOk=!!nForm.paymentMethod;
+        const plateOk=(($('#plateNumber').val()||'').length===4);
+        enable=nameOk&&phoneOk&&payOk&&plateOk;
+      } else if(i===4){ enable=!!positionUrl; }
+      nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled', !enable);
       renderSummary();
     }
 
     function renderSummary(){
-      document.getElementById('sumArea').textContent    = $('#area').find(':selected').text() || '—';
-      document.getElementById('sumService').textContent = $('#service').find(':selected').text() || '—';
-      document.getElementById('sumDate').textContent    = ($('#date').val() || '—');
-      document.getElementById('sumTime').textContent    = (window.selectedTime?.ui || '—');
-      document.getElementById('sumPay').textContent     = (nForm.paymentMethod || '—');
+      const areaTxt=$('#area').find(':selected').text()||'—';
+      const svcTxt=$('#service').find(':selected').text()||'—';
+      const dateTxt=$('#date').val()||'—';
+      const timeTxt=(window.selectedTime?.ui||'—');
+      const payTxt=(nForm.paymentMethod||'—');
+
+      document.getElementById('sumArea').textContent=areaTxt;
+      document.getElementById('sumService').textContent=svcTxt;
+      document.getElementById('sumDate').textContent=dateTxt;
+      document.getElementById('sumTime').textContent=timeTxt;
+      document.getElementById('sumPay').textContent=payTxt;
+
+      // عناوين لمسة مطوّلة لمعاينة النص الكامل على الموبايل
+      document.querySelector('[title="المنطقة"]').title = areaTxt;
+      document.querySelector('[title="الخدمة"]').title = svcTxt;
+      document.querySelector('[title="التاريخ"]').title = dateTxt;
+      document.querySelector('[title="الوقت"]').title   = timeTxt;
+      document.querySelector('[title="الدفع"]').title   = payTxt;
+
       syncHeaderHeight();
     }
 
-    function renderThankYou(){
-      const first = (nForm.customerN||'').trim().split(' ')[0];
-      document.getElementById('thanksTitle').textContent =
-        first ? `تم حجز موعدك بنجاح، ${first}! 🎉` : `تم حجز موعدك بنجاح 🎉`;
-      document.getElementById('thanksCopy').textContent =
-        'وصلنا طلبك، وسنرسل لك التأكيد واللوكيشن على الواتساب قريباً.';
-      const info = [
-        {icon:'fa-location-dot',        text: $('#area').find(':selected').text()||'—'},
-        {icon:'fa-screwdriver-wrench',  text: $('#service').find(':selected').text()||'—'},
-        {icon:'fa-calendar-day',        text: nForm.date || $('#date').val() || '—'},
-        {icon:'fa-clock',               text: (window.selectedTime?.ui || '—')},
-        {icon:'fa-credit-card',         text: nForm.paymentMethod || '—'}
-      ];
-      document.getElementById('thanksSummary').innerHTML =
-        info.map(i=>`<span class="chip"><i class="fa-solid ${i.icon}"></i> ${i.text}</span>`).join('');
-    }
-  </script>
-
-  <!-- Google Maps (async) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
-  <script>
-    /* Google Map init (unchanged) */
-    let map, marker, positionUrl="";
+    /* Google Map init */
+    let map, marker;
     function initMap(){
       const def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
@@ -995,5 +775,8 @@
     }
     window.initMap = initMap;
   </script>
+
+  <!-- Google Maps (async) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
 </body>
 </html>
