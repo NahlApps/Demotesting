@@ -34,13 +34,31 @@
 
     html,body{height:100%}
     body{
-      margin:0; font-family:'Cairo',sans-serif; color:#fff;
-      background:
-        linear-gradient(180deg, rgba(11,38,48,.65), rgba(11,38,48,.35)),
-        url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/lorenzo-hamers-n1SRvkP6bEk-unsplash%20(1).jpg") center/cover fixed;
+      margin:0; font-family:'Cairo',sans-serif;
       min-height:100vh; display:flex; flex-direction:column;
       padding-top:var(--header-h); padding-bottom:var(--footer-h);
       color-scheme: light;
+      background:#0b2630; /* actual photos via #bgStage */
+      color:#fff;
+    }
+
+    /* ===== Step Background Cross-Fade ===== */
+    #bgStage{
+      position:fixed; inset:0; z-index:-1; pointer-events:none;
+    }
+    #bgStage .bg-layer{
+      position:absolute; inset:0;
+      background-position:center; background-size:cover; background-repeat:no-repeat;
+      opacity:0; transition:opacity 560ms cubic-bezier(.22,.61,.36,1);
+      will-change:opacity, background-image;
+    }
+    #bgStage .bg-layer::after{
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(11,38,48,.62), rgba(11,38,48,.38));
+    }
+    #bgStage .bg-layer.is-show{ opacity:1; }
+    @media (prefers-reduced-motion: reduce){
+      #bgStage .bg-layer{ transition:none; }
     }
 
     /* Header */
@@ -59,7 +77,7 @@
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
     .mini-progress .step{font-weight:var(--fw-bold); font-size:var(--fs-md)}
 
-    /* Header Summary – شفاف */
+    /* Header Summary chips (transparent) */
     .header-summary{ display:flex; justify-content:center }
     .summary-bar{ display:flex; gap:8px; align-items:center; width:100%; max-width:1120px; background:transparent; border:0; box-shadow:none; flex-wrap:wrap; }
     .summary-bar .chip{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--border-300); border-radius:999px; padding:6px 10px; font-size:.88rem; color:#0B2630; white-space:nowrap; box-shadow:var(--shadow-xs); }
@@ -165,7 +183,7 @@
     .btn-footer.hidden{visibility:hidden}
     .btn-footer.disabled, .btn-footer:disabled{opacity:.6; pointer-events:none}
 
-    /* PPT Deck (خلفية أفتح) */
+    /* PPT Deck (lighter) */
     .ppt-deck{
       position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0;
       overflow:hidden; border-radius:14px;
@@ -192,19 +210,16 @@
     .rebook-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);filter:saturate(1.05)}
     .rebook-btn:active{transform:translateY(0) scale(.99)}
 
-    /* ===== Mobile (intl-tel-input) — RTL & contrast fixes ===== */
+    /* Mobile phone input (intl-tel-input) */
     .iti{ width:100% !important; }
     #mobile.form-control{
       height:48px; line-height:48px;
-      direction:ltr;             /* أرقام يسار */
-      text-align:left;
+      direction:ltr; text-align:left;
     }
     html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ right:12px; left:auto; }
     html[dir="rtl"] .iti--separate-dial-code .iti__selected-flag{ right:12px; left:auto; border-right:1px solid var(--border-300); }
     html[dir="rtl"] .iti--allow-dropdown input#mobile,
-    html[dir="rtl"] .iti--separate-dial-code input#mobile{
-      padding-right:108px; padding-left:12px;
-    }
+    html[dir="rtl"] .iti--separate-dial-code input#mobile{ padding-right:108px; padding-left:12px; }
     .iti__country-list{ text-align:right; }
     .iti__selected-flag{ background-color:transparent !important; padding:0 10px; }
     .iti__arrow{ border-top-color:#0B2630 !important; }
@@ -227,6 +242,12 @@
   </script>
 </head>
 <body>
+  <!-- Step Background (cross-fade) -->
+  <div id="bgStage" aria-hidden="true">
+    <div class="bg-layer bg-a is-show"></div>
+    <div class="bg-layer bg-b"></div>
+  </div>
+
   <!-- Toasts -->
   <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px" aria-live="polite" aria-atomic="true"></div>
 
@@ -463,7 +484,7 @@
           return res.json();
         }).then(function(json){ cb(json); }).catch(function(e){
           console.error('[GET] failed:', e);
-          // make sure overlays are not stuck
+          // ensure overlays are not stuck
           setLoadingServices(false); setLoadingTimes(false);
           if(retries>0 && String(e).indexOf('AbortError')===-1){
             setTimeout(function(){ callContent2(path,cb,abortable,retries-1); }, 600);
@@ -513,8 +534,41 @@
 
     var nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
+    /* ---------------- Step Backgrounds (your 7 images) ---------------- */
+    const STEP_BG = [
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg", // page1 Welcome
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg", // page2 Service
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG3.jpg", // page4 Time
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG4.jpg", // page5 Contact
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg", // page5b Payment
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg", // page6 Map
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"  // page7 Done
+    ];
+    (function preloadBG(){ STEP_BG.forEach(function(src){ var img=new Image(); img.decoding='async'; img.src=src; }); })();
+    var _bgToggle = false;
+    function setStepBackground(stepIndex){
+      var url = STEP_BG[Math.min(stepIndex, STEP_BG.length-1)];
+      var a = document.querySelector('#bgStage .bg-a');
+      var b = document.querySelector('#bgStage .bg-b');
+      var show = _bgToggle ? a : b;
+      var hide = _bgToggle ? b : a;
+      if(show) show.style.backgroundImage = 'url("'+url+'")';
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce){
+        if(hide) hide.classList.remove('is-show');
+        if(show) show.classList.add('is-show');
+        _bgToggle = !_bgToggle;
+        return;
+      }
+      requestAnimationFrame(function(){
+        if(show) show.classList.add('is-show');
+        if(hide) hide.classList.remove('is-show');
+        _bgToggle = !_bgToggle;
+      });
+    }
+
     /* ---------------- Helpers ---------------- */
-    // ResizeObserver: يحدّث ارتفاع الهيدر تلقائيًا
+    // ResizeObserver: auto header height → CSS var
     var headerRO;
     function initHeaderRO(){
       var header=document.getElementById('siteHeader');
@@ -545,6 +599,7 @@
       hideOverlays();
       syncProgress(idx);
       updateNextAvailability();
+      setStepBackground(idx); /* <-- background per step */
     }
     function getActiveIndex(){ var id=(document.querySelector('.page.active')||{}).id; return Math.max(0, orderedPages.indexOf(id)); }
     function syncProgress(i){
@@ -753,7 +808,7 @@
       $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
-      // ===== Mobile field (intl-tel-input) enhanced — FIXED =====
+      // Mobile field (intl-tel-input)
       const phoneEl = document.querySelector('#mobile');
       itiPhone = window.intlTelInput(phoneEl, {
         initialCountry: 'sa',
@@ -767,13 +822,10 @@
         useFullscreenPopup: true,
         utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
-
-      // أرقام فقط + تحقق لحظي
       phoneEl.addEventListener('input', function(){
         this.value = this.value.replace(/[^\d]/g,'');
         validateMobileInline();
       });
-      // عند تغيير الدولة نعيد التحقق فقط
       phoneEl.addEventListener('countrychange', validateMobileInline);
 
       setLoadingServices(true);
@@ -846,6 +898,9 @@
       startWelcomeDeck();
       renderSummary();
       initHeaderRO();
+
+      // set initial background
+      setStepBackground(0);
     })();
 
     /* Footer nav */
