@@ -16,46 +16,78 @@
 
   <style>
     :root{
+      /* Brand */
       --brand-700:#015a6c; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --ink-800:#173944; --ink-700:#224652;
+
+      /* Surfaces / Borders */
       --surface-000:#ffffff; --surface-100:#EDF3F6; --border-300:#D4E0E6;
+
+      /* Radius + Shadow */
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.08);
       --shadow-sm:0 3px 12px rgba(11,38,48,.12);
       --shadow-md:0 10px 28px rgba(11,38,48,.16);
+
+      /* Motion tokens */
       --ease:cubic-bezier(.22,.61,.36,1);
       --ease-decel:cubic-bezier(0.2,0,0,1);
       --ease-accel:cubic-bezier(0.3,1,0.8,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms; --dur-lg:640ms;
+
+      /* Typography + spacing */
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
+
+      /* Layout (dynamic header via RO) */
       --header-h:120px; --footer-h:78px;
+
+      /* Glass cards control */
+      --card-alpha:.86;   /* 0..1 */
+      --card-blur:8px;
+      --card-border:rgba(255,255,255,.55);
     }
 
-    html,body{height:100%}
+    /* Root sizing — FULLSCREEN mobile background */
+    html,body{height:100%; min-height:100vh;}
+    @supports (height: 100dvh){
+      html,body{ min-height:100dvh; }
+    }
+
     body{
       margin:0; font-family:'Cairo',sans-serif;
       min-height:100vh; display:flex; flex-direction:column;
       padding-top:var(--header-h); padding-bottom:var(--footer-h);
-      color-scheme: light;
-      background:#0b2630; /* photos handled by #bgStage */
-      color:#fff;
+      color:#fff; color-scheme: light;
+      background:#0b2630; /* fallback color; photos handled by #bgStage */
+    }
+    @supports (height: 100dvh){
+      body{ min-height:100dvh; }
     }
 
     /* ===== Step Background (Luxury Motion) ===== */
     #bgStage{
       position:fixed; inset:0; z-index:-1; pointer-events:none;
+      width:100%; height:100vh;
+    }
+    @supports (height: 100dvh){
+      #bgStage{ height:100dvh; }
     }
     #bgStage .bg-layer{
-      position:absolute; inset:0;
+      position:absolute; inset:0; width:100%; height:100%;
       background-position:center; background-size:cover; background-repeat:no-repeat;
       opacity:0;
       transition:
         opacity 640ms cubic-bezier(.22,.61,.36,1),
         filter 700ms cubic-bezier(.22,.61,.36,1);
       filter: blur(0) saturate(1) brightness(1);
-      will-change: opacity, filter, background-image;
-      background-attachment: fixed; /* smooth scroll feel */
+      will-change: opacity, filter, background-image, transform;
+      background-attachment: fixed; /* desktop smoothness */
+      transform: translateZ(0);
+    }
+    /* Mobile/iOS fix: disable background-attachment:fixed to avoid jumps */
+    @media (max-width: 768px){
+      #bgStage .bg-layer{ background-attachment: scroll; }
     }
     #bgStage .bg-layer::after{
       content:""; position:absolute; inset:0;
@@ -127,8 +159,32 @@
     @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
     .page h1{font-size:var(--fs-xl); font-weight:var(--fw-bold); margin:0; text-align:center; color:var(--ink-900)}
 
-    /* Cards + fields */
-    .card{background:var(--surface-000); color:var(--ink-900); border-radius:var(--radius-md); box-shadow:var(--shadow-md); padding:var(--sp-6); width:100%; max-width:920px}
+    /* Base card */
+    .card{
+      background:var(--surface-000);
+      color:var(--ink-900);
+      border-radius:var(--radius-md);
+      box-shadow:var(--shadow-md);
+      padding:var(--sp-6);
+      width:100%; max-width:920px;
+    }
+    /* Glass card override (transparent, relative for overlays) */
+    .card{
+      position:relative;
+      background: rgba(255,255,255, var(--card-alpha));
+      backdrop-filter: blur(var(--card-blur)) saturate(1.05);
+      -webkit-backdrop-filter: blur(var(--card-blur)) saturate(1.05);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 28px rgba(11,38,48,.16);
+    }
+    .card.solid{
+      background:#fff !important;
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+      border-color:#D4E0E6 !important;
+    }
+    @media (max-width:560px){ :root{ --card-alpha:.9; } }
+
     .form-control, select, .select2-selection{
       background:var(--surface-000); color:var(--ink-900);
       border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important;
@@ -483,10 +539,8 @@
     <div class="footer-inner">
       <div class="footer-left">
         <div class="footer-brand">
-          <!-- ✅ Hyperlink to Nahl.app -->
           <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a>
         </div>
-        <!-- ✅ Social icons -->
         <div class="footer-social" aria-label="تابعنا">
           <a href="https://wa.me/" target="_blank" rel="noopener" title="WhatsApp" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
           <a href="https://www.tiktok.com/@yourhandle" target="_blank" rel="noopener" title="TikTok" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
@@ -509,7 +563,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---------------- API helpers (client-only, server untouched) ---------------- */
+    /* ---------------- API helpers (client-only) ---------------- */
     const defaultLink2 = `https://nahl-platform.vercel.app/api/app/AM/general/${'33e0d05d-d771-46f4-a7e7-7c634b4e3a9e'}/form`;
     const RESERVE_URL_PRIMARY   = `${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK  = `${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
@@ -580,15 +634,15 @@
 
     var nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
-    /* ---------------- Step Backgrounds (your 7 images) ---------------- */
+    /* ---------------- Step Backgrounds (7 images) ---------------- */
     const STEP_BG = [
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg", // page1 Welcome
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg", // page2 Service
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG3.jpg", // page4 Time
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG4.jpg", // page5 Contact
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg", // page5b Payment
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg", // page6 Map
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"  // page7 Done
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg", // page1
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg", // page2
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG3.jpg", // page4
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG4.jpg", // page5
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg", // page5b
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg", // page6
+      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"  // page7
     ];
     (function preloadBG(){ STEP_BG.forEach(function(src){ var img=new Image(); img.decoding='async'; img.src=src; }); })();
     var _bgToggle = false;
@@ -662,10 +716,9 @@
       var isWelcome = i===0;
       var isLast = i === (orderedPages.length-1);
 
-      // Toggle footer buttons
       start.classList.toggle('hidden', !isWelcome);
-      prev.classList.toggle('hidden', isWelcome || isLast);  // hide on first + last
-      next.classList.toggle('hidden', isWelcome || isLast);  // hide on welcome + last
+      prev.classList.toggle('hidden', isWelcome || isLast);
+      next.classList.toggle('hidden', isWelcome || isLast);
       if(isWelcome){ start.textContent='تخطي العرض'; }
     }
 
@@ -1040,8 +1093,7 @@
       } else if(i === 5){
         enable = !!positionUrl;
       } else if(i === 6){
-        // Thank-you page: no next/prev at all (already hidden in syncProgress)
-        enable = false;
+        enable = false; // Thank-you page
       }
       nextBtn.disabled = !enable;
       nextBtn.classList.toggle('disabled', !enable);
