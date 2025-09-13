@@ -427,7 +427,9 @@
       }
       try{
         await new Promise(r=>setTimeout(r, 300)); // tiny debounce for UX
-        const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal})});
+        const fullUrl = defaultLink2+path;
+        console.debug('[API] GET', fullUrl);
+        const res=await fetch(fullUrl,{method:'GET',redirect:'follow',...(abortable&&{signal})});
         if(!res.ok){
           if(retries>0) return callContent2(path,cb,abortable,retries-1);
           throw new Error('Network');
@@ -560,6 +562,36 @@
       dateEl.setAttribute('min', today);
     })();
 
+    // ---- FIXED: helper to parse a slot time robustly
+    function parseTimeToLuxon(rawTime){
+      let t = DateTime.fromISO(String(rawTime||'').trim(), { setZone:true });
+      if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'HH:mm:ss', { setZone:true });
+      if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'H:mm a',   { setZone:true });
+      if (!t.isValid) t = DateTime.fromFormat(String(rawTime||''), 'H:mm',     { setZone:true });
+      return t.isValid ? t : null;
+    }
+
+    // ---- FIXED: normalize availability fields across different schemas
+    function normalizeAvailability(r){
+      const status = String(r.TS_status || r.status || r.TS_appointment_status || '').toLowerCase();
+      const availableFlag = (typeof r.isAvailable === 'boolean') ? r.isAvailable : undefined;
+
+      const booked   = Number(r.booked ?? r.TS_booked);
+      const capacity = Number(r.capacity ?? r.TS_capacity);
+      let remaining  = Number(r.remaining ?? r.TS_remaining);
+      if (!Number.isFinite(remaining) && Number.isFinite(capacity) && Number.isFinite(booked)){
+        remaining = capacity - booked;
+      }
+
+      const looksOpen =
+        availableFlag === true ||
+        ['available','open','free','empty','vacant'].includes(status) ||
+        (Number.isFinite(remaining) ? remaining > 0 : (availableFlag !== false && !status));
+
+      return { looksOpen, remaining, status, availableFlag };
+    }
+
+    // ---- FIXED: fetch + filter ONLY available slots, with detailed console logs
     function fetchTimesForSelectedDate(){
       const dateEl = document.getElementById('date');
       const timeContainer = document.getElementById('time-container');
@@ -581,38 +613,81 @@
           <span class="visually-hidden">Loading...</span>
         </div>`;
 
-      // No departmentId (matches original working behavior)
+      const now = DateTime.now().setZone('Asia/Riyadh');
+      const isToday = selectedISO === now.toISODate();
+
+      // (Optional) if backend supports it, ask for only-available
       const qs = `/appointments?startDate=${encodeURIComponent(selectedISO)}`
                + `&location=${encodeURIComponent(loc)}`
-               + `&service=${encodeURIComponent(srv)}`;
+               + `&service=${encodeURIComponent(srv)}`
+               + `&onlyAvailable=1`; // safe even if ignored by backend
 
       callContent2(qs, (res) => {
-        const rows = (res?.data?.appointments || []);
-        const list = [];
+        console.groupCollapsed('%cAppointments fetch','color:#027A93;font-weight:700');
+        console.log('Query params =>', { selectedISO, location:loc, service:srv, isToday });
+        const rowsRaw = (res?.data?.appointments || []);
+        console.log('Raw rows count:', rowsRaw.length);
+        if (rowsRaw.length) {
+          console.table(
+            rowsRaw.slice(0,20).map(r => ({
+              date: r.TS_appointment_date,
+              time: r.TS_appointment_time,
+              status: r.TS_status || r.status || r.TS_appointment_status,
+              isAvailable: r.isAvailable,
+              booked: r.booked ?? r.TS_booked,
+              capacity: r.capacity ?? r.TS_capacity,
+              remaining: r.remaining ?? r.TS_remaining
+            }))
+          );
+        }
 
-        rows.forEach((r) => {
-          // keep only exact selected date
+        // Filter pipeline
+        const filtered = rowsRaw.filter(r => {
+          // 1) exact date match
           const d = DateTime.fromISO(r.TS_appointment_date, { setZone: true });
-          if (!d.isValid || d.toISODate() !== selectedISO) return;
+          if (!d.isValid || d.toISODate() !== selectedISO) return false;
 
-          const raw = String(r.TS_appointment_time || '').trim();
-          let t = DateTime.fromISO(raw, { setZone: true });
-          if (!t.isValid) t = DateTime.fromFormat(raw, 'HH:mm:ss', { setZone: true });
-          if (!t.isValid) t = DateTime.fromFormat(raw, 'H:mm a',   { setZone: true });
-          if (!t.isValid) t = DateTime.fromFormat(raw, 'H:mm',     { setZone: true });
-          if (!t.isValid) return;
+          // 2) parse time
+          const t = parseTimeToLuxon(r.TS_appointment_time);
+          if (!t) return false;
 
-          list.push({
-            label: t.toLocaleString(DateTime.TIME_SIMPLE), // e.g., 3:30 PM
-            actual12: t.toFormat('hh:mm a')                 // stable canonical
-          });
+          // 3) availability
+          const { looksOpen } = normalizeAvailability(r);
+          if (!looksOpen) return false;
+
+          // 4) for today, hide past times (5-min guard)
+          if (isToday) {
+            const slot = now.set({ hour: t.hour, minute: t.minute, second: 0 });
+            if (slot < now.plus({ minutes: 5 })) return false;
+          }
+
+          return true;
+        });
+
+        console.log('Filtered available rows count:', filtered.length);
+
+        // Build UI list
+        const list = filtered.map(r => {
+          const t = parseTimeToLuxon(r.TS_appointment_time);
+          return {
+            label: t.toLocaleString(DateTime.TIME_SIMPLE), // UI label (e.g., 3:30 PM)
+            actual12: t.toFormat('hh:mm a')                 // canonical for sorting & dedup
+          };
         });
 
         // De-dup & sort
         const seen = new Set();
         dayTimes = list
-          .filter(x => { if (seen.has(x.label)) return false; seen.add(x.label); return true; })
+          .filter(x => { if (seen.has(x.actual12)) return false; seen.add(x.actual12); return true; })
           .sort((a,b)=> a.actual12.localeCompare(b.actual12));
+
+        console.log('Final unique, sorted slots:', dayTimes.length);
+        if (dayTimes.length) {
+          console.table(dayTimes.map(x => ({ label:x.label, sortKey:x.actual12 })));
+        } else {
+          console.info('No available slots after filtering for date:', selectedISO);
+        }
+        console.groupEnd();
 
         timesLoaded = true;
         renderSelectedDateTimes(selectedISO);
@@ -632,6 +707,12 @@
           </div>`;
         return;
       }
+
+      // ---- FIXED: Log rendering info
+      console.groupCollapsed('%cRender times','color:#0B2630;font-weight:700');
+      console.log('Date:', selectedISO, '| Slots:', dayTimes.length);
+      console.table(dayTimes);
+      console.groupEnd();
 
       if (!dayTimes.length) {
         timeContainer.innerHTML = `
@@ -662,10 +743,10 @@
           nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
 
           window.selectedTime = { ui: t.label, iso: nForm.time };
-          selectedTime        = window.selectedTime; // critical for Next gating
+          selectedTime        = window.selectedTime;
 
+          console.log('Selected time =>', window.selectedTime);
           updateNextAvailability?.();
-          // Optionally: showPage(3);
         });
 
         timeContainer.appendChild(btn);
@@ -876,7 +957,8 @@
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
       marker.addListener('dragend', ({latLng})=>setPos(latLng));
-      map.addListener('click', ({latLng})=>setPos(latLng));
+      map.addEventListener?.('click', ({latLng})=>setPos(latLng)); // safety if google maps version changes
+      map.addListener?.('click', ({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
       if(btn){
         btn.addEventListener('click', ()=>{
