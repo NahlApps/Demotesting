@@ -16,27 +16,39 @@
 
   <style>
     :root{
+      /* Brand & surfaces */
       --brand-700:#015a6c; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --ink-700:#224652;
       --surface-000:#fff; --border-300:#D4E0E6;
+
+      /* Radius + Shadow */
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.08);
       --shadow-sm:0 3px 12px rgba(11,38,48,.12);
       --shadow-md:0 10px 28px rgba(11,38,48,.16);
+
+      /* Motion tokens */
       --ease:cubic-bezier(.22,.61,.36,1);
       --ease-decel:cubic-bezier(0.2,0,0,1);
       --ease-accel:cubic-bezier(0.3,1,0.8,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
+
+      /* Typography + spacing */
       --fs-xxl:1.6rem; --fs-xl:1.375rem; --fs-md:1rem; --fs-sm:.9rem; --fw-bold:800;
       --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-7:32px;
+
+      /* Layout */
       --header-h:120px;
       --footer-h:96px;
+
+      /* Cards (glass) */
       --card-alpha:.86; --card-blur:8px; --card-border:rgba(255,255,255,.55);
     }
     @media (max-width:640px){ :root{ --footer-h: calc(118px + env(safe-area-inset-bottom)); } }
 
     html,body{height:100%; min-height:100vh;}
     @supports (height:100dvh){ html,body{min-height:100dvh;} }
+
     body{
       margin:0; font-family:'Cairo',sans-serif;
       display:flex; flex-direction:column;
@@ -45,7 +57,11 @@
     }
 
     /* Fullscreen step background */
-    #bgStage{position:fixed; inset:0; z-index:-1; background-position:center; background-size:cover; background-repeat:no-repeat; width:100%; height:100vh; background-attachment:fixed;}
+    #bgStage{
+      position:fixed; inset:0; z-index:-1;
+      background-position:center; background-size:cover; background-repeat:no-repeat;
+      width:100%; height:100vh; background-attachment:fixed;
+    }
     @supports (height:100dvh){ #bgStage{height:100dvh;} }
     @media (max-width:768px){ #bgStage{background-attachment:scroll;} }
     #bgStage::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34));}
@@ -54,8 +70,8 @@
     header{position:sticky; top:0; z-index:50; background:rgba(11,38,48,.42); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.18); padding-top:env(safe-area-inset-top);}
     .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .brand img{height:82px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
-    @media (max-width:640px){ .brand img{height:72px} }
+    .brand img{height:92px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
+    @media (max-width:640px){ .brand img{height:80px} }
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
@@ -115,7 +131,7 @@
     .note-info{ background:#E6F4F7; border:1px solid #B3E0EA; color:#0B2630; display:flex }
     .field-note i{ opacity:.8 }
 
-    /* Select2 contrast */
+    /* Select2 – high contrast */
     .select2-container--default .select2-selection--single{ background:#ffffff !important; border:1px solid var(--border-300) !important; border-radius:var(--radius-md)!important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered{ color:#0B2630 !important; line-height:48px !important; padding-inline:42px 42px !important; }
     .select2-container--default .select2-selection--single .select2-selection__placeholder{ color:#667085 !important; }
@@ -135,7 +151,7 @@
     .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
-    /* Overlays in cards */
+    /* Overlays (in-card) */
     .load-overlay{ position:absolute; inset:0; background:rgba(255,255,255,.9); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:var(--radius-md); }
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
     @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
@@ -146,7 +162,7 @@
     .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
-    /* Footer */
+    /* Footer (bigger on mobile) */
     footer.sticky-nav{ position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.62); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; min-height:var(--footer-h); }
     .footer-inner{ max-width:1120px; width:100%; padding:12px 12px calc(10px + env(safe-area-inset-bottom)); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
     .footer-left{display:flex; align-items:center; gap:12px; flex:0 0 auto}
@@ -167,7 +183,7 @@
       .footer-social a{ width:42px; height:42px; }
     }
 
-    /* PPT deck (static background) */
+    /* PPT deck (static) */
     .ppt-deck{ position:relative; width:100%; max-width:860px; min-height:220px; margin:8px auto 0; overflow:hidden; border-radius:14px; background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(244,250,252,.92)); border:1px solid rgba(255,255,255,.55); box-shadow:var(--shadow-md); }
     .ppt-slide{ position:absolute; inset:0; padding:28px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; opacity:0; transform:translateY(10px) scale(.995); }
     .ppt-slide h2{ font-size:var(--fs-xxl); font-weight:800; color:var(--ink-900); margin:0 0 8px; letter-spacing:.2px }
@@ -177,16 +193,17 @@
     @keyframes pptIn{ from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none} }
     @keyframes pptOut{ from{opacity:1; transform:none} to{opacity:0; transform:translateY(-12px) scale(.992)} }
 
+    /* Thank you */
     .success-hero{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:10px}
     .success-icon{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,var(--brand-600),#12b3cf);box-shadow:0 10px 24px rgba(2,122,147,.25), inset 0 0 0 6px rgba(255,255,255,.35);position:relative}
     .success-icon::after{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;color:#fff;position:absolute;inset:0;display:grid;place-items:center;font-size:40px;transform:scale(.7);opacity:0;animation:popIn .5s var(--ease-decel) .1s forwards}
     @keyframes popIn{to{transform:scale(1);opacity:1}}
     .thanks-title{font-size:1.35rem;font-weight:800;color:#0b2630;margin:0}
     .thanks-copy{color:#33545f;margin:0;opacity:.95}
-
     .rebook-btn{display:inline-flex;align-items:center;gap:10px;justify-content:center;background:linear-gradient(135deg,var(--brand-600),var(--brand-700));color:#fff;border:0;border-radius:999px;padding:14px 24px;min-height:52px;font-weight:800;font-size:1.05rem;letter-spacing:.2px;box-shadow:0 10px 24px rgba(2,122,147,.28);transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), filter var(--dur-xs) var(--ease)}
     .rebook-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);filter:saturate(1.05)}
 
+    /* Phone input adjustments */
     .iti{ width:100% !important; }
     #mobile.form-control{ height:48px; line-height:48px; direction:ltr; text-align:left; }
     html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ right:12px; left:auto; }
@@ -198,12 +215,12 @@
     .iti__arrow{ border-top-color:#0B2630 !important; }
   </style>
 
+  <!-- Logo fallback (يستعمل الرابط المطلوب أولًا) -->
   <script>
-    /* Logo fallback (يستعمل الرابط المطلوب أولًا) */
     function handleLogoError(img){
       var fallbacks = [
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_14_40%20PM.png",
-        "https://dummyimage.com/220x82/027A93/ffffff.png&text=Nahl.app"
+        "https://dummyimage.com/240x92/027A93/ffffff.png&text=Nahl.app"
       ];
       var i = Number(img.dataset.fidx||0);
       if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
@@ -242,6 +259,7 @@
     </div>
   </header>
 
+  <!-- Body -->
   <main>
     <div id="app">
       <div class="stage">
@@ -495,7 +513,10 @@
     const orderedPages=["page1","page2","page4","page5","page5b","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","تم"];
     let selectedTime=null;
-    let servicesCache=null, categoriesCache=null, itiPhone=null;
+    let servicesCache=null, categoriesCache=null;
+
+    // intlTelInput instance (defensive)
+    window.itiPhone = null;
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
 
@@ -581,27 +602,29 @@
     function showFieldError(inputEl, msgEl, msg){ if(inputEl){ inputEl.classList.add('is-invalid'); inputEl.setAttribute('aria-invalid','true'); } if(msgEl){ msgEl.textContent = msg || ''; msgEl.style.display='block'; } }
     function clearFieldError(inputEl, msgEl){ if(inputEl){ inputEl.classList.remove('is-invalid'); inputEl.removeAttribute('aria-invalid'); } if(msgEl){ msgEl.textContent=''; msgEl.style.display=''; } }
 
-    /* Mobile validation – improved */
+    /* ---- Phone helpers (defensive) ---- */
     const GCC_HELP = { sa:'5XXXXXXXX', ae:'5XXXXXXXX', bh:'3XXXXXXX', kw:'5XXXXXXX', om:'9XXXXXXX', qa:'3XXXXXXX' };
+
     function updateMobileHelp(){
-      if(!window.itiPhone) return;
-      const c = itiPhone.getSelectedCountryData()?.iso2 || 'sa';
-      const ex = GCC_HELP[c] || '5XXXXXXXX';
       const help = document.getElementById('mobileHelp');
-      if(help) help.textContent = 'مثال: ' + ex;
+      if (!window.itiPhone || typeof window.itiPhone.getSelectedCountryData !== 'function'){
+        if (help) help.textContent = 'مثال: 5XXXXXXXX';
+        return;
+      }
+      const data = window.itiPhone.getSelectedCountryData();
+      const iso2 = (data && data.iso2) ? data.iso2 : 'sa';
+      if (help) help.textContent = 'مثال: ' + (GCC_HELP[iso2] || '5XXXXXXXX');
     }
     function sanitizeMobileForCountry(raw){
-      const c = itiPhone.getSelectedCountryData()?.iso2 || 'sa';
+      const c = (window.itiPhone && typeof window.itiPhone.getSelectedCountryData==='function')
+        ? (window.itiPhone.getSelectedCountryData()?.iso2 || 'sa')
+        : 'sa';
       let v = (raw||'').replace(/[^\d]/g,'');
-      // في السعودية: إزالة الصفر الأول وفرض البدء بـ 5 إن وجد 0 في البداية
-      if(c==='sa'){
-        if(v.startsWith('0')) v = v.replace(/^0+/, '');
-        // فقط تنسيق إرشادي، لا نفرض 5 تلقائيًا حتى لا نغيّر نية المستخدم
-      }
+      if(c==='sa'){ if(v.startsWith('0')) v = v.replace(/^0+/, ''); }
       return v;
     }
     function mobileValidationMessage(){
-      const code = itiPhone.getValidationError?.() ?? null;
+      const code = (window.itiPhone && typeof window.itiPhone.getValidationError==='function') ? window.itiPhone.getValidationError() : null;
       if(code===2) return 'الرقم قصير جدًا';
       if(code===3) return 'الرقم طويل جدًا';
       if(code===1) return 'رمز الدولة غير صحيح';
@@ -611,11 +634,10 @@
     function validateMobileInline(){
       const el=document.getElementById('mobile');
       const msgEl=document.getElementById('err-mobile');
-      if(!window.itiPhone){ clearFieldError(el,msgEl); return true; }
-      // تنظيف خفيف دون إتلاف الكتابة
+      if(!window.itiPhone || typeof window.itiPhone.isValidNumber!=='function'){ clearFieldError(el,msgEl); return true; }
       const sanitized = sanitizeMobileForCountry(el.value);
       if(el.value !== sanitized){ el.value = sanitized; }
-      const ok = itiPhone.isValidNumber?.() === true;
+      const ok = window.itiPhone.isValidNumber();
       if(!ok){ showFieldError(el, msgEl, mobileValidationMessage()); return false; }
       clearFieldError(el, msgEl); return true;
     }
@@ -625,7 +647,7 @@
     function validateTimeInline(){ const msgEl=document.getElementById('err-time'); if(!selectedTime){ msgEl.textContent='الرجاء اختيار وقت مناسب'; return false; } msgEl.textContent=''; return true; }
     function validatePayInline(){ const msgEl=document.getElementById('err-pay'); if(!nForm.paymentMethod){ msgEl.textContent='الرجاء اختيار طريقة الدفع'; return false; } msgEl.textContent=''; return true; }
 
-    /* --- كشف “رقم لوحة مميّز” (آخر 4 أرقام) --- */
+    /* --- كشف “رقم لوحة مميّز” --- */
     function detectSpecialPlate(s){
       if(!/^\d{4}$/.test(s)) return null;
       const d=[...s].map(x=>+x);
@@ -823,45 +845,50 @@
     }
 
     /* Init & bindings */
-    (function(){
+    document.addEventListener('DOMContentLoaded', function(){
       enforceDateMinToday();
       const today=DateTime.now().toFormat('yyyy-LL-dd');
-      document.getElementById('date').value=today; document.getElementById('date').setAttribute('min',today);
+      const dateEl=document.getElementById('date');
+      dateEl.value=today; dateEl.setAttribute('min',today);
 
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'التصنيف', dir:'rtl'});
       $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
 
-      // intl-tel-input – mobile validation improved
+      // intl-tel-input – defensive init
       const phoneEl=document.querySelector('#mobile');
-      window.itiPhone=window.intlTelInput(phoneEl,{
-        initialCountry:'sa',
-        onlyCountries:['sa','ae','bh','kw','om','qa'],
-        separateDialCode:true,
-        nationalMode:false,
-        autoPlaceholder:'aggressive',
-        setPlaceholderNumberType:'MOBILE',
-        formatOnDisplay:true,
-        autoInsertDialCode:true,
-        useFullscreenPopup:true,
-        utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
-      });
-      // sanitize & validate on input
-      phoneEl.addEventListener('input', function(){
-        // أرقام فقط
-        const cur = this.value;
-        const clean = cur.replace(/[^\d]/g,'');
-        if(cur !== clean) this.value = clean;
-        validateMobileInline();
-      });
-      phoneEl.addEventListener('blur', validateMobileInline);
-      phoneEl.addEventListener('countrychange', function(){
-        // تحديث مثال الدولة + إعادة التحقق
+      if (phoneEl && window.intlTelInput){
+        window.itiPhone = window.intlTelInput(phoneEl,{
+          initialCountry:'sa',
+          onlyCountries:['sa','ae','bh','kw','om','qa'],
+          separateDialCode:true,
+          nationalMode:false,
+          autoPlaceholder:'aggressive',
+          setPlaceholderNumberType:'MOBILE',
+          formatOnDisplay:true,
+          autoInsertDialCode:true,
+          useFullscreenPopup:true,
+          utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
+        });
+
         updateMobileHelp();
-        validateMobileInline();
-      });
-      updateMobileHelp();
+
+        // sanitize & validate on input
+        phoneEl.addEventListener('input', function(){
+          const cur = this.value;
+          const clean = cur.replace(/[^\d]/g,'');
+          if(cur !== clean) this.value = clean;
+          validateMobileInline();
+        });
+        phoneEl.addEventListener('blur', validateMobileInline);
+        phoneEl.addEventListener('countrychange', function(){
+          updateMobileHelp();
+          validateMobileInline();
+        });
+      } else {
+        updateMobileHelp(); // default example if lib not ready
+      }
 
       loadLocationsAndFirstServices();
 
@@ -911,7 +938,10 @@
       renderSummary();
       initHeaderRO();
       setStepBackground(0);
-    })();
+
+      // تحميل أولي للأوقات عندما يصل المستخدم لصفحة الوقت
+      document.getElementById('date').addEventListener('change', fetchTimesForSelectedDate);
+    });
 
     /* Footer nav */
     (function(){
@@ -940,7 +970,8 @@
           const okN=validateNameInline(), okM=validateMobileInline(), okP=validatePlateInline();
           if(!(okN && okM && okP)) return;
           nForm.customerN=$('#name').val().trim();
-          nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
+          const phoneNum = (window.itiPhone && typeof window.itiPhone.getNumber==='function') ? window.itiPhone.getNumber().replace(/^\+/,'') : '';
+          nForm.customerM=phoneNum;
           nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
           showPage(4); return; // الدفع
         }
@@ -982,13 +1013,6 @@
       $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
     })();
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.body.classList.add('intro-play');
-      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
-      enforceDateMinToday();
-      initHeaderRO();
-    });
-
     function updateNextAvailability(){
       const i = getActiveIndex();
       const nextBtn = document.getElementById('footer-next');
@@ -999,7 +1023,7 @@
         enable = !!selectedTime;
       } else if(i === 3){ // page5
         const nameOk = $('#name').val().trim().length > 0;
-        const phoneOk = (itiPhone && itiPhone.isValidNumber && itiPhone.isValidNumber());
+        const phoneOk = (window.itiPhone && typeof window.itiPhone.isValidNumber==='function' && window.itiPhone.isValidNumber());
         const plateVal = $('#plateNumber').val()||'';
         const plateOk  = (plateVal.length===0 || /^\d{4}$/.test(plateVal));
         enable = nameOk && phoneOk && plateOk;
@@ -1054,9 +1078,8 @@
     }
   </script>
 
-  <!-- Google Maps: عرّف initMap عالمية قبل التحميل -->
+  <!-- Google Maps: initMap عالمي -->
   <script>
-    // حالة الخريطة + مسار الموقع (عالمي واحد فقط)
     let map, marker;
     window.positionUrl = window.positionUrl ?? "";
 
