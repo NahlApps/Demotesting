@@ -45,7 +45,7 @@
     }
 
     /* Fullscreen step background */
-    #bgStage{position:fixed; inset:0; z-index:-1; background-position:center; background-size:cover; background-repeat:no-repeat; width:100%; height:100vh; background-attachment:fixed;}
+    #bgStage{position:fixed; inset:0; z-index:-1; background-position:center; background-size:cover; background-repeat:no-repeat; width:100%; height:100vh;}
     @supports (height:100dvh){ #bgStage{height:100dvh;} }
     @media (max-width:768px){ #bgStage{background-attachment:scroll;} }
     #bgStage::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34));}
@@ -54,8 +54,8 @@
     header{position:sticky; top:0; z-index:50; background:rgba(11,38,48,.42); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.18); padding-top:env(safe-area-inset-top);}
     .header-inner{max-width:1120px; width:100%; padding:10px var(--sp-3) 12px; display:flex; flex-direction:column; gap:10px;}
     .header-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .brand img{height:54px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
-    @media (max-width:640px){ .brand img{height:46px} }
+    .brand img{height:70px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25))}
+    @media (max-width:640px){ .brand img{height:58px} }
     .mini-progress{display:flex; align-items:center; gap:var(--sp-3); flex:1}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease-decel)}
@@ -210,7 +210,7 @@
   </script>
 </head>
 <body>
-  <!-- Fullscreen step background -->
+  <!-- fullscreen background per step -->
   <div id="bgStage" aria-hidden="true"></div>
 
   <!-- Toasts -->
@@ -487,7 +487,9 @@
     const DateTime=luxon.DateTime;
     const orderedPages=["page1","page2","page4","page5","page5b","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","تم"];
-    let selectedTime=null, positionUrl="";
+    let selectedTime=null;
+    var positionUrl="";         /* تعريف واحد عالمي فقط */
+
     let servicesCache=null, categoriesCache=null, itiPhone=null;
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:''};
@@ -639,352 +641,4 @@
           if (!looksOpen) return false;
           if (isToday) {
             const slot = now.set({ hour: t.hour, minute: t.minute, second: 0 });
-            if (slot < now.plus({ minutes: 5 })) return false;
-          }
-          return true;
-        });
-
-        const list = filtered.map(r => {
-          const t = parseTimeToLuxon(r.TS_appointment_time);
-          return { label: t.toLocaleString(DateTime.TIME_SIMPLE), actual12: t.toFormat('hh:mm a') };
-        });
-
-        const seen = new Set();
-        dayTimes = list
-          .filter(x => { if (seen.has(x.actual12)) return false; seen.add(x.actual12); return true; })
-          .sort((a,b)=> a.actual12.localeCompare(b.actual12));
-
-        timesLoaded = true;
-        renderSelectedDateTimes(selectedISO);
-        dateEl.disabled = false;
-        setLoadingTimes(false);
-      }, true);
-    }
-
-    function renderSelectedDateTimes(selectedISO){
-      const timeContainer = document.getElementById('time-container');
-      timeContainer.innerHTML = '';
-
-      if (!timesLoaded) {
-        timeContainer.innerHTML = `<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"><span class="visually-hidden">Loading...</span></div>`;
-        return;
-      }
-
-      if (!dayTimes.length) {
-        timeContainer.innerHTML = `<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد متاحة</div>`;
-        window.selectedTime = null;
-        selectedTime = null;
-        updateNextAvailability?.();
-        return;
-      }
-
-      dayTimes.forEach((t) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'time-option';
-        btn.setAttribute('role','radio');
-        btn.setAttribute('aria-checked','false');
-        btn.setAttribute('dir','ltr');
-        btn.textContent = t.label;
-
-        btn.addEventListener('click', () => {
-          [...timeContainer.children].forEach(el => el.setAttribute('aria-checked','false'));
-          btn.setAttribute('aria-checked','true');
-
-          const parsed = DateTime.fromFormat(t.actual12, 'h:mm a');
-          nForm.date = selectedISO;
-          nForm.time = parsed.isValid ? parsed.toFormat('HH:mm') : t.actual12;
-
-          window.selectedTime = { ui: t.label, iso: nForm.time };
-          selectedTime        = window.selectedTime;
-
-          validateTimeInline();
-          updateNextAvailability?.();
-        });
-
-        timeContainer.appendChild(btn);
-      });
-    }
-
-    /* ------------ Locations & Services loader (spinner فقط في الصفحة 2) ------------ */
-    let servicesVersion = 0; // لتجاهل الاستجابات القديمة
-    function loadLocationsAndFirstServices(){
-      setLoadingServices(true);
-      callContent2(`/locations`, res=>{
-        const list=res?.data||[];
-        const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
-        $('#area').empty().select2({data:ds,width:'100%'});
-        if(ds.length){
-          const firstId = ds[0].id;
-          $('#area').val(firstId).trigger('change.select2'); // تحديث الواجهة دون استدعاء fetch تلقائي
-          nForm.location = firstId;
-          // نحمّل الخدمات لأول منطقة
-          servicesVersion++;
-          fetchServicesForArea(firstId, servicesVersion, /*closeSpinner*/ true);
-        }else{
-          setLoadingServices(false);
-          showToast('error','لا توجد مناطق متاحة حالياً');
-        }
-      });
-    }
-    function fetchServicesForArea(locationId, versionAtCall, closeSpinner){
-      setLoadingServices(true);
-      callContent2(`/services?location=${encodeURIComponent(locationId)}`, res=>{
-        if(versionAtCall !== servicesVersion){ return; } // استجابة قديمة
-        servicesCache=res?.data?.services||[];
-        categoriesCache=res?.data?.servicesCat||[];
-        const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
-        $('#serviceCat').empty().select2({data:cats,width:'100%'});
-        if(cats.length){
-          $('#serviceCat').val(cats[0].id).trigger('change.select2');
-          // حضّر عناصر الخدمة
-          const cid=Number(cats[0].id);
-          const items=servicesCache.filter(s=>Number(s.TS_category_id)===cid)
-                                   .sort((a,b)=>a.TS_service_id-b.TS_service_id)
-                                   .map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}));
-          $('#service').empty().select2({data:items,width:'100%'});
-          if(items.length) $('#service').val(items[0].id).trigger('change.select2');
-        }
-        if(closeSpinner){ setLoadingServices(false); }
-        updateNextAvailability();
-      }, true);
-    }
-
-    /* Init & bindings */
-    (function(){
-      enforceDateMinToday();
-      const today=DateTime.now().toFormat('yyyy-LL-dd');
-      document.getElementById('date').value=today; document.getElementById('date').setAttribute('min',today);
-
-      $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
-      $('#serviceCat').select2({width:'100%',placeholder:'التصنيف', dir:'rtl'});
-      $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
-      $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
-
-      const phoneEl=document.querySelector('#mobile');
-      itiPhone=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], separateDialCode:true, nationalMode:false, autoPlaceholder:'aggressive', setPlaceholderNumberType:'MOBILE', formatOnDisplay:true, autoInsertDialCode:true, useFullscreenPopup:true, utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js' });
-      phoneEl.addEventListener('input', function(){ this.value=this.value.replace(/[^\d]/g,''); validateMobileInline(); });
-      phoneEl.addEventListener('countrychange', validateMobileInline);
-
-      // تحميل المناطق + الخدمات لأول مرة (مع سبينر الصفحة 2 فقط)
-      loadLocationsAndFirstServices();
-
-      // عند تغيير المنطقة: نحمّل الخدمات مع سبينر الصفحة 2
-      $('#area').on('change', function(){
-        nForm.location=this.value;
-        servicesVersion++;
-        fetchServicesForArea(this.value, servicesVersion, /*closeSpinner*/ true);
-        updateNextAvailability();
-      });
-
-      // تغيير التصنيف يغيّر الخدمات فورًا (بدون سبينر إضافي)
-      $('#serviceCat').on('change', function(){
-        nForm.serviceCat=this.value;
-        const cid=Number(this.value);
-        const items=(servicesCache||[]).filter(s=>Number(s.TS_category_id)===cid)
-              .sort((a,b)=>a.TS_service_id-b.TS_service_id)
-              .map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}));
-        $('#service').empty().select2({data:items,width:'100%'}); 
-        if(items.length){ $('#service').val(items[0].id).trigger('change.select2'); }
-        setLoadingServices(false); // تأكد من إخفاء السبينر
-        updateNextAvailability();
-      });
-
-      // تغيير الخدمة
-      $('#service').on('change', function(){ nForm.service=this.value||''; if(getActiveIndex()===2){ document.getElementById('date').dispatchEvent(new Event('change')); } updateNextAvailability(); });
-
-      // ماركات
-      const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
-      $('#carBrand').empty().select2({data:brands,width:'100%'});
-
-      // Payment ARIA
-      const payGroup=document.getElementById('payGroup');
-      const payCards=[...payGroup.querySelectorAll('.pay-card')];
-      payCards.forEach((card, idx)=>{
-        const input=card.querySelector('input');
-        card.setAttribute('role','radio'); card.setAttribute('aria-checked','false'); card.setAttribute('tabindex', idx===0?'0':'-1');
-        const choose=()=>{ payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; }); card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; nForm.paymentMethod=input.value; validatePayInline(); updateNextAvailability(); };
-        card.addEventListener('click', choose);
-        card.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); choose(); } if(['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'].includes(e.key)){ e.preventDefault(); const i=payCards.indexOf(card); const nextI=(e.key==='ArrowRight'||e.key==='ArrowDown')?Math.min(i+1,payCards.length-1):Math.max(i-1,0); payCards[nextI].focus(); } });
-      });
-
-      // Inline validation
-      $('#name').on('input', validateNameInline);
-      $('#plateNumber').on('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); validatePlateInline(); updateNextAvailability(); });
-      $('#serviceCount, #serviceCat, #service, #area, #date').on('change', updateNextAvailability);
-
-      $('#rebook').on('click', ()=>location.href='/');
-
-      syncProgress(0);
-      startWelcomeDeck();
-      renderSummary();
-      initHeaderRO();
-      setStepBackground(0);
-    })();
-
-    /* Footer nav */
-    (function(){
-      const $prev=document.getElementById('footer-prev');
-      const $next=document.getElementById('footer-next');
-      const $start=document.getElementById('page1-button');
-
-      $start.addEventListener('click', ()=>{ stopWelcomeDeck(); showPage(1); });
-
-      async function gotoNext(){
-        const i=getActiveIndex(); const id=orderedPages[i];
-
-        if(id==='page2'){
-          if(!$('#area').val()){ showToast('error','يرجى اختيار المنطقة'); return; }
-          if(!$('#service').val()){ showToast('error','يرجى اختيار الخدمة'); return; }
-          nForm.service=$('#service').val(); nForm.serviceCount=$('#serviceCount').val()||'1';
-          showPage(2); document.getElementById('date').dispatchEvent(new Event('change')); return;
-        }
-
-        if(id==='page4'){
-          if(!validateTimeInline()) return;
-          showPage(3); return;
-        }
-
-        if(id==='page5'){
-          const okN=validateNameInline(), okM=validateMobileInline(), okP=validatePlateInline();
-          if(!(okN && okM && okP)) return;
-          nForm.customerN=$('#name').val().trim();
-          nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
-          nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
-          showPage(4); return; // الدفع
-        }
-
-        if(id==='page5b'){
-          if(!validatePayInline()) return;
-          showPage(5); return; // الخريطة
-        }
-
-        if(id==='page6'){
-          if(!positionUrl){ showToast('error','الرجاء تحديد الموقع على الخريطة'); return; }
-          nForm.urlLocation=positionUrl;
-
-          const payload = {
-            date: nForm.date, time: nForm.time, location: nForm.location, service: nForm.service,
-            serviceCount: nForm.serviceCount, serviceCat: nForm.serviceCat, customerM: nForm.customerM,
-            customerN: nForm.customerN, paymentMethod: nForm.paymentMethod, urlLocation: nForm.urlLocation,
-            locationDescription: nForm.locationDescription || '', locale: 'ar'
-          };
-
-          const r = await postReservation(payload);
-
-          if(r.ok && r.data?.success){
-            if(r.data?.otp){ showToast('error','الخادم يطلب رمز تحقق (OTP). عطّل خيار OTP في إعدادات التطبيق.'); return; }
-            showToast('success','تم إنشاء الحجز');
-            showPage(6); renderThankYou();
-          } else {
-            const msg = r?.data?.msgAR
-              || (r.status===404 ? 'المسار غير موجود: تأكد من /form/reserveAppointment'
-                                 : r.status===0   ? 'تعذر الاتصال بالخادم (تحقق من CORS/الشبكة)'
-                                                  : 'تعذر إنشاء الحجز');
-            showToast('error', msg);
-          }
-          return;
-        }
-      }
-
-      $next.addEventListener('click', gotoNext);
-      $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
-    })();
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.body.classList.add('intro-play');
-      setTimeout(()=>document.body.classList.remove('intro-play'), 820);
-      enforceDateMinToday();
-      initHeaderRO();
-    });
-
-    function updateNextAvailability(){
-      const i = getActiveIndex();
-      const nextBtn = document.getElementById('footer-next');
-      let enable = true;
-      if(i === 1){ // page2
-        enable = !!($('#area').val() && $('#service').val());
-      } else if(i === 2){ // page4
-        enable = !!selectedTime;
-      } else if(i === 3){ // page5
-        const nameOk = $('#name').val().trim().length > 0;
-        const phoneOk = (itiPhone && itiPhone.isValidNumber());
-        const plateVal = $('#plateNumber').val()||'';
-        const plateOk  = (plateVal.length===0 || plateVal.length===4); // اختياري
-        enable = nameOk && phoneOk && plateOk;
-      } else if(i === 4){ // page5b
-        enable = !!nForm.paymentMethod;
-      } else if(i === 5){ // page6
-        enable = !!positionUrl;
-      } else if(i === 6){ // page7
-        enable = false;
-      }
-      nextBtn.disabled = !enable;
-      nextBtn.classList.toggle('disabled', !enable);
-      renderSummary();
-    }
-
-    function renderSummary(){
-      const areaTxt=$('#area').find(':selected').text()||'—';
-      const svcTxt =$('#service').find(':selected').text()||'—';
-      const dateTxt=$('#date').val()||'—';
-      const timeTxt=(window.selectedTime && window.selectedTime.ui) || '—';
-      const payTxt =(nForm.paymentMethod||'—');
-      let el;
-      el=document.getElementById('sumArea');    if(el) el.textContent=areaTxt;
-      el=document.getElementById('sumService'); if(el) el.textContent=svcTxt;
-      el=document.getElementById('sumDate');    if(el) el.textContent=dateTxt;
-      el=document.getElementById('sumTime');    if(el) el.textContent=timeTxt;
-      el=document.getElementById('sumPay');     if(el) el.textContent=payTxt;
-      el=document.querySelector('[data-sum-chip="area"]');    if(el) el.setAttribute('title', areaTxt);
-      el=document.querySelector('[data-sum-chip="service"]'); if(el) el.setAttribute('title', svcTxt);
-      el=document.querySelector('[data-sum-chip="date"]');    if(el) el.setAttribute('title', dateTxt);
-      el=document.querySelector('[data-sum-chip="time"]');    if(el) el.setAttribute('title', timeTxt);
-      el=document.querySelector('[data-sum-chip="pay"]');     if(el) el.setAttribute('title', payTxt);
-    }
-
-    function renderThankYou(){
-      const first=(nForm.customerN||'').trim().split(' ')[0];
-      const tTitle=document.getElementById('thanksTitle');
-      const tCopy=document.getElementById('thanksCopy');
-      if(tTitle) tTitle.textContent = first ? ('تم حجز موعدك بنجاح، '+first+'! 🎉') : 'تم حجز موعدك بنجاح 🎉';
-      if(tCopy)  tCopy.textContent  = 'وصلنا طلبك، وسنرسل لك التأكيد واللوكيشن على الواتساب قريباً.';
-      const info=[
-        {icon:'fa-location-dot', text:$('#area').find(':selected').text()||'—'},
-        {icon:'fa-screwdriver-wrench', text:$('#service').find(':selected').text()||'—'},
-        {icon:'fa-calendar-day', text:nForm.date||$('#date').val()||'—'},
-        {icon:'fa-clock', text:(window.selectedTime&&window.selectedTime.ui)||'—'},
-        {icon:'fa-credit-card', text:nForm.paymentMethod||'—'}
-      ];
-      const wrap=document.getElementById('thanksSummary');
-      if(wrap) wrap.innerHTML = info.map(i=>`<span class="chip"><i class="fa-solid ${i.icon}"></i> ${i.text}</span>`).join('');
-    }
-  </script>
-
-  <!-- Google Maps -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
-  <script>
-    let map, marker; let positionUrl="";
-    function initMap(){
-      const def={lat:26.34165524787632,lng:50.11524831545726};
-      map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
-      marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; document.getElementById('mapHint').innerHTML = `تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; updateNextAvailability(); };
-      marker.addListener('dragend', ({latLng})=>setPos(latLng));
-      map.addListener('click', ({latLng})=>setPos(latLng));
-      const btn=document.getElementById('show-my-location');
-      if(btn){
-        btn.addEventListener('click', ()=>{
-          if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
-          navigator.geolocation.getCurrentPosition(
-            pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
-            err=>{ const msg = err?.message || 'رجاءً فعّل الـ GPS وأذونات الموقع'; showToast('error','تعذر تحديد موقعك: '+msg); },
-            { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
-          );
-        });
-      }
-    }
-    window.initMap = initMap;
-  </script>
-</body>
-</html>
+            if (slot < now.plus
