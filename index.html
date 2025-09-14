@@ -123,8 +123,10 @@
   </style>
 </head>
 <body>
+  <!-- Toasts -->
   <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
 
+  <!-- Header -->
   <header id="siteHeader">
     <div class="header-inner">
       <div class="brand">
@@ -142,6 +144,7 @@
     </div>
   </header>
 
+  <!-- Body -->
   <main>
     <div id="app">
       <div class="stage">
@@ -160,6 +163,7 @@
         <!-- 2) Service & Location -->
         <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
           <h1>وين تحب نجيك؟</h1>
+
           <div class="card position-relative" id="servicesCard">
             <label class="form-label">اختيار المنطقة</label>
             <select id="area" style="width:100%"></select>
@@ -293,6 +297,7 @@
     </div>
   </main>
 
+  <!-- Footer -->
   <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-brand">
@@ -334,7 +339,7 @@
     /* ---------- API (canonical path only) ---------- */
     const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';
     const BASE  =`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
-    const RESERVE_URL =`${BASE}/reserveAppointment`; // ✅ No fallback to non-/form path
+    const RESERVE_URL =`${BASE}/reserveAppointment`;
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -396,7 +401,6 @@
     }
 
     async function postReservation(payload){
-      // Try to avoid preflight by using form first (simple request)
       const attempts = [
         { url: RESERVE_URL, mode: 'form' },
         { url: RESERVE_URL, mode: 'json' },
@@ -498,6 +502,7 @@
       });
     }
 
+    /* —— Welcome slideshow —— */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -783,7 +788,6 @@
 
           const payload = buildPayload();
 
-          // final front guard
           if(!payload.date || !payload.time || !payload.location || !payload.service ||
              !payload.customerM || !payload.payingMethod || !payload.urlLocation){
             console.log('[reserve payload - invalid]', payload);
@@ -805,8 +809,8 @@
         }
         showPage(Math.min(i+1, orderedPages.length-1));
       }
-      $next.addEventListener('click', gotoNext);
-      $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
+      document.getElementById('footer-next').addEventListener('click', gotoNext);
+      document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
       payCards.forEach((card)=>{
@@ -816,7 +820,7 @@
         card.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();} });
       });
 
-      $('#rebook').on('click', ()=>location.href='/');
+      document.getElementById('rebook').addEventListener('click', ()=>location.href='/');
 
       setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
     });
@@ -837,21 +841,43 @@
     }
 
     /* ---------- Google Map ---------- */
-    let map, marker, positionUrl="";
+    let map, marker; // ✅ no duplicate positionUrl here (it's declared in STATE)
+
     function initMap(){
       const def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; const hint=document.getElementById('mapHint'); if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; renderSummary('page6'); updateNextAvailability(); };
-      marker.addEventListener('dragend',({latLng})=>setPos(latLng));
-      map.addEventListener('click',({latLng})=>setPos(latLng));
+
+      const setPos=(latLng,pan=false)=>{
+        if(!latLng) return;
+        marker.setPosition(latLng);
+        if(pan) map.panTo(latLng);
+        map.setZoom(17);
+        positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
+        const hint=document.getElementById('mapHint');
+        if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`;
+        renderSummary('page6'); updateNextAvailability();
+      };
+
+      // ✅ Use Google Maps event system
+      marker.addListener('dragend',({latLng})=>setPos(latLng));
+      map.addListener('click',({latLng})=>setPos(latLng));
+
       const btn=document.getElementById('show-my-location');
-      btn?.addEventListener('click',()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),err=>{ showToast('error','تعذر تحديد موقعك'); },{ enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); });
+      btn?.addEventListener('click',()=>{
+        if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
+        navigator.geolocation.getCurrentPosition(
+          pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
+          ()=>{ showToast('error','تعذر تحديد موقعك'); },
+          { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
+        );
+      });
     }
+    // expose for callback
     window.initMap=initMap;
   </script>
 
-  <!-- Google Maps -->
+  <!-- Google Maps (must come after window.initMap assignment) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
 </body>
 </html>
