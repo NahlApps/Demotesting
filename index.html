@@ -18,21 +18,15 @@
     :root{
       --brand-700:#01657A; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --surface-000:#FFF; --border-300:#D4E0E6;
-
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.07);
       --shadow-sm:0 3px 12px rgba(11,38,48,.09);
       --shadow-md:0 10px 28px rgba(11,38,48,.14);
-
       --ease:cubic-bezier(.22,.61,.36,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
-
-      --header-h:76px;
-      --footer-h:100px;
-
+      --header-h:76px; --footer-h:100px;
       --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
-
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
@@ -44,126 +38,60 @@
       padding-top:var(--header-h);
       padding-bottom:var(--footer-h);
     }
-
-    /* ===== Header (fixed) ===== */
-    header{
-      position:fixed; top:0; left:0; right:0; z-index:999;
-      background:rgba(11,38,48,.36); backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.15);
-    }
-    .header-inner{
-      max-width:1120px; width:100%; margin:0 auto;
-      padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between;
-    }
+    header{position:fixed; top:0; left:0; right:0; z-index:999; background:rgba(11,38,48,.36); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.15);}
+    .header-inner{max-width:1120px; width:100%; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between;}
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:84px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
-
     .header-right{flex:1; display:flex; flex-direction:column; gap:6px}
     .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
     .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease)}
     .mini-progress .step{font-weight:800; font-size:1rem}
-
-    /* ===== Summary chips ===== */
     .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
     .summary-chips.hidden{display:none!important;}
-    .chip{
-      display:inline-flex; align-items:center; gap:6px; max-width:100%;
-      padding:6px 10px; border:1px solid rgba(255,255,255,.35);
-      border-radius:999px; color:#fff; font-size:.85rem; background:transparent;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
+    .chip{display:inline-flex; align-items:center; gap:6px; max-width:100%; padding:6px 10px; border:1px solid rgba(255,255,255,.35); border-radius:999px; color:#fff; font-size:.85rem; background:transparent; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
     .chip.current{ background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.75); box-shadow:0 0 0 2px rgba(255,255,255,.16) inset; }
-
-    /* ===== Layout / pages ===== */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
     #app{width:100%; max-width:1120px}
     .stage{position:relative; min-height:560px; padding:8px 0 20px}
-    .page{
-      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
-      padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992);
-      pointer-events:none;
-    }
+    .page{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px; padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;}
     .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
     .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
     @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
     @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
     .page h1{font-size:1.375rem; font-weight:800; margin:0; text-align:center}
-
-    .card{
-      background:rgba(255,255,255,.88); color:#0B2630;
-      border-radius:14px; box-shadow:var(--shadow-md);
-      padding:24px; width:100%; max-width:920px; backdrop-filter:blur(6px);
-    }
-
-    /* ===== Welcome deck ===== */
+    .card{background:rgba(255,255,255,.88); color:#0B2630; border-radius:14px; box-shadow:var(--shadow-md); padding:24px; width:100%; max-width:920px; backdrop-filter:blur(6px);}
     .ppt-deck{position:relative; width:100%; max-width:920px; height:200px}
-    .ppt-slide{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      opacity:0; transform:translateY(14px) scale(.98); transition:opacity .6s var(--ease), transform .6s var(--ease);
-    }
+    .ppt-slide{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transform:translateY(14px) scale(.98); transition:opacity .6s var(--ease), transform .6s var(--ease);}
     .ppt-slide .slide-card{ background:rgba(255,255,255,.92); color:#0B2630; border-radius:14px; box-shadow:var(--shadow-md); padding:18px 20px; text-align:center; width:min(820px,92%) }
     .ppt-slide.is-active{opacity:1; transform:none; z-index:2}
     .ppt-slide.is-exiting{opacity:0; transform:translateY(-8px) scale(.985); z-index:1}
     .ppt-dots{display:flex; gap:8px; justify-content:center; margin-top:12px}
     .ppt-dot{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.55)}
     .ppt-dot.active{background:#fff}
-
-    /* ===== Forms & Select2 ===== */
-    .form-control, select, .select2-selection{
-      background:#fff; color:#0B2630; border:1px solid var(--border-300)!important; border-radius:14px!important;
-      min-height:52px; text-align:center; font-size:16px;
-      transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
-    }
+    .form-control, select, .select2-selection{background:#fff; color:#0B2630; border:1px solid var(--border-300)!important; border-radius:14px!important; min-height:52px; text-align:center; font-size:16px; transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);}
     .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .form-label{display:inline-block; margin-bottom:6px; font-size:.9rem; font-weight:800; color:#224652}
     .field-error{color:#dc2626; font-size:.85rem; margin-top:6px; display:none}
-
     .select2-container .select2-selection--single .select2-selection__rendered{color:#0B2630!important; line-height:52px!important;}
     .select2-container .select2-selection--single{height:52px!important; display:flex; align-items:center}
     .select2-dropdown{background:#fff; color:#0B2630}
     .select2-results__option, .select2-search__field{color:#0B2630}
-
-    /* ===== Time grid ===== */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
     @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
-    .time-option{
-      background:#fff; color:#0B2630; font-weight:800;
-      border:1px solid var(--border-300); border-radius:14px;
-      padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs);
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-    }
+    .time-option{background:#fff; color:#0B2630; font-weight:800; border:1px solid var(--border-300); border-radius:14px; padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs); transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease); display:flex; flex-direction:column; align-items:center; justify-content:center;}
     .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
-
-    /* ===== Overlays ===== */
-    .load-overlay{
-      position:absolute; inset:0; background:rgba(255,255,255,.88); color:#0B2630;
-      display:none; align-items:center; justify-content:center; gap:12px; border-radius:14px; backdrop-filter:blur(2px);
-    }
+    .load-overlay{position:absolute; inset:0; background:rgba(255,255,255,.88); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:14px; backdrop-filter:blur(2px);}
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
     @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-
-    /* ===== Payment ===== */
     .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:920px}
-    .pay-card{
-      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px;
-      padding:24px; display:flex; justify-content:center; align-items:center; gap:16px;
-      min-height:76px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-    }
+    .pay-card{background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px; padding:24px; display:flex; justify-content:center; align-items:center; gap:16px; min-height:76px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);}
     .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
     .pay-card img{max-width:140px; height:auto}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
-
-    /* ===== Map ===== */
     #googleMap{width:100%;height:420px;border-radius:14px;overflow:hidden}
-
-    /* ===== Footer ===== */
-    footer.sticky-nav{
-      position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.45);
-      backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);
-    }
+    footer.sticky-nav{position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.45); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);}
     .footer-inner{ max-width:1120px; width:100%; margin:0 auto; padding:12px; display:flex; align-items:center; justify-content:space-between; gap:10px}
     .footer-brand{ font-size:.95rem; color:#fff; opacity:.94; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
     .footer-brand a{color:#fff; text-decoration:underline}
@@ -175,19 +103,11 @@
     .btn-footer.primary{background:#027A93; color:#fff; border-color:#027A93}
     .btn-footer.hidden{visibility:hidden}
     .btn-footer:disabled{opacity:.6; pointer-events:none}
-
-    /* ===== Mobile polish ===== */
     @media (max-width: 480px){
       :root{ --footer-h: 118px; }
-      .header-inner{
-        padding-top: max(8px, env(safe-area-inset-top));
-        padding-bottom:8px; gap:10px;
-      }
+      .header-inner{padding-top:max(8px, env(safe-area-inset-top)); padding-bottom:8px; gap:10px;}
       .brand img{ height:72px }
-      .summary-chips{
-        overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
-        gap:6px; padding-bottom:2px; scrollbar-width:thin;
-      }
+      .summary-chips{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; gap:6px; padding-bottom:2px; scrollbar-width:thin;}
       .summary-chips::-webkit-scrollbar{ height:4px }
       .chip{ padding:4px 8px; font-size:.78rem }
       .chip .title{ display:none }
@@ -197,33 +117,21 @@
       .footer-actions{width:100%}
       .footer-brand{width:100%; justify-content:space-between}
     }
-
-    /* ===== Phone input tweaks (fit + country code LEFT) ===== */
     .iti{ width:100%; }
-    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{
-      left:8px; right:auto;
-    }
-    html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
-      padding-left: calc(76px + 8px);
-      padding-right: 12px;
-      text-align: left; direction: ltr;
-    }
+    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ left:8px; right:auto; }
+    html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{ padding-left: calc(76px + 8px); padding-right: 12px; text-align: left; direction: ltr; }
   </style>
 </head>
 <body>
-  <!-- Toasts -->
   <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
 
-  <!-- ===== Header (fixed) ===== -->
   <header id="siteHeader">
     <div class="header-inner">
       <div class="brand">
-        <img id="brandLogo"
-             alt="Nahl Time"
+        <img id="brandLogo" alt="Nahl Time"
              src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png"
-             onerror="handleLogoError(this)" />
+             onerror="handleLogoError(this)"/>
       </div>
-
       <div class="header-right">
         <div class="mini-progress" aria-hidden="true">
           <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
@@ -234,45 +142,24 @@
     </div>
   </header>
 
-  <!-- ===== Body ===== -->
   <main>
     <div id="app">
       <div class="stage">
         <!-- 1) Welcome -->
         <section id="page1" class="page active" aria-label="الترحيب">
           <h1>✨ غسيل بدون طوابير</h1>
-
           <div id="pptDeck" class="ppt-deck">
-            <div class="ppt-slide is-active">
-              <div class="slide-card">
-                <h3 class="mb-2">نجيك لين باب بيتك</h3>
-                <p class="m-0">حجز سريع • خدمة متنقلة • احترافية في كل تفصيل</p>
-              </div>
-            </div>
-            <div class="ppt-slide">
-              <div class="slide-card">
-                <h3 class="mb-2">مواد فاخرة</h3>
-                <p class="m-0">منتجات آمنة على الطلاء والداخلية مع عناية دقيقة</p>
-              </div>
-            </div>
-            <div class="ppt-slide">
-              <div class="slide-card">
-                <h3 class="mb-2">موعدك على راحتك</h3>
-                <p class="m-0">حدد المنطقة والخدمة والوقت المناسب — والباقي علينا</p>
-              </div>
-            </div>
+            <div class="ppt-slide is-active"><div class="slide-card"><h3 class="mb-2">نجيك لين باب بيتك</h3><p class="m-0">حجز سريع • خدمة متنقلة • احترافية في كل تفصيل</p></div></div>
+            <div class="ppt-slide"><div class="slide-card"><h3 class="mb-2">مواد فاخرة</h3><p class="m-0">منتجات آمنة على الطلاء والداخلية مع عناية دقيقة</p></div></div>
+            <div class="ppt-slide"><div class="slide-card"><h3 class="mb-2">موعدك على راحتك</h3><p class="m-0">حدد المنطقة والخدمة والوقت المناسب — والباقي علينا</p></div></div>
           </div>
           <div id="pptDots" class="ppt-dots" aria-hidden="true"></div>
-
-          <div class="card text-center" style="max-width:860px">
-            <p class="mb-0" style="color:#224652">انطلق — الخطوة التالية لاختيار المنطقة والخدمة</p>
-          </div>
+          <div class="card text-center" style="max-width:860px"><p class="mb-0" style="color:#224652">انطلق — الخطوة التالية لاختيار المنطقة والخدمة</p></div>
         </section>
 
         <!-- 2) Service & Location -->
         <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
           <h1>وين تحب نجيك؟</h1>
-
           <div class="card position-relative" id="servicesCard">
             <label class="form-label">اختيار المنطقة</label>
             <select id="area" style="width:100%"></select>
@@ -388,12 +275,8 @@
         <!-- 6) Map -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
-          <div class="card">
-            <div id="googleMap"></div>
-          </div>
-          <div class="card text-center">
-            <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
-          </div>
+          <div class="card"><div id="googleMap"></div></div>
+          <div class="card text-center"><button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button></div>
           <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
           <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
         </section>
@@ -410,7 +293,6 @@
     </div>
   </main>
 
-  <!-- ===== Footer ===== -->
   <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-brand">
@@ -449,11 +331,10 @@
       else { img.style.display = 'none'; }
     }
 
-    /* ---------- API ---------- */
+    /* ---------- API (canonical path only) ---------- */
     const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';
-    const defaultLink2=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
-    const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
-    const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
+    const BASE  =`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
+    const RESERVE_URL =`${BASE}/reserveAppointment`; // ✅ No fallback to non-/form path
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -464,7 +345,7 @@
       }
       try{
         await new Promise(r=>setTimeout(r, 200));
-        const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal}),cache:'no-store'});
+        const res=await fetch(BASE+path,{method:'GET',redirect:'follow',...(abortable&&{signal}),cache:'no-store'});
         if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network');}
         cb(await res.json());
       }catch(e){
@@ -472,16 +353,13 @@
       }
     }
 
-    /* ====== NEW tolerant POST (json → form) ====== */
-    async function postReservationTry(url, payload, mode='json'){
+    /* ===== tolerant POST (form → json) ===== */
+    async function postReservationTry(url, payload, mode='form'){
       try{
         let headers = { 'Accept':'application/json' };
         let body;
 
-        if(mode==='json'){
-          headers['Content-Type'] = 'application/json;charset=UTF-8';
-          body = JSON.stringify(payload);
-        }else if(mode==='form'){
+        if(mode==='form'){
           headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
           const usp = new URLSearchParams();
           for (const [k,v] of Object.entries(payload)){
@@ -489,7 +367,7 @@
           }
           body = usp.toString();
         }else{
-          headers['Content-Type'] = 'text/plain;charset=UTF-8';
+          headers['Content-Type'] = 'application/json;charset=UTF-8';
           body = JSON.stringify(payload);
         }
 
@@ -498,14 +376,12 @@
           mode:'cors',
           cache:'no-store',
           credentials:'omit',
-          referrerPolicy:'no-referrer',
           headers,
           body
         });
 
         const text = await res.text();
         let data=null; try{ data = JSON.parse(text); }catch(_){}
-
         const success = !!(data?.success || data?.ok || data?.status==='ok');
 
         if(!res.ok || !success){
@@ -513,7 +389,6 @@
           console.warn('[reserve validation errors]', data?.errors || data?.zod || data?.details || null);
           return { ok:false, status:res.status, data, raw:errMsg };
         }
-
         return { ok:true, status:res.status, data: data ?? text, raw:text };
       }catch(err){
         return { ok:false, status:0, error:String(err) };
@@ -521,13 +396,11 @@
     }
 
     async function postReservation(payload){
+      // Try to avoid preflight by using form first (simple request)
       const attempts = [
-        { url: RESERVE_URL_PRIMARY,  mode: 'json' },
-        { url: RESERVE_URL_PRIMARY,  mode: 'form' },
-        { url: RESERVE_URL_FALLBACK, mode: 'json' },
-        { url: RESERVE_URL_FALLBACK, mode: 'form' },
+        { url: RESERVE_URL, mode: 'form' },
+        { url: RESERVE_URL, mode: 'json' },
       ];
-
       let last=null;
       for(const a of attempts){
         const r = await postReservationTry(a.url, payload, a.mode);
@@ -575,11 +448,7 @@
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
       requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 240); });
-
-      syncProgress(idx);
-      setPageBackground(next.id);
-      renderSummary(next.id);
-      updateNextAvailability();
+      syncProgress(idx); setPageBackground(next.id); renderSummary(next.id); updateNextAvailability();
       if(next.id==='page1') startWelcomeDeck();
     }
     function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
@@ -597,20 +466,12 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* —— summary chips —— */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
       const currGroup=STEP_GROUP_INDEX[activeId] ?? 0;
-
-      if(currGroup===0){
-        wrap.classList.add('hidden');
-        wrap.style.display='none';
-        wrap.innerHTML='';
-        return;
-      }
-      wrap.classList.remove('hidden');
-      wrap.style.display='flex';
+      if(currGroup===0){ wrap.classList.add('hidden'); wrap.style.display='none'; wrap.innerHTML=''; return; }
+      wrap.classList.remove('hidden'); wrap.style.display='flex';
 
       const areaTxt=$('#area').find(':selected').text()||'';
       const srvTxt=$('#service').find(':selected').text()||'';
@@ -627,10 +488,7 @@
         {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4},
         {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
       ];
-      if(cntTxt && cntTxt !== '1'){
-        chips.splice(2,0,{i:'fa-car',t:'عدد',v:cntTxt,g:1});
-      }
-
+      if(cntTxt && cntTxt !== '1'){ chips.splice(2,0,{i:'fa-car',t:'عدد',v:cntTxt,g:1}); }
       wrap.innerHTML='';
       chips.filter(c=>c.v && c.g<=currGroup).forEach(c=>{
         const el=document.createElement('div');
@@ -640,7 +498,6 @@
       });
     }
 
-    /* —— Welcome slideshow —— */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -649,7 +506,6 @@
       const dotsWrap=document.getElementById('pptDots');
       dotsWrap.innerHTML=slides.map((_,i)=>`<span class="ppt-dot${i===0?' active':''}"></span>`).join('');
       const dots=[...dotsWrap.children];
-
       const setActive=(i,ex=-1)=>{
         slides.forEach((s,idx)=>{ s.classList.remove('is-active','is-exiting'); if(idx===i){s.classList.add('is-active'); s.style.zIndex=2;} else if(idx===ex){s.classList.add('is-exiting'); s.style.zIndex=1;} else{s.style.zIndex=0;} });
         dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
@@ -740,21 +596,16 @@
         btn.addEventListener('click',()=>{
           [...timeContainer.children].forEach(el=>el.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
-
           nForm.date = selectedISO;
-          nForm.time = t.actual24s;   // always HH:mm:ss
-
-          // ✅ Keep both in sync
+          nForm.time = t.actual24s;
           window.selectedTime = { ui: t.label, iso: nForm.time };
           selectedTime        = window.selectedTime;
-
           renderSummary('page3'); updateNextAvailability();
         });
         timeContainer.appendChild(btn);
       });
     }
 
-    /* ---------- ResizeObservers ---------- */
     function installResizeObservers(){
       const header=document.getElementById('siteHeader');
       const footer=document.getElementById('siteFooter');
@@ -767,7 +618,6 @@
       header && ro.observe(header); footer && ro.observe(footer);
     }
 
-    /* ---------- Build payload (with compat aliases) ---------- */
     function buildPayload(){
       const toIntOrUndef = (v) => {
         if (v === undefined || v === null || v === '') return undefined;
@@ -799,36 +649,32 @@
       const locDesc = (nForm.locationDescription || '').trim() || undefined;
 
       const payload = {
-        date: dateISO,                // YYYY-MM-DD
-        time: timeStd,                // HH:mm:ss
-        location: locId,              // number
-        service: srvId,               // number
-        serviceCat: catId,            // number
-        serviceCount: String(count),  // string ok
-        customerM: phoneDigits,       // digits only
+        date: dateISO,
+        time: timeStd,
+        location: locId,
+        service: srvId,
+        serviceCat: catId,
+        serviceCount: String(count),
+        customerM: phoneDigits,
         customerN: nForm.customerN || undefined,
         paymentMethod: (nForm.paymentMethod||'').toLowerCase(),
-        urlLocation: nForm.urlLocation,          // Google Maps URL
-        locationDescription: locDesc,            // optional
+        urlLocation: nForm.urlLocation,
+        locationDescription: locDesc,
         locale: 'ar'
       };
 
-      // ---- Compat aliases for older handlers ----
       const compat = {
         payingMethod: payload.paymentMethod,
-
         appointmentDate: payload.date,
         appointmentTime: payload.time,
         TS_appointment_date: payload.date,
         TS_appointment_time: payload.time,
-
         locationId: payload.location,
         serviceId: payload.service,
         categoryId: payload.serviceCat,
         TS_location_id: payload.location,
         TS_service_id: payload.service,
         TS_category_id: payload.serviceCat,
-
         mobile: payload.customerM,
         customerMobile: payload.customerM,
         customerPhone: payload.customerM,
@@ -838,10 +684,8 @@
       return { ...payload, ...compat };
     }
 
-    /* ---------- Init ---------- */
     $(function(){
       installResizeObservers();
-
       Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.src=src; });
 
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
@@ -852,15 +696,11 @@
 
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
-        separateDialCode:true, autoPlaceholder:'off',
-        placeholderNumberType:'MOBILE',
+        separateDialCode:true, autoPlaceholder:'off', placeholderNumberType:'MOBILE',
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
       $('#mobile').attr({inputmode:'tel',autocomplete:'tel',placeholder:'5XXXXXXXX'})
-                  .on('blur', ()=>{
-                    const ok = itiPhone && itiPhone.isValidNumber();
-                    document.getElementById('err-mobile').style.display = ok ? 'none':'block';
-                  });
+                  .on('blur', ()=>{ const ok = itiPhone && itiPhone.isValidNumber(); document.getElementById('err-mobile').style.display = ok ? 'none':'block'; });
 
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
@@ -943,7 +783,7 @@
 
           const payload = buildPayload();
 
-          // FRONT guard for requireds to avoid 400
+          // final front guard
           if(!payload.date || !payload.time || !payload.location || !payload.service ||
              !payload.customerM || !payload.payingMethod || !payload.urlLocation){
             console.log('[reserve payload - invalid]', payload);
@@ -953,10 +793,11 @@
 
           console.log('[reserve payload]', payload);
           const r=await postReservation(payload);
-          console.log('[reserve response]', r.status, r.data || r.raw);
+          console.log('[reserve response]', r?.status, r?.data || r?.raw || r?.error);
 
-          if(r.ok && (r.data?.success || r.data?.ok || r.data?.status==='ok')){ showToast('success','تم إنشاء الحجز'); showPage(6); }
-          else{
+          if(r.ok && (r.data?.success || r.data?.ok || r.data?.status==='ok')){
+            showToast('success','تم إنشاء الحجز'); showPage(6);
+          }else{
             const msg=r?.data?.msgAR || r?.data?.message || r?.raw || 'تعذر إنشاء الحجز';
             showToast('error', String(msg));
           }
@@ -996,14 +837,14 @@
     }
 
     /* ---------- Google Map ---------- */
-    let map, marker;
+    let map, marker, positionUrl="";
     function initMap(){
       const def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; const hint=document.getElementById('mapHint'); if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; renderSummary('page6'); updateNextAvailability(); };
-      marker.addListener('dragend',({latLng})=>setPos(latLng));
-      map.addListener('click',({latLng})=>setPos(latLng));
+      marker.addEventListener('dragend',({latLng})=>setPos(latLng));
+      map.addEventListener('click',({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
       btn?.addEventListener('click',()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),err=>{ showToast('error','تعذر تحديد موقعك'); },{ enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); });
     }
