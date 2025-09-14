@@ -471,30 +471,71 @@
         if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),600);
       }
     }
-    async function postReservationTry(url, payload, contentType='application/json;charset=UTF-8'){
+
+    /* ====== NEW tolerant POST (json → form) ====== */
+    async function postReservationTry(url, payload, mode='json'){
       try{
+        let headers = { 'Accept':'application/json' };
+        let body;
+
+        if(mode==='json'){
+          headers['Content-Type'] = 'application/json;charset=UTF-8';
+          body = JSON.stringify(payload);
+        }else if(mode==='form'){
+          headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+          const usp = new URLSearchParams();
+          for (const [k,v] of Object.entries(payload)){
+            if (v !== undefined && v !== null) usp.append(k, String(v));
+          }
+          body = usp.toString();
+        }else{
+          headers['Content-Type'] = 'text/plain;charset=UTF-8';
+          body = JSON.stringify(payload);
+        }
+
         const res=await fetch(url,{
           method:'POST',
           mode:'cors',
           cache:'no-store',
           credentials:'omit',
           referrerPolicy:'no-referrer',
-          headers:{'Content-Type':contentType,'Accept':'application/json'},
-          body:JSON.stringify(payload)
+          headers,
+          body
         });
-        const raw=await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
-        return {ok:res.ok,status:res.status,data,raw};
-      }catch(err){ return {ok:false,status:0,error:String(err)} }
-    }
-    async function postReservation(payload){
-      // Try JSON first, then text/plain, then fallback endpoint
-      let r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'application/json;charset=UTF-8');
-      if(!r.ok){ r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'text/plain;charset=UTF-8'); }
-      if(!r.ok && r.status===404){
-        r=await postReservationTry(RESERVE_URL_FALLBACK,payload,'application/json;charset=UTF-8');
-        if(!r.ok){ r=await postReservationTry(RESERVE_URL_FALLBACK,payload,'text/plain;charset=UTF-8'); }
+
+        const text = await res.text();
+        let data=null; try{ data = JSON.parse(text); }catch(_){}
+
+        const success = !!(data?.success || data?.ok || data?.status==='ok');
+
+        if(!res.ok || !success){
+          const errMsg = data?.msgAR || data?.message || data?.error || text || 'Bad Request';
+          console.warn('[reserve validation errors]', data?.errors || data?.zod || data?.details || null);
+          return { ok:false, status:res.status, data, raw:errMsg };
+        }
+
+        return { ok:true, status:res.status, data: data ?? text, raw:text };
+      }catch(err){
+        return { ok:false, status:0, error:String(err) };
       }
-      return r;
+    }
+
+    async function postReservation(payload){
+      const attempts = [
+        { url: RESERVE_URL_PRIMARY,  mode: 'json' },
+        { url: RESERVE_URL_PRIMARY,  mode: 'form' },
+        { url: RESERVE_URL_FALLBACK, mode: 'json' },
+        { url: RESERVE_URL_FALLBACK, mode: 'form' },
+      ];
+
+      let last=null;
+      for(const a of attempts){
+        const r = await postReservationTry(a.url, payload, a.mode);
+        console.log('[reserve attempt]', a.url, a.mode, r.status, r.data || r.raw || r.error);
+        if (r.ok) return r;
+        last = r;
+      }
+      return last;
     }
 
     /* ---------- Toast ---------- */
@@ -556,7 +597,7 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* —— summary chips (important only; NEVER on welcome) —— */
+    /* —— summary chips —— */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
@@ -599,7 +640,7 @@
       });
     }
 
-    /* —— Welcome slideshow (3 slides, auto → page2) —— */
+    /* —— Welcome slideshow —— */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -699,8 +740,14 @@
         btn.addEventListener('click',()=>{
           [...timeContainer.children].forEach(el=>el.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
-          nForm.date=selectedISO; nForm.time=t.actual24s;  // always HH:mm:ss
-          window.selectedTime={ui:t.label,iso:nForm.time};
+
+          nForm.date = selectedISO;
+          nForm.time = t.actual24s;   // always HH:mm:ss
+
+          // ✅ Keep both in sync
+          window.selectedTime = { ui: t.label, iso: nForm.time };
+          selectedTime        = window.selectedTime;
+
           renderSummary('page3'); updateNextAvailability();
         });
         timeContainer.appendChild(btn);
@@ -720,7 +767,7 @@
       header && ro.observe(header); footer && ro.observe(footer);
     }
 
-    /* ---------- Build payload (strict) ---------- */
+    /* ---------- Build payload (with compat aliases) ---------- */
     function buildPayload(){
       const toIntOrUndef = (v) => {
         if (v === undefined || v === null || v === '') return undefined;
@@ -751,20 +798,44 @@
 
       const locDesc = (nForm.locationDescription || '').trim() || undefined;
 
-      return {
-        date: dateISO,                         // "YYYY-MM-DD"
-        time: timeStd,                         // "HH:mm:ss"
-        location: locId,                       // number | undefined
-        service: srvId,                        // number | undefined
-        serviceCat: catId,                     // number | undefined
-        serviceCount: String(count),           // keep as string (safer for older handlers)
-        customerM: phoneDigits,                // digits only
-        customerN: nForm.customerN,            // string
+      const payload = {
+        date: dateISO,                // YYYY-MM-DD
+        time: timeStd,                // HH:mm:ss
+        location: locId,              // number
+        service: srvId,               // number
+        serviceCat: catId,            // number
+        serviceCount: String(count),  // string ok
+        customerM: phoneDigits,       // digits only
+        customerN: nForm.customerN || undefined,
         paymentMethod: (nForm.paymentMethod||'').toLowerCase(),
-        urlLocation: nForm.urlLocation,        // google maps url
-        locationDescription: locDesc,          // undefined if empty
+        urlLocation: nForm.urlLocation,          // Google Maps URL
+        locationDescription: locDesc,            // optional
         locale: 'ar'
       };
+
+      // ---- Compat aliases for older handlers ----
+      const compat = {
+        payingMethod: payload.paymentMethod,
+
+        appointmentDate: payload.date,
+        appointmentTime: payload.time,
+        TS_appointment_date: payload.date,
+        TS_appointment_time: payload.time,
+
+        locationId: payload.location,
+        serviceId: payload.service,
+        categoryId: payload.serviceCat,
+        TS_location_id: payload.location,
+        TS_service_id: payload.service,
+        TS_category_id: payload.serviceCat,
+
+        mobile: payload.customerM,
+        customerMobile: payload.customerM,
+        customerPhone: payload.customerM,
+        name: payload.customerN
+      };
+
+      return { ...payload, ...compat };
     }
 
     /* ---------- Init ---------- */
@@ -874,7 +945,7 @@
 
           // FRONT guard for requireds to avoid 400
           if(!payload.date || !payload.time || !payload.location || !payload.service ||
-             !payload.customerM || !payload.paymentMethod || !payload.urlLocation){
+             !payload.customerM || !payload.payingMethod || !payload.urlLocation){
             console.log('[reserve payload - invalid]', payload);
             showToast('error','الرجاء إكمال البيانات المطلوبة قبل التأكيد');
             return;
@@ -884,7 +955,7 @@
           const r=await postReservation(payload);
           console.log('[reserve response]', r.status, r.data || r.raw);
 
-          if(r.ok && r.data?.success){ showToast('success','تم إنشاء الحجز'); showPage(6); }
+          if(r.ok && (r.data?.success || r.data?.ok || r.data?.status==='ok')){ showToast('success','تم إنشاء الحجز'); showPage(6); }
           else{
             const msg=r?.data?.msgAR || r?.data?.message || r?.raw || 'تعذر إنشاء الحجز';
             showToast('error', String(msg));
