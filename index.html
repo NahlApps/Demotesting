@@ -234,9 +234,7 @@
 
     /* ===== Phone input tweaks (fit + country code LEFT) ===== */
     .iti{ width:100%; }
-    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{
-      left:8px; right:auto;
-    }
+    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ left:8px; right:auto; }
     html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
       padding-left: calc(76px + 8px);
       padding-right: 12px;
@@ -660,7 +658,6 @@
         {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
       ];
       if(cntTxt && cntTxt !== '1'){
-        chips.splice(2,0){};
         chips.splice(2,0,{i:'fa-car',t:'عدد',v:cntTxt,g:1});
       }
 
@@ -769,7 +766,7 @@
         timeContainer.appendChild(btn);
       });
 
-      // install keyboard navigation each render
+      // keyboard navigation each render
       installRovingRadios('#time-container', '.time-option');
     }
 
@@ -812,7 +809,7 @@
 
     function buildPayload(){
       const loc=$('#area').val(); const svcC=$('#serviceCat').val(); const svc=$('#service').val(); const cnt=$('#serviceCount').val()||'1';
-      const phoneDigits=itiPhone?.getNumber?.()?.replace(/^\+/, '') || ($('#mobile').val()||'').replace(/\D/g,'');
+      const phoneDigits= (window.intlTelInputUtils && itiPhone?.getNumber) ? (itiPhone.getNumber().replace(/^\+/, '')) : (($('#mobile').val()||'').replace(/\D/g,''));
       return {
         date:nForm.date, time:nForm.time,
         location:(loc!==null&&loc!=='')?String(loc):undefined,
@@ -859,7 +856,7 @@ END:VCALENDAR`;
       const start=DateTime.fromISO(`${booking.payload.date}T${(booking.payload.time||'09:00')}`).toUTC();
       const end=start.plus({minutes:60});
       const fmt=(d)=>d.toFormat("yyyyMMdd'T'HHmmss'Z'");
-      const details=`الخدمة: ${svcText}%0Aالعدد: ${booking.payload.serviceCount||'1'}%0Aالدفع: ${(booking.payload.paymentMethod||'').toUpperCase()}%0Aالمرجع: ${(booking.ref||'-')}`;
+      const details=`الخدمة: ${encodeURIComponent(svcText)}%0Aالعدد: ${encodeURIComponent(booking.payload.serviceCount||'1')}%0Aالدفع: ${encodeURIComponent((booking.payload.paymentMethod||'').toUpperCase())}%0Aالمرجع: ${encodeURIComponent(booking.ref||'-')}`;
       const loc=encodeURIComponent(booking.payload.urlLocation||'');
       return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('حجز غسيل - NahlTime')}&dates=${fmt(start)}/${fmt(end)}&details=${details}&location=${loc}`;
     }
@@ -1055,12 +1052,14 @@ END:VCALENDAR`;
     /* ---------- Google Map ---------- */
     let map, marker;
     function initMap(){
-      const def={lat:26.34165524787632,lng:50.11524831545726};
+      // Center on Riyadh (requested)
+      const def={lat:24.7136,lng:46.6753};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
       const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; const hint=document.getElementById('mapHint'); if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; renderSummary('page6'); updateNextAvailability(); };
-      marker.addEventListener('dragend',({latLng})=>setPos(latLng));
-      map.addEventListener('click',({latLng})=>setPos(latLng));
+      marker.addListener('dragend',({latLng})=>setPos(latLng));
+      // FIX: use Google Maps listener (not addEventListener)
+      map.addListener('click',({latLng})=>setPos(latLng));
       const btn=document.getElementById('show-my-location');
       btn?.addEventListener('click',()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),err=>{ showToast('error','تعذر تحديد موقعك'); },{ enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); });
     }
