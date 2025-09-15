@@ -27,8 +27,8 @@
       --ease:cubic-bezier(.22,.61,.36,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
 
-      --header-h:76px;     /* auto-updated by ResizeObserver */
-      --footer-h:100px;    /* auto-updated by ResizeObserver */
+      --header-h:76px;
+      --footer-h:100px;
 
       --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
@@ -41,8 +41,8 @@
         var(--page-bg) center/cover no-repeat fixed;
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
-      padding-top:var(--header-h);   /* space for fixed header */
-      padding-bottom:var(--footer-h);/* space for sticky footer */
+      padding-top:var(--header-h);
+      padding-bottom:var(--footer-h);
     }
 
     /* ===== Header (fixed) ===== */
@@ -158,7 +158,20 @@
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
 
     /* ===== Map ===== */
-    #googleMap{width:100%;height:420px;border-radius:14px;overflow:hidden}
+    #googleMap{width:100%;height:420px;border-radius:14px;overflow:hidden; position:relative}
+    .map-topbar{
+      position:absolute; top:10px; right:10px; left:10px; z-index:5;
+      display:flex; gap:8px; align-items:center;
+    }
+    .map-search{
+      flex:1; background:#fff; color:#0B2630; border-radius:12px; border:1px solid var(--border-300);
+      box-shadow:var(--shadow-sm); padding:8px 12px; min-height:44px;
+    }
+    .map-ctrls{display:flex; gap:8px}
+    .map-btn{
+      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:12px; min-height:44px; padding:8px 12px;
+      display:inline-flex; align-items:center; gap:6px; box-shadow:var(--shadow-xs); cursor:pointer;
+    }
 
     /* ===== Footer ===== */
     footer.sticky-nav{
@@ -199,18 +212,14 @@
       .footer-brand{width:100%; justify-content:space-between}
     }
 
-    /* ===== Phone input tweaks (fit + country code LEFT) ===== */
+    /* ===== Phone input tweaks ===== */
     .iti{ width:100%; }
-    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{
-      left:8px; right:auto;
-    }
+    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ left:8px; right:auto; }
     html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
-      padding-left: calc(76px + 8px);
-      padding-right: 12px;
-      text-align: left; direction: ltr;
+      padding-left: calc(76px + 8px); padding-right: 12px; text-align: left; direction: ltr;
     }
 
-    /* ===== Thank page (new) ===== */
+    /* ===== Thank page ===== */
     .success-badge{
       width:72px;height:72px;border-radius:50%;
       background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;
@@ -224,11 +233,25 @@
     .recap .label{min-width:90px;color:#224652;font-weight:800}
     .thank-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
     .thank-actions .btn{border-radius:12px;font-weight:800}
+
+    /* ===== Full-screen submission overlay (anti double submit) ===== */
+    .screen-overlay{
+      position:fixed; inset:0; z-index:1200; display:none;
+      background:rgba(255,255,255,.75); backdrop-filter:blur(2px);
+      align-items:center; justify-content:center; gap:12px; color:#0B2630;
+    }
+    .screen-overlay.show{display:flex}
   </style>
 </head>
 <body>
   <!-- Toasts -->
-  <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
+  <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1300;display:flex;flex-direction:column;gap:8px"></div>
+
+  <!-- Submission blocking overlay -->
+  <div id="submitOverlay" class="screen-overlay" aria-hidden="true">
+    <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
+    <strong>جاري إرسال الحجز…</strong>
+  </div>
 
   <!-- ===== Header (fixed) ===== -->
   <header id="siteHeader">
@@ -408,17 +431,24 @@
         <!-- 6) Map -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
-          <div class="card">
+          <div class="card position-relative">
+            <!-- Map controls overlay -->
+            <div class="map-topbar">
+              <input id="mapSearch" class="map-search" type="text" placeholder="ابحث عن موقعك (داخل السعودية)…" aria-label="بحث عن الموقع">
+              <div class="map-ctrls">
+                <button id="mapType" class="map-btn" type="button" aria-pressed="false"><i class="fa-regular fa-map"></i> خريطة</button>
+                <button id="show-my-location" class="map-btn" type="button"><i class="fa-solid fa-location-crosshairs"></i> موقعي</button>
+              </div>
+            </div>
             <div id="googleMap"></div>
           </div>
           <div class="card text-center">
-            <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
+            <small id="mapHint" class="text-muted d-block" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
           </div>
-          <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
           <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
         </section>
 
-        <!-- 7) Done (IMPROVED) -->
+        <!-- 7) Done -->
         <section id="page7" class="page" aria-label="تم الحجز">
           <h1 class="visually-hidden">تم الحجز</h1>
 
@@ -430,9 +460,7 @@
             </div>
 
             <!-- Recap -->
-            <div id="thank-recap" class="recap mt-3" style="text-align:start">
-              <!-- filled by JS -->
-            </div>
+            <div id="thank-recap" class="recap mt-3" style="text-align:start"></div>
 
             <!-- Actions -->
             <div class="thank-actions mt-3">
@@ -568,6 +596,7 @@
     };
     const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6};
     let selectedTime=null, servicesCache=null, categoriesCache=null, itiPhone=null, positionUrl="";
+    let isSubmitting = false;
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', locale:'ar'};
 
     function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
@@ -620,7 +649,6 @@
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
       const currGroup=STEP_GROUP_INDEX[activeId] ?? 0;
 
-      // hide completely on welcome
       wrap.style.display = currGroup === 0 ? 'none' : 'flex';
       if(currGroup===0){ wrap.innerHTML=''; return; }
 
@@ -628,7 +656,7 @@
       const srvTxt=$('#service').find(':selected').text()||'';
       const dt=nForm.date ? DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '';
       const tm=nForm.time||'';
-      const pay=nForm.paymentMethod||'';
+      const pay=(nForm.paymentMethod||'').toUpperCase();
       const plate=$('#plateNumber').val()||'';
       const locOk=!!positionUrl;
 
@@ -637,7 +665,7 @@
         {i:'fa-screwdriver-wrench',t:'الخدمة',v:srvTxt,g:1},
         {i:'fa-clock',t:'الموعد',v:(dt&&tm)?`${dt} • ${tm}`:'',g:2},
         {i:'fa-id-card',t:'لوحة',v:plate,g:3},
-        {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4},
+        {i:'fa-credit-card',t:'الدفع',v:pay,g:4},
         {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
       ];
 
@@ -650,7 +678,7 @@
       });
     }
 
-    /* —— Welcome slideshow (3 slides, auto → page2) —— */
+    /* —— Welcome slideshow (auto → page2) —— */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -671,7 +699,7 @@
     }
     function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
-    /* —— Times API helpers —— */
+    /* —— Times helpers —— */
     function parseTimeToLuxon(raw){ let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true}); return t.isValid?t:null; }
     function normalizeAvailability(r){ const s=String(r.TS_status||r.status||r.TS_appointment_status||'').toLowerCase(); const f=(typeof r.isAvailable==='boolean')?r.isAvailable:undefined; const b=Number(r.booked??r.TS_booked); const c=Number(r.capacity??r.TS_capacity); let rem=Number(r.remaining??r.TS_remaining); if(!Number.isFinite(rem)&&Number.isFinite(c)&&Number.isFinite(b)) rem=c-b; const open=f===true||['available','open','free','empty','vacant','canceled'].includes(s)||(Number.isFinite(rem)?rem>0:(f!==false&&!s)); return {looksOpen:open,remaining:rem}; }
 
@@ -740,7 +768,7 @@
       });
     }
 
-    /* ---------- ResizeObservers: keep padding in sync with fixed header & footer ---------- */
+    /* ---------- ResizeObservers: fix paddings for fixed header/footer ---------- */
     function installResizeObservers(){
       const header=document.getElementById('siteHeader');
       const footer=document.getElementById('siteFooter');
@@ -768,7 +796,7 @@
       };
     }
 
-    /* ===== THANK PAGE HELPERS (NEW) ===== */
+    /* ===== THANK PAGE HELPERS ===== */
     function buildThankMeta(serverResp){
       const areaTxt = $('#area').find(':selected').text() || '';
       const srvTxt  = $('#service').find(':selected').text() || '';
@@ -955,24 +983,40 @@
 
         if(id==='page6'){
           if(!positionUrl){ document.getElementById('err-map').style.display='block'; showToast('error','الرجاء تحديد الموقع'); return; }
-          document.getElementById('err-map').style.display='none'; nForm.urlLocation=positionUrl;
+          if(isSubmitting) return; // prevent double
+          isSubmitting = true;
+
+          // Block UI
+          const overlay = document.getElementById('submitOverlay');
+          const nextBtn = document.getElementById('footer-next');
+          nextBtn.classList.add('hidden'); nextBtn.disabled = true;
+          overlay.classList.add('show');
+
+          document.getElementById('err-map').style.display='none';
+          nForm.urlLocation=positionUrl;
 
           const r=await postReservation(buildPayload());
+
           if(r.ok && r.data?.success){
             const meta = buildThankMeta(r.data);
             populateThankPage(meta);
             showToast('success','تم إنشاء الحجز');
-            showPage(6); // page7
+            overlay.classList.remove('show');
+            showPage(6); // Go to Thank you
           } else {
             const msg=r?.data?.msgAR || (r.status===404?'المسار غير موجود':'تعذر إنشاء الحجز');
             showToast('error',msg);
+            // Unblock on failure
+            isSubmitting = false;
+            overlay.classList.remove('show');
+            nextBtn.classList.remove('hidden'); nextBtn.disabled = false;
           }
           return;
         }
         showPage(Math.min(i+1, orderedPages.length-1));
       }
       $next.addEventListener('click', gotoNext);
-      $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
+      $prev.addEventListener('click', ()=>{ if(isSubmitting) return; const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
       // Payment select
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
@@ -997,26 +1041,81 @@
       else if(i===2){ enable=!!selectedTime; }
       else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable = nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
       else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
-      else if(i===5){ enable=!!positionUrl; }
+      else if(i===5){ enable=!!positionUrl && !isSubmitting; }
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* ---------- Google Map ---------- */
-    let map, marker;
+    /* ---------- Google Map (Saudi-optimized) ---------- */
+    let map, marker, autocomplete, geocoder, mapType = 'roadmap';
     function initMap(){
-      const def={lat:26.34165524787632,lng:50.11524831545726};
-      map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
+      const def={lat:24.7136,lng:46.6753}; // Riyadh
+      map=new google.maps.Map(document.getElementById('googleMap'),{
+        center:def, zoom:12, disableDoubleClickZoom:true, mapTypeId: mapType
+      });
+      geocoder = new google.maps.Geocoder();
+
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; const hint=document.getElementById('mapHint'); if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; renderSummary('page6'); updateNextAvailability(); };
+
+      const setPos=(latLng,pan=false)=>{
+        if(!latLng) return;
+        marker.setPosition(latLng);
+        if(pan) map.panTo(latLng);
+        map.setZoom(17);
+        positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
+        // reverse geocode for a friendly hint
+        geocoder.geocode({location:{lat:latLng.lat(),lng:latLng.lng()}}, (res, status)=>{
+          const addr = (status==='OK' && res && res[0]) ? res[0].formatted_address : `${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}`;
+          const hint=document.getElementById('mapHint');
+          if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${addr}</strong>`;
+        });
+        renderSummary('page6'); updateNextAvailability();
+      };
+
       marker.addListener('dragend',({latLng})=>setPos(latLng));
       map.addListener('click',({latLng})=>setPos(latLng));
-      const btn=document.getElementById('show-my-location');
-      btn?.addEventListener('click',()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),err=>{ showToast('error','تعذر تحديد موقعك'); },{ enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); });
+
+      // Controls
+      const btnLocate=document.getElementById('show-my-location');
+      btnLocate?.addEventListener('click',()=>{
+        if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
+        navigator.geolocation.getCurrentPosition(
+          pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
+          err=>{ showToast('error','تعذر تحديد موقعك'); },
+          { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
+        );
+      });
+
+      const btnType=document.getElementById('mapType');
+      btnType?.addEventListener('click',()=>{
+        mapType = map.getMapTypeId()==='roadmap' ? 'hybrid' : 'roadmap';
+        map.setMapTypeId(mapType);
+        btnType.setAttribute('aria-pressed', mapType!=='roadmap');
+        btnType.innerHTML = mapType==='roadmap' ? '<i class="fa-regular fa-map"></i> خريطة' : '<i class="fa-solid fa-mountain-sun"></i> قمر صناعي';
+      });
+
+      // Places Autocomplete (Saudi only)
+      const input=document.getElementById('mapSearch');
+      const saBounds = {north:32.154, south:16.347, west:34.495, east:55.666}; // rough KSA bounds
+      const opts = {
+        fields:['geometry','formatted_address','name'],
+        componentRestrictions:{ country: ['sa'] },
+        bounds: saBounds, strictBounds:false
+      };
+      autocomplete = new google.maps.places.Autocomplete(input, opts);
+      autocomplete.addListener('place_changed', ()=>{
+        const place = autocomplete.getPlace();
+        if(!place.geometry || !place.geometry.location){ showToast('error','لم يتم العثور على موقع'); return; }
+        setPos(place.geometry.location, true);
+      });
+
+      // default hint
+      const hint=document.getElementById('mapHint');
+      if(hint) hint.innerHTML='اضغط على الخريطة أو اسحب العلامة لتحديد موقعك';
     }
     window.initMap=initMap;
   </script>
 
-  <!-- Google Maps -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
+  <!-- Google Maps (with Places for Autocomplete) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places" async defer></script>
 </body>
 </html>
