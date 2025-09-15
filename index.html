@@ -190,7 +190,6 @@
     /* ===== Mobile polish ===== */
     @media (max-width: 480px){
       .brand img{ height:64px }
-      /* compact chips & horizontal scroll */
       .summary-chips{
         overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
         gap:6px; padding-bottom:2px; scrollbar-width:thin;
@@ -323,7 +322,7 @@
               </div>
             </div>
 
-            <!-- NEW: time filters & sort -->
+            <!-- time filters & sort -->
             <div class="time-toolbar mt-3">
               <div>
                 <label class="form-label" for="timeFilter">فلترة الوقت</label>
@@ -683,8 +682,8 @@
     function normalizeAvailability(r){
       const s=String(r.TS_status||r.status||r.TS_appointment_status||'').toLowerCase();
       const f=(typeof r.isAvailable==='boolean')?r.isAvailable:undefined;
-      const b=Number(r.booked??r.TS_booked); const c=Number(r.capacity??r.TS_capacity);
-      let rem=Number(r.remaining??r.TS_remaining);
+      const b=Number(r.TS_booked ?? r.booked); const c=Number(r.TS_capacity ?? r.capacity);
+      let rem=Number(r.TS_remaining ?? r.remaining);
       if(!Number.isFinite(rem)&&Number.isFinite(c)&&Number.isFinite(b)) rem=c-b;
       const open=f===true||['available','open','free','empty','vacant','canceled'].includes(s)||(Number.isFinite(rem)?rem>0:(f!==false&&!s));
       return {looksOpen:open,remaining:rem};
@@ -818,12 +817,12 @@
       // preload BGs
       Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.src=src; });
 
-      // Select2
-      $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
-      $('#serviceCat').select2({width:'100%',placeholder:'التصنيف', dir:'rtl'});
-      $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
-      $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
-      $('#area, #serviceCat, #service').on('select2:open', ()=>{$('.select2-search__field').attr('dir','rtl');});
+      // Select2 with luxury placeholders
+      $('#area').select2({width:'100%',placeholder:'اختر المنطقة لخدمة العناية الفاخرة', dir:'rtl'});
+      $('#serviceCat').select2({width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
+      $('#service').select2({width:'100%',placeholder:'باقتك المختارة', dir:'rtl'});
+      $('#carBrand').select2({width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
+      $('#area, #serviceCat, #service, #carBrand').on('select2:open', ()=>{$('.select2-search__field').attr('dir','rtl');});
 
       // Phone input
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
@@ -831,10 +830,16 @@
         separateDialCode:true, placeholderNumberType:'MOBILE',
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
-      $('#mobile').attr({inputmode:'tel',autocomplete:'tel'}).on('blur', ()=> {
-        const ok = itiPhone && itiPhone.isValidNumber();
-        document.getElementById('err-mobile').style.display = ok ? 'none':'block';
-      });
+      // Luxury placeholders for inputs
+      $('#name').attr('placeholder','الاسم الرباعي كما سيظهر في الفاتورة');
+      $('#mobile').attr({placeholder:'رقم التواصل الخاص — مثال 5XXXXXXXX', inputmode:'tel', autocomplete:'tel'})
+                  .on('blur', ()=> {
+                    const ok = itiPhone && itiPhone.isValidNumber();
+                    document.getElementById('err-mobile').style.display = ok ? 'none':'block';
+                  });
+      $('#carName').attr('placeholder','الموديل/الفئة — مثال: S-Class، LX 570');
+      $('#plateNumber').attr('placeholder','آخر ٤ أرقام — للتوثيق فقط');
+      $('#mapSearch').attr('placeholder','ابحث عن برج، حي، أو عنوان داخل السعودية');
 
       // Load locations → services
       const today=DateTime.now().toFormat('yyyy-LL-dd');
@@ -843,7 +848,8 @@
       setLoadingServices(true);
       callContent2(`/locations`, res=>{
         const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
-        $('#area').empty().select2({data:ds,width:'100%'}); if(ds.length) $('#area').val(ds[0].id).trigger('change'); else { setLoadingServices(false); showToast('error','لا توجد مناطق متاحة حالياً'); }
+        $('#area').empty().select2({data:ds,width:'100%',placeholder:'اختر المنطقة لخدمة العناية الفاخرة', dir:'rtl'});
+        if(ds.length) $('#area').val(ds[0].id).trigger('change'); else { setLoadingServices(false); showToast('error','لا توجد مناطق متاحة حالياً'); }
         renderSummary('page2');
       });
 
@@ -852,31 +858,41 @@
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
           servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
-          $('#serviceCat').empty().select2({data:cats,width:'100%'}); if(cats.length) $('#serviceCat').val(cats[0].id).trigger('change');
+          $('#serviceCat').empty().select2({data:cats,width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
+          if(cats.length) $('#serviceCat').val(cats[0].id).trigger('change');
           setLoadingServices(false); renderSummary('page2'); updateNextAvailability();
         }, true);
       });
+
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
         const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
-        $('#service').empty().select2({data:items,width:'100%'}); if(items.length) $('#service').val(items[0].id).trigger('change');
+        $('#service').empty().select2({data:items,width:'100%',placeholder:'باقتك المختارة', dir:'rtl'});
+        if(items.length) $('#service').val(items[0].id).trigger('change');
         renderSummary('page2'); updateNextAvailability();
       });
       $('#service').on('change', function(){ nForm.service=this.value||''; renderSummary('page2'); updateNextAvailability(); });
 
-      // Brands
-      const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
-      $('#carBrand').empty().select2({data:brands,width:'100%'});
+      // Brands — luxury first in KSA
+      const luxuryFirstBrands = [
+        'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati',
+        'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti',
+        'GMC','Toyota','Nissan','Hyundai','Kia','Honda','Chevrolet','Ford','Mazda','Mitsubishi','Other'
+      ].map(b=>({id:b,text:b}));
+      $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
-      // Inputs
+      // Inputs & counters
       $('#name').on('input', function(){ nForm.customerN=this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
       $('#mobile').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
       $('#carName').on('input', function(){ updateNextAvailability(); });
       $('#serviceCount').on('change', function(){ nForm.serviceCount=this.value||'1'; renderSummary('page2'); updateNextAvailability(); });
       $('#plateNumber').on('input', function(){ updatePlateHint(); renderSummary('page4'); updateNextAvailability(); });
 
-      // Date & time toolbar
+      // Date & time toolbar labels (luxury tone)
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
+      $('#timeFilter option[value="all"]').text('كل الأوقات المتاحة');
+      $('#sortAsc').text('من الصباح إلى المساء');
+      $('#sortDesc').text('من المساء إلى الصباح');
       $('#timeFilter').on('change', function(){ currentTimeFilter=this.value; renderSelectedDateTimes(lastSelectedISO); });
       $('#sortAsc').on('click', function(){ sortDir='asc'; this.classList.add('active'); document.getElementById('sortDesc').classList.remove('active'); renderSelectedDateTimes(lastSelectedISO); });
       $('#sortDesc').on('click', function(){ sortDir='desc'; this.classList.add('active'); document.getElementById('sortAsc').classList.remove('active'); renderSelectedDateTimes(lastSelectedISO); });
