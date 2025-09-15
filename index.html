@@ -121,6 +121,10 @@
     .select2-results__option, .select2-search__field{color:#0B2630}
 
     .time-toolbar{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:8px}
+    @media (min-width:768px){ .time-toolbar{grid-template-columns: 1fr; } }
+    .btn-toggle{display:flex; gap:8px}
+    .btn-toggle .btn{flex:1}
+
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
     @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
     .time-option{
@@ -165,14 +169,9 @@
     .footer-social{display:flex; align-items:center; gap:12px}
     .footer-social a{color:#fff; opacity:.95; font-size:1.2rem}
     .footer-actions{display:flex; gap:12px; width:100%}
-    .btn-footer{
-      flex:1; border:1px solid var(--border-300); border-radius:14px; padding:16px 16px; min-height:56px;
-      font-size:1rem; font-weight:800; background:#fff; color:#027A93;
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
-    }
+    .btn-footer{ flex:1; border:1px solid var(--border-300); border-radius:14px; padding:16px 16px; min-height:56px; font-size:1rem; font-weight:800; background:#fff; color:#027A93; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease); }
     .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
-    .btn-footer:active{transform:translateY(0); box-shadow:var(--shadow-xs)}
-    .btn-footer.primary{background:linear-gradient(180deg,#0286a3,#027A93); color:#fff; border-color:#027A93}
+    .btn-footer.primary{background:#027A93; color:#fff; border-color:#027A93}
     .btn-footer.hidden{visibility:hidden}
     .btn-footer:disabled{opacity:.6; pointer-events:none}
     #footer-wait{display:none; align-items:center; gap:10px; color:#fff; font-weight:800}
@@ -335,7 +334,7 @@
           <div class="card">
             <div class="row g-3">
               <div class="col-12 col-md-6">
-                <label for="name" class="form-label">الإسم</label>
+                <label for="name" class="form-label">الاسم</label>
                 <input id="name" type="text" class="form-control" placeholder="الاسم كما سيظهر في الفاتورة" autocomplete="name"/>
                 <div class="field-error" id="err-name">يرجى إدخال الاسم</div>
               </div>
@@ -441,7 +440,7 @@
       </div>
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
-        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>التالي</button>
+        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>تخطي العرض</button>
 
         <div id="footer-wait" class="">
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -538,7 +537,6 @@
     let isSubmitting=false;
 
     let currentTimeFilter='all';
-    let sortDir='asc'; /* default early → late */
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', locale:'ar'};
 
@@ -569,15 +567,16 @@
       const onThanks=(orderedPages[i]==='page7');
       prev.classList.toggle('hidden', i===0 || onThanks);
       next.classList.toggle('hidden', onThanks);
-      /* make Next label "Skip" on welcome */
-      next.textContent = (i===0 ? 'تخطي العرض' : 'التالي');
       wait.classList.remove('show');
+
+      // Make Next act as "Skip" on welcome
+      next.textContent = (i===0) ? 'تخطي العرض' : 'التالي';
     }
 
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* Plate: any-length numeric + hint */
+    /* Plate logic (any length) */
     function isSpecialPlate(num){
       if(!/^\d+$/.test(num) || num.length < 3) return false;
       const same = /^(\d)\1+$/.test(num);
@@ -670,8 +669,6 @@
     }
 
     let dayTimes=[]; let timesLoaded=false;
-    let currentTimeFilter='all';
-
     function timeInMins(h, m){ return (h*60)+m }
     function passesFilter(mins){
       if(currentTimeFilter==='all') return true;
@@ -754,8 +751,8 @@
           nForm.date=selectedISO; nForm.time=parsed.toFormat('HH:mm');
           window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime;
           renderSummary('page3'); updateNextAvailability();
-          /* NEW: auto-advance to Contact after time select */
-          if(getActiveIndex()===2){ showPage(3); }
+          /* NEW: auto-advance to Contact page after selecting a time */
+          showPage(3);
         });
         timeContainer.appendChild(btn);
       });
@@ -812,7 +809,7 @@
                     document.getElementById('err-mobile').style.display = ok ? 'none':'block';
                   });
 
-      $('#name').attr('placeholder','الاسم كما سيظهر في الفاتورة'); /* removed الرباعي */
+      $('#name').attr('placeholder','الاسم كما سيظهر في الفاتورة');
       $('#carName').attr('placeholder','الموديل/الفئة — مثال: S-Class، LX 570');
       $('#plateNumber').attr('placeholder','أرقام اللوحة — اختياري');
 
@@ -872,7 +869,7 @@
 
       async function gotoNext(){
         const i=getActiveIndex(); const id=orderedPages[i];
-        if(id==='page1'){ /* Next acts as Skip */ stopWelcomeDeck(); showPage(1); return; }
+        if(id==='page1'){ stopWelcomeDeck(); showPage(1); return; } // acts as Skip
 
         if(id==='page2'){
           const areaOk=!!$('#area').val(), catOk=!!$('#serviceCat').val(), svcOk=!!$('#service').val();
@@ -938,16 +935,16 @@
       document.getElementById('footer-next').addEventListener('click', gotoNext);
       document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
-      /* Payment cards (auto-advance after select) */
+      /* Payment cards — auto-advance to Map after choosing */
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
       payCards.forEach((card,idx)=>{
         const input=card.querySelector('input');
         const choose=()=>{ 
           payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; });
-          card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true;
+          card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; 
           nForm.paymentMethod=input.value; renderSummary('page5'); updateNextAvailability();
-          /* NEW: auto-advance to Map after payment select */
-          if(getActiveIndex()===4){ showPage(5); }
+          /* NEW: auto-advance to Map page after selecting payment */
+          showPage(5);
         };
         card.addEventListener('click',choose);
         card.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();} });
@@ -960,15 +957,13 @@
 
     function updateNextAvailability(){
       const i=getActiveIndex(); const nextBtn=document.getElementById('footer-next'); let enable=true;
-      if(i===0){ enable=true; }                                  /* welcome: Skip */
+      if(i===0){ enable=true; }
       else if(i===1){ enable=!!($('#area').val()&&$('#service').val()); }
       else if(i===2){ enable=!!selectedTime; }
       else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
       else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
       else if(i===5){ enable=!!positionUrl; }
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
-      /* keep label up-to-date if user navigates quickly */
-      nextBtn.textContent = (i===0 ? 'تخطي العرض' : 'التالي');
     }
 
     /* Google Map + Places (Saudi focus) */
