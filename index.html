@@ -18,15 +18,21 @@
     :root{
       --brand-700:#01657A; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
       --ink-900:#0B2630; --surface-000:#FFF; --border-300:#D4E0E6;
+
       --radius-md:14px; --radius-pill:999px;
       --shadow-xs:0 2px 6px rgba(11,38,48,.07);
       --shadow-sm:0 3px 12px rgba(11,38,48,.09);
       --shadow-md:0 10px 28px rgba(11,38,48,.14);
+
       --ease:cubic-bezier(.22,.61,.36,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
-      --header-h:76px; --footer-h:100px;
+
+      --header-h:76px;     /* auto-updated by ResizeObserver */
+      --footer-h:100px;    /* auto-updated by ResizeObserver */
+
       --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
+
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
@@ -35,63 +41,131 @@
         var(--page-bg) center/cover no-repeat fixed;
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
-      padding-top:var(--header-h);
-      padding-bottom:var(--footer-h);
+      padding-top:var(--header-h);   /* space for fixed header */
+      padding-bottom:var(--footer-h);/* space for sticky footer */
     }
-    header{position:fixed; top:0; left:0; right:0; z-index:999; background:rgba(11,38,48,.36); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.15);}
-    .header-inner{max-width:1120px; width:100%; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between;}
+
+    /* ===== Header (fixed) ===== */
+    header{
+      position:fixed; top:0; left:0; right:0; z-index:999;
+      background:rgba(11,38,48,.36); backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.15);
+    }
+    .header-inner{
+      max-width:1120px; width:100%; margin:0 auto;
+      padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between;
+    }
     .brand{display:flex; align-items:center; gap:10px}
     .brand img{height:84px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
+
     .header-right{flex:1; display:flex; flex-direction:column; gap:6px}
     .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
-    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease)}
+    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease); will-change:width}
     .mini-progress .step{font-weight:800; font-size:1rem}
+
+    /* ===== Summary chips ===== */
     .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
     .summary-chips.hidden{display:none!important;}
-    .chip{display:inline-flex; align-items:center; gap:6px; max-width:100%; padding:6px 10px; border:1px solid rgba(255,255,255,.35); border-radius:999px; color:#fff; font-size:.85rem; background:transparent; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .chip{
+      display:inline-flex; align-items:center; gap:6px; max-width:100%;
+      padding:6px 10px; border:1px solid rgba(255,255,255,.35);
+      border-radius:999px; color:#fff; font-size:.85rem; background:transparent;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
     .chip.current{ background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.75); box-shadow:0 0 0 2px rgba(255,255,255,.16) inset; }
+
+    /* ===== Layout / pages ===== */
     main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
     #app{width:100%; max-width:1120px}
     .stage{position:relative; min-height:560px; padding:8px 0 20px}
-    .page{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px; padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;}
+    .page{
+      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
+      padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992);
+      pointer-events:none;
+    }
     .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
     .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
     @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
     @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
     .page h1{font-size:1.375rem; font-weight:800; margin:0; text-align:center}
-    .card{background:rgba(255,255,255,.88); color:#0B2630; border-radius:14px; box-shadow:var(--shadow-md); padding:24px; width:100%; max-width:920px; backdrop-filter:blur(6px);}
+
+    .card{
+      background:rgba(255,255,255,.88); color:#0B2630;
+      border-radius:14px; box-shadow:var(--shadow-md);
+      padding:24px; width:100%; max-width:920px; backdrop-filter:blur(6px);
+    }
+
+    /* ===== Welcome deck ===== */
     .ppt-deck{position:relative; width:100%; max-width:920px; height:200px}
-    .ppt-slide{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transform:translateY(14px) scale(.98); transition:opacity .6s var(--ease), transform .6s var(--ease);}
+    .ppt-slide{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      opacity:0; transform:translateY(14px) scale(.98); transition:opacity .6s var(--ease), transform .6s var(--ease);
+    }
     .ppt-slide .slide-card{ background:rgba(255,255,255,.92); color:#0B2630; border-radius:14px; box-shadow:var(--shadow-md); padding:18px 20px; text-align:center; width:min(820px,92%) }
     .ppt-slide.is-active{opacity:1; transform:none; z-index:2}
     .ppt-slide.is-exiting{opacity:0; transform:translateY(-8px) scale(.985); z-index:1}
     .ppt-dots{display:flex; gap:8px; justify-content:center; margin-top:12px}
     .ppt-dot{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.55)}
     .ppt-dot.active{background:#fff}
-    .form-control, select, .select2-selection{background:#fff; color:#0B2630; border:1px solid var(--border-300)!important; border-radius:14px!important; min-height:52px; text-align:center; font-size:16px; transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);}
+
+    /* ===== Forms & Select2 ===== */
+    .form-control, select, .select2-selection{
+      background:#fff; color:#0B2630; border:1px solid var(--border-300)!important; border-radius:14px!important;
+      min-height:52px; text-align:center; font-size:16px;
+      transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
+    }
     .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .form-label{display:inline-block; margin-bottom:6px; font-size:.9rem; font-weight:800; color:#224652}
     .field-error{color:#dc2626; font-size:.85rem; margin-top:6px; display:none}
+    .has-error .form-control, .has-error .select2-selection{ border-color:#dc2626 !important; }
+    .has-error .field-error{display:block}
+
     .select2-container .select2-selection--single .select2-selection__rendered{color:#0B2630!important; line-height:52px!important;}
     .select2-container .select2-selection--single{height:52px!important; display:flex; align-items:center}
     .select2-dropdown{background:#fff; color:#0B2630}
     .select2-results__option, .select2-search__field{color:#0B2630}
+
+    /* ===== Time grid ===== */
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
     @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
-    .time-option{background:#fff; color:#0B2630; font-weight:800; border:1px solid var(--border-300); border-radius:14px; padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs); transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease); display:flex; flex-direction:column; align-items:center; justify-content:center;}
+    .time-option{
+      background:#fff; color:#0B2630; font-weight:800;
+      border:1px solid var(--border-300); border-radius:14px;
+      padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs);
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
     .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
     .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
-    .load-overlay{position:absolute; inset:0; background:rgba(255,255,255,.88); color:#0B2630; display:none; align-items:center; justify-content:center; gap:12px; border-radius:14px; backdrop-filter:blur(2px);}
+
+    /* ===== Overlays ===== */
+    .load-overlay{
+      position:absolute; inset:0; background:rgba(255,255,255,.88); color:#0B2630;
+      display:none; align-items:center; justify-content:center; gap:12px; border-radius:14px; backdrop-filter:blur(2px);
+    }
     .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
     @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+
+    /* ===== Payment ===== */
     .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:920px}
-    .pay-card{background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px; padding:24px; display:flex; justify-content:center; align-items:center; gap:16px; min-height:76px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);}
+    .pay-card{
+      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px;
+      padding:24px; display:flex; justify-content:center; align-items:center; gap:16px;
+      min-height:76px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+    }
     .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
     .pay-card img{max-width:140px; height:auto}
     .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
+
+    /* ===== Map ===== */
     #googleMap{width:100%;height:420px;border-radius:14px;overflow:hidden}
-    footer.sticky-nav{position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.45); backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);}
+
+    /* ===== Footer ===== */
+    footer.sticky-nav{
+      position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.45);
+      backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);
+    }
     .footer-inner{ max-width:1120px; width:100%; margin:0 auto; padding:12px; display:flex; align-items:center; justify-content:space-between; gap:10px}
     .footer-brand{ font-size:.95rem; color:#fff; opacity:.94; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
     .footer-brand a{color:#fff; text-decoration:underline}
@@ -103,61 +177,100 @@
     .btn-footer.primary{background:#027A93; color:#fff; border-color:#027A93}
     .btn-footer.hidden{visibility:hidden}
     .btn-footer:disabled{opacity:.6; pointer-events:none}
+
+    /* ===== Mobile polish ===== */
     @media (max-width: 480px){
       :root{ --footer-h: 118px; }
-      .header-inner{padding-top:max(8px, env(safe-area-inset-top)); padding-bottom:8px; gap:10px;}
+      .header-inner{
+        padding-top: max(8px, env(safe-area-inset-top));
+        padding-bottom:8px; gap:10px;
+      }
       .brand img{ height:72px }
-      .summary-chips{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; gap:6px; padding-bottom:2px; scrollbar-width:thin;}
+      /* compact chips & horizontal scroll to save vertical space */
+      .summary-chips{
+        overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
+        gap:6px; padding-bottom:2px; scrollbar-width:thin;
+      }
       .summary-chips::-webkit-scrollbar{ height:4px }
       .chip{ padding:4px 8px; font-size:.78rem }
-      .chip .title{ display:none }
+      .chip .title{ display:none }            /* hide labels on mobile to keep it small */
       .chip .value{ max-width:140px; overflow:hidden; text-overflow:ellipsis }
       .btn-footer{min-height:58px; font-size:1.05rem}
       .footer-inner{flex-wrap:wrap}
       .footer-actions{width:100%}
       .footer-brand{width:100%; justify-content:space-between}
     }
-    .iti{ width:100%; }
-    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ left:8px; right:auto; }
-    html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{ padding-left: calc(76px + 8px); padding-right: 12px; text-align: left; direction: ltr; }
+
+    /* ===== Phone input tweaks (fit + country code LEFT) ===== */
+    .iti{ width:100%; } /* make the intl-tel container fill the column */
+    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{
+      left:8px; right:auto;      /* move flag/country code to LEFT side */
+    }
+    html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
+      padding-left: calc(76px + 8px);  /* space for the left flag/dial code */
+      padding-right: 12px;
+      text-align: left; direction: ltr;/* enter digits naturally LTR */
+    }
   </style>
 </head>
 <body>
   <!-- Toasts -->
   <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
 
-  <!-- Header -->
+  <!-- ===== Header (fixed) ===== -->
   <header id="siteHeader">
     <div class="header-inner">
       <div class="brand">
-        <img id="brandLogo" alt="Nahl Time"
+        <img id="brandLogo"
+             alt="Nahl Time"
              src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png"
-             onerror="handleLogoError(this)"/>
+             onerror="handleLogoError(this)" />
       </div>
+
       <div class="header-right">
         <div class="mini-progress" aria-hidden="true">
           <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
           <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
+        <!-- chips are injected here (hidden on welcome page) -->
         <div id="summaryChips" class="summary-chips hidden" aria-live="polite"></div>
       </div>
     </div>
   </header>
 
-  <!-- Body -->
+  <!-- ===== Body ===== -->
   <main>
     <div id="app">
       <div class="stage">
         <!-- 1) Welcome -->
         <section id="page1" class="page active" aria-label="الترحيب">
           <h1>✨ غسيل بدون طوابير</h1>
+
           <div id="pptDeck" class="ppt-deck">
-            <div class="ppt-slide is-active"><div class="slide-card"><h3 class="mb-2">نجيك لين باب بيتك</h3><p class="m-0">حجز سريع • خدمة متنقلة • احترافية في كل تفصيل</p></div></div>
-            <div class="ppt-slide"><div class="slide-card"><h3 class="mb-2">مواد فاخرة</h3><p class="m-0">منتجات آمنة على الطلاء والداخلية مع عناية دقيقة</p></div></div>
-            <div class="ppt-slide"><div class="slide-card"><h3 class="mb-2">موعدك على راحتك</h3><p class="m-0">حدد المنطقة والخدمة والوقت المناسب — والباقي علينا</p></div></div>
+            <div class="ppt-slide is-active">
+              <div class="slide-card">
+                <h3 class="mb-2">نجيك لين باب بيتك</h3>
+                <p class="m-0">حجز سريع • خدمة متنقلة • احترافية في كل تفصيل</p>
+              </div>
+            </div>
+            <div class="ppt-slide">
+              <div class="slide-card">
+                <h3 class="mb-2">مواد فاخرة</h3>
+                <p class="m-0">منتجات آمنة على الطلاء والداخلية مع عناية دقيقة</p>
+              </div>
+            </div>
+            <div class="ppt-slide">
+              <div class="slide-card">
+                <h3 class="mb-2">موعدك على راحتك</h3>
+                <p class="m-0">حدد المنطقة والخدمة والوقت المناسب — والباقي علينا</p>
+              </div>
+            </div>
           </div>
           <div id="pptDots" class="ppt-dots" aria-hidden="true"></div>
-          <div class="card text-center" style="max-width:860px"><p class="mb-0" style="color:#224652">انطلق — الخطوة التالية لاختيار المنطقة والخدمة</p></div>
+
+          <div class="card text-center" style="max-width:860px">
+            <p class="mb-0" style="color:#224652">انطلق — الخطوة التالية لاختيار المنطقة والخدمة</p>
+          </div>
         </section>
 
         <!-- 2) Service & Location -->
@@ -189,6 +302,7 @@
               </div>
             </div>
 
+            <!-- spinner only for services page -->
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
               <strong>جاري تحميل الخدمات…</strong>
@@ -230,7 +344,7 @@
               </div>
               <div class="col-12 col-md-6">
                 <label for="mobile" class="form-label">رقم الجوال</label>
-                <input id="mobile" type="tel" class="form-control" placeholder="5XXXXXXXX" autocomplete="tel"/>
+                <input id="mobile" type="tel" class="form-control" placeholder="+9665…" autocomplete="tel"/>
                 <div class="field-error" id="err-mobile">الرجاء إدخال رقم جوال صحيح</div>
               </div>
             </div>
@@ -250,6 +364,8 @@
               <div class="col-12 col-md-4">
                 <label class="form-label" for="plateNumber">آخر 4 أرقام من اللوحة</label>
                 <input id="plateNumber" type="text" inputmode="numeric" maxlength="4" class="form-control" placeholder="1234" autocomplete="off"/>
+                <small id="plateHelp" class="text-muted d-block mt-1" style="opacity:.9">نستخدم آخر ٤ أرقام للتأكيد فقط</small>
+                <div class="field-error" id="err-plate" style="display:none"></div>
               </div>
               <input id="locationDescription" type="text" hidden/>
             </div>
@@ -279,8 +395,12 @@
         <!-- 6) Map -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
-          <div class="card"><div id="googleMap"></div></div>
-          <div class="card text-center"><button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button></div>
+          <div class="card">
+            <div id="googleMap"></div>
+          </div>
+          <div class="card text-center">
+            <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
+          </div>
           <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
           <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
         </section>
@@ -297,7 +417,7 @@
     </div>
   </main>
 
-  <!-- Footer -->
+  <!-- ===== Footer ===== -->
   <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-brand">
@@ -311,6 +431,11 @@
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>التالي</button>
+        <!-- shown during submission to prevent double submit -->
+        <div id="submitSpinner" class="btn-footer primary" style="display:none; justify-content:center; align-items:center; gap:10px; pointer-events:none;">
+          <span class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
+          <strong>جاري إنشاء الحجز…</strong>
+        </div>
       </div>
     </div>
   </footer>
@@ -336,10 +461,10 @@
       else { img.style.display = 'none'; }
     }
 
-    /* ---------- API (canonical path only) ---------- */
-    const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';
-    const BASE  =`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
-    const RESERVE_URL =`${BASE}/reserveAppointment`;
+    /* ---------- API ---------- */
+    const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';  /* <-- updated as requested */
+    const FORM_BASE=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
+    const RESERVE_URL=`${FORM_BASE}/reserveAppointment`;   // ONLY this route (no cross-origin fallback)
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -350,7 +475,7 @@
       }
       try{
         await new Promise(r=>setTimeout(r, 200));
-        const res=await fetch(BASE+path,{method:'GET',redirect:'follow',...(abortable&&{signal}),cache:'no-store'});
+        const res=await fetch(FORM_BASE+path,{method:'GET',redirect:'follow',...(abortable&&{signal}),cache:'no-store'});
         if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network');}
         cb(await res.json());
       }catch(e){
@@ -358,61 +483,27 @@
       }
     }
 
-    /* ===== tolerant POST (form → json) ===== */
-    async function postReservationTry(url, payload, mode='form'){
+    // POST helper — send as text/plain (server does readBody + JSON.parse)
+    async function postReservationTry(url, payload){
       try{
-        let headers = { 'Accept':'application/json' };
-        let body;
-
-        if(mode==='form'){
-          headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
-          const usp = new URLSearchParams();
-          for (const [k,v] of Object.entries(payload)){
-            if (v !== undefined && v !== null) usp.append(k, String(v));
-          }
-          body = usp.toString();
-        }else{
-          headers['Content-Type'] = 'application/json;charset=UTF-8';
-          body = JSON.stringify(payload);
-        }
-
         const res=await fetch(url,{
           method:'POST',
           mode:'cors',
           cache:'no-store',
           credentials:'omit',
-          headers,
-          body
+          referrerPolicy:'no-referrer',
+          headers:{ 'Content-Type': 'text/plain;charset=UTF-8', 'Accept':'application/json' },
+          body: JSON.stringify(payload)
         });
-
-        const text = await res.text();
-        let data=null; try{ data = JSON.parse(text); }catch(_){}
-        const success = !!(data?.success || data?.ok || data?.status==='ok');
-
-        if(!res.ok || !success){
-          const errMsg = data?.msgAR || data?.message || data?.error || text || 'Bad Request';
-          console.warn('[reserve validation errors]', data?.errors || data?.zod || data?.details || null);
-          return { ok:false, status:res.status, data, raw:errMsg };
-        }
-        return { ok:true, status:res.status, data: data ?? text, raw:text };
+        const raw=await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
+        return {ok:res.ok,status:res.status,data,raw};
       }catch(err){
-        return { ok:false, status:0, error:String(err) };
+        return {ok:false,status:0,error:String(err)};
       }
     }
-
     async function postReservation(payload){
-      const attempts = [
-        { url: RESERVE_URL, mode: 'form' },
-        { url: RESERVE_URL, mode: 'json' },
-      ];
-      let last=null;
-      for(const a of attempts){
-        const r = await postReservationTry(a.url, payload, a.mode);
-        console.log('[reserve attempt]', a.url, a.mode, r.status, r.data || r.raw || r.error);
-        if (r.ok) return r;
-        last = r;
-      }
-      return last;
+      const r = await postReservationTry(RESERVE_URL, payload);
+      return r;
     }
 
     /* ---------- Toast ---------- */
@@ -441,6 +532,7 @@
     };
     const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6};
     let selectedTime=null, servicesCache=null, categoriesCache=null, itiPhone=null, positionUrl="";
+    let isSubmitting=false;   /* <-- prevent double submit */
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', locale:'ar'};
 
     function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
@@ -452,7 +544,11 @@
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
       requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 240); });
-      syncProgress(idx); setPageBackground(next.id); renderSummary(next.id); updateNextAvailability();
+
+      syncProgress(idx);
+      setPageBackground(next.id);
+      renderSummary(next.id);
+      updateNextAvailability();
       if(next.id==='page1') startWelcomeDeck();
     }
     function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
@@ -470,12 +566,33 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
+    function isSpecialPlate(num){
+      if(!/^\d{4}$/.test(num)) return false;
+      const same=/^(\d)\1{3}$/.test(num), asc='0123456789'.includes(num), desc='9876543210'.includes(num), pal=num===num.split('').reverse().join(''), pairs=/^(\d)\1(\d)\2$/.test(num);
+      return same||asc||desc||pal||pairs;
+    }
+    function updatePlateHint(){
+      const v=($('#plateNumber').val()||'').replace(/\D/g,'').slice(0,4);
+      $('#plateNumber').val(v);
+      $('#plateHelp').text(isSpecialPlate(v)?'رقم مميز 👌 — ممتاز للتوثيق السريع.':'نستخدم آخر ٤ أرقام للتأكيد فقط');
+      const pe=document.getElementById('err-plate');
+      if(v.length>0 && v.length<4){ pe.style.display='block'; pe.textContent='رجاءً أدخل ٤ أرقام'; } else { pe.style.display='none'; }
+    }
+
+    /* —— summary chips (important only; NEVER on welcome) —— */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
       const currGroup=STEP_GROUP_INDEX[activeId] ?? 0;
-      if(currGroup===0){ wrap.classList.add('hidden'); wrap.style.display='none'; wrap.innerHTML=''; return; }
-      wrap.classList.remove('hidden'); wrap.style.display='flex';
+
+      if(currGroup===0){
+        wrap.classList.add('hidden');
+        wrap.style.display='none';
+        wrap.innerHTML='';
+        return;
+      }
+      wrap.classList.remove('hidden');
+      wrap.style.display='flex';
 
       const areaTxt=$('#area').find(':selected').text()||'';
       const srvTxt=$('#service').find(':selected').text()||'';
@@ -492,17 +609,20 @@
         {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4},
         {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
       ];
-      if(cntTxt && cntTxt !== '1'){ chips.splice(2,0,{i:'fa-car',t:'عدد',v:cntTxt,g:1}); }
+      if(cntTxt && cntTxt !== '1'){
+        chips.splice(2,0,{i:'fa-car',t:'عدد',v:cntTxt,g:1});
+      }
+
       wrap.innerHTML='';
       chips.filter(c=>c.v && c.g<=currGroup).forEach(c=>{
         const el=document.createElement('div');
-        el.className='chip'+(c.g===currGroup?' current':'' );
+        el.className='chip'+(c.g===currGroup?' current':'');
         el.innerHTML=`<i class="fa-solid ${c.i}"></i><span class="title">${c.t}:</span><span class="value">${c.v}</span>`;
         wrap.appendChild(el);
       });
     }
 
-    /* —— Welcome slideshow —— */
+    /* —— Welcome slideshow (3 slides, auto → page2) —— */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -511,6 +631,7 @@
       const dotsWrap=document.getElementById('pptDots');
       dotsWrap.innerHTML=slides.map((_,i)=>`<span class="ppt-dot${i===0?' active':''}"></span>`).join('');
       const dots=[...dotsWrap.children];
+
       const setActive=(i,ex=-1)=>{
         slides.forEach((s,idx)=>{ s.classList.remove('is-active','is-exiting'); if(idx===i){s.classList.add('is-active'); s.style.zIndex=2;} else if(idx===ex){s.classList.add('is-exiting'); s.style.zIndex=1;} else{s.style.zIndex=0;} });
         dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
@@ -523,21 +644,8 @@
     function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
     /* —— Times helpers —— */
-    function parseTimeToLuxon(raw){
-      let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true});
-      if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
-      if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true});
-      if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true});
-      return t.isValid?t:null;
-    }
-    function normalizeAvailability(r){
-      const s=String(r.TS_status||r.status||r.TS_appointment_status||'').toLowerCase();
-      const f=(typeof r.isAvailable==='boolean')?r.isAvailable:undefined;
-      const b=Number(r.booked??r.TS_booked); const c=Number(r.capacity??r.TS_capacity); let rem=Number(r.remaining??r.TS_remaining);
-      if(!Number.isFinite(rem)&&Number.isFinite(c)&&Number.isFinite(b)) rem=c-b;
-      const open=f===true||['available','open','free','empty','vacant','canceled'].includes(s)||(Number.isFinite(rem)?rem>0:(f!==false&&!s));
-      return {looksOpen:open,remaining:rem};
-    }
+    function parseTimeToLuxon(raw){ let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true}); return t.isValid?t:null; }
+    function normalizeAvailability(r){ const s=String(r.TS_status||r.status||r.TS_appointment_status||'').toLowerCase(); const f=(typeof r.isAvailable==='boolean')?r.isAvailable:undefined; const b=Number(r.booked??r.TS_booked); const c=Number(r.capacity??r.TS_capacity); let rem=Number(r.remaining??r.TS_remaining); if(!Number.isFinite(rem)&&Number.isFinite(c)&&Number.isFinite(b)) rem=c-b; const open=f===true||['available','open','free','empty','vacant','canceled'].includes(s)||(Number.isFinite(rem)?rem>0:(f!==false&&!s)); return {looksOpen:open,remaining:rem}; }
 
     let dayTimes=[]; let timesLoaded=false;
 
@@ -569,13 +677,9 @@
           return true;
         });
 
-        const list=filtered.map(r=>{
-          const t=parseTimeToLuxon(r.TS_appointment_time);
-          return { label:t.toLocaleString(DateTime.TIME_SIMPLE), actual24s:t.toFormat('HH:mm:ss') };
-        });
+        const list=filtered.map(r=>{ const t=parseTimeToLuxon(r.TS_appointment_time); return {label:t.toLocaleString(DateTime.TIME_SIMPLE), actual12:t.toFormat('hh:mm a')}; });
         const seen=new Set();
-        dayTimes=list.filter(x=>{ if(seen.has(x.actual24s)) return false; seen.add(x.actual24s); return true; })
-                     .sort((a,b)=>a.actual24s.localeCompare(b.actual24s));
+        dayTimes=list.filter(x=>{ if(seen.has(x.actual12)) return false; seen.add(x.actual12); return true; }).sort((a,b)=>a.actual12.localeCompare(b.actual12));
 
         timesLoaded=true; renderSelectedDateTimes(selectedISO); dateEl.disabled=false; setLoadingTimes(false);
       }, true);
@@ -601,16 +705,14 @@
         btn.addEventListener('click',()=>{
           [...timeContainer.children].forEach(el=>el.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
-          nForm.date = selectedISO;
-          nForm.time = t.actual24s;
-          window.selectedTime = { ui: t.label, iso: nForm.time };
-          selectedTime        = window.selectedTime;
-          renderSummary('page3'); updateNextAvailability();
+          const parsed=DateTime.fromFormat(t.actual12,'h:mm a'); nForm.date=selectedISO; nForm.time=parsed.isValid?parsed.toFormat('HH:mm'):t.actual12;
+          window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime; renderSummary('page3'); updateNextAvailability();
         });
         timeContainer.appendChild(btn);
       });
     }
 
+    /* ---------- ResizeObservers: keep padding in sync with fixed header & footer ---------- */
     function installResizeObservers(){
       const header=document.getElementById('siteHeader');
       const footer=document.getElementById('siteFooter');
@@ -624,89 +726,46 @@
     }
 
     function buildPayload(){
-      const toIntOrUndef = (v) => {
-        if (v === undefined || v === null || v === '') return undefined;
-        const n = parseInt(String(v), 10);
-        return Number.isFinite(n) ? n : undefined;
+      const loc=$('#area').val(); const svcC=$('#serviceCat').val(); const svc=$('#service').val(); const cnt=$('#serviceCount').val()||'1';
+      const phoneDigits=itiPhone?.getNumber?.()?.replace(/^\+/, '') || '';
+      return {
+        date:nForm.date, time:nForm.time,
+        location:(loc!==null&&loc!=='')?String(loc):undefined,
+        service:(svc!==null&&svc!=='')?String(svc):undefined,
+        serviceCount:String(cnt),
+        serviceCat:(svcC!==null&&svcC!=='')?String(svcC):undefined,
+        customerM:phoneDigits, customerN:nForm.customerN,
+        paymentMethod:(nForm.paymentMethod||'').toLowerCase(),
+        urlLocation:nForm.urlLocation, locationDescription:nForm.locationDescription||'', locale:'ar'
       };
-      const hhmmToHHMMSS = (t) => {
-        if (!t) return undefined;
-        const m = String(t).match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
-        if (!m) return undefined;
-        const hh = m[1].padStart(2, '0');
-        const mm = m[2].padStart(2, '0');
-        const ss = (m[3] || '00').padStart(2, '0');
-        return `${hh}:${mm}:${ss}`;
-      };
-
-      const locId   = toIntOrUndef($('#area').val());
-      const catId   = toIntOrUndef($('#serviceCat').val());
-      const srvId   = toIntOrUndef($('#service').val());
-      const count   = toIntOrUndef($('#serviceCount').val()) ?? 1;
-
-      const dateISO = nForm.date || DateTime.now().toISODate();
-      const timeStd = hhmmToHHMMSS(nForm.time);
-
-      const phoneDigits = (window.intlTelInputUtils && itiPhone?.getNumber)
-        ? itiPhone.getNumber().replace(/^\+/, '')
-        : (($('#mobile').val()||'').replace(/\D/g,''));
-
-      const locDesc = (nForm.locationDescription || '').trim() || undefined;
-
-      const payload = {
-        date: dateISO,
-        time: timeStd,
-        location: locId,
-        service: srvId,
-        serviceCat: catId,
-        serviceCount: String(count),
-        customerM: phoneDigits,
-        customerN: nForm.customerN || undefined,
-        paymentMethod: (nForm.paymentMethod||'').toLowerCase(),
-        urlLocation: nForm.urlLocation,
-        locationDescription: locDesc,
-        locale: 'ar'
-      };
-
-      const compat = {
-        payingMethod: payload.paymentMethod,
-        appointmentDate: payload.date,
-        appointmentTime: payload.time,
-        TS_appointment_date: payload.date,
-        TS_appointment_time: payload.time,
-        locationId: payload.location,
-        serviceId: payload.service,
-        categoryId: payload.serviceCat,
-        TS_location_id: payload.location,
-        TS_service_id: payload.service,
-        TS_category_id: payload.serviceCat,
-        mobile: payload.customerM,
-        customerMobile: payload.customerM,
-        customerPhone: payload.customerM,
-        name: payload.customerN
-      };
-
-      return { ...payload, ...compat };
     }
 
+    /* ---------- Init ---------- */
     $(function(){
       installResizeObservers();
+
+      // preload BGs
       Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.src=src; });
 
+      // Select2
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'التصنيف', dir:'rtl'});
       $('#service').select2({width:'100%',placeholder:'الخدمة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
       $('#area, #serviceCat, #service').on('select2:open', ()=>{$('.select2-search__field').attr('dir','rtl');});
 
+      // Phone input
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
-        separateDialCode:true, autoPlaceholder:'off', placeholderNumberType:'MOBILE',
+        separateDialCode:true, placeholderNumberType:'MOBILE',
         utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
       });
-      $('#mobile').attr({inputmode:'tel',autocomplete:'tel',placeholder:'5XXXXXXXX'})
-                  .on('blur', ()=>{ const ok = itiPhone && itiPhone.isValidNumber(); document.getElementById('err-mobile').style.display = ok ? 'none':'block'; });
+      $('#mobile').attr({inputmode:'tel',autocomplete:'tel'}).on('blur', ()=> {
+        const ok = itiPhone && itiPhone.isValidNumber();
+        document.getElementById('err-mobile').style.display = ok ? 'none':'block';
+      });
 
+      // Load locations → services
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
@@ -728,27 +787,30 @@
       });
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
-        const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)
-                    ?.sort((a,b)=>a.TS_service_id-b.TS_service_id)
-                    ?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
+        const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
         $('#service').empty().select2({data:items,width:'100%'}); if(items.length) $('#service').val(items[0].id).trigger('change');
         renderSummary('page2'); updateNextAvailability();
       });
       $('#service').on('change', function(){ nForm.service=this.value||''; renderSummary('page2'); updateNextAvailability(); });
 
+      // Brands
       const brands=["Toyota","Nissan","Hyundai","Kia","Honda","Lexus","BMW","Mercedes-Benz","Chevrolet","Ford","Mazda","Mitsubishi","Aston Martin","Other"].sort().map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:brands,width:'100%'});
 
+      // Inputs
       $('#name').on('input', function(){ nForm.customerN=this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
       $('#mobile').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
       $('#carName').on('input', function(){ updateNextAvailability(); });
       $('#serviceCount').on('change', function(){ nForm.serviceCount=this.value||'1'; renderSummary('page2'); updateNextAvailability(); });
-      $('#plateNumber').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
+      $('#plateNumber').on('input', function(){ updatePlateHint(); renderSummary('page4'); updateNextAvailability(); });
 
+      // Date
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
 
+      // Footer nav
       const $prev=document.getElementById('footer-prev');
       const $next=document.getElementById('footer-next');
+      const $wait=document.getElementById('submitSpinner');
 
       async function gotoNext(){
         const i=getActiveIndex(); const id=orderedPages[i];
@@ -766,14 +828,12 @@
         if(id==='page3'){ if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; } showPage(3); return; }
 
         if(id==='page4'){
-          const nameOk=($('#name').val()||'').trim().length>0;
-          const phoneOk= itiPhone ? itiPhone.isValidNumber() : false;
+          const nameOk=($('#name').val()||'').trim().length>0; const phoneOk= itiPhone ? itiPhone.isValidNumber() : false;
           document.getElementById('err-name').style.display=nameOk?'none':'block';
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
-          nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/, '');
-          const plateRaw=($('#plateNumber').val()||'').replace(/\D/g,''); // optional
-          nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', plateRaw].filter(Boolean).join(', ');
+          nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
+          nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
           showPage(4); return;
         }
 
@@ -786,32 +846,39 @@
           if(!positionUrl){ document.getElementById('err-map').style.display='block'; showToast('error','الرجاء تحديد الموقع'); return; }
           document.getElementById('err-map').style.display='none'; nForm.urlLocation=positionUrl;
 
-          const payload = buildPayload();
+          if(isSubmitting) return;          /* prevent double click */
+          isSubmitting = true;
+          $prev.style.display='none';       /* remove nav while submitting */
+          $next.style.display='none';
+          $wait.style.display='flex';       /* show waiting spinner */
 
-          if(!payload.date || !payload.time || !payload.location || !payload.service ||
-             !payload.customerM || !payload.payingMethod || !payload.urlLocation){
-            console.log('[reserve payload - invalid]', payload);
-            showToast('error','الرجاء إكمال البيانات المطلوبة قبل التأكيد');
-            return;
-          }
+          const r=await postReservation(buildPayload());
 
-          console.log('[reserve payload]', payload);
-          const r=await postReservation(payload);
-          console.log('[reserve response]', r?.status, r?.data || r?.raw || r?.error);
-
-          if(r.ok && (r.data?.success || r.data?.ok || r.data?.status==='ok')){
-            showToast('success','تم إنشاء الحجز'); showPage(6);
+          if(r.ok && r.data?.success){
+            showToast('success','تم إنشاء الحجز');
+            $wait.style.display='none';     /* hide spinner before transitioning */
+            showPage(6);                    /* to thank-you (buttons hidden by logic) */
           }else{
-            const msg=r?.data?.msgAR || r?.data?.message || r?.raw || 'تعذر إنشاء الحجز';
-            showToast('error', String(msg));
+            let msg = 'تعذر إنشاء الحجز';
+            if (r?.data?.msgAR) msg = r.data.msgAR;
+            else if (r.status === 404) msg = 'المسار متاح لكن الخادم أعاد 404 (خطأ داخلي في المعالجة)';
+            showToast('error', msg);
+
+            // restore buttons so user can retry
+            $wait.style.display='none';
+            $next.style.display='';
+            $prev.style.display='';
+            isSubmitting = false;
+            updateNextAvailability();
           }
           return;
         }
         showPage(Math.min(i+1, orderedPages.length-1));
       }
-      document.getElementById('footer-next').addEventListener('click', gotoNext);
-      document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
+      $next.addEventListener('click', gotoNext);
+      $prev.addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
+      // Payment select
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
       payCards.forEach((card)=>{
         const input=card.querySelector('input');
@@ -820,64 +887,40 @@
         card.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();} });
       });
 
-      document.getElementById('rebook').addEventListener('click', ()=>location.href='/');
+      // Rebook
+      $('#rebook').on('click', ()=>location.href='/');
 
+      // Start
       setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
     });
 
     function updateNextAvailability(){
       const i=getActiveIndex(); const nextBtn=document.getElementById('footer-next'); let enable=true;
-      if(i===0){ enable=true; }
+      if(i===0){ enable=true; }                   // welcome always enabled
       else if(i===1){ enable=!!($('#area').val()&&$('#service').val()); }
       else if(i===2){ enable=!!selectedTime; }
-      else if(i===3){
-        const nameOk=($('#name').val()||'').trim().length>0;
-        const phoneOk= itiPhone ? itiPhone.isValidNumber() : false;
-        enable = nameOk && phoneOk;
-      }
+      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; const phoneOk= (window.itiPhone ? itiPhone.isValidNumber() : false); enable = nameOk && phoneOk; }
       else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
-      else if(i===5){ enable=!!positionUrl; }
+      else if(i===5){ enable=!!positionUrl && !isSubmitting; }  // block while submitting
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
     /* ---------- Google Map ---------- */
-    let map, marker; // ✅ no duplicate positionUrl here (it's declared in STATE)
-
+    let map, marker;
     function initMap(){
       const def={lat:26.34165524787632,lng:50.11524831545726};
       map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-
-      const setPos=(latLng,pan=false)=>{
-        if(!latLng) return;
-        marker.setPosition(latLng);
-        if(pan) map.panTo(latLng);
-        map.setZoom(17);
-        positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
-        const hint=document.getElementById('mapHint');
-        if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`;
-        renderSummary('page6'); updateNextAvailability();
-      };
-
-      // ✅ Use Google Maps event system
+      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; const hint=document.getElementById('mapHint'); if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; renderSummary('page6'); updateNextAvailability(); };
       marker.addListener('dragend',({latLng})=>setPos(latLng));
       map.addListener('click',({latLng})=>setPos(latLng));
-
       const btn=document.getElementById('show-my-location');
-      btn?.addEventListener('click',()=>{
-        if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
-        navigator.geolocation.getCurrentPosition(
-          pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
-          ()=>{ showToast('error','تعذر تحديد موقعك'); },
-          { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
-        );
-      });
+      btn?.addEventListener('click',()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),err=>{ showToast('error','تعذر تحديد موقعك'); },{ enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); });
     }
-    // expose for callback
     window.initMap=initMap;
   </script>
 
-  <!-- Google Maps (must come after window.initMap assignment) -->
+  <!-- Google Maps -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
 </body>
 </html>
