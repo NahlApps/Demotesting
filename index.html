@@ -209,6 +209,21 @@
       padding-right: 12px;
       text-align: left; direction: ltr;
     }
+
+    /* ===== Thank page (new) ===== */
+    .success-badge{
+      width:72px;height:72px;border-radius:50%;
+      background:#16a34a;color:#fff;display:flex;align-items:center;justify-content:center;
+      font-size:34px;font-weight:900;box-shadow:0 10px 28px rgba(22,163,74,.35);
+    }
+    .recap{
+      background:rgba(255,255,255,.92);border:1px solid var(--border-300);
+      border-radius:14px;padding:14px 16px;color:#0B2630;
+    }
+    .recap .rowp{display:flex;gap:10px;align-items:center;margin:.25rem 0}
+    .recap .label{min-width:90px;color:#224652;font-weight:800}
+    .thank-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+    .thank-actions .btn{border-radius:12px;font-weight:800}
   </style>
 </head>
 <body>
@@ -390,42 +405,62 @@
           <div class="field-error" id="err-pay" style="text-align:center">يرجى اختيار طريقة الدفع</div>
         </section>
 
-        <!-- 6) Map (ENHANCED) -->
+        <!-- 6) Map -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
-
-          <!-- Search input over the map -->
-          <div class="card" style="position:relative;">
-            <input id="placeSearch" class="form-control" type="text"
-                   placeholder="ابحث عن موقعك (عنوان/حي/معلم)…"
-                   style="position:absolute; z-index:3; top:12px; left:12px; right:12px;">
-            <div id="googleMap" style="margin-top:56px;"></div>
+          <div class="card">
+            <div id="googleMap"></div>
           </div>
-
-          <!-- Inline confirmation sheet -->
-          <div id="locationSheet" class="card" style="display:none; max-width:920px;">
-            <div class="d-flex flex-column gap-1">
-              <strong>العنوان المقترح:</strong>
-              <div id="locAddress" class="text-muted"></div>
-              <small id="locCoords" class="text-muted"></small>
-              <div class="mt-2 d-flex gap-2 flex-wrap">
-                <button id="confirmLocation" class="btn btn-primary">تأكيد الموقع</button>
-                <a id="locShare" class="btn btn-outline-secondary" target="_blank" rel="noopener">فتح في الخرائط</a>
-                <button id="show-my-location" class="btn btn-outline-primary" type="button">إستخدام موقعي الحالي</button>
-              </div>
-            </div>
+          <div class="card text-center">
+            <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
           </div>
-
           <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
           <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
         </section>
 
-        <!-- 7) Done -->
+        <!-- 7) Done (IMPROVED) -->
         <section id="page7" class="page" aria-label="تم الحجز">
-          <h1>شكراً لكم 🌟</h1>
-          <div class="card text-center" style="max-width:720px">
-            <p class="mb-3" style="color:#224652">تم استلام طلبكم، وسنؤكد الموعد على واتساب قريبًا.</p>
-            <button id="rebook" class="btn btn-primary" type="button" style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px">🔁 حجز جديد</button>
+          <h1 class="visually-hidden">تم الحجز</h1>
+
+          <div class="card text-center" style="max-width:760px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+              <div class="success-badge" aria-hidden="true">✓</div>
+              <h2 class="mb-1" style="font-weight:800;color:#0B2630">تم تأكيد طلبك بنجاح 🎉</h2>
+              <p class="m-0" style="color:#224652">سنقوم بالتأكيد عبر واتساب قريبًا — شكرًا لاختيارك نحل.</p>
+            </div>
+
+            <!-- Recap -->
+            <div id="thank-recap" class="recap mt-3" style="text-align:start">
+              <!-- filled by JS -->
+            </div>
+
+            <!-- Actions -->
+            <div class="thank-actions mt-3">
+              <a id="btnGoogleCal" class="btn btn-primary" target="_blank" rel="noopener">
+                <i class="fa-regular fa-calendar-plus ms-1"></i> إضافة إلى Google
+              </a>
+              <a id="btnICS" class="btn btn-outline-primary" download="booking.ics">
+                <i class="fa-regular fa-calendar ms-1"></i> تنزيل .ICS
+              </a>
+              <a id="btnPay" class="btn btn-outline-success" target="_blank" rel="noopener" style="display:none">
+                <i class="fa-solid fa-credit-card ms-1"></i> الدفع / الفاتورة
+              </a>
+              <a id="btnDirections" class="btn btn-outline-secondary" target="_blank" rel="noopener">
+                <i class="fa-solid fa-map-location-dot ms-1"></i> فتح الخرائط
+              </a>
+              <a id="btnShareWA" class="btn btn-outline-success" target="_blank" rel="noopener">
+                <i class="fa-brands fa-whatsapp ms-1"></i> مشاركة عبر واتساب
+              </a>
+            </div>
+
+            <hr class="my-3"/>
+
+            <div class="d-flex justify-content-center">
+              <button id="rebook" class="btn btn-primary" type="button"
+                      style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px">
+                🔁 حجز جديد
+              </button>
+            </div>
           </div>
         </section>
       </div>
@@ -472,7 +507,7 @@
     }
 
     /* ---------- API ---------- */
-    const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff'; /* keep per your last change */
+    const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';
     const defaultLink2=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
     const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
@@ -594,12 +629,14 @@
       const dt=nForm.date ? DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '';
       const tm=nForm.time||'';
       const pay=nForm.paymentMethod||'';
+      const plate=$('#plateNumber').val()||'';
       const locOk=!!positionUrl;
 
       const chips=[
         {i:'fa-location-dot',t:'المنطقة',v:areaTxt,g:1},
         {i:'fa-screwdriver-wrench',t:'الخدمة',v:srvTxt,g:1},
-        {i:'fa-clock',t:'الموعد',v:(dt&&tm)?`${dt} • ${tm}`:(dt||tm),g:2},
+        {i:'fa-clock',t:'الموعد',v:(dt&&tm)?`${dt} • ${tm}`:'',g:2},
+        {i:'fa-id-card',t:'لوحة',v:plate,g:3},
         {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4},
         {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
       ];
@@ -731,6 +768,90 @@
       };
     }
 
+    /* ===== THANK PAGE HELPERS (NEW) ===== */
+    function buildThankMeta(serverResp){
+      const areaTxt = $('#area').find(':selected').text() || '';
+      const srvTxt  = $('#service').find(':selected').text() || '';
+      const cnt     = nForm.serviceCount || '1';
+      const pay     = (nForm.paymentMethod||'').toUpperCase();
+      const dateISO = nForm.date;
+      const time24  = nForm.time;
+      const name    = nForm.customerN || '';
+      const phone   = nForm.customerM || '';
+      const mapsUrl = positionUrl || nForm.urlLocation || '';
+      const shareUrl = serverResp?.data?.shareUrl || serverResp?.shareUrl || null;
+
+      const dtStart = luxon.DateTime.fromISO(`${dateISO}T${time24}`, { zone:'Asia/Riyadh' });
+      const dtEnd   = dtStart.plus({ minutes: 45 });
+
+      return {
+        title: `موعد ${srvTxt} - نحل`,
+        areaTxt, srvTxt, cnt, pay, name, phone, dateISO, time24,
+        start: dtStart, end: dtEnd,
+        mapsUrl, shareUrl
+      };
+    }
+    function populateThankPage(meta){
+      const el = document.getElementById('thank-recap');
+      el.innerHTML = `
+        <div class="rowp"><span class="label">الخدمة</span><span>${meta.srvTxt} <small class="text-muted">(عدد ${meta.cnt})</small></span></div>
+        <div class="rowp"><span class="label">الموعد</span><span>${meta.start.toFormat('EEEE d LLL yyyy')} • ${meta.start.toFormat('hh:mm a')}</span></div>
+        <div class="rowp"><span class="label">المنطقة</span><span>${meta.areaTxt||'—'}</span></div>
+        <div class="rowp"><span class="label">الدفع</span><span>${meta.pay|| '—'}</span></div>
+        <div class="rowp"><span class="label">الاسم</span><span>${meta.name||'—'}</span></div>
+        <div class="rowp"><span class="label">الجوال</span><span dir="ltr">+${meta.phone||'—'}</span></div>
+      `;
+      const aDir = document.getElementById('btnDirections');
+      if (aDir) aDir.href = meta.mapsUrl || '#';
+      const aPay = document.getElementById('btnPay');
+      if (meta.shareUrl) { aPay.href = meta.shareUrl; aPay.style.display = 'inline-block'; }
+      else { aPay.style.display = 'none'; }
+      const g = document.getElementById('btnGoogleCal');
+      const i = document.getElementById('btnICS');
+      if (g) g.href = makeGoogleCalendarUrl(meta);
+      if (i) i.href = makeICSdataUrl(meta);
+      const msg =
+        `تم حجز موعد:\n` +
+        `الخدمة: ${meta.srvTxt} (عدد ${meta.cnt})\n`+
+        `التاريخ: ${meta.start.toFormat('yyyy-LL-dd')}\n`+
+        `الوقت: ${meta.start.toFormat('hh:mm a')}\n`+
+        `الموقع: ${meta.mapsUrl ? meta.mapsUrl : '—'}\n`+
+        `${meta.shareUrl ? ('الدفع/الفاتورة: ' + meta.shareUrl) : ''}`;
+      const aWA = document.getElementById('btnShareWA');
+      if (aWA) aWA.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    }
+    function makeGoogleCalendarUrl(meta){
+      const startUTC = meta.start.toUTC().toFormat("yyyyLLdd'T'HHmmss'Z'");
+      const endUTC   = meta.end.toUTC().toFormat("yyyyLLdd'T'HHmmss'Z'");
+      const details  = `الاسم: ${meta.name}%0Aالجوال: +${meta.phone}%0Aالدفع: ${meta.pay}${meta.shareUrl?('%0Aالفاتورة: '+meta.shareUrl):''}`;
+      const location = meta.mapsUrl || meta.areaTxt || 'Saudi Arabia';
+      return `https://calendar.google.com/calendar/render?action=TEMPLATE`
+        + `&text=${encodeURIComponent(meta.title)}`
+        + `&dates=${startUTC}/${endUTC}`
+        + `&ctz=Asia%2FRiyadh`
+        + `&details=${details}`
+        + `&location=${encodeURIComponent(location)}`;
+    }
+    function makeICSdataUrl(meta){
+      const dtStart = meta.start.toUTC().toFormat("yyyyLLdd'T'HHmmss'Z'");
+      const dtEnd   = meta.end.toUTC().toFormat("yyyyLLdd'T'HHmmss'Z'");
+      const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        `SUMMARY:${meta.title}`,
+        `DESCRIPTION:الاسم: ${meta.name}\\nالجوال: +${meta.phone}\\nالدفع: ${meta.pay}${meta.shareUrl?('\\nالفاتورة: '+meta.shareUrl):''}`,
+        `LOCATION:${meta.mapsUrl||meta.areaTxt||'Saudi Arabia'}`,
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n');
+      return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(lines);
+    }
+
     /* ---------- Init ---------- */
     $(function(){
       installResizeObservers();
@@ -745,7 +866,7 @@
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
       $('#area, #serviceCat, #service').on('select2:open', ()=>{$('.select2-search__field').attr('dir','rtl');});
 
-      // Phone input (fits, country code LEFT via CSS)
+      // Phone input
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
         separateDialCode:true, placeholderNumberType:'MOBILE',
@@ -798,13 +919,11 @@
       // Date
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
 
-      // Footer nav (with submit lock on final post)
+      // Footer nav
       const $prev=document.getElementById('footer-prev');
       const $next=document.getElementById('footer-next');
-      let submitting=false;
 
       async function gotoNext(){
-        if(submitting) return;
         const i=getActiveIndex(); const id=orderedPages[i];
         if(id==='page1'){ stopWelcomeDeck(); showPage(1); return; }
 
@@ -838,22 +957,15 @@
           if(!positionUrl){ document.getElementById('err-map').style.display='block'; showToast('error','الرجاء تحديد الموقع'); return; }
           document.getElementById('err-map').style.display='none'; nForm.urlLocation=positionUrl;
 
-          // prevent double submit
-          submitting=true;
-          const oldHTML=$next.innerHTML;
-          $next.disabled=true; $next.classList.add('disabled');
-          $next.innerHTML='<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>جاري الإرسال…';
-
           const r=await postReservation(buildPayload());
-
           if(r.ok && r.data?.success){
-            showToast('success','تم إنشاء الحجز'); showPage(6);
-          }else{
+            const meta = buildThankMeta(r.data);
+            populateThankPage(meta);
+            showToast('success','تم إنشاء الحجز');
+            showPage(6); // page7
+          } else {
             const msg=r?.data?.msgAR || (r.status===404?'المسار غير موجود':'تعذر إنشاء الحجز');
             showToast('error',msg);
-            // allow retry
-            submitting=false;
-            $next.disabled=false; $next.classList.remove('disabled'); $next.innerHTML=oldHTML;
           }
           return;
         }
@@ -880,187 +992,31 @@
 
     function updateNextAvailability(){
       const i=getActiveIndex(); const nextBtn=document.getElementById('footer-next'); let enable=true;
-      if(i===0){ enable=true; }                   // welcome always enabled
+      if(i===0){ enable=true; }
       else if(i===1){ enable=!!($('#area').val()&&$('#service').val()); }
       else if(i===2){ enable=!!selectedTime; }
-      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
+      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable = nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
       else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
       else if(i===5){ enable=!!positionUrl; }
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* ---------- Google Map (ENHANCED KSA UX) ---------- */
-    let map, marker, accuracyCircle, geocoder, autocomplete, geocodeTimer=null;
-
+    /* ---------- Google Map ---------- */
+    let map, marker;
     function initMap(){
-      geocoder = new google.maps.Geocoder();
-
-      const SAUDI_BOUNDS = new google.maps.LatLngBounds(
-        { lat: 16.29, lng: 34.50 }, // SW
-        { lat: 32.15, lng: 55.67 }  // NE
-      );
-
-      map = new google.maps.Map(document.getElementById('googleMap'), {
-        center: SAUDI_BOUNDS.getCenter(),
-        zoom: 6,
-        restriction: { latLngBounds: SAUDI_BOUNDS, strictBounds: true },
-        mapTypeControl: false,
-        fullscreenControl: true,
-        streetViewControl: false,
-        zoomControl: true,
-        draggable: true,
-        gestureHandling: 'greedy',
-        disableDoubleClickZoom: true
-      });
-      map.fitBounds(SAUDI_BOUNDS);
-
-      marker = new google.maps.Marker({
-        map,
-        draggable: true,
-        title: 'اسحب أو اضغط لتحديد الموقع',
-        visible: false
-      });
-
-      accuracyCircle = new google.maps.Circle({
-        map,
-        radius: 0,
-        strokeOpacity: 0.2,
-        fillOpacity: 0.08,
-        visible: false
-      });
-
-      // Autocomplete (KSA-only)
-      const input = document.getElementById('placeSearch');
-      autocomplete = new google.maps.places.Autocomplete(input, {
-        componentRestrictions: { country: "sa" },
-        bounds: SAUDI_BOUNDS,
-        strictBounds: true,
-        fields: ["place_id", "name", "formatted_address", "geometry"]
-      });
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (!place.geometry || !place.geometry.location) {
-          showToast('error', 'تعذر تحديد هذا العنوان');
-          return;
-        }
-        setPosition(place.geometry.location, true /*pan*/);
-        showAddress(place.formatted_address || place.name);
-      });
-
-      // Map click sets a pin
-      map.addListener('click', ({ latLng }) => {
-        setPosition(latLng, true);
-        debouncedReverseGeocode(latLng);
-      });
-
-      // Dragging pin also updates
-      marker.addListener('dragend', ({ latLng }) => {
-        setPosition(latLng, false);
-        debouncedReverseGeocode(latLng);
-      });
-
-      // “Use my location”
-      const myLocBtn = document.getElementById('show-my-location');
-      myLocBtn?.addEventListener('click', () => {
-        if (!navigator.geolocation) {
-          showToast('error', 'المتصفح لا يدعم تحديد الموقع');
-          return;
-        }
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-            setPosition(latLng, true, pos.coords.accuracy);
-            debouncedReverseGeocode(latLng);
-          },
-          (err) => showToast('error', 'تعذر تحديد موقعك: ' + (err?.message || '')),
-          { enableHighAccuracy: true, timeout: 12000, maximumAge: 45000 }
-        );
-      });
-
-      // Confirm CTA
-      document.getElementById('confirmLocation')?.addEventListener('click', () => {
-        if (!positionUrl) { showToast('error', 'الرجاء تحديد موقعك'); return; }
-        showToast('success', 'تم اختيار الموقع');
-        renderSummary('page6');
-        updateNextAvailability();
-      });
-
-      // Bias to selected area (if chosen earlier)
-      tryBiasToSelectedArea(SAUDI_BOUNDS);
+      const def={lat:26.34165524787632,lng:50.11524831545726};
+      map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
+      marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
+      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; const hint=document.getElementById('mapHint'); if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; renderSummary('page6'); updateNextAvailability(); };
+      marker.addListener('dragend',({latLng})=>setPos(latLng));
+      map.addListener('click',({latLng})=>setPos(latLng));
+      const btn=document.getElementById('show-my-location');
+      btn?.addEventListener('click',()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),err=>{ showToast('error','تعذر تحديد موقعك'); },{ enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); });
     }
-
-    function setPosition(latLng, pan = true, accuracyMeters = null){
-      marker.setPosition(latLng);
-      marker.setVisible(true);
-
-      positionUrl = `https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
-      const coords = document.getElementById('locCoords');
-      if (coords) coords.textContent = `الإحداثيات: ${latLng.lat().toFixed(6)}, ${latLng.lng().toFixed(6)}`;
-      const share = document.getElementById('locShare');
-      if (share) share.href = positionUrl;
-
-      if (typeof accuracyMeters === 'number' && accuracyMeters > 0) {
-        accuracyCircle.setCenter(latLng);
-        accuracyCircle.setRadius(Math.min(accuracyMeters, 150));
-        accuracyCircle.setVisible(true);
-      } else {
-        accuracyCircle.setVisible(false);
-      }
-
-      if (pan) {
-        map.panTo(latLng);
-        map.setZoom(Math.max(map.getZoom(), 17));
-      }
-
-      document.getElementById('locationSheet').style.display = 'block';
-      renderSummary('page6');
-      updateNextAvailability();
-    }
-
-    function debouncedReverseGeocode(latLng){
-      clearTimeout(geocodeTimer);
-      geocodeTimer = setTimeout(() => reverseGeocode(latLng), 300);
-    }
-
-    function reverseGeocode(latLng){
-      geocoder.geocode({ location: latLng }, (results, status) => {
-        if (status !== 'OK' || !results || !results.length) {
-          showAddress('تعذر جلب العنوان…');
-          return;
-        }
-        const best = results.find(r => r.types?.includes('premise') || r.types?.includes('street_address'))
-                 || results[0];
-        showAddress(best.formatted_address || 'بدون عنوان واضح');
-      });
-    }
-
-    function showAddress(txt){
-      const el = document.getElementById('locAddress');
-      if (el) el.textContent = txt || '';
-    }
-
-    function tryBiasToSelectedArea(SAUDI_BOUNDS){
-      const areaText = ($('#area').find(':selected').text() || '').trim();
-      if (!areaText) return;
-      const svcGeocoder = new google.maps.Geocoder();
-      svcGeocoder.geocode({ address: `${areaText}, السعودية`, region: 'SA' }, (results, status) => {
-        if (status === 'OK' && results?.[0]?.geometry?.location) {
-          const loc = results[0].geometry.location;
-          map.setCenter(loc);
-          map.setZoom(12);
-          if (autocomplete) autocomplete.setBounds(map.getBounds());
-        } else {
-          // Default to KSA bounds if not found
-          map.fitBounds(SAUDI_BOUNDS);
-        }
-      });
-    }
-
-    // Expose for callback
     window.initMap=initMap;
   </script>
 
-  <!-- Google Maps (Arabic, KSA, Places) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&language=ar&region=SA&libraries=places" async defer></script>
+  <!-- Google Maps -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
 </body>
 </html>
