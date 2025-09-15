@@ -66,7 +66,6 @@
 
     /* ===== Summary chips ===== */
     .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
-    .summary-chips.hidden{display:none!important;}
     .chip{
       display:inline-flex; align-items:center; gap:6px; max-width:100%;
       padding:6px 10px; border:1px solid rgba(255,255,255,.35);
@@ -186,14 +185,13 @@
         padding-bottom:8px; gap:10px;
       }
       .brand img{ height:72px }
-      /* compact chips & horizontal scroll to save vertical space */
       .summary-chips{
         overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
         gap:6px; padding-bottom:2px; scrollbar-width:thin;
       }
       .summary-chips::-webkit-scrollbar{ height:4px }
       .chip{ padding:4px 8px; font-size:.78rem }
-      .chip .title{ display:none }            /* hide labels on mobile to keep it small */
+      .chip .title{ display:none }
       .chip .value{ max-width:140px; overflow:hidden; text-overflow:ellipsis }
       .btn-footer{min-height:58px; font-size:1.05rem}
       .footer-inner{flex-wrap:wrap}
@@ -202,14 +200,14 @@
     }
 
     /* ===== Phone input tweaks (fit + country code LEFT) ===== */
-    .iti{ width:100%; } /* make the intl-tel container fill the column */
+    .iti{ width:100%; }
     html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{
-      left:8px; right:auto;      /* move flag/country code to LEFT side */
+      left:8px; right:auto;
     }
     html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
-      padding-left: calc(76px + 8px);  /* space for the left flag/dial code */
+      padding-left: calc(76px + 8px);
       padding-right: 12px;
-      text-align: left; direction: ltr;/* enter digits naturally LTR */
+      text-align: left; direction: ltr;
     }
   </style>
 </head>
@@ -233,7 +231,7 @@
           <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
         <!-- chips are injected here (hidden on welcome page) -->
-        <div id="summaryChips" class="summary-chips hidden" aria-live="polite"></div>
+        <div id="summaryChips" class="summary-chips" aria-live="polite"></div>
       </div>
     </div>
   </header>
@@ -392,15 +390,32 @@
           <div class="field-error" id="err-pay" style="text-align:center">يرجى اختيار طريقة الدفع</div>
         </section>
 
-        <!-- 6) Map -->
+        <!-- 6) Map (ENHANCED) -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
           <h1>الموقع على خريطة قوقل</h1>
-          <div class="card">
-            <div id="googleMap"></div>
+
+          <!-- Search input over the map -->
+          <div class="card" style="position:relative;">
+            <input id="placeSearch" class="form-control" type="text"
+                   placeholder="ابحث عن موقعك (عنوان/حي/معلم)…"
+                   style="position:absolute; z-index:3; top:12px; left:12px; right:12px;">
+            <div id="googleMap" style="margin-top:56px;"></div>
           </div>
-          <div class="card text-center">
-            <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
+
+          <!-- Inline confirmation sheet -->
+          <div id="locationSheet" class="card" style="display:none; max-width:920px;">
+            <div class="d-flex flex-column gap-1">
+              <strong>العنوان المقترح:</strong>
+              <div id="locAddress" class="text-muted"></div>
+              <small id="locCoords" class="text-muted"></small>
+              <div class="mt-2 d-flex gap-2 flex-wrap">
+                <button id="confirmLocation" class="btn btn-primary">تأكيد الموقع</button>
+                <a id="locShare" class="btn btn-outline-secondary" target="_blank" rel="noopener">فتح في الخرائط</a>
+                <button id="show-my-location" class="btn btn-outline-primary" type="button">إستخدام موقعي الحالي</button>
+              </div>
+            </div>
           </div>
+
           <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
           <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
         </section>
@@ -431,11 +446,6 @@
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>التالي</button>
-        <!-- shown during submission to prevent double submit -->
-        <div id="submitSpinner" class="btn-footer primary" style="display:none; justify-content:center; align-items:center; gap:10px; pointer-events:none;">
-          <span class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
-          <strong>جاري إنشاء الحجز…</strong>
-        </div>
       </div>
     </div>
   </footer>
@@ -462,9 +472,10 @@
     }
 
     /* ---------- API ---------- */
-    const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';  /* <-- updated as requested */
-    const FORM_BASE=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
-    const RESERVE_URL=`${FORM_BASE}/reserveAppointment`;   // ONLY this route (no cross-origin fallback)
+    const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff'; /* keep per your last change */
+    const defaultLink2=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
+    const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
+    const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -475,34 +486,24 @@
       }
       try{
         await new Promise(r=>setTimeout(r, 200));
-        const res=await fetch(FORM_BASE+path,{method:'GET',redirect:'follow',...(abortable&&{signal}),cache:'no-store'});
+        const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal}),cache:'no-store'});
         if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network');}
         cb(await res.json());
       }catch(e){
         if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),600);
       }
     }
-
-    // POST helper — send as text/plain (server does readBody + JSON.parse)
-    async function postReservationTry(url, payload){
+    async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
       try{
-        const res=await fetch(url,{
-          method:'POST',
-          mode:'cors',
-          cache:'no-store',
-          credentials:'omit',
-          referrerPolicy:'no-referrer',
-          headers:{ 'Content-Type': 'text/plain;charset=UTF-8', 'Accept':'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const res=await fetch(url,{method:'POST',mode:'cors',cache:'no-store',credentials:'omit',referrerPolicy:'no-referrer',headers:{'Content-Type':contentType,'Accept':'application/json'},body:JSON.stringify(payload)});
         const raw=await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
         return {ok:res.ok,status:res.status,data,raw};
-      }catch(err){
-        return {ok:false,status:0,error:String(err)};
-      }
+      }catch(err){ return {ok:false,status:0,error:String(err)} }
     }
     async function postReservation(payload){
-      const r = await postReservationTry(RESERVE_URL, payload);
+      let r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'text/plain;charset=UTF-8');
+      if(!r.ok && (r.status===415||r.status===406||r.status===0)) r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'application/json;charset=UTF-8');
+      if(!r.ok && r.status===404) r=await postReservationTry(RESERVE_URL_FALLBACK,payload,'text/plain;charset=UTF-8');
       return r;
     }
 
@@ -532,7 +533,6 @@
     };
     const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6};
     let selectedTime=null, servicesCache=null, categoriesCache=null, itiPhone=null, positionUrl="";
-    let isSubmitting=false;   /* <-- prevent double submit */
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', locale:'ar'};
 
     function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
@@ -579,24 +579,18 @@
       if(v.length>0 && v.length<4){ pe.style.display='block'; pe.textContent='رجاءً أدخل ٤ أرقام'; } else { pe.style.display='none'; }
     }
 
-    /* —— summary chips (important only; NEVER on welcome) —— */
+    /* —— summary chips (NEVER on welcome) —— */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
       const currGroup=STEP_GROUP_INDEX[activeId] ?? 0;
 
-      if(currGroup===0){
-        wrap.classList.add('hidden');
-        wrap.style.display='none';
-        wrap.innerHTML='';
-        return;
-      }
-      wrap.classList.remove('hidden');
-      wrap.style.display='flex';
+      // hide completely on welcome
+      wrap.style.display = currGroup === 0 ? 'none' : 'flex';
+      if(currGroup===0){ wrap.innerHTML=''; return; }
 
       const areaTxt=$('#area').find(':selected').text()||'';
       const srvTxt=$('#service').find(':selected').text()||'';
-      const cntTxt=$('#serviceCount').val()||'';
       const dt=nForm.date ? DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '';
       const tm=nForm.time||'';
       const pay=nForm.paymentMethod||'';
@@ -605,13 +599,10 @@
       const chips=[
         {i:'fa-location-dot',t:'المنطقة',v:areaTxt,g:1},
         {i:'fa-screwdriver-wrench',t:'الخدمة',v:srvTxt,g:1},
-        {i:'fa-clock',t:'الموعد',v:(dt||tm)?((dt&&tm)?`${dt} • ${tm}`:(dt||tm)):'',g:2},
+        {i:'fa-clock',t:'الموعد',v:(dt&&tm)?`${dt} • ${tm}`:(dt||tm),g:2},
         {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4},
         {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
       ];
-      if(cntTxt && cntTxt !== '1'){
-        chips.splice(2,0,{i:'fa-car',t:'عدد',v:cntTxt,g:1});
-      }
 
       wrap.innerHTML='';
       chips.filter(c=>c.v && c.g<=currGroup).forEach(c=>{
@@ -643,7 +634,7 @@
     }
     function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
-    /* —— Times helpers —— */
+    /* —— Times API helpers —— */
     function parseTimeToLuxon(raw){ let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true}); if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true}); return t.isValid?t:null; }
     function normalizeAvailability(r){ const s=String(r.TS_status||r.status||r.TS_appointment_status||'').toLowerCase(); const f=(typeof r.isAvailable==='boolean')?r.isAvailable:undefined; const b=Number(r.booked??r.TS_booked); const c=Number(r.capacity??r.TS_capacity); let rem=Number(r.remaining??r.TS_remaining); if(!Number.isFinite(rem)&&Number.isFinite(c)&&Number.isFinite(b)) rem=c-b; const open=f===true||['available','open','free','empty','vacant','canceled'].includes(s)||(Number.isFinite(rem)?rem>0:(f!==false&&!s)); return {looksOpen:open,remaining:rem}; }
 
@@ -754,7 +745,7 @@
       $('#carBrand').select2({width:'100%',placeholder:'ماركة السيارة', dir:'rtl'});
       $('#area, #serviceCat, #service').on('select2:open', ()=>{$('.select2-search__field').attr('dir','rtl');});
 
-      // Phone input
+      // Phone input (fits, country code LEFT via CSS)
       itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
         initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
         separateDialCode:true, placeholderNumberType:'MOBILE',
@@ -807,12 +798,13 @@
       // Date
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
 
-      // Footer nav
+      // Footer nav (with submit lock on final post)
       const $prev=document.getElementById('footer-prev');
       const $next=document.getElementById('footer-next');
-      const $wait=document.getElementById('submitSpinner');
+      let submitting=false;
 
       async function gotoNext(){
+        if(submitting) return;
         const i=getActiveIndex(); const id=orderedPages[i];
         if(id==='page1'){ stopWelcomeDeck(); showPage(1); return; }
 
@@ -828,7 +820,7 @@
         if(id==='page3'){ if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; } showPage(3); return; }
 
         if(id==='page4'){
-          const nameOk=($('#name').val()||'').trim().length>0; const phoneOk= itiPhone ? itiPhone.isValidNumber() : false;
+          const nameOk=($('#name').val()||'').trim().length>0; const phoneOk=itiPhone && itiPhone.isValidNumber();
           document.getElementById('err-name').style.display=nameOk?'none':'block';
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
@@ -846,30 +838,22 @@
           if(!positionUrl){ document.getElementById('err-map').style.display='block'; showToast('error','الرجاء تحديد الموقع'); return; }
           document.getElementById('err-map').style.display='none'; nForm.urlLocation=positionUrl;
 
-          if(isSubmitting) return;          /* prevent double click */
-          isSubmitting = true;
-          $prev.style.display='none';       /* remove nav while submitting */
-          $next.style.display='none';
-          $wait.style.display='flex';       /* show waiting spinner */
+          // prevent double submit
+          submitting=true;
+          const oldHTML=$next.innerHTML;
+          $next.disabled=true; $next.classList.add('disabled');
+          $next.innerHTML='<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>جاري الإرسال…';
 
           const r=await postReservation(buildPayload());
 
           if(r.ok && r.data?.success){
-            showToast('success','تم إنشاء الحجز');
-            $wait.style.display='none';     /* hide spinner before transitioning */
-            showPage(6);                    /* to thank-you (buttons hidden by logic) */
+            showToast('success','تم إنشاء الحجز'); showPage(6);
           }else{
-            let msg = 'تعذر إنشاء الحجز';
-            if (r?.data?.msgAR) msg = r.data.msgAR;
-            else if (r.status === 404) msg = 'المسار متاح لكن الخادم أعاد 404 (خطأ داخلي في المعالجة)';
-            showToast('error', msg);
-
-            // restore buttons so user can retry
-            $wait.style.display='none';
-            $next.style.display='';
-            $prev.style.display='';
-            isSubmitting = false;
-            updateNextAvailability();
+            const msg=r?.data?.msgAR || (r.status===404?'المسار غير موجود':'تعذر إنشاء الحجز');
+            showToast('error',msg);
+            // allow retry
+            submitting=false;
+            $next.disabled=false; $next.classList.remove('disabled'); $next.innerHTML=oldHTML;
           }
           return;
         }
@@ -880,7 +864,7 @@
 
       // Payment select
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
-      payCards.forEach((card)=>{
+      payCards.forEach((card,idx)=>{
         const input=card.querySelector('input');
         const choose=()=>{ payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; }); card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; nForm.paymentMethod=input.value; renderSummary('page5'); updateNextAvailability(); };
         card.addEventListener('click',choose);
@@ -899,28 +883,184 @@
       if(i===0){ enable=true; }                   // welcome always enabled
       else if(i===1){ enable=!!($('#area').val()&&$('#service').val()); }
       else if(i===2){ enable=!!selectedTime; }
-      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; const phoneOk= (window.itiPhone ? itiPhone.isValidNumber() : false); enable = nameOk && phoneOk; }
+      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
       else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
-      else if(i===5){ enable=!!positionUrl && !isSubmitting; }  // block while submitting
+      else if(i===5){ enable=!!positionUrl; }
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* ---------- Google Map ---------- */
-    let map, marker;
+    /* ---------- Google Map (ENHANCED KSA UX) ---------- */
+    let map, marker, accuracyCircle, geocoder, autocomplete, geocodeTimer=null;
+
     function initMap(){
-      const def={lat:26.34165524787632,lng:50.11524831545726};
-      map=new google.maps.Map(document.getElementById('googleMap'),{center:def,zoom:12,disableDoubleClickZoom:true});
-      marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
-      const setPos=(latLng,pan=false)=>{ if(!latLng) return; marker.setPosition(latLng); if(pan) map.panTo(latLng); map.setZoom(17); positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`; const hint=document.getElementById('mapHint'); if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`; renderSummary('page6'); updateNextAvailability(); };
-      marker.addListener('dragend',({latLng})=>setPos(latLng));
-      map.addListener('click',({latLng})=>setPos(latLng));
-      const btn=document.getElementById('show-my-location');
-      btn?.addEventListener('click',()=>{ if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; } navigator.geolocation.getCurrentPosition(pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),err=>{ showToast('error','تعذر تحديد موقعك'); },{ enableHighAccuracy:true, timeout:10000, maximumAge:30000 }); });
+      geocoder = new google.maps.Geocoder();
+
+      const SAUDI_BOUNDS = new google.maps.LatLngBounds(
+        { lat: 16.29, lng: 34.50 }, // SW
+        { lat: 32.15, lng: 55.67 }  // NE
+      );
+
+      map = new google.maps.Map(document.getElementById('googleMap'), {
+        center: SAUDI_BOUNDS.getCenter(),
+        zoom: 6,
+        restriction: { latLngBounds: SAUDI_BOUNDS, strictBounds: true },
+        mapTypeControl: false,
+        fullscreenControl: true,
+        streetViewControl: false,
+        zoomControl: true,
+        draggable: true,
+        gestureHandling: 'greedy',
+        disableDoubleClickZoom: true
+      });
+      map.fitBounds(SAUDI_BOUNDS);
+
+      marker = new google.maps.Marker({
+        map,
+        draggable: true,
+        title: 'اسحب أو اضغط لتحديد الموقع',
+        visible: false
+      });
+
+      accuracyCircle = new google.maps.Circle({
+        map,
+        radius: 0,
+        strokeOpacity: 0.2,
+        fillOpacity: 0.08,
+        visible: false
+      });
+
+      // Autocomplete (KSA-only)
+      const input = document.getElementById('placeSearch');
+      autocomplete = new google.maps.places.Autocomplete(input, {
+        componentRestrictions: { country: "sa" },
+        bounds: SAUDI_BOUNDS,
+        strictBounds: true,
+        fields: ["place_id", "name", "formatted_address", "geometry"]
+      });
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry || !place.geometry.location) {
+          showToast('error', 'تعذر تحديد هذا العنوان');
+          return;
+        }
+        setPosition(place.geometry.location, true /*pan*/);
+        showAddress(place.formatted_address || place.name);
+      });
+
+      // Map click sets a pin
+      map.addListener('click', ({ latLng }) => {
+        setPosition(latLng, true);
+        debouncedReverseGeocode(latLng);
+      });
+
+      // Dragging pin also updates
+      marker.addListener('dragend', ({ latLng }) => {
+        setPosition(latLng, false);
+        debouncedReverseGeocode(latLng);
+      });
+
+      // “Use my location”
+      const myLocBtn = document.getElementById('show-my-location');
+      myLocBtn?.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          showToast('error', 'المتصفح لا يدعم تحديد الموقع');
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const latLng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+            setPosition(latLng, true, pos.coords.accuracy);
+            debouncedReverseGeocode(latLng);
+          },
+          (err) => showToast('error', 'تعذر تحديد موقعك: ' + (err?.message || '')),
+          { enableHighAccuracy: true, timeout: 12000, maximumAge: 45000 }
+        );
+      });
+
+      // Confirm CTA
+      document.getElementById('confirmLocation')?.addEventListener('click', () => {
+        if (!positionUrl) { showToast('error', 'الرجاء تحديد موقعك'); return; }
+        showToast('success', 'تم اختيار الموقع');
+        renderSummary('page6');
+        updateNextAvailability();
+      });
+
+      // Bias to selected area (if chosen earlier)
+      tryBiasToSelectedArea(SAUDI_BOUNDS);
     }
+
+    function setPosition(latLng, pan = true, accuracyMeters = null){
+      marker.setPosition(latLng);
+      marker.setVisible(true);
+
+      positionUrl = `https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
+      const coords = document.getElementById('locCoords');
+      if (coords) coords.textContent = `الإحداثيات: ${latLng.lat().toFixed(6)}, ${latLng.lng().toFixed(6)}`;
+      const share = document.getElementById('locShare');
+      if (share) share.href = positionUrl;
+
+      if (typeof accuracyMeters === 'number' && accuracyMeters > 0) {
+        accuracyCircle.setCenter(latLng);
+        accuracyCircle.setRadius(Math.min(accuracyMeters, 150));
+        accuracyCircle.setVisible(true);
+      } else {
+        accuracyCircle.setVisible(false);
+      }
+
+      if (pan) {
+        map.panTo(latLng);
+        map.setZoom(Math.max(map.getZoom(), 17));
+      }
+
+      document.getElementById('locationSheet').style.display = 'block';
+      renderSummary('page6');
+      updateNextAvailability();
+    }
+
+    function debouncedReverseGeocode(latLng){
+      clearTimeout(geocodeTimer);
+      geocodeTimer = setTimeout(() => reverseGeocode(latLng), 300);
+    }
+
+    function reverseGeocode(latLng){
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status !== 'OK' || !results || !results.length) {
+          showAddress('تعذر جلب العنوان…');
+          return;
+        }
+        const best = results.find(r => r.types?.includes('premise') || r.types?.includes('street_address'))
+                 || results[0];
+        showAddress(best.formatted_address || 'بدون عنوان واضح');
+      });
+    }
+
+    function showAddress(txt){
+      const el = document.getElementById('locAddress');
+      if (el) el.textContent = txt || '';
+    }
+
+    function tryBiasToSelectedArea(SAUDI_BOUNDS){
+      const areaText = ($('#area').find(':selected').text() || '').trim();
+      if (!areaText) return;
+      const svcGeocoder = new google.maps.Geocoder();
+      svcGeocoder.geocode({ address: `${areaText}, السعودية`, region: 'SA' }, (results, status) => {
+        if (status === 'OK' && results?.[0]?.geometry?.location) {
+          const loc = results[0].geometry.location;
+          map.setCenter(loc);
+          map.setZoom(12);
+          if (autocomplete) autocomplete.setBounds(map.getBounds());
+        } else {
+          // Default to KSA bounds if not found
+          map.fitBounds(SAUDI_BOUNDS);
+        }
+      });
+    }
+
+    // Expose for callback
     window.initMap=initMap;
   </script>
 
-  <!-- Google Maps -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async" async defer></script>
+  <!-- Google Maps (Arabic, KSA, Places) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&language=ar&region=SA&libraries=places" async defer></script>
 </body>
 </html>
