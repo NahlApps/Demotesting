@@ -1,50 +1,203 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CarFection Ticket Review</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        iframe {
-            width: 100%;
-            height: 100vh;
-            border: none;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>NahlHub</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="assets/nahl-ds.css" />
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <!-- Config + GAS shim -->
+  <script src="js/config.js"></script>
+  <script src="js/gas-rpc-shim.js"></script>
+
+  <style>
+    .auth-card{max-width:520px;margin:40px auto}
+    .muted-center{color:var(--muted);text-align:center}
+    .section[hidden]{display:none}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid var(--line);padding:10px;text-align:start}
+  </style>
 </head>
 <body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <img class="logo" alt="" src="" onerror="this.style.display='none'">
+        <span>Nahl Hub</span>
+      </div>
 
-    <iframe id="appIframe" src=""></iframe>
+      <nav class="nav header-nav">
+        <button class="tab" aria-selected="true" onclick="show('home')">Home</button>
+        <button class="tab" aria-selected="false" onclick="show('sessions')">Sessions</button>
+      </nav>
 
-    <script>
-        // Function to extract the ID parameter from the URL
-        function getIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
-        }
+      <div class="header-controls">
+        <button class="icon-btn" title="Toggle theme" onclick="toggleTheme()">🌗</button>
+        <div class="divider" style="width:1px;height:24px;background:var(--line)"></div>
+        <div class="me">
+          <span class="chip chip-muted" id="meEmail">guest</span>
+          <button class="btn" id="btnSignIn" onclick="renderGsi()">Sign in</button>
+          <button class="btn" id="btnSignOut" onclick="logout()" style="display:none">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-        // Get the ID from the URL
-        const id = getIdFromUrl();
+  <main class="container">
+    <section id="home" class="section">
+      <div class="card auth-card">
+        <h3 class="card-title">Sign in</h3>
+        <p class="muted">Use your Google account to continue.</p>
+        <div class="row" style="justify-content:center"><div id="gsiBtn"></div></div>
+        <p class="muted-center mt-2" id="domainNote" style="display:none">Your organization restricts login by domain.</p>
+      </div>
 
-        // If ID exists, construct the new URL and set it to the iframe
-        const iframe = document.getElementById('appIframe');
-        const baseUrl = 'https://script.google.com/macros/s/AKfycbwBzdnfkMzQOujA8gZNS3CKByz_Vi52lARH4-z92EGYFkRaQFNHuaj41yW4Xhj6quE9/exec';
-        if (id) {
-            iframe.src = `${baseUrl}&id=${id}`;
-        } else {
-            iframe.src = baseUrl;
-        }
-    </script>
-    
+      <div class="card" id="afterLogin" style="display:none">
+        <h3 class="card-title">Welcome</h3>
+        <p id="welcome">—</p>
+        <div class="row" style="gap:8px">
+          <button class="btn" onclick="me()">Refresh context</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="sessions" class="section" hidden>
+      <div class="card">
+        <h3 class="card-title">Your sessions</h3>
+        <div class="row" style="justify-content:space-between">
+          <button class="btn" onclick="loadSessions()">Refresh</button>
+          <button class="btn btn-secondary" onclick="revokeAll()">Revoke All</button>
+        </div>
+        <div class="hr"></div>
+        <table class="table" id="sessTable"></table>
+      </div>
+    </section>
+  </main>
+
+  <div class="toaster" id="toaster" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+/* ---------- tiny UI helpers ---------- */
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function showToast(msg, type){
+  const wrap = $('#toaster'); const el = document.createElement('div');
+  el.className = 'toast ' + (type||''); el.textContent = msg; wrap.appendChild(el);
+  setTimeout(()=>{ el.classList.add('reveal','in'); },20);
+  setTimeout(()=>{ el.remove(); }, 3600);
+}
+function toggleTheme(){
+  const el = document.documentElement;
+  const now = el.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  el.setAttribute('data-theme', now); localStorage.setItem('pref.theme', now);
+}
+function show(id){
+  $$('.section').forEach(s=>s.hidden=true);
+  $('#'+id).hidden=false;
+  $$('.header-nav .tab').forEach(b=>b.setAttribute('aria-selected','false'));
+  event?.target?.setAttribute('aria-selected','true');
+}
+
+/* ---------- auth state ---------- */
+const AUTH = {
+  token: null, iat:0, exp:0, clientId:'',
+  save(){ localStorage.setItem('nahl.session', JSON.stringify({token:this.token, iat:this.iat, exp:this.exp})); },
+  load(){ try{ const x=JSON.parse(localStorage.getItem('nahl.session')||'{}'); this.token=x.token||null; this.iat=x.iat||0; this.exp=x.exp||0; }catch(_){ this.token=null; } },
+  clear(){ localStorage.removeItem('nahl.session'); this.token=null; this.iat=this.exp=0; }
+};
+
+function renderHeader(){
+  const signed = !!AUTH.token;
+  $('#btnSignIn').style.display = signed ? 'none' : '';
+  $('#btnSignOut').style.display = signed ? '' : 'none';
+  $('#afterLogin').style.display = signed ? '' : 'none';
+}
+
+/* ---------- Google button ---------- */
+async function renderGsi(){
+  if (!AUTH.clientId) {
+    const cfg = await GAS.run('auth_getGoogleClientId');
+    AUTH.clientId = cfg?.client_id || '';
+  }
+  if (!window.google?.accounts?.id || !AUTH.clientId) return;
+  const c = document.getElementById('gsiBtn'); c.innerHTML = '';
+  google.accounts.id.initialize({ client_id: AUTH.clientId, callback: onCredential, auto_select: false, cancel_on_tap_outside: true });
+  google.accounts.id.renderButton(c, { theme:'filled_blue', size:'large', type:'standard', shape:'pill', text:'continue_with' });
+}
+
+async function onCredential(resp){
+  const idToken = resp?.credential; if (!idToken) return;
+  const res = await GAS.run('auth_login_google', idToken);
+  if (!res?.ok) { showToast(res?.error || 'Login failed', 'err'); return; }
+  AUTH.token = res.session_token; AUTH.iat = res.iat; AUTH.exp = res.exp; AUTH.save();
+  $('#meEmail').textContent = res.me?.email || '—';
+  $('#welcome').textContent = `Signed in as ${res.me?.email || '—'}. Tenants: ${(res.tenants||[]).length}`;
+  renderHeader();
+  scheduleRefresh();
+}
+
+/* ---------- refresh / logout ---------- */
+let refreshTimer=null;
+function scheduleRefresh(){
+  if (!AUTH.exp) return;
+  clearTimeout(refreshTimer);
+  const skew = 120; // 2m before expiry
+  const ms = Math.max(5000, (AUTH.exp - Math.floor(Date.now()/1000) - skew) * 1000);
+  refreshTimer = setTimeout(async ()=>{
+    const res = await GAS.run('auth_refresh', AUTH.token);
+    if (res?.ok){ AUTH.token = res.session_token; AUTH.iat = res.iat; AUTH.exp = res.exp; AUTH.save(); scheduleRefresh(); }
+    else { showToast('Session refresh failed', 'err'); logout(); }
+  }, ms);
+}
+async function logout(){
+  try { if (AUTH.token) await GAS.run('auth_logout', AUTH.token); } catch(_){}
+  AUTH.clear(); renderHeader(); $('#meEmail').textContent = 'guest'; show('home'); renderGsi();
+}
+
+/* ---------- API helpers ---------- */
+async function me(){
+  if (!AUTH.token) return;
+  const res = await GAS.run('auth_me', AUTH.token);
+  if (res?.ok){
+    $('#meEmail').textContent = res.me?.email || '';
+    $('#welcome').textContent = `Signed in as ${res.me?.email || '—'}. Tenants: ${(res.tenants||[]).length}`;
+  }
+}
+
+async function loadSessions(){
+  if (!AUTH.token) return;
+  const res = await GAS.run('auth_sessions_list', AUTH.token);
+  if (!res?.ok){ $('#sessTable').innerHTML = `<tr><td>${res?.error||'Failed'}</td></tr>`; return; }
+  const rows = res.sessions || [];
+  const html = `
+    <tr><th>jti</th><th>status</th><th>active</th><th>exp</th><th>elevated_until</th></tr>
+    ${rows.map(r=>`<tr>
+      <td>${r.jti}</td><td>${r.status}</td><td>${r.active?'yes':'no'}</td>
+      <td>${r.exp?new Date(r.exp*1000).toLocaleString():'—'}</td>
+      <td>${r.elevated_until?new Date(r.elevated_until*1000).toLocaleTimeString():'—'}</td>
+    </tr>`).join('')}
+  `;
+  $('#sessTable').innerHTML = html;
+}
+
+async function revokeAll(){
+  if (!AUTH.token) return;
+  if (!confirm('Revoke all your sessions?')) return;
+  const res = await GAS.run('auth_revoke_all', AUTH.token);
+  if (res?.ok){ showToast('Revoked','ok'); await logout(); } else { showToast(res?.error||'Failed','err'); }
+}
+
+/* ---------- boot ---------- */
+(function init(){
+  const theme = localStorage.getItem('pref.theme') || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  AUTH.load(); renderHeader();
+  if (AUTH.token) { me(); scheduleRefresh(); }
+  else { renderGsi(); }
+})();
+</script>
 </body>
 </html>
