@@ -152,21 +152,39 @@ function addService(element) {
 }
 
 /* intl-tel-input init ... (unchanged) */
-const input = document.querySelector("#mobile");
-const countryCodeInput = window.intlTelInput(input, {
-  utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js",
-  countryOrder:["sa","qa"],
-  initialCountry:"sa",
-  onlyCountries:["sa","qa","ae","om","kw","bh"],
-  excludeCountries:["il"],
-  strictMode:true,
-  i18n:{ /* … your i18n map unchanged … */ },
-});
-const errorMap = ["رقم غير صحيح","رمز دولة غير صحيح","المُدخل أقصر من المتوقع","المُدخل أطول من المتوقع","رقم غير صحيح"];
+<script>
+let countryCodeInput; // make it available to other functions
 
-/* luxon/dayjs setup, locale, load user data, etc. (unchanged) */
-var DateTime = luxon.DateTime;
-document.getElementById("date").setAttribute("min", new Date().toLocaleDateString("fr-ca"));
+document.addEventListener('DOMContentLoaded', function () {
+  const input = document.getElementById('mobile');
+  if (!input) {
+    console.warn('⚠️ #mobile input not found when initializing intl-tel-input');
+    return;
+  }
+
+  countryCodeInput = window.intlTelInput(input, {
+    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js",
+    countryOrder:["sa","qa"],
+    initialCountry:"sa",
+    onlyCountries:["sa","qa","ae","om","kw","bh"],
+    excludeCountries:["il"],
+    strictMode:true,
+    i18n: /* your i18n map here */,
+  });
+
+  const errorMap = ["رقم غير صحيح", "رمز دولة غير صحيح", "المُدخل أقصر من المتوقع", "المُدخل أطول من المتوقع", "رقم غير صحيح"];
+
+  input.addEventListener("change", () => {
+    // safe to reference countryCodeInput now
+    console.log(countryCodeInput.getNumber().substring(1));
+    console.log(countryCodeInput.isValidNumber());
+    const msg = errorMap[countryCodeInput.getValidationError()] || "رقم غير صحيح";
+    console.log(msg);
+    console.log(countryCodeInput.getSelectedCountryData().dialCode);
+  });
+});
+</script>
+
 
 /* ==================== ORIGINAL METHOD HELPERS ==================== */
 let controllers = [];
