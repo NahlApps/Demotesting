@@ -1,21 +1,24 @@
-// assets/js/storage.js
+export function loadUser() {
+  try {
+    return {
+      name: localStorage.getItem("name") || "",
+      mobile: localStorage.getItem("mobile") || "",
+    };
+  } catch {
+    return { name: "", mobile: "" };
+  }
+}
 
-export function getName() {
-  try { return localStorage.getItem("name") || ""; } catch { return ""; }
+export function saveUser({ name, mobile }) {
+  try {
+    localStorage.setItem("name", name || "");
+    localStorage.setItem("mobile", mobile || "");
+  } catch {}
 }
-export function setName(v) {
-  try { localStorage.setItem("name", v || ""); } catch {}
-}
-export function getMobile() {
-  try { return localStorage.getItem("mobile") || ""; } catch { return ""; }
-}
-export function setMobile(v) {
-  try { localStorage.setItem("mobile", v || ""); } catch {}
-}
-export function clearSaved() {
+
+export function clearUser() {
   try {
     localStorage.removeItem("name");
     localStorage.removeItem("mobile");
   } catch {}
 }
-
