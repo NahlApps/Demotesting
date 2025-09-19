@@ -1,138 +1,123 @@
-// assets/js/appointments.js
-import { fetchAppointments } from "./api.js";
-import { DateTime, els, weekdaysAR } from "./config.js";
+import { DateTime, dayjs, locale, weekdaysAR, weekdaysEN } from './config.js';
+import { callContent2 } from './api.js';
 
-let appointments = [[], [], []];
-let actualTimes = [[], [], []];
+// state
+export let appointments = [[], [], []];
+export let ActualTimes = [[], [], []];
+export let timesLoaded = false;
 
-export function initAppointments() {
-  // Min date today
-  const dateEl = els.date();
-  if (!dateEl) return;
-  try {
-    dateEl.setAttribute("min", new Date().toLocaleDateString("fr-ca"));
-  } catch {}
-  // default value
-  dateEl.value = DateTime.now().toFormat("yyyy-MM-dd");
-
-  // Header days
-  setHeaderDays(DateTime.now());
-
-  // First fetch once service/area loaded
-  dateEl.addEventListener("change", () => onDateChange());
+function headerWeekdayName(dt) {
+  const idx = dt.weekday % 7; // luxon: 1..7
+  return (locale === 'ar') ? weekdaysAR[idx - 1] : weekdaysEN[idx - 1];
 }
 
-function setHeaderDays(day1) {
-  const day2 = day1.plus({ days: 1 });
-  const day3 = day1.plus({ days: 2 });
-  const dates = [day1, day2, day3];
-
-  for (let i = 1; i <= 3; i++) {
-    const dw = weekdaysAR[dates[i - 1].weekday % 7];
-    document.getElementById(`day${i}`).innerText = dw;
-    document.getElementById(`day${i}date`).innerText = dates[i - 1].toFormat("yyyy-MM-dd");
-  }
-}
-
-async function onDateChange() {
-  const dateEl = els.date();
-  const areaEl = els.area();
-  const svcEl = els.service();
-  const container = els.timeContainer();
-  if (!dateEl || !areaEl || !svcEl || !container) return;
-
-  // disable input while loading
-  dateEl.disabled = true;
-  container.innerHTML = loadingMarkup();
-
-  appointments = [[], [], []];
-  actualTimes = [[], [], []];
-
-  const d1 = DateTime.fromISO(dateEl.value);
+export function setupInitialDates() {
+  const d1 = DateTime.now();
   const d2 = d1.plus({ days: 1 });
   const d3 = d1.plus({ days: 2 });
-  setHeaderDays(d1);
+  const dates = [d1, d2, d3];
 
-  try {
-    const data = await fetchAppointments(d1.toFormat("yyyy-MM-dd"), areaEl.value, svcEl.value);
-    const arr = data?.data?.appointments || [];
-
-    // normalize
-    const tmpActual = [];
-    for (let i = 0; i < arr.length; i++) {
-      const x = DateTime.fromISO(arr[i]["TS_appointment_date"], { setZone: true });
-      const y = DateTime.fromISO(arr[i]["TS_appointment_time"], { setZone: true });
-      arr[i]["TS_appointment_date"] = x.toISODate();
-      arr[i]["TS_appointment_time"] = y.toLocaleString(DateTime.TIME_SIMPLE).replace(" ", " ");
-      tmpActual[i] = y.toFormat("hh:mm a");
-    }
-
-    for (let i = 0; i < arr.length; i++) {
-      const when = arr[i]["TS_appointment_date"];
-      const t = arr[i]["TS_appointment_time"];
-      const a = tmpActual[i];
-
-      if (when === d1.toFormat("yyyy-MM-dd")) { appointments[0].push(t); actualTimes[0].push(a); }
-      else if (when === d2.toFormat("yyyy-MM-dd")) { appointments[1].push(t); actualTimes[1].push(a); }
-      else if (when === d3.toFormat("yyyy-MM-dd")) { appointments[2].push(t); actualTimes[2].push(a); }
-    }
-
-    // Show first day's times
-    renderTimes(0);
-  } catch (err) {
-    console.error("[appointments]", err);
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center;">حدث خطأ في جلب المواعيد</div>`;
-  } finally {
-    dateEl.disabled = false;
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById(`day${i}`).innerText = headerWeekdayName(dates[i - 1]);
+    document.getElementById(`day${i}date`).innerText = dates[i - 1].toFormat('yyyy-MM-dd');
   }
+
+  const min = new Date().toLocaleDateString("fr-ca");
+  document.getElementById("date").setAttribute("min", min);
+  document.getElementById("date").value = DateTime.now().toFormat('yyyy-MM-dd');
 }
 
-function loadingMarkup() {
-  return `
-    <div id="department-spinner" class="spinner-border" role="status"
-         style="grid-column: 1 / -1; justify-self: center;">
-      <span class="sr-only">Loading...</span>
-    </div>`;
-}
+// render times for a given day index (0,1,2)
+export function timesSetter(index) {
+  const timeContainer = document.getElementById("time-container");
+  $("#time-container").empty();
+  timeContainer.innerHTML = "";
 
-export function renderTimes(index) {
-  const container = els.timeContainer();
-  container.innerHTML = "";
-
-  if (!appointments[index]?.length) {
-    container.innerHTML = `
-      <div style="grid-column: 1 / -1; justify-self: center;">لا توجد مواعيد متاحة</div>
-    `;
+  if (appointments[index].length === 0) {
+    timeContainer.innerHTML = `
+      <div role="status" style="grid-column-start: span 3;justify-self: center;">
+        <span>لا توجد مواعيد متاحة</span>
+      </div>`;
     return;
   }
 
   for (let y = 0; y < appointments[index].length; y++) {
-    const btn = document.createElement("button");
-    btn.className = "time-button";
-    btn.dir = "ltr";
-    btn.textContent = appointments[index][y];
-    const date = document.getElementById(`day${index + 1}date`).innerText;
-    const time = actualTimes[index][y];
-    btn.addEventListener("click", () => window.choosedDate(time, date, 4));
-    container.appendChild(btn);
+    timeContainer.innerHTML += `
+      <button onclick="window.choosedDate('${ActualTimes[index][y]}','${document.getElementById(`day${index+1}date`).innerText}',4)" class="time-button" dir="ltr">
+        ${appointments[index][y]}
+      </button>`;
   }
 }
 
-// Exposed for inline onclicks created at runtime
-window.choosedDate = (time, date, i) => {
-  // i == page index (4) from original
-  const dt = DateTime.fromFormat(time, "h:mm a");
-  const nForm = window.__nForm || (window.__nForm = {});
+export function wireDateChange(nForm) {
+  document.getElementById('date').onchange = () => {
+    const dateEl = document.getElementById('date');
+    dateEl.disabled = true;
+    document.getElementById('time-container').innerHTML = `
+      <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3;justify-self: center;">
+        <span class="sr-only">Loading...</span>
+      </div>`;
 
-  nForm.date = date;
-  nForm.time = dt.toFormat("HH:mm");
+    ActualTimes = [[], [], []];
+    appointments = [[], [], []];
+    timesLoaded = false;
 
-  // transition to next page
-  const p1 = document.getElementById(`page${i}`);
-  const p2 = document.getElementById(`page${i + 1}`);
+    const day1 = DateTime.fromISO(dateEl.value);
+    const day2 = day1.plus({ days: 1 });
+    const day3 = day1.plus({ days: 2 });
+    const datesSet = [day1, day2, day3];
+
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById(`day${i}`).innerText = headerWeekdayName(datesSet[i - 1]);
+      document.getElementById(`day${i}date`).innerText = datesSet[i - 1].toFormat('yyyy-MM-dd');
+    }
+
+    const location = document.getElementById("area").value;
+    const service = document.getElementById("service").value;
+
+    callContent2(`/appointments?startDate=${day1.toFormat('yyyy-MM-dd')}&location=${location}&service=${service}`, (data) => {
+      const received = data.data.appointments || [];
+      const tmpActualTimes = [];
+
+      for (let i = 0; i < received.length; i++) {
+        const x = DateTime.fromISO(received[i]['TS_appointment_date'], { setZone: true });
+        const y = DateTime.fromISO(received[i]['TS_appointment_time'], { setZone: true });
+        received[i]['TS_appointment_date'] = x.toISODate();
+        received[i]['TS_appointment_time'] = y.toLocaleString(DateTime.TIME_SIMPLE).replace(" ", " ");
+        tmpActualTimes[i] = y.toFormat('hh:mm a');
+      }
+
+      for (let i = 0; i < received.length; i++) {
+        const d = received[i]["TS_appointment_date"];
+        if (d === day1.toFormat('yyyy-MM-dd')) {
+          appointments[0].push(received[i]['TS_appointment_time']);
+          ActualTimes[0].push(tmpActualTimes[i]);
+        } else if (d === day2.toFormat('yyyy-MM-dd')) {
+          appointments[1].push(received[i]['TS_appointment_time']);
+          ActualTimes[1].push(tmpActualTimes[i]);
+        } else if (d === day3.toFormat('yyyy-MM-dd')) {
+          appointments[2].push(received[i]['TS_appointment_time']);
+          ActualTimes[2].push(tmpActualTimes[i]);
+        }
+      }
+
+      timesLoaded = true;
+      timesSetter(0); // initially render day 1
+      dateEl.disabled = false;
+    }, true);
+  };
+}
+
+// choose time + navigate to next page
+export function choosedDate(timeLabel, dateISO, currentPage, nForm) {
+  nForm.date = dateISO;
+  const parts = timeLabel.split(" ");
+  const parsedTime = DateTime.fromFormat(parts.join(" "), "h:mm a");
+  nForm.time = parsedTime.toFormat("HH:mm");
+
+  const p1 = document.getElementById(`page${currentPage}`);
+  const p2 = document.getElementById(`page${currentPage + 1}`);
   p1.classList.remove("fadeIn"); p1.classList.add("fadeOut");
   p2.classList.remove("fadeOut"); p2.classList.add("fadeIn");
   setTimeout(() => { p1.style.display = "none"; p2.style.display = "flex"; }, 1000);
-};
-
-export { onDateChange }; // used by services change
+}
