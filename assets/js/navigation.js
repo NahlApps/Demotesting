@@ -1,193 +1,246 @@
-// assets/js/navigation.js
-import { checkNumberValidity, getPhone } from "./validation.js";
-import { t } from "./i18n.js";
-import { reserveAppointment } from "./api.js";
-import { renderTimes } from "./appointments.js";
-import { getPosition } from "./maps.js";
-import { DateTime } from "./config.js";
+import { locale, DateTime } from './config.js';
+import { checkNumberValidity } from './validation.js';
+import { callContent2 } from './api.js';
+import { choosedDate } from './appointments.js';
+import { saveUser, clearUser } from './storage.js';
 
-// Global N-Form state shared across modules
-const nForm = (window.__nForm = window.__nForm || {
-  date: "", time: "",
-  location: "", service: "", serviceCount: "1", serviceCat: "",
-  customerM: "", customerN: "",
-  paymentMethod: "",
-  urlLocation: "",
-  locationDescription: ""
-});
+// simple timer (used in OTP flow previously)
+export function startTimer(duration, display) {
+  document.getElementById("resend-objects")?.style && (document.getElementById("resend-objects").style.display = "block");
+  try { document.getElementById("page6-resend")?.remove(); } catch {}
+  let timer = duration;
 
-export function initNavigation() {
-  setupNextBack();
-  setupAutoAdvanceFromPage3();
-  setupRebook();
-}
+  const time_counter = setInterval(function () {
+    const minutes = String(parseInt(timer / 60, 10)).padStart(2, '0');
+    const seconds = String(parseInt(timer % 60, 10)).padStart(2, '0');
 
-function setupNextBack() {
-  // Page1 -> Page2
-  byId("page1-button")?.addEventListener("click", () => go(1, 2));
+    if (display) display.textContent = `${minutes}:${seconds}`;
+    timer = --timer;
 
-  // Page2 validations
-  byId("page2-button")?.addEventListener("click", () => {
-    const area = byId("area");
-    if (!area?.value) {
-      // let maps overlay hint handle UX
-      byId("page2-form")?.reportValidity();
-      return;
+    if (timer < 0) {
+      clearInterval(time_counter);
+      const timerElement = document.getElementById("resend-objects");
+      if (!timerElement) return;
+
+      const resendButton = document.createElement("button");
+      resendButton.id = "page6-resend";
+      resendButton.className = "filter-button";
+      resendButton.type = "button";
+      const sp = document.createElement("span");
+      sp.textContent = "إعادة ارسال";
+      resendButton.appendChild(sp);
+
+      timerElement.after(resendButton);
+      timerElement.style.display = "none";
+      document.getElementById("page6-contact") && (document.getElementById("page6-contact").style.display = "block");
     }
-    nForm.location = area.value;
-    go(2, 3);
-  });
-
-  // Page5 validations (name, phone, payment)
-  byId("page5-button")?.addEventListener("click", () => {
-    const name = byId("name");
-    if (!name || !name.value.trim()) {
-      name?.setCustomValidity(localeIsAR() ? "يُرجى ملئ هذا الحقل" : "Required field");
-      byId("page5-form")?.reportValidity();
-      return;
-    } else {
-      name.setCustomValidity("");
-    }
-    if (!checkNumberValidity()) {
-      byId("page5-form")?.reportValidity();
-      return;
-    }
-    const paying = document.querySelector('input[name="payingMethod"]:checked')?.value;
-    if (!paying) {
-      byId("page5-form")?.reportValidity();
-      return;
-    }
-
-    nForm.customerN = name.value.trim();
-    nForm.customerM = getPhone();
-    nForm.paymentMethod = paying;
-
-    go(5, 6);
-  });
-
-  // Back buttons
-  for (let i = 3; i <= 6; i++) {
-    const backBtn = byId(`page${i}-return`);
-    if (!backBtn) continue;
-    backBtn.addEventListener("click", () => {
-      const src = byId(`page${i}`);
-      const dst = i === 4 ? byId("page2") : byId(`page${i - 1}`);
-      transition(src, dst);
-    });
-  }
+  }, 1000);
 }
 
-// Auto-advance Page3 to Page4 (after availability is shown)
-function setupAutoAdvanceFromPage3() {
-  const page3 = byId("page3");
-  const nextBtn = byId("page3-button"); // kept for compatibility
-  if (!page3) return;
+export function wirePager(nForm, iti) {
+  // Expose global for inline onclick in HTML (time buttons)
+  window.choosedDate = (t, d, i) => choosedDate(t, d, i, nForm);
 
-  const obs = new MutationObserver(() => {
-    if (page3.style.display === "flex") {
-      setTimeout(() => {
-        // generate first times (if not yet)
-        renderTimes(0);
-        // move forward
-        go(3, 4);
-      }, 5000);
-    }
-  });
-  obs.observe(page3, { attributes: true, attributeFilter: ["style"] });
-}
+  for (let i = 1; i < 7; i++) {
+    if (i === 4) continue; // #page4 has times grid selection
 
-function setupRebook() {
-  byId("rebook")?.addEventListener("click", () => {
-    window.location.href = "https://www.spongnsoap.com/";
-  });
-}
+    const btnNext = document.getElementById(`page${i}-button`);
+    const page = document.getElementById(`page${i}`);
+    const pageNext = document.getElementById(`page${i + 1}`);
 
-function go(from, to) {
-  const p1 = byId(`page${from}`);
-  const p2 = byId(`page${to}`);
-  transition(p1, p2);
-}
+    if (!btnNext) continue;
 
-function transition(src, dst) {
-  if (!src || !dst) return;
-  src.classList.remove("fadeIn"); src.classList.add("fadeOut");
-  dst.classList.remove("fadeOut"); dst.classList.add("fadeIn");
-  setTimeout(() => { src.style.display = "none"; dst.style.display = "flex"; }, 1000);
-}
+    if (i === 2) {
+      btnNext.onclick = () => {
+        const field1 = document.getElementById("area");
+        if (!field1.value) {
+          // show a quick hint via map infowindow (handled in maps.js if needed)
+          document.getElementById("page2-form").reportValidity();
+          return;
+        }
+        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
+        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
+        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "flex"; }, 1000);
+        nForm.location = field1.value;
+      };
+    } else if (i === 3) {
+      btnNext.onclick = () => {
+        const field3 = document.getElementById("serviceCat");
+        const field4 = document.getElementById("service");
+        const serviceCount = document.getElementById("serviceCount");
+        const form = document.getElementById("page3-form");
 
-// Submit from Page6 (called after Terms accepted)
-export async function submitFromPage6() {
-  const descEl = byId("locationDescription");
-
-  // Validate desc length
-  const val = (descEl?.value || "").trim();
-  if (val.length > 200) {
-    descEl.setCustomValidity(t("desc-too-long"));
-    byId("page6-form")?.reportValidity();
-    descEl.setCustomValidity("");
-    return;
-  }
-
-  const pos = getPosition();
-  if (!pos) {
-    // maps module shows the infoWindow hint already
-    return;
-  }
-
-  nForm.urlLocation = pos;
-
-  // Spinner + disable nav
-  const next = byId("page6-button");
-  const back = byId("page6-return");
-  const spinWrap = byId("page6-spinner");
-  showSpinner(spinWrap, true);
-  toggle(next, false); toggle(back, false);
-
-  try {
-    const res = await reserveAppointment(nForm);
-    if (res?.success) {
-      transition(byId("page6"), byId("page7"));
-      // remember?
-      if (confirm("عزيزنا/عزيزتنا, ودك نتذكر بياناتك على هذا الجهاز لتسهيل الغسلات الجاية ؟")) {
         try {
-          localStorage.setItem("name", byId("name").value.trim());
-          localStorage.setItem("mobile", nForm.customerM);
-        } catch {}
-      } else {
+          if (parseInt(serviceCount.value) <= 0 || parseInt(serviceCount.value) > 10) {
+            if (locale === "en") serviceCount.setCustomValidity("Must be between 1 and 10");
+            else serviceCount.setCustomValidity("لابد أن يكون بين 1 و 10");
+            throw new Error("bad count");
+          }
+        } catch {
+          form.reportValidity();
+          return;
+        }
+
+        if (!field3.value || !field4.value) {
+          field3.style.borderColor = field3.value ? 'green' : 'red';
+          field4.style.borderColor = field4.value ? 'green' : 'red';
+          field3.style.borderWidth = 'thin';
+          field4.style.borderWidth = 'thin';
+          return;
+        } else {
+          field3.style.borderColor = 'green';
+          field3.style.borderWidth = 'thin';
+          field4.style.borderColor = 'green';
+          field4.style.borderWidth = 'thin';
+        }
+
+        nForm.customerN = (document.getElementById("name")?.value || "").trim();
+        nForm.serviceCat = field3.value;
+        nForm.service = field4.value;
+        nForm.serviceCount = serviceCount.value;
+
+        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
+        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
+        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "flex"; }, 1000);
+      };
+    } else if (i === 5) {
+      btnNext.onclick = () => {
+        const field1 = document.getElementById("name");
+        const form = document.getElementById("page5-form");
+        const payingMethod = document.querySelector('input[name="payingMethod"]:checked')?.value;
+
         try {
-          localStorage.removeItem("name");
-          localStorage.removeItem("mobile");
-        } catch {}
-      }
+          if (!payingMethod) throw new Error("no payment");
+          if (!field1.value.trim()) {
+            if (locale === "en") field1.setCustomValidity("Required field");
+            else field1.setCustomValidity("يُرجى ملئ هذا الحقل");
+            throw new Error("no name");
+          }
+        } catch {
+          form.reportValidity();
+          return;
+        }
+
+        if (!checkNumberValidity(iti)) {
+          form.reportValidity();
+          return;
+        }
+
+        nForm.paymentMethod = payingMethod;
+        nForm.customerN = field1.value.trim();
+        nForm.customerM = iti.getNumber().substring(1);
+
+        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
+        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
+        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "flex"; }, 1000);
+      };
+    } else if (i === 6) {
+      // page6: show terms, then send POST
+      btnNext.onclick = () => {
+        const { map, infoWindow, position } = window.__MAP_STATE__ || {};
+        if (!position) {
+          if (map && infoWindow) {
+            infoWindow.setPosition(map.getCenter());
+            infoWindow.setContent("الرجاء تحديد الموقع");
+            infoWindow.open(map);
+          }
+          return;
+        }
+
+        const termsModalEl = document.getElementById('termsModal');
+        const termsModal = new bootstrap.Modal(termsModalEl);
+        const acceptCheckbox = document.getElementById('termsAccept');
+        const confirmBtn = document.getElementById('confirmTerms');
+
+        acceptCheckbox.checked = false;
+        confirmBtn.disabled = true;
+
+        acceptCheckbox.onchange = () => { confirmBtn.disabled = !acceptCheckbox.checked; };
+        termsModal.show();
+
+        confirmBtn.onclick = () => {
+          termsModal.hide();
+
+          document.getElementById(`page${i}-return`).style.display = "none";
+          btnNext.style.display = "none";
+          const pageSpinner = document.getElementById(`page${i}-spinner`);
+          const failAlert = document.getElementById(`fail-alert-5`);
+          failAlert.style.display = "none";
+          pageSpinner.style.display = "flex";
+          pageSpinner.children[0].style.display = "block";
+          pageSpinner.children[1].style.display = "block";
+
+          nForm.urlLocation = position;
+
+          const x = document.getElementById("locationDescription");
+          try {
+            if (x && x.value.trim().length > 200) {
+              if (locale === "en") x.setCustomValidity("Description is too long");
+              else x.setCustomValidity("الوصف أطول من المتوقع");
+              throw new Error("desc too long");
+            }
+          } catch {
+            document.getElementById("page6-form").reportValidity();
+            document.getElementById(`page${i}-return`).style.display = "inline-block";
+            btnNext.style.display = "inline-block";
+            pageSpinner.style.display = "none";
+            pageSpinner.children[0].style.display = "none";
+            pageSpinner.children[1].style.display = "none";
+            return;
+          }
+
+          fetch(`${location.origin ? location.origin : ''}${new URL('.', window.location).pathname}${''}`); // noop to keep scope warm
+
+          fetch(`${defaultLink2}/reserveAppointment`, {
+            redirect: "follow",
+            method: "POST",
+            body: JSON.stringify(nForm)
+          }).then(async (res) => {
+            pageSpinner.style.display = 'none';
+            if (!res.ok) throw Object.assign(new Error('Custom error'), { response: res });
+            const response = await res.json();
+            if (response.success) {
+              page.classList.remove("fadeIn"); page.classList.add("fadeOut");
+              const done = document.getElementById(`page${i + 1}`);
+              done.classList.remove("fadeOut"); done.classList.add("fadeIn");
+
+              setTimeout(() => {
+                page.style.display = "none";
+                done.style.display = "flex";
+                // remember user?
+                if (confirm(`عزيزنا/عزيزتنا, ودك نتذكر بياناتك على هذا الجهاز لتسهيل الغسلات الجاية ؟`)) {
+                  saveUser({ name: document.getElementById("name").value, mobile: iti.getNumber().substring(1) });
+                } else {
+                  clearUser();
+                }
+              }, 1000);
+            }
+          }).catch(async (err) => {
+            console.log("Error:", err.message);
+            const ejson = err.response ? await err.response.json() : {};
+            document.getElementById(`page${i}-return`).style.display = "inline-block";
+            btnNext.style.display = "inline-block";
+
+            page.classList.remove("fadeIn"); page.classList.add("fadeOut");
+            page.style.display = "none";
+            const backTo4 = document.getElementById(`page4`);
+            backTo4.classList.remove("fadeOut"); backTo4.classList.add("fadeIn");
+            backTo4.style.display = "flex";
+
+            const failAlert3 = document.getElementById(`fail-alert-3`);
+            failAlert3.style.display = "block";
+            if (locale === "en") {
+              failAlert3.children[0].innerHTML = ejson.msgEN ? ejson.msgEN : "Unexpected error, Please contact us";
+            } else {
+              failAlert3.children[0].innerHTML = ejson.msgAR ? ejson.msgAR : "عذرًا حصل خطأ غير متوقع الرجاء التواصل معنا";
+            }
+            failAlert3.children[2].innerHTML = "";
+            document.getElementById('date').dispatchEvent(new Event('change'));
+          });
+        };
+      };
     } else {
-      throw new Error("Reservation not successful");
-    }
-  } catch (err) {
-    console.error("[reserve]", err);
-    // Return to page4, show alert
-    const errMsg = err.response?.msgAR || err.response?.msgEN || t("unexpected");
-    const alert = byId("fail-alert-3");
-    if (alert) {
-      alert.style.display = "block";
-      alert.children[0].innerHTML = errMsg;
-      if (alert.children[2]) alert.children[2].innerHTML = "";
-    }
-    transition(byId("page6"), byId("page4"));
-    // trigger a refresh on date list (optional)
-    byId("date")?.dispatchEvent(new Event("change"));
-  } finally {
-    showSpinner(spinWrap, false);
-    toggle(next, true); toggle(back, true);
-  }
-}
-
-function toggle(el, on) { if (el) el.style.display = on ? "inline-block" : "none"; }
-function showSpinner(wrap, on) {
-  if (!wrap) return;
-  wrap.style.display = on ? "flex" : "none";
-  const sp = wrap.querySelector(".spinner-border");
-  if (sp) sp.style.display = on ? "block" : "none";
-}
-
-function byId(id) { return document.getElementById(id); }
-function localeIsAR() { return (navigator.language || "").includes("ar"); }
+      btnNext.onclick = () => {
+        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
+        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
+        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "
