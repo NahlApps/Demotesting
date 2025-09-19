@@ -177,6 +177,20 @@
   font-weight: bold;
   letter-spacing: .5px;
 }
+
+/* Simple spacing helpers */
+#service,
+#serviceCat {
+  margin: 3%;
+}
+
+form input {
+  margin: 3%;
+}
+
+#select2-container {
+  width: 100% !important;
+}
 .rebook-button:hover {
   background: linear-gradient(135deg, #027790, #32a5bc);
   transform: scale(1.05);
