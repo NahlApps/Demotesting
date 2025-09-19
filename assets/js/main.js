@@ -1,113 +1,138 @@
 /**
  * /assets/js/main.js
- * Lightweight bootstrap that connects page UI to the global map helpers.
- * Depends on /assets/js/maps.js being loaded first (it defines window.myMap, window.setBoundries, window.detectMyLocation).
- *
- * No ES modules here — everything is plain JS and global-safe.
+ * Plain JS (no modules). Wires page navigation + map helper hooks.
+ * Relies on /assets/js/maps.js exposing: window.myMap, window.setBoundries, window.detectMyLocation
  */
 
 (function () {
   "use strict";
 
-  // Helper: add event listener if the element exists
-  function on(el, evt, handler, opts) {
-    if (!el) return;
-    el.addEventListener(evt, handler, opts || false);
-  }
-
-  // Helper: debounce (for noisy events like selects that are programmatically updated)
+  // Small helpers
+  function $(id) { return document.getElementById(id); }
+  function on(el, evt, fn, opts) { if (el) el.addEventListener(evt, fn, opts || false); }
   function debounce(fn, wait) {
-    let t;
-    return function () {
-      const ctx = this, args = arguments;
-      clearTimeout(t);
-      t = setTimeout(function () { fn.apply(ctx, args); }, wait);
-    };
+    let t; return function () { clearTimeout(t); t = setTimeout(() => fn.apply(this, arguments), wait); };
   }
 
-  // Hook up “اظهار موقعي” button -> detectMyLocation()
+  // Page switching with fade classes; falls back to simple display toggles
+  function switchPage(fromId, toId) {
+    var from = $(fromId), to = $(toId);
+    if (!from || !to) return;
+
+    // Ensure destination has proper display
+    to.style.display = "flex";
+
+    // Try to use CSS animations if present
+    try {
+      from.classList.remove("fadeIn");
+      from.classList.add("fadeOut");
+      to.classList.remove("fadeOut");
+      to.classList.add("fadeIn");
+      setTimeout(function () {
+        from.style.display = "none";
+      }, 300); // keep short; your CSS uses 1s but this feels snappier
+    } catch (_) {
+      // Fallback without animations
+      from.style.display = "none";
+      to.style.display = "flex";
+    }
+  }
+
+  // Wire “اظهار موقعي”
   function wireMyLocationButton() {
-    var btn = document.getElementById("show-my-location");
-    on(btn, "click", function () {
+    on($("show-my-location"), "click", function () {
       if (typeof window.detectMyLocation === "function") {
         window.detectMyLocation();
       } else {
-        console.warn("[main.js] detectMyLocation is not available yet.");
+        console.warn("[main.js] detectMyLocation() not ready.");
       }
     });
   }
 
-  // Wire area select -> setBoundries()
+  // Wire area select → setBoundries()
   function wireAreaSelect() {
-    var area = document.getElementById("area");
+    var area = $("area");
     if (!area) return;
 
-    // When user changes the dropdown
     on(area, "change", debounce(function () {
       if (typeof window.setBoundries === "function") {
         window.setBoundries();
-      } else {
-        console.warn("[main.js] setBoundries is not available yet.");
       }
-    }, 50));
+    }, 60));
 
-    // If options are injected later (e.g., after an async load), run once automatically
-    const tryApplyBounds = debounce(function () {
-      if (!area.value && area.options.length > 0) {
-        // Select2 may set value via JS; we still attempt to set bounds using current selection text.
-      }
+    // In case options arrive asynchronously (Select2 load)
+    const mo = new MutationObserver(debounce(function () {
       if (typeof window.setBoundries === "function") {
         window.setBoundries();
       }
-    }, 100);
-
-    // Observe changes to the <select> (new options from async load)
-    const mo = new MutationObserver(function () {
-      tryApplyBounds();
-    });
+    }, 100));
     mo.observe(area, { childList: true, subtree: true });
 
-    // Kick once on load in case values already exist
-    tryApplyBounds();
+    // First-run attempt
+    if (typeof window.setBoundries === "function") {
+      window.setBoundries();
+    }
   }
 
-  // Optional: Wire the rebook button to navigate home (keeps behavior in case inline code is absent)
+  // Wire “حجز جديد” fallback (keeps your inline handler behaviour if present)
   function wireRebook() {
-    var rebook = document.getElementById("rebook");
-    on(rebook, "click", function (e) {
-      // if inline script already attached, this won't hurt; let navigation happen
-      if (!e.defaultPrevented) {
-        // fallback: go to homepage if no other handler
-        try {
-          // You can change the URL below if needed
-          window.location.href = "https://www.spongnsoap.com/";
-        } catch (_) {}
-      }
+    on($("rebook"), "click", function (e) {
+      // If another script already handled, do nothing
+      if (e.defaultPrevented) return;
+      try { window.location.href = "https://www.spongnsoap.com/"; } catch (_) {}
     });
   }
 
-  // Accessibility: if a #googleMap container exists but the API hasn’t run yet,
-  // provide a gentle console note. (The Google callback still initializes the map.)
+  // NEW: Wire the first “Next” button (page1 → page2)
+  function wirePage1Next() {
+    var btn = $("page1-button");
+    if (!btn) return;
+    on(btn, "click", function () {
+      switchPage("page1", "page2");
+    });
+  }
+
+  // Optional: wire the rest if you want simple forward/back fallbacks.
+  // These won’t clash with your inline logic; they only act if clicked.
+  function wireFallbackNav() {
+    var map = [
+      ["page2-button",   "page2", "page3"],
+      ["page3-return",   "page3", "page2"],
+      ["page4-return",   "page4", "page2"], // your flow goes back to page2 from page4
+      ["page5-return",   "page5", "page4"]
+      // Note: page3-button/page4-button/page5-button/page6-button submit/validate
+      // are handled in your inline script — we won’t override them here.
+    ];
+    map.forEach(function (m) {
+      var el = $(m[0]);
+      if (!el) return;
+      on(el, "click", function () { switchPage(m[1], m[2]); });
+    });
+  }
+
   function sanityCheck() {
-    var mapEl = document.getElementById("googleMap");
-    if (mapEl && typeof window.myMap !== "function") {
-      // This is fine — Google Maps will call window.myMap() once its script loads.
-      // We log just in case the loader tag is missing or placed before maps.js.
+    if ($("googleMap") && typeof window.myMap !== "function") {
+      // This is fine; the Google loader will call window.myMap() when ready.
       console.info("[main.js] Waiting for Google Maps to call window.myMap callback…");
     }
   }
 
   // Boot
   document.addEventListener("DOMContentLoaded", function () {
-    wireMyLocationButton();
-    wireAreaSelect();
-    wireRebook();
+    wirePage1Next();        // ← Fixes your issue
+    wireFallbackNav();      // Optional helpers for other buttons
+    wireMyLocationButton(); // Map “my location” button
+    wireAreaSelect();       // Area → polygon bounds
+    wireRebook();           // Fallback for rebook
     sanityCheck();
   });
 
-  // Expose a tiny debug handle (optional)
+  // Optional tiny debug API
   window.NAHL_MAIN = {
+    goto: switchPage,
     rewire: function () {
+      wirePage1Next();
+      wireFallbackNav();
       wireMyLocationButton();
       wireAreaSelect();
       wireRebook();
