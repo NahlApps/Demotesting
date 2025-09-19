@@ -661,7 +661,8 @@ function timesSetter(index){
     document.getElementById('time-container').innerHTML = `<div id="department-spinner" role="status" style="grid-column-start: span 3; justify-self:center;"><span>لا توجد مواعيد متاحة</span></div>`;
   }
   for (let y=0; y<appointments[index].length; y++){
-    timeContainer.innerHTML += `<button onclick="choosedDate('${ActualTimes[index][y]}','${document.getElementById(\`day${index+1}date\`).innerText}',${4})" class="time-button" dir="ltr">${appointments[index][y]}</button>`;
+timeContainer.innerHTML += `<button onclick="choosedDate('${ActualTimes[index][y]}','${document.getElementById('day' + (index + 1) + 'date').innerText}',4)" class="time-button" dir="ltr">${appointments[index][y]}</button>`;
+
   }
 }
 
