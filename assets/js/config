@@ -1,0 +1,36 @@
+// assets/js/config.js
+
+// Locale
+export const locale = (navigator.language || "ar").includes("ar") ? "ar" : "ar"; // default to ar
+
+// Time windows
+export const acceptedHourdiff = 1;
+export const acceptedMindiff = 30;
+
+// API endpoints
+export const defaultLink2 =
+  "https://nahl-platform.vercel.app/api/app/AM/general/33e0d05d-d771-46f4-a7e7-7c634b4e3a9e/form";
+
+// Dates / i18n
+export const weekdaysAR = [
+  "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت",
+];
+export const weekdaysEN = [
+  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
+];
+
+// Google maps helpers
+export const prePosition = "https://www.google.com/maps/search/?api=1&query=";
+
+// Shorthand to luxon
+export const DateTime = window.luxon?.DateTime;
+export const dayjs = window.dayjs;
+
+// Selectors used throughout
+export const els = {
+  date: () => document.getElementById("date"),
+  area: () => document.getElementById("area"),
+  service: () => document.getElementById("service"),
+  serviceCat: () => document.getElementById("serviceCat"),
+  timeContainer: () => document.getElementById("time-container"),
+};
