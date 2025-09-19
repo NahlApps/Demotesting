@@ -1,6 +1,5 @@
-// assets/js/brands.js
-
-const carBrands = [
+// Populate car brands + select2 wiring + helpers
+export const carBrands = [
   "Acura","Alfa Romeo","Aston Martin","Audi","Bentley","BMW","Bugatti","Buick",
   "Cadillac","Chevrolet","Chrysler","Citroën","Dacia","Daewoo","Daihatsu","Dodge",
   "Ferrari","Fiat","Ford","Genesis","GMC","Haval","Holden","Honda","Hummer",
@@ -13,30 +12,19 @@ const carBrands = [
   "Volvo","Wiesmann","Zotye"
 ].sort();
 
-export function initBrands() {
-  const sel = document.getElementById("carBrand");
-  if (!sel) return;
-
-  // Keep "Other" if present (index 0)
-  const hasOther = Array.from(sel.options).some(o => o.value === "Other");
-  if (!hasOther) {
-    const other = document.createElement("option");
-    other.value = "Other"; other.text = "Other";
-    sel.appendChild(other);
-  }
-
-  for (const brand of carBrands) {
-    const op = document.createElement("option");
-    op.value = brand;
-    op.textContent = brand;
-    sel.appendChild(op);
-  }
-
-  // Select2
-  if (window.$ && typeof window.$.fn.select2 === "function") {
-    window.$("#carBrand").select2({
-      placeholder: "Select a car brand",
-      allowClear: true
-    });
-  }
+export function mountBrands() {
+  const sel = $('#carBrand');
+  carBrands.forEach(b => sel.append(`<option value="${b}">${b}</option>`));
+  sel.select2({ placeholder: "Select a car brand", allowClear: true });
 }
+
+export function updateLocationDescription() {
+  const brand = document.getElementById("carBrand").value || "";
+  const name = document.getElementById("carName").value || "";
+  const plate = document.getElementById("plateNumber").value || "";
+  const desc = [brand, name, plate].filter(Boolean).join(", ");
+  document.getElementById("locationDescription").value = desc;
+}
+
+// expose for inline oninput in HTML
+window.updateLocationDescription = updateLocationDescription;
