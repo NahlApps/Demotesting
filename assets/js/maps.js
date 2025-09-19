@@ -1,252 +1,253 @@
-// assets/js/navigation.js
-import { locale, DateTime } from './config.js';
-import { defaultLink2 } from './config.js';         // ⬅️ add this
-import { checkNumberValidity } from './validation.js';
-import { choosedDate } from './appointments.js';
-import { saveUser, clearUser } from './storage.js';
+// /assets/js/maps.js
 
-export function startTimer(duration, display) {
-  const holder = document.getElementById("resend-objects");
-  if (holder && holder.style) holder.style.display = "block";
-  try { const r = document.getElementById("page6-resend"); if (r) r.remove(); } catch {}
+// ---------- Shared state ----------
+let map = null;
+let infoWindow = null;
+let marker = null;
+let polygon = null;
 
-  let timer = duration;
-  const intervalId = setInterval(() => {
-    const minutes = String(parseInt(timer / 60, 10)).padStart(2, '0');
-    const seconds = String(parseInt(timer % 60, 10)).padStart(2, '0');
-    if (display) display.textContent = minutes + ":" + seconds;
-    timer -= 1;
+let position = ""; // Google Maps share URL
+const prePosition = "https://www.google.com/maps/search/?api=1&query=";
 
-    if (timer < 0) {
-      clearInterval(intervalId);
-      const timerElement = document.getElementById("resend-objects");
-      if (!timerElement) return;
+// Default center
+let defaultLocation = { lat: 26.34165524787632, lng: 50.11524831545726 };
 
-      const btn = document.createElement("button");
-      btn.id = "page6-resend";
-      btn.className = "filter-button";
-      btn.type = "button";
-      const sp = document.createElement("span");
-      sp.textContent = "إعادة ارسال";
-      btn.appendChild(sp);
-
-      timerElement.after(btn);
-      timerElement.style.display = "none";
-
-      const contact = document.getElementById("page6-contact");
-      if (contact) contact.style.display = "block";
-    }
-  }, 1000);
+// Publish minimal state for other scripts (optional)
+function publishMapState() {
+  window.__MAP_STATE__ = { map, infoWindow, marker, polygon, position };
 }
 
-export function wirePager(nForm, iti) {
-  window.choosedDate = (t, d, i) => choosedDate(t, d, i, nForm);
-
-  for (let i = 1; i < 7; i++) {
-    if (i === 4) continue;
-
-    const btnNext = document.getElementById(`page${i}-button`);
-    const page = document.getElementById(`page${i}`);
-    const pageNext = document.getElementById(`page${i + 1}`);
-    if (!btnNext) continue;
-
-    if (i === 2) {
-      btnNext.onclick = () => {
-        const area = document.getElementById("area");
-        if (!area.value) {
-          document.getElementById("page2-form").reportValidity();
-          return;
-        }
-        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
-        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
-        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "flex"; }, 1000);
-        nForm.location = area.value;
-      };
-    } else if (i === 3) {
-      btnNext.onclick = () => {
-        const cat = document.getElementById("serviceCat");
-        const svc = document.getElementById("service");
-        const count = document.getElementById("serviceCount");
-        const form = document.getElementById("page3-form");
-
-        try {
-          const c = parseInt(count.value || "0", 10);
-          if (isNaN(c) || c < 1 || c > 10) {
-            if (locale === "en") count.setCustomValidity("Must be between 1 and 10");
-            else count.setCustomValidity("لابد أن يكون بين 1 و 10");
-            throw new Error("bad count");
-          }
-          count.setCustomValidity("");
-        } catch {
-          form.reportValidity();
-          return;
-        }
-
-        if (!cat.value || !svc.value) {
-          cat.style.borderColor = cat.value ? 'green' : 'red';
-          svc.style.borderColor = svc.value ? 'green' : 'red';
-          cat.style.borderWidth = 'thin';
-          svc.style.borderWidth = 'thin';
-          return;
-        }
-
-        nForm.customerN = (document.getElementById("name")?.value || "").trim();
-        nForm.serviceCat = cat.value;
-        nForm.service = svc.value;
-        nForm.serviceCount = count.value;
-
-        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
-        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
-        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "flex"; }, 1000);
-      };
-    } else if (i === 5) {
-      btnNext.onclick = () => {
-        const nameEl = document.getElementById("name");
-        const form = document.getElementById("page5-form");
-        const paying = document.querySelector('input[name="payingMethod"]:checked')?.value;
-
-        try {
-          if (!paying) throw new Error("no payment");
-          if (!nameEl.value.trim()) {
-            if (locale === "en") nameEl.setCustomValidity("Required field");
-            else nameEl.setCustomValidity("يُرجى ملئ هذا الحقل");
-            throw new Error("no name");
-          }
-          nameEl.setCustomValidity("");
-        } catch {
-          form.reportValidity();
-          return;
-        }
-
-        if (!checkNumberValidity(iti)) {
-          form.reportValidity();
-          return;
-        }
-
-        nForm.paymentMethod = paying;
-        nForm.customerN = nameEl.value.trim();
-        nForm.customerM = iti.getNumber().substring(1);
-
-        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
-        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
-        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "flex"; }, 1000);
-      };
-    } else if (i === 6) {
-      btnNext.onclick = () => {
-        const mapState = window.__MAP_STATE__ || {};
-        const pos = mapState.position;
-        if (!pos) {
-          if (mapState.map && mapState.infoWindow) {
-            mapState.infoWindow.setPosition(mapState.map.getCenter());
-            mapState.infoWindow.setContent("الرجاء تحديد الموقع");
-            mapState.infoWindow.open(mapState.map);
-          }
-          return;
-        }
-
-        const modalEl = document.getElementById('termsModal');
-        const modal = new bootstrap.Modal(modalEl);
-        const chk = document.getElementById('termsAccept');
-        const ok = document.getElementById('confirmTerms');
-
-        chk.checked = false;
-        ok.disabled = true;
-        chk.onchange = () => { ok.disabled = !chk.checked; };
-        modal.show();
-
-        ok.onclick = () => {
-          modal.hide();
-
-          const backBtn = document.getElementById(`page${i}-return`);
-          backBtn.style.display = "none";
-          btnNext.style.display = "none";
-
-          const pageSpinner = document.getElementById(`page${i}-spinner`);
-          const fail = document.getElementById(`fail-alert-5`);
-          fail.style.display = "none";
-          pageSpinner.style.display = "flex";
-          pageSpinner.children[0].style.display = "block";
-          pageSpinner.children[1].style.display = "block";
-
-          nForm.urlLocation = pos;
-
-          const desc = document.getElementById("locationDescription");
-          if (desc && desc.value.trim().length > 200) {
-            if (locale === "en") desc.setCustomValidity("Description is too long");
-            else desc.setCustomValidity("الوصف أطول من المتوقع");
-            document.getElementById("page6-form").reportValidity();
-            backBtn.style.display = "inline-block";
-            btnNext.style.display = "inline-block";
-            pageSpinner.style.display = "none";
-            pageSpinner.children[0].style.display = "none";
-            pageSpinner.children[1].style.display = "none";
-            return;
-          }
-          if (desc) desc.setCustomValidity("");
-
-          fetch(`${defaultLink2}/reserveAppointment`, {
-            redirect: "follow",
-            method: "POST",
-            body: JSON.stringify(nForm)
-          }).then(async (res) => {
-            pageSpinner.style.display = 'none';
-            if (!res.ok) throw Object.assign(new Error('Custom error'), { response: res });
-            const json = await res.json();
-            if (json.success) {
-              page.classList.remove("fadeIn"); page.classList.add("fadeOut");
-              const done = document.getElementById(`page${i + 1}`);
-              done.classList.remove("fadeOut"); done.classList.add("fadeIn");
-              setTimeout(() => {
-                page.style.display = "none";
-                done.style.display = "flex";
-                if (confirm("عزيزنا/عزيزتنا, ودك نتذكر بياناتك على هذا الجهاز لتسهيل الغسلات الجاية ؟")) {
-                  saveUser({ name: document.getElementById("name").value, mobile: iti.getNumber().substring(1) });
-                } else {
-                  clearUser();
-                }
-              }, 1000);
-            }
-          }).catch(async (err) => {
-            const resJson = err.response ? await err.response.json() : {};
-            backBtn.style.display = "inline-block";
-            btnNext.style.display = "inline-block";
-
-            page.classList.remove("fadeIn"); page.classList.add("fadeOut");
-            page.style.display = "none";
-            const backTo4 = document.getElementById(`page4`);
-            backTo4.classList.remove("fadeOut"); backTo4.classList.add("fadeIn");
-            backTo4.style.display = "flex";
-
-            const fail3 = document.getElementById(`fail-alert-3`);
-            fail3.style.display = "block";
-            fail3.children[0].innerHTML =
-              locale === "en"
-              ? (resJson.msgEN || "Unexpected error, Please contact us")
-              : (resJson.msgAR || "عذرًا حصل خطأ غير متوقع الرجاء التواصل معنا");
-            fail3.children[2].innerHTML = "";
-
-            document.getElementById('date').dispatchEvent(new Event('change'));
-          });
-        };
-      };
-    } else {
-      btnNext.onclick = () => {
-        page.classList.remove("fadeIn"); page.classList.add("fadeOut");
-        pageNext.classList.remove("fadeOut"); pageNext.classList.add("fadeIn");
-        setTimeout(() => { page.style.display = "none"; pageNext.style.display = "flex"; }, 1000);
-      };
-    }
+// ---------- INIT ----------
+function myMap() {
+  const mapEl = document.getElementById("googleMap");
+  if (!mapEl) {
+    console.warn("googleMap element not found.");
+    return;
   }
 
-  for (let i = 3; i < 7; i++) {
-    const btnBack = document.getElementById(`page${i}-return`);
-    if (!btnBack) continue;
-    const page = document.getElementById(`page${i}`);
-    const prev = (i === 4) ? document.getElementById(`page2`) : document.getElementById(`page${i - 1}`);
-    btnBack.onclick = () => {
-      page.classList.remove("fadeIn"); page.classList.add("fadeOut");
-      prev.classList.remove("fadeOut"); prev.classList.add("fadeIn");
-      setTimeout(() => { page.style.display = "none"; prev.style.display = "flex"; }, 1000);
+  map = new google.maps.Map(mapEl, {
+    center: defaultLocation,
+    zoom: 12,
+    disableDoubleClickZoom: true
+  });
+
+  infoWindow = new google.maps.InfoWindow();
+
+  marker = new google.maps.Marker({
+    position: defaultLocation,
+    map,
+    draggable: true,
+    title: "اضغط أو اسحب لتحديد الموقع"
+  });
+
+  // Drag to set
+  marker.addListener("dragend", (e) => validateAndSetPosition(e.latLng));
+  // Click to set
+  map.addListener("click", (e) => validateAndSetPosition(e.latLng));
+  // Double click: prevent default zoom & set
+  map.addListener("dblclick", (e) => {
+    if (e && typeof e.stop === "function") e.stop();
+    validateAndSetPosition(e.latLng);
+  });
+
+  // Long press (mobile-ish)
+  let pressTimer = null;
+  map.addListener("mousedown", (e) => {
+    pressTimer = setTimeout(() => validateAndSetPosition(e.latLng), 600);
+  });
+  map.addListener("mouseup", () => clearTimeout(pressTimer));
+  map.addListener("touchstart", (e) => {
+    pressTimer = setTimeout(() => validateAndSetPosition(e.latLng), 600);
+  });
+  map.addListener("touchend", () => clearTimeout(pressTimer));
+
+  // Hide drag hint
+  const dragHint = document.getElementById("drag-instructions");
+  if (dragHint) {
+    setTimeout(() => { dragHint.style.display = "none"; }, 5000);
+    map.addListener("dragstart", () => { dragHint.style.display = "none"; });
+  }
+
+  // Wire button
+  const locationBtn = document.getElementById("show-my-location");
+  if (locationBtn) locationBtn.addEventListener("click", detectMyLocation);
+
+  publishMapState();
+}
+
+// ---------- HELPERS ----------
+function validateAndSetPosition(latLng) {
+  if (!latLng) return;
+
+  if (polygon && !google.maps.geometry.poly.containsLocation(latLng, polygon)) {
+    alert("⚠️ عذرًا، موقعك خارج نطاق الخدمة");
+    position = "";
+    if (map && infoWindow) {
+      infoWindow.setContent("🚫 موقع خارج الخدمة");
+      infoWindow.setPosition(map.getCenter());
+      infoWindow.open(map);
+    }
+    publishMapState();
+    return;
+  }
+
+  if (marker) marker.setPosition(latLng);
+  if (map) {
+    map.panTo(latLng);
+    map.setZoom(17);
+  }
+
+  position = `${prePosition}${latLng.lat()},${latLng.lng()}`;
+
+  if (infoWindow) {
+    infoWindow.setContent("✅ تم تحديث موقعك هنا");
+    infoWindow.open(map, marker);
+  }
+
+  publishMapState();
+}
+
+// ---------- AREAS / BOUNDARIES ----------
+function setBoundries() {
+  const areaSelect = document.getElementById("area");
+  if (!areaSelect) return;
+
+  const selectedArea = areaSelect.options[areaSelect.selectedIndex]?.text?.trim() || "";
+  let APP_Location;
+  let polygonCoords;
+
+  if (selectedArea === "العزيزية - الخبر") {
+    APP_Location = {
+      north: 26.237892901838705,
+      south: 26.15102181049713,
+      west: 50.090294685184475,
+      east: 50.234894203935546
     };
+    polygonCoords = [
+      { lng: 50.215045355428195, lat: 26.219724394350184 },
+      { lng: 50.2135291654911,   lat: 26.1870383495685   },
+      { lng: 50.137875179099595, lat: 26.069703060741347 },
+      { lng: 50.10628808282646,  lat: 26.15001891083389  },
+      { lng: 50.143828288837895, lat: 26.21660551929113  },
+      { lng: 50.19603263782255,  lat: 26.21897351180097  }
+    ];
+  } else if (selectedArea === "أجيال - أرامكو") {
+    APP_Location = {
+      north: 26.289037271670438,
+      south: 26.237817336683204,
+      west: 50.05143566513406,
+      east: 50.096905737932595
+    };
+    polygonCoords = [
+      { lng: 50.06256215323989,  lat: 26.275519772515292 },
+      { lng: 50.070562455580834, lat: 26.277608292466685 },
+      { lng: 50.08514528516432,  lat: 26.257720425641132 },
+      { lng: 50.06822454797902,  lat: 26.24524748257814  },
+      { lng: 50.06115405632103,  lat: 26.262628935642045 },
+      { lng: 50.05894452767791,  lat: 26.267950423932856 }
+    ];
+  } else if (selectedArea === "الدوحة و الدانة") {
+    APP_Location = {
+      north: 26.37969652644046,
+      south: 26.277002257490476,
+      west: 50.11899625151807,
+      east: 50.195753733969404
+    };
+    polygonCoords = [
+      { lng: 50.11488540829821,  lat: 26.341056543806932  },
+      { lng: 50.136645122501264, lat: 26.353671078060277  },
+      { lng: 50.14577577434936,  lat: 26.363004767230812  },
+      { lng: 50.178697561294584, lat: 26.332926849815745  },
+      { lng: 50.17972636713662,  lat: 26.31448441448552   },
+      { lng: 50.16468008169681,  lat: 26.29799900302895   }
+    ];
+  } else {
+    alert("⚠️ المنطقة غير معرفة، يرجى الاختيار الصحيح");
+    return;
   }
+
+  defaultLocation = {
+    lat: (APP_Location.north + APP_Location.south) / 2,
+    lng: (APP_Location.east + APP_Location.west) / 2
+  };
+
+  if (polygon) {
+    polygon.setMap(null);
+    polygon = null;
+  }
+
+  polygon = new google.maps.Polygon({
+    paths: polygonCoords,
+    strokeColor: "#ff0000",
+    strokeOpacity: 0.4,
+    strokeWeight: 2,
+    fillColor: "#00ff00",
+    fillOpacity: 0.1
+  });
+  polygon.setMap(map);
+
+  if (map) {
+    map.setCenter(defaultLocation);
+    map.setZoom(14);
+  }
+  if (marker) marker.setPosition(defaultLocation);
+
+  position = `${prePosition}${defaultLocation.lat},${defaultLocation.lng}`;
+  publishMapState();
 }
+
+// ---------- GEOLOCATION ----------
+function detectMyLocation() {
+  if (!navigator.geolocation) {
+    handleLocationError(false);
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const userPos = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+
+      if (polygon && !google.maps.geometry.poly.containsLocation(userPos, polygon)) {
+        alert("⚠️ عذرًا، موقعك خارج نطاق الخدمة");
+        return;
+      }
+
+      if (marker) marker.setPosition(userPos);
+      if (map) {
+        map.panTo(userPos);
+        map.setZoom(17);
+      }
+
+      position = `${prePosition}${pos.coords.latitude},${pos.coords.longitude}`;
+      if (infoWindow) infoWindow.close();
+
+      publishMapState();
+    },
+    () => handleLocationError(true)
+  );
+}
+
+function handleLocationError(browserHasGeolocation) {
+  if (!map || !infoWindow) return;
+  infoWindow.setPosition(map.getCenter());
+  infoWindow.setContent(
+    browserHasGeolocation
+      ? "⚠️ تعذر الحصول على موقعك. يرجى السماح بالوصول للموقع."
+      : "⚠️ جهازك لا يدعم تحديد الموقع."
+  );
+  infoWindow.open(map);
+}
+
+// ---------- EXPORTS + GLOBALS ----------
+// ES module exports (so main.js can import)
+export { myMap, setBoundries, detectMyLocation };
+
+// Also attach to window so Google’s callback and non-module code can see them
+window.myMap = myMap;
+window.setBoundries = setBoundries;
+window.detectMyLocation = detectMyLocation;
+
+// Optional: expose read-only state
+Object.defineProperty(window, "__MAP_STATE__", {
+  get() { return { map, infoWindow, marker, polygon, position }; }
+});
