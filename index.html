@@ -693,23 +693,33 @@ document.getElementById('date').onchange=()=>{
 };
 document.getElementById('date').value=DateTime.now().toFormat('yyyy-MM-dd');
 
-function timesSetter(index){
-  let timeContainer=document.getElementById("time-container");
-  $("#time-container").empty();
-  timeContainer.innerHTML="";
-  if(appointments[index].length==0){
-    document.getElementById('time-container').innerHTML=`
-      <div id="department-spinner" class="" role="status" style="grid-column-start: span 3; justify-self:center;">
-        <span class="color:">لا توجد مواعيد متاحة</span>
+function timesSetter(index) {
+  const timeContainer = document.getElementById("time-container");
+  timeContainer.innerHTML = "";
+
+  if (appointments[index].length === 0) {
+    timeContainer.innerHTML = `
+      <div id="department-spinner" class="" role="status" style="grid-column-start: span 3; justify-self: center;">
+        <span>لا توجد مواعيد متاحة</span>
       </div>`;
+    return;
   }
-  for(let y=0;y<appointments[index].length;y++){
-    timeContainer.innerHTML+=`
-      <button onclick="choosedDate('${ActualTimes[index][y]}','${document.getElementById(\`day${index+1}date\`).innerText}',4)" class="time-button" dir="ltr">
-        ${appointments[index][y]}
-      </button>`;
+
+  const dayDate = document.getElementById('day' + (index + 1) + 'date').innerText;
+
+  for (let y = 0; y < appointments[index].length; y++) {
+    const btn = document.createElement('button');
+    btn.className = 'time-button';
+    btn.dir = 'ltr';
+    btn.textContent = appointments[index][y];
+
+    const actual = ActualTimes[index][y];
+    btn.addEventListener('click', () => choosedDate(actual, dayDate, 4));
+
+    timeContainer.appendChild(btn);
   }
 }
+
 
 for(let i=1;i<=3;i++){
   document.getElementById(`day${i}`).innerText=weekdays[dates[i-1].weekday];
@@ -964,7 +974,7 @@ function myMap(){
   setTimeout(()=>{ dragHint.style.display="none"; },5000);
   map.addListener("dragstart",()=>{ dragHint.style.display="none"; });
 }
-
+window.myMap = myMap;
 function validateAndSetPosition(latLng){
   if(polygon && !google.maps.geometry.poly.containsLocation(latLng,polygon)){
     alert("⚠️ عذرًا، موقعك خارج نطاق الخدمة");
