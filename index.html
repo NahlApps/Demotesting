@@ -638,59 +638,94 @@ let dates=[day1,day2,day3];
 
 let weekdays=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت","الأحد"];
 
-document.getElementById('date').onchange=()=>{
-  document.getElementById('date').disabled=true;
-  $("#time-container").empty();
-  document.getElementById('time-container').innerHTML=`
-    <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3; justify-self:center;">
-      <span class="sr-only">Loading...</span>
-    </div>`;
-  ActualTimes=[[],[],[]];
-  appointments=[[],[],[]];
-  timesLoaded=false;
+document.getElementById('date').onchange = () => {
+  const serviceEl = document.getElementById("service");
+  const serviceId = (serviceEl && serviceEl.value) ? String(serviceEl.value).trim() : "";
 
-  day1 = DateTime.fromISO(document.getElementById('date').value);
-  day2 = day1.plus({days:1});
-  day3 = day1.plus({days:2});
-  const datesSet=[day1,day2,day3];
-
-  for(let i=1;i<=3;i++){
-    document.getElementById(`day${i}`).innerText=weekdays[datesSet[i-1].weekday];
-    document.getElementById(`day${i}date`).innerText=datesSet[i-1].toFormat('yyyy-MM-dd');
+  // If service is not chosen, don’t call the API
+  if (!serviceId) {
+    document.getElementById('time-container').innerHTML = `
+      <div style="grid-column:1 / -1; text-align:center; padding:1rem;">
+        يرجى اختيار الخدمة أولاً
+      </div>`;
+    document.getElementById('date').disabled = false;
+    return;
   }
 
-  callContent2(`/appointments?startDate=${day1.toFormat('yyyy-MM-dd')}&location=${document.getElementById("area").value}&service=${document.getElementById("service").value}`,(data)=>{
-    document.getElementById('time-container').innerHTML=`
-      <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3; justify-self:center;">
+  document.getElementById('date').disabled = true;
+  $("#time-container").empty();
+  document.getElementById('time-container').innerHTML = `
+    <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3; justify-self: center;">
+      <span class="sr-only">Loading...</span>
+    </div>`;
+
+  ActualTimes = [[],[],[]];
+  appointments = [[],[],[]];
+  timesLoaded = false;
+
+  let day1 = luxon.DateTime.fromISO(document.getElementById('date').value);
+  let day2 = day1.plus({days:1});
+  let day3 = day1.plus({days:2});
+
+  for (let i = 1; i <= 3; i++) {
+    const d = i === 1 ? day1 : i === 2 ? day2 : day3;
+    document.getElementById(`day${i}`).innerText = weekdays[d.weekday];
+    document.getElementById(`day${i}date`).innerText = d.toFormat('yyyy-MM-dd');
+  }
+
+  const areaId = document.getElementById("area").value;
+  const url =
+    `/appointments?startDate=${encodeURIComponent(day1.toFormat('yyyy-MM-dd'))}` +
+    `&location=${encodeURIComponent(areaId)}` +
+    `&service=${encodeURIComponent(serviceId)}`;
+
+  callContent2(url, (data) => {
+    document.getElementById('time-container').innerHTML = `
+      <div id="department-spinner" class="spinner-border" role="status" style="grid-column-start: span 3; justify-self: center;">
         <span class="sr-only">Loading...</span>
       </div>`;
-    appointments=[[],[],[]];
-    let recievedDates=(data.data && data.data.appointments) || [];
-    let tempActualTimes=[];
-    for(let i=0;i<recievedDates.length;i++){
-      let x=DateTime.fromISO(recievedDates[i]['TS_appointment_date'], { setZone:true });
-      let y=DateTime.fromISO(recievedDates[i]['TS_appointment_time'], { setZone:true });
-      recievedDates[i]['TS_appointment_date']=x.toISODate();
-      recievedDates[i]['TS_appointment_time']=y.toLocaleString(DateTime.TIME_SIMPLE).replace(" "," ");
-      tempActualTimes[i]=y.toFormat('hh:mm a');
+
+    appointments = [[],[],[]];
+
+    const recieved = data?.data?.appointments || [];
+    const tempActualTimes = [];
+
+    for (let i = 0; i < recieved.length; i++) {
+      const x = luxon.DateTime.fromISO(recieved[i]['TS_appointment_date'], { setZone: true });
+      const y = luxon.DateTime.fromISO(recieved[i]['TS_appointment_time'], { setZone: true });
+      recieved[i]['TS_appointment_date'] = x.toISODate();
+      recieved[i]['TS_appointment_time'] = y.toLocaleString(luxon.DateTime.TIME_SIMPLE).replace(" ", " ");
+      tempActualTimes[i] = y.toFormat('hh:mm a');
     }
-    for(let i=0;i<recievedDates.length;i++){
-      if(recievedDates[i]["TS_appointment_date"]==day1.toFormat('yyyy-MM-dd')){
-        appointments[0].push(recievedDates[i]['TS_appointment_time']);
+
+    const d1 = day1.toFormat('yyyy-MM-dd');
+    const d2 = day2.toFormat('yyyy-MM-dd');
+    const d3 = day3.toFormat('yyyy-MM-dd');
+
+    for (let i = 0; i < recieved.length; i++) {
+      const r = recieved[i];
+      if (r.TS_appointment_date === d1) {
+        appointments[0].push(r.TS_appointment_time);
         ActualTimes[0].push(tempActualTimes[i]);
-      }else if(recievedDates[i]["TS_appointment_date"]==day2.toFormat('yyyy-MM-dd')){
-        appointments[1].push(recievedDates[i]['TS_appointment_time']);
+      } else if (r.TS_appointment_date === d2) {
+        appointments[1].push(r.TS_appointment_time);
         ActualTimes[1].push(tempActualTimes[i]);
-      }else if(recievedDates[i]["TS_appointment_date"]==day3.toFormat('yyyy-MM-dd')){
-        appointments[2].push(recievedDates[i]['TS_appointment_time']);
+      } else if (r.TS_appointment_date === d3) {
+        appointments[2].push(r.TS_appointment_time);
         ActualTimes[2].push(tempActualTimes[i]);
       }
     }
-    timesLoaded=true;
-    timesSetter(0); // load today's times
-    document.getElementById('date').disabled=false;
+
+    timesLoaded = true;
+
+    // KEEP YOUR ORIGINAL METHOD: render all three headers/days as before
+    // If your original code used timesSetter with header clicks, call it initially:
+    timesSetter(0);
+
+    document.getElementById('date').disabled = false;
   }, true);
 };
+
 document.getElementById('date').value=DateTime.now().toFormat('yyyy-MM-dd');
 
 function timesSetter(index) {
@@ -874,30 +909,43 @@ $("#area").on("change",()=>{
   $('#date').trigger('change');
 });
 
-function servicesDropdownLoader2(data){
-  let categoriesID=Object.keys(data);
-  let categoriesNames=[];
-  for(const id of categoriesID){
-    categoriesNames.push(data[id].category.TS_category_arabic_name);
+function servicesDropdownLoader2(data) {
+  const categoriesID = Object.keys(data);
+  const categoriesNames = [];
+  for (const id of categoriesID) {
+    categoriesNames.push(locale === "en"
+      ? data[id].category.TS_category_english_name
+      : data[id].category.TS_category_arabic_name
+    );
   }
-  add_dropdown_list(categoriesNames,categoriesID,"serviceCat","disabled");
-  var parentElement=document.getElementById("service");
-  parentElement.innerHTML="";
-  document.getElementById('serviceCat').addEventListener('change',function(){
-    let currentCategory=document.getElementById("serviceCat").value;
-    let myServicesID=[];
-    let myServiceNames=[];
-    const sorted=data[currentCategory].services.sort((a,b)=>a.TS_service_id-b.TS_service_id);
-    for(const element of sorted){
-      myServicesID.push(element.TS_service_id);
-      myServiceNames.push(element.TS_service_arabic_name);
+  add_dropdown_list(categoriesNames, categoriesID, "serviceCat", "disabled", "servicesCat");
+
+  document.getElementById("service").innerHTML = "";
+
+  document.getElementById('serviceCat').addEventListener('change', function () {
+    const currentCategory = document.getElementById("serviceCat").value;
+    const sorted = data[currentCategory].services.slice().sort((a,b)=>a.TS_service_id - b.TS_service_id);
+
+    const myServicesID = [];
+    const myServiceNames = [];
+    for (const s of sorted) {
+      myServicesID.push(s.TS_service_id);
+      myServiceNames.push(locale === "en" ? s.TS_service_english_name : s.TS_service_arabic_name);
     }
-    add_dropdown_list(myServiceNames,myServicesID,"service","disabled");
+    add_dropdown_list(myServiceNames, myServicesID, "service", "disabled", "services");
   });
-  document.getElementById('service').addEventListener('change',()=>$('#date').trigger('change'));
-  const event=new Event('change');
-  document.getElementById('serviceCat').dispatchEvent(event);
+
+  // Fetch ONLY when a concrete service is selected by the user
+  document.getElementById('service').addEventListener('change', function(){
+    if (this.value) {
+      // now we have a service, refresh available appointments
+      document.getElementById('date').dispatchEvent(new Event('change'));
+    }
+  });
+
+  // Do NOT auto trigger date change here (prevents &service=)
 }
+
 function add_dropdown_list(show_list,value_list,element_id){
   var parentElement=document.getElementById(element_id);
   parentElement.innerHTML="";
