@@ -64,124 +64,11 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css" />
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
-  <style>
-    /* ————— YOUR ORIGINAL CSS (unchanged) ————— */
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-    body, html { margin:0%; height:100%; font-family:'Cairo',sans-serif; position:fixed; width:100vw; height:100vh; }
-    input, select{ text-align:center; }
-    body{ display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:center; background-size:cover; }
-    .bg-image{ position:absolute; width:100%; z-index:-1; background-image:url("https://www.dropbox.com/s/s9bxuykl0w49dqa/background2.jpg?raw=1"); filter:blur(8px); -webkit-filter:blur(8px); height:100%; background-position:center; background-repeat:no-repeat; background-size:cover; }
-    h1{ margin-bottom:5.3%; }
-    #banner,#form{ flex-basis:50%; height:100%; }
-    #form{ display:flex; flex-direction:column; align-items:center; justify-content:center; background:#48b5d0e0; color:#ffffff; box-shadow:0 0 5px 10px rgba(5, 28, 59, 0.981), 10px 0px 70px 0px rgba(5, 28, 59, 0.426); }
-    #form-content{ width:100%; overflow:auto; flex-basis:100%; display:flex; flex-direction:column; justify-content:space-between; }
-    #form-content #page1,#form-content #page2,#form-content #page3,#form-content #page4,#form-content #page5,#form-content #page6,#form-content #page7{ text-align:center; display:flex; flex-direction:column; align-items:center; z-index:2; position:relative; justify-content:space-evenly; height:auto; }
-    #page1,#page2,#page3,#page4,#page5,#page6,#page7{ justify-content:space-evenly; height:100%; }
-    #page1,#page2,#page4,#page5,#page6,#page7{ height:70%; }
-    .header{ z-index:2; text-align:center; color:#ffffff; font-weight:bold; flex-basis:10%; margin:0; padding:0; padding-top:10%; }
-    .header h1{ vertical-align:-webkit-baseline-middle; display:inline-block; margin:0; padding:0; font-size:40px; }
-    .header img{ width:220px; }
-    .header-grid1{ display:flex; flex-direction:row; align-items:flex-end; justify-content:center; }
-    .header-grid3{ display:flex; flex-direction:row; align-items:flex-end; justify-content:flex-end; }
-    .header-grid2{ display:flex; flex-direction:row; align-items:flex-end; justify-content:center; font-size:10px; }
-    .social{ width:100% !important; }
-    a.nostyle:link, a.nostyle:visited{ text-decoration:inherit; color:inherit; cursor:auto; }
+  <!-- App styles -->
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
 
-    .radio-buttons{ align-items:center; background-color:#fff; border-radius:12px; box-shadow:transparent 0 0 0 3px, rgba(18,18,18,.1) 0 6px 20px; box-sizing:border-box; color:#40bfb7; cursor:pointer; display:inline-flex; justify-content:center; outline:none; padding:1rem 1.2rem; text-align:center; text-decoration:none; transition:box-shadow .2s, -webkit-box-shadow .2s; border:0; user-select:none; width:50%; }
-    .radios:checked + img, .radios:checked + h2, .radios:checked + svg{ background:linear-gradient(45deg, rgba(137,137,137,1) 0%, rgba(84,108,156,1) 100%); color:#493a68; }
-    .radio-label{ width:80%; }
-    .filter-button{ align-items:center; background-color:#ffffff; border-radius:12px; box-shadow:transparent 0 0 0 3px, rgba(18,18,18,.1) 0 6px 20px; box-sizing:border-box; color:#0394b6; cursor:pointer; display:inline-flex; font-family:'Cairo',sans-serif; font-size:1.2rem; font-weight:700; justify-content:center; line-height:1; margin:0; outline:none; padding:1rem 1.2rem; text-align:center; text-decoration:none; transition:box-shadow .2s, -webkit-box-shadow .2s; white-space:nowrap; border:0; user-select:none; }
-    .filter-button-wrap{ max-width:250px; padding:3px; position:relative; background:linear-gradient(to right, #d3d3d3, #0394b6); border-radius:15px; }
-    .filter-button:hover{ background-color:#0394b6; color:#f5f5f5; }
-
-    .time-date-box{ display:flex; flex-direction:column; border-radius:10px; width:100%; margin-top:30px; padding:10px; }
-    #time-date-header{ border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1); border:none; }
-    .time-date-header{ display:flex; flex-direction:row; justify-content:stretch; align-items:center; color:black; }
-    .time-date-header div{ padding-top:15px; padding-bottom:15px; background-color:white; flex-basis:33.333%; box-shadow:transparent 0 0 0 3px, rgba(18,18,18,.1) 0 6px 20px; transition:all 1s; cursor:pointer; }
-    .time-date-header div:hover{ background-color:#0394b6; color:#f5f5f5; }
-    .time-date-header .choosed{ background-color:#0394b6; color:#f5f5f5; }
-    .spinner-border{ border-color:#0394b6; border-right-color:transparent; }
-    #department-spinner{ color:#0394b6; }
-
-    .time-container{ display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; justify-content:space-evenly; align-content:start; align-items:start; background-color:white; height:23rem; overflow-y:auto; }
-    .time-button{ align-items:center; background-color:#fff; border-radius:12px; box-shadow:transparent 0 0 0 3px, rgba(18,18,18,.1) 0 6px 20px; box-sizing:border-box; color:#121212; cursor:pointer; display:inline-flex; flex:1 1 auto; font-size:1rem; font-weight:700; justify-content:center; line-height:1; margin:3%; outline:none; padding:1.5rem 1.2rem; text-align:center; transition:box-shadow .2s, -webkit-box-shadow .2s; white-space:nowrap; border:0; align-self:start; flex-grow:0; }
-    a{ color:#ffffff; text-decoration:none; }
-    .time-button:hover{ background-color:#0394b6; color:#f5f5f5; }
-    #date{ padding:2rem; }
-    form input{ margin:3%; }
-    .banner-content{ display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; }
-    .banner-content-holder{ display:flex; flex-direction:column; align-items:center; height:50%; justify-content:center; }
-    @keyframes fadeOut{ 0%{opacity:1;} 100%{opacity:0;} }
-    .fadeOut{ animation:fadeOut 1s forwards; }
-    @keyframes fadeIn{ 0%{opacity:0;} 100%{opacity:1;} }
-    .fadeIn{ animation:fadeIn 1s forwards; }
-    #select2-container{ width:100% !important; }
-
-    .instagram-button,.tiktok-button,.whatsapp-button{ position:fixed; left:15px; z-index:99; background-color:#0000; border-radius:50px; color:#fff; text-decoration:none; width:50px; height:50px; font-size:30px; display:flex; flex-direction:column; justify-content:center; align-items:center; animation:effect 5s ease-in; }
-    .instagram-button:hover,.tiktok-button:hover,.whatsapp-button:hover{ width:55px; height:55px; font-size:35px; }
-    .page6-contact{ margin:2% 20% 0 20%; font-size:smaller; display:none; }
-
-    @keyframes effect{ 20%,100%{width:50px;height:50px;font-size:30px;} 0%,10%{width:55px;height:55px;font-size:35px;} 5%{width:50px;height:50px;font-size:30px;} }
-    svg{ left:-0%; width:47%; }
-
-    @media only screen and (max-width:1000px){
-      #banner{ position:absolute; display:none; flex-basis:0%; filter:blur(7px); }
-      .banner-content{ z-index:-1; }
-      #form{ flex-basis:100%; }
-      .banner-content-holder{ width:100%; height:100%; }
-      svg{ left:-3%; width:100%; } svg g path{ fill:#d6d6d6; }
-      #time-container{ display:grid; grid-template-columns:1fr 1fr 1fr; }
-      .radio-buttons{ width:60%; }
-    }
-    @media only screen and (max-width:450px){ #date{ padding-top:.5rem; padding-bottom:2rem; } .radio-buttons{ width:80%; } }
-    @media only screen and (max-height:775px){
-      #page3{ padding-top:10%; margin-bottom:10%; }
-      #page5,#page4{ padding-top:10%; margin-bottom:10%; }
-      #page1,#page2{ margin-bottom:10%; height:60%; }
-      #page6,#page7{ height:50%; }
-      .radio-buttons{ width:80%; }
-    }
-
-    #service,#serviceCat{ margin:3%; }
-    input:focus{ outline:none; }
-    .select2-selection__rendered{ line-height:32px !important; }
-    .select2-selection{ height:37px !important; }
-    #page6-resend{ position:relative; background:linear-gradient(45deg, rgba(73,58,104,1) 0%, rgba(64,191,184,1) 100%); transition:all 1s; }
-    #page6-resend:hover{ transition:all 1s; color:rgb(43 37 57); }
-    #page6-resend span{ z-index:3; }
-    #page6-resend:after{ position:absolute; content:''; top:0; left:0; width:100%; height:100%; border-radius:12px; background-image:linear-gradient(45deg,rgba(64,191,184,1) 0%, rgba(73,58,104,1) 100%); transition:opacity .5s ease-out; z-index:2; opacity:0; }
-    #page6-resend:hover:after{ opacity:1; }
-    .iti{ width:100%; }
-    #chip-container{ display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:20px; }
-
-    body{ font-family:'Cairo',sans-serif; background-color:#f5f5f5; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-    .form-container{ display:flex; flex-direction:column; gap:5px; width:100%; max-width:400px; }
-    .chip{ background:rgba(255,255,255,0); color:#ffffff; padding:8px; border-radius:8px; box-shadow:0 0 6px rgba(55,51,141,0); display:flex; flex-direction:column; align-items:center; transition:transform .2s ease-in-out; }
-    .chip:hover{ transform:scale(1.01); }
-    .chip label{ font-size:12px; font-weight:600; margin-bottom:3px; text-align:center; }
-    .chip select,.chip input{ width:100%; max-width:280px; font-size:12px; padding:4px; border-radius:6px; border:none; text-align:center; background:#ffffff; color:#37338d; box-shadow:0 1px 3px rgba(0,0,0,0.1); transition:box-shadow .3s ease-in-out; }
-    .chip select:focus,.chip input:focus{ box-shadow:0 0 4px rgba(244,206,20,0.7); outline:none; }
-    #locationDescription{ font-weight:bold; background:rgba(233,236,239,1); color:#555; font-size:12px; padding:4px; }
-
-    #drag-instructions{ position:absolute; top:20px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,0.9); padding:8px 12px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2); text-align:center; font-size:14px; color:#333; z-index:9999; animation:fadeIn .5s ease-in-out; }
-    #drag-instructions img{ width:40px; height:auto; margin-bottom:4px; animation:moveHand 1.5s infinite alternate ease-in-out; }
-    @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
-    #drag-icon{ font-size:40px; display:block; margin:0 auto 4px; animation:moveHand 1.5s infinite alternate ease-in-out; }
-    @keyframes moveHand{ from{transform:translateX(0);} to{transform:translateX(15px);} }
-
-    .rebook-button{ background:linear-gradient(135deg,#0394b6,#48b5d0); color:#ffffff; font-size:1.2rem; padding:.8em 2em; border-radius:12px; border:none; box-shadow:0 4px 12px rgba(3,148,182,.3); transition:all .3s ease-in-out; font-family:'Cairo',sans-serif; font-weight:bold; letter-spacing:.5px; }
-    .rebook-button:hover{ background:linear-gradient(135deg,#027790,#32a5bc); transform:scale(1.05); box-shadow:0 6px 18px rgba(3,148,182,.5); cursor:pointer; }
-
-    :root{ --fab-size:56px; --fab-bg:rgba(34,34,34,.55); }
-    .social-fab{ position:fixed; left:15px; z-index:999; width:var(--fab-size); height:var(--fab-size); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; text-decoration:none; background:var(--fab-bg); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); box-shadow:0 8px 20px rgba(0,0,0,.35), 0 0 0 2px rgba(255,255,255,.10) inset; transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease; will-change:transform, box-shadow; }
-    .social-fab i{ font-size:1.4rem; filter:drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
-    .whatsapp-button{ bottom:15px; --brand:#25D366; }
-    .instagram-button{ bottom:74px; --brand:#E1306C; }
-    .tiktok-button{ bottom:133px; --brand:#69C9D0; }
-    .social-fab:hover, .social-fab:focus-visible{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(0,0,0,.45), 0 0 0 2px var(--brand) inset, 0 0 14px var(--brand); outline:none; }
-    .social-fab:focus-visible{ outline:3px solid var(--brand); outline-offset:3px; }
-    @media (prefers-reduced-motion: reduce){ .social-fab{ transition:none; } }
-  </style>
 </head>
 
 <body>
@@ -248,7 +135,7 @@
           <label for="service">الخدمة</label>
           <div style="position:relative;">
             <select id="service" type="text" style="width:90%;" required></select>
-            <div id="page3-2-spinner" style="position:absolute; top:0; left:47.6%;">
+            <div id="page3-2-spinner" style="position:absolute; top:0; left:47.6%; display:none;">
               <div class="spinner-border" role="status" style="width:1.5rem; height:1.5rem; margin-top:19%;"><span class="sr-only">Loading...</span></div>
             </div>
           </div>
@@ -262,7 +149,7 @@
 
       <!-- Page 3 -->
       <div id="page3" class="fadeIn" style="display:none;">
-        <div id="page3-wait" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10;">
+        <div id="page3-wait" class="overlay-wait" style="display:none;">
           <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
           <p style="color:#fff; margin-top:1em; font-size:1.2em;">جاري جلب المواعيد…</p>
         </div>
@@ -271,7 +158,7 @@
           <label for="serviceCat" style="display:none;">صنف الخدمة</label>
           <div style="position:relative; display:none;">
             <select id="serviceCat" type="text" style="width:100%;" required></select>
-            <div id="page3-1-spinner" style="position:absolute; top:0; left:47.6%;">
+            <div id="page3-1-spinner" style="position:absolute; top:0; left:47.6%; display:none;">
               <div class="spinner-border" role="status" style="width:1.5rem; height:1.5rem; margin-top:19%;"><span class="sr-only">Loading...</span></div>
             </div>
           </div>
@@ -518,8 +405,9 @@
   </div>
 
   <!-- Your app scripts (moved from inline to modules) -->
-  <script src="/assets/js/maps.js"></script>
-  <script src="/assets/js/main.js"></script>
+  <script src="assets/js/maps.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
 
   <!-- Google Maps (calls window.myMap defined in maps.js) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=myMap&libraries=geometry" async defer></script>

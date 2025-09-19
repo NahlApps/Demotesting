@@ -133,7 +133,7 @@ export function wirePager(nForm, iti) {
       };
     } else if (i === 6) {
       btnNext.onclick = () => {
-        const mapState = window.__MAP_STATE__ || {};
+        const mapState = window.NAHL_MAPS || {};
         const pos = mapState.position;
         if (!pos) {
           if (mapState.map && mapState.infoWindow) {
@@ -182,7 +182,10 @@ export function wirePager(nForm, iti) {
             pageSpinner.children[1].style.display = "none";
             return;
           }
-          if (desc) desc.setCustomValidity("");
+          if (desc) {
+            desc.setCustomValidity("");
+            nForm.locationDescription = desc.value;
+          }
 
           fetch(`${defaultLink2}/reserveAppointment`, {
             redirect: "follow",
