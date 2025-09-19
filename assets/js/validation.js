@@ -1,37 +1,49 @@
-// validation.js
-// intl-tel-input is loaded globally by index.html
-let iti;
+import { locale } from './config.js';
 
-export function initPhoneInput(inputEl) {
-  iti = window.intlTelInput(inputEl, {
-    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js",
-    countryOrder: ["sa", "qa"],
-    initialCountry: "sa",
-    onlyCountries: ["sa", "qa", "ae", "om", "kw", "bh"],
-    excludeCountries: ["il"],
-    strictMode: true
-  });
-  return iti;
+const errorMap = ["رقم غير صحيح", "رمز دولة غير صحيح", "المُدخل أقصر من المتوقع", "المُدخل أطول من المتوقع", "رقم غير صحيح"];
+
+export function checkUrlValidity() {
+  const location = document.getElementById("googleMap");
+  const reg = /^(https?:\/\/.)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/g;
+  const locationValue = (location?.value || "").trim();
+
+  if (!locationValue || !reg.test(locationValue)) {
+    if (locale === "en") location?.setCustomValidity("Please Enter a URL");
+    else location?.setCustomValidity("الرجاء ادخال رابط الموقع بالشكل الصحيح");
+    return false;
+  }
+  return true;
 }
 
-export function getFullNumber() {
-  return iti ? iti.getNumber().substring(1) : "";
+export function checkNumberValidity(iti) {
+  const number = document.getElementById("mobile");
+  const phoneNumber = iti.getNumber().substring(1);
+  const region = iti.getSelectedCountryData().dialCode;
+
+  if (isNaN(phoneNumber) || !iti.isValidNumber() || !phoneNumber) {
+    const msg = errorMap[iti.getValidationError()] || "رقم غير صحيح";
+    if (locale === "en") number.setCustomValidity("Please enter a Valid a phone number");
+    else number.setCustomValidity(msg);
+    return false;
+  }
+  if (region === "966") {
+    if (iti.getNumber().substring(4, 6) === "05") {
+      if (locale === "en") number.setCustomValidity("Please enter a Valid a phone number");
+      else number.setCustomValidity("الرجاء ادخال رقم الهاتف بطريقة صحيحة");
+      return false;
+    }
+  }
+  number.setCustomValidity("");
+  return true;
 }
 
-export function isPhoneValid() {
-  return iti ? iti.isValidNumber() : false;
-}
-
-// Simple URL validation (not used for map URL since we build it)
-export function isValidUrl(value) {
-  const re = /^(https?:\/\/)[^\s/$.?#].[^\s]*$/i;
-  return re.test(String(value).trim());
-}
-
-// Plate: 1–4 digits only
-export function attachPlateSanitizer(inputEl, onChange) {
-  inputEl.addEventListener("input", () => {
-    inputEl.value = inputEl.value.replace(/\D/g, "").slice(0, 4);
-    if (onChange) onChange();
-  });
+// 1–4 digits, no alert (use setCustomValidity)
+export function validatePlateNumber(input) {
+  const v = input.value.replace(/\D/g, '').slice(0, 4);
+  input.value = v;
+  if (v && !/^\d{1,4}$/.test(v)) {
+    input.setCustomValidity("رقم اللوحة يجب أن يكون من 1 إلى 4 أرقام");
+  } else {
+    input.setCustomValidity("");
+  }
 }
