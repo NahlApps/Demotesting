@@ -1,5 +1,4 @@
 import { locale } from './config.js';
-import { translations } from './i18n.js';
 
 export function add_dropdown_list(show_list, value_list, element_id, _first_option_disabled, key = null) {
   const parentElement = document.getElementById(element_id);
@@ -37,6 +36,24 @@ export function valueLookUp(list, lookupValuesList, indexLookupValuesList, targe
 
 export function servicesDropdownLoader2(grouped) {
   const categoriesID = Object.keys(grouped);
+  if (!categoriesID.length) {
+    const catEl = document.getElementById('serviceCat');
+    const svcEl = document.getElementById('service');
+    if (catEl) catEl.innerHTML = '';
+    if (svcEl) svcEl.innerHTML = '';
+    return;
+  }
+  const catSelect = document.getElementById('serviceCat');
+  const svcSelect = document.getElementById('service');
+  if (catSelect && catSelect.parentNode) {
+    const clone = catSelect.cloneNode(false);
+    catSelect.parentNode.replaceChild(clone, catSelect);
+  }
+  if (svcSelect && svcSelect.parentNode) {
+    const clone = svcSelect.cloneNode(false);
+    svcSelect.parentNode.replaceChild(clone, svcSelect);
+  }
+
   const categoriesNames = [];
 
   for (const id of categoriesID) {

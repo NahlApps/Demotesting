@@ -13,6 +13,8 @@ export const carBrands = [
 ].sort();
 
 export function mountBrands() {
+  const $ = window.jQuery || window.$;
+  if (!$) return;
   const sel = $('#carBrand');
   carBrands.forEach(b => sel.append(`<option value="${b}">${b}</option>`));
   sel.select2({ placeholder: "Select a car brand", allowClear: true });

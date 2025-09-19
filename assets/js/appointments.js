@@ -1,5 +1,7 @@
-import { DateTime, dayjs, locale, weekdaysAR, weekdaysEN } from './config.js';
+import { DateTime, locale, weekdaysAR, weekdaysEN } from './config.js';
 import { callContent2 } from './api.js';
+
+const $ = window.jQuery || window.$;
 
 // state
 export let appointments = [[], [], []];
@@ -30,7 +32,12 @@ export function setupInitialDates() {
 // render times for a given day index (0,1,2)
 export function timesSetter(index) {
   const timeContainer = document.getElementById("time-container");
-  $("#time-container").empty();
+  if ($) {
+    $("#time-container").empty();
+  } else {
+    const tc = document.getElementById("time-container");
+    if (tc) tc.innerHTML = "";
+  }
   timeContainer.innerHTML = "";
 
   if (appointments[index].length === 0) {
