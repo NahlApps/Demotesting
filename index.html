@@ -199,6 +199,23 @@
       padding-right: 12px;
       text-align: left; direction: ltr;
     }
+
+    /* ===== Additional Services chips (lightweight, clickable) ===== */
+    .addon-wrap{margin-top:12px}
+    .addon-title{display:flex; align-items:center; gap:8px; font-weight:800; color:#224652; margin-bottom:6px}
+    .addon-chips{display:flex; flex-wrap:wrap; gap:8px}
+    .addon-chip{
+      display:inline-flex; align-items:center; gap:6px; padding:8px 12px;
+      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:999px;
+      box-shadow:var(--shadow-xs); cursor:pointer; user-select:none;
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
+    }
+    .addon-chip:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
+    .addon-chip[aria-pressed="true"]{
+      border-color:var(--brand-600);
+      outline:3px solid rgba(2,122,147,.18); outline-offset:1px;
+      font-weight:800;
+    }
   </style>
 </head>
 <body>
@@ -285,6 +302,13 @@
                 </select>
               </div>
             </div>
+
+            <!-- ===== Additional services (chips) START ===== -->
+            <div class="addon-wrap">
+              <div class="addon-title"><i class="fa-solid fa-plus"></i> خدمات إضافية (اختياري)</div>
+              <div id="addonChips" class="addon-chips" role="group" aria-label="خدمات إضافية"></div>
+            </div>
+            <!-- ===== Additional services (chips) END ===== -->
 
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
@@ -538,7 +562,7 @@
 
     let currentTimeFilter='all';
 
-    const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', locale:'ar'};
+    const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', addons:[], locale:'ar'};
 
     function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
 
@@ -859,6 +883,48 @@
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
+      // ===== Additional services chips render & logic =====
+      const ADDON_OPTIONS = [
+        'غسيل داخلي عميق',
+        'تعقيم بالبخار',
+        'تلميع خارجي',
+        'حماية النانو',
+        'إزالة روائح',
+        'تنظيف مقاعد جلد',
+        'تنظيف السجاد/الأرضيات',
+        'تنظيف المحرك (خارجي)'
+      ];
+      function renderAddonChips(){
+        const wrap = document.getElementById('addonChips');
+        if(!wrap) return;
+        wrap.innerHTML = '';
+        ADDON_OPTIONS.forEach((label, idx)=>{
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'addon-chip';
+          btn.setAttribute('aria-pressed', nForm.addons.includes(label) ? 'true' : 'false');
+          btn.setAttribute('data-value', label);
+          btn.innerHTML = `<i class="fa-solid fa-circle-plus"></i><span>${label}</span>`;
+          btn.addEventListener('click', ()=>{
+            const val = String(btn.getAttribute('data-value')||'').trim();
+            const selected = nForm.addons.includes(val);
+            if(selected){
+              nForm.addons = nForm.addons.filter(x=>x!==val);
+              btn.setAttribute('aria-pressed','false');
+            }else{
+              nForm.addons = [...nForm.addons, val];
+              btn.setAttribute('aria-pressed','true');
+            }
+            updateNextAvailability(); // optional
+          });
+          btn.addEventListener('keydown', e=>{
+            if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); }
+          });
+          wrap.appendChild(btn);
+        });
+      }
+      renderAddonChips();
+
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
       $('#timeFilter').on('change', function(){ currentTimeFilter=this.value; renderSelectedDateTimes(lastSelectedISO); });
 
@@ -887,7 +953,16 @@
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
           nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
-          nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
+          // Compose locationDescription (existing) + addons (new)
+          const parts = [
+            $('#carBrand').val()||'',
+            $('#carName').val()||'',
+            $('#plateNumber').val()||''
+          ].filter(Boolean);
+          if(nForm.addons && nForm.addons.length){
+            parts.push('إضافي: ' + nForm.addons.join('، '));
+          }
+          nForm.locationDescription = parts.join(', ');
           showPage(4); return;
         }
 
