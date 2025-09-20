@@ -563,7 +563,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbxTpaQtQwHrqU-S1xORQoXZhG2ZSuP2MOXDYwotli049rsdlSk4cL_w0POoF6TiCM8ndA/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -1103,9 +1103,20 @@
       });
 
       const luxuryFirstBrands = [
-        'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati',
-        'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti',
-        'GMC','Toyota','Nissan','Hyundai','Kia','Honda','Chevrolet','Ford','Mazda','Mitsubishi','Other'
+        // Ultra-luxury & exotics
+        'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati','Bugatti',
+        // Luxury / premium
+        'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti','Volvo',
+        // Popular in GCC (mainstream & premium)
+        'Toyota','Nissan','Hyundai','Kia','Honda','Mitsubishi','Mazda','GMC','Chevrolet','Ford','Jeep','Dodge','RAM',
+        'Volkswagen','Peugeot','Renault','Skoda','Subaru','Suzuki','Isuzu','Mini','Opel','Citroën',
+        // Chinese brands (active/visible in GCC)
+        'MG','Geely','Haval','GWM (Great Wall)','TANK','ORA','BYD','Changan','Oshan','GAC','JAC','Chery','Exeed','Omoda','Jetour',
+        'Hongqi','BAIC','DFSK (Glory)','Foton','Maxus','Roewe','Lynk & Co','Zeekr','Neta (Hozon)','Seres',
+        // EV startups (availability varies by country)
+        'NIO','XPeng','Leapmotor',
+        // Fallback
+        'Other'
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
