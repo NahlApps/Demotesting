@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>حجوزات المواعيد</title>
 
-  <!-- ===== Favicon & App Icons ===== -->
-  <!-- Base favicon (PNG fallback). Replace with your final optimized icons when ready -->
+  <!-- ===== Favicon (robust, cross-browser) ===== -->
+  <!-- If /favicon.ico exists on your root, these will be used by most browsers -->
+  <link rel="icon" href="/favicon.ico?v=1" sizes="any">
+  <link rel="shortcut icon" href="/favicon.ico?v=1">
+  <!-- PNG fallbacks (served from your existing Supabase asset) -->
   <link rel="icon" type="image/png" sizes="32x32"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png"/>
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
   <link rel="icon" type="image/png" sizes="16x16"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png"/>
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
   <link rel="apple-touch-icon" sizes="180x180"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png"/>
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
   <meta name="theme-color" content="#027A93"/>
-  <meta name="apple-mobile-web-app-title" content="Nahl"/>
 
   <!-- ===== SEO: Canonical & Robots ===== -->
   <link rel="canonical" href="https://nahl.app/booking"/>
@@ -234,7 +236,7 @@
       text-align: left; direction: ltr;
     }
 
-    /* ===== Additional Services chips (lightweight, clickable) ===== */
+    /* ===== Additional Services chips ===== */
     .addon-wrap{margin-top:12px}
     .addon-title{display:flex; align-items:center; gap:8px; font-weight:800; color:#224652; margin-bottom:6px}
     .addon-chips{display:flex; flex-wrap:wrap; gap:8px}
@@ -337,12 +339,11 @@
               </div>
             </div>
 
-            <!-- ===== Additional services (chips) START ===== -->
+            <!-- Additional services (chips) -->
             <div class="addon-wrap">
               <div class="addon-title"><i class="fa-solid fa-plus"></i> خدمات إضافية (اختياري)</div>
               <div id="addonChips" class="addon-chips" role="group" aria-label="خدمات إضافية"></div>
             </div>
-            <!-- ===== Additional services (chips) END ===== -->
 
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
@@ -654,7 +655,7 @@
       const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
     }
 
-    /* Summary chips (hidden on welcome) */
+    /* Summary chips */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
@@ -792,7 +793,7 @@
 
       const viewList = dayTimes
         .filter(x=>passesFilter(x.mins))
-        .sort((a,b)=> a.mins - b.mins); /* always early → late */
+        .sort((a,b)=> a.mins - b.mins);
 
       if(!viewList.length){
         timeContainer.innerHTML=`<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد ضمن الفلتر المحدد</div>`;
@@ -809,7 +810,6 @@
           nForm.date=selectedISO; nForm.time=parsed.toFormat('HH:mm');
           window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime;
           renderSummary('page3'); updateNextAvailability();
-          /* NEW: auto-advance to Contact page after selecting a time */
           showPage(3);
         });
         timeContainer.appendChild(btn);
@@ -917,7 +917,7 @@
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
-      // ===== Additional services chips render & logic =====
+      // Additional services chips
       const ADDON_OPTIONS = [
         'غسيل داخلي عميق',
         'تعقيم بالبخار',
@@ -932,7 +932,7 @@
         const wrap = document.getElementById('addonChips');
         if(!wrap) return;
         wrap.innerHTML = '';
-        ADDON_OPTIONS.forEach((label, idx)=>{
+        ADDON_OPTIONS.forEach((label)=>{
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'addon-chip';
@@ -949,7 +949,7 @@
               nForm.addons = [...nForm.addons, val];
               btn.setAttribute('aria-pressed','true');
             }
-            updateNextAvailability(); // optional
+            updateNextAvailability();
           });
           btn.addEventListener('keydown', e=>{
             if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); }
@@ -987,7 +987,6 @@
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
           nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
-          // Compose locationDescription (existing) + addons (new)
           const parts = [
             $('#carBrand').val()||'',
             $('#carName').val()||'',
@@ -1044,7 +1043,7 @@
       document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
-      payCards.forEach((card,idx)=>{
+      payCards.forEach((card)=>{
         const input=card.querySelector('input');
         const choose=()=>{ 
           payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; });
@@ -1077,7 +1076,6 @@
     let map, marker, autocomplete, allowedPoly;
     const SA_BOUNDS = { north: 32.154, south: 16.370, west: 34.495, east: 55.666 };
 
-    // ===== POLYGON START (replace with your exact zone) =====
     // Example polygon roughly covering central Riyadh area.
     const ALLOWED_POLY_PATH = [
       {lat:24.9550, lng:46.4630},
@@ -1091,7 +1089,6 @@
       {lat:24.5600, lng:46.4200},
       {lat:24.7400, lng:46.3900}
     ];
-    // ===== POLYGON END =====
 
     function initMap(){
       const def={lat:24.7136,lng:46.6753};
@@ -1100,7 +1097,7 @@
         restriction:{latLngBounds: SA_BOUNDS, strictBounds:false}
       });
 
-      // Draw allowed polygon overlay (visual frame)
+      // Draw allowed polygon overlay
       allowedPoly = new google.maps.Polygon({
         map,
         paths: ALLOWED_POLY_PATH,
@@ -1111,7 +1108,7 @@
         fillOpacity: 0.05
       });
 
-      // Compute polygon bounds and softly restrict panning inside it
+      // Restrict panning softly to polygon bounds
       const polyBounds = new google.maps.LatLngBounds();
       ALLOWED_POLY_PATH.forEach(p => polyBounds.extend(p));
       map.fitBounds(polyBounds);
@@ -1148,7 +1145,6 @@
       autocomplete.addListener('place_changed', ()=>{
         const place=autocomplete.getPlace(); if(!place?.geometry) return;
         const loc=place.geometry.location;
-        // Also enforce polygon on autocomplete selection
         if (!google.maps.geometry.poly.containsLocation(loc, allowedPoly)) {
           showToast('error','الموقع المحدد خارج نطاق الخدمة');
           return;
