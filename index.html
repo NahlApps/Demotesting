@@ -9,11 +9,11 @@
   <link rel="icon" href="/favicon.ico?v=1" sizes="any">
   <link rel="shortcut icon" href="/favicon.ico?v=1">
   <link rel="icon" type="image/png" sizes="32x32"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%201٣,%٢٠٢٥,%٢٠١_٢١_٣٣%20PM.png">
   <link rel="icon" type="image/png" sizes="16x16"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%201٣,%٢٠٢٥,%٢٠١_٢١_٣٣%20PM.png">
   <link rel="apple-touch-icon" sizes="180x180"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%201٣,%٢٠٢٥,%٢٠١_٢١_٣٣%20PM.png">
   <meta name="theme-color" content="#027A93"/>
 
   <!-- ===== SEO: Canonical & Robots ===== -->
@@ -282,7 +282,7 @@
       <div class="brand">
         <img id="brandLogo"
              alt="Nahl Time"
-             src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png"
+             src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%201٣,%٢٠٢٥,%٢٠١_٢١_٣٣%20PM.png"
              onerror="handleLogoError(this)" />
       </div>
 
@@ -563,7 +563,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwtSI1D2kZUhblgeqwq0Nj9VWHnopNftobXNFRe_1f1uE6RbCVMhiUek4q8MpwCOxS-jA/exec';
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbxTpaQtQwHrqU-S1xORQoXZhG2ZSuP2MOXDYwotli049rsdlSk4cL_w0POoF6TiCM8ndA/exec';
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -628,6 +628,46 @@
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', addons:[], locale:'ar'};
 
+    /* ===== Map settings (from GAS) ===== */
+    let MAP_SA_BOUNDS = { north: 32.154, south: 16.370, west: 34.495, east: 55.666 };
+    let MAP_ALLOWED_POLY_PATH = [
+      {lat:24.9550, lng:46.4630},
+      {lat:25.0000, lng:46.6400},
+      {lat:24.9900, lng:46.8200},
+      {lat:24.9000, lng:46.9500},
+      {lat:24.7200, lng:46.9800},
+      {lat:24.5600, lng:46.8800},
+      {lat:24.4700, lng:46.7200},
+      {lat:24.4600, lng:46.5400},
+      {lat:24.5600, lng:46.4200},
+      {lat:24.7400, lng:46.3900}
+    ];
+    let _mapSettingsLoaded=false;
+    async function loadMapSettings(){
+      if(!GAS_BASE_URL) return;
+      try{
+        const url = `${GAS_BASE_URL}?route=mapSettings&appId=${encodeURIComponent(APP_ID)}`;
+        const res = await fetch(url, {method:'GET',mode:'cors',cache:'no-store',headers:{'Accept':'application/json'}});
+        const data = await res.json().catch(()=>null);
+        if(res.ok && data && data.success && data.data){
+          const b = data.data.SA_BOUNDS;
+          const p = data.data.ALLOWED_POLY_PATH;
+          if(b && ['north','south','west','east'].every(k=>typeof b[k]==='number')){
+            MAP_SA_BOUNDS = b;
+          }
+          if(Array.isArray(p) && p.length){
+            MAP_ALLOWED_POLY_PATH = p.map(x=>({lat:Number(x.lat),lng:Number(x.lng)})).filter(v=>Number.isFinite(v.lat)&&Number.isFinite(v.lng));
+          }
+          _mapSettingsLoaded=true;
+          console.log('[MapSettings] Loaded from GAS', {bounds:MAP_SA_BOUNDS, points:MAP_ALLOWED_POLY_PATH.length});
+        }else{
+          console.warn('[MapSettings] Using defaults (not found)', data);
+        }
+      }catch(e){
+        console.warn('[MapSettings] Error loading settings, using defaults', e);
+      }
+    }
+
     function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
 
     function showPage(idx){
@@ -656,7 +696,6 @@
       prev.classList.toggle('hidden', i===0 || onThanks);
       next.classList.toggle('hidden', onThanks);
       wait.classList.remove('show');
-
       next.textContent = (i===0) ? 'تخطي العرض' : 'التالي';
     }
 
@@ -878,6 +917,9 @@
 
       Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.src=src; });
 
+      // Preload map settings (async; initMap will wait on this if not yet loaded)
+      loadMapSettings();
+
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة لخدمة العناية الفاخرة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
       $('#service').select2({width:'100%',placeholder:'باقتك المختارة', dir:'rtl'});
@@ -951,32 +993,22 @@
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
-      // === Additional Services chips (dynamic from GAS by APP_ID) ===
-      async function fetchAdditionalServices(){
-        const wrap = document.getElementById('addonChips');
-        if(!wrap) return;
-        wrap.innerHTML = '<span class="text-muted">…جاري التحميل</span>';
-        try{
-          const url = `${GAS_BASE_URL}?route=additionalServices&appId=${encodeURIComponent(APP_ID)}`;
-          const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store', headers:{'Accept':'application/json'}});
-          const data = await res.json().catch(()=>null);
-          const items = (res.ok && data && data.success && Array.isArray(data.data)) ? data.data : [];
-          renderAddonChips(items.map(x=>x.label).filter(Boolean));
-          console.log('[AdditionalServices] Loaded', { appId: APP_ID, count: items.length, sample: items.slice(0,3) });
-        }catch(err){
-          console.warn('[AdditionalServices] fetch error', err);
-          renderAddonChips([]); // empty on failure
-        }
-      }
-      function renderAddonChips(labels){
+      // Additional services chips (static here; wired elsewhere to fetch from GAS if needed)
+      const ADDON_OPTIONS = [
+        'غسيل داخلي عميق',
+        'تعقيم بالبخار',
+        'تلميع خارجي',
+        'حماية النانو',
+        'إزالة روائح',
+        'تنظيف مقاعد جلد',
+        'تنظيف السجاد/الأرضيات',
+        'تنظيف المحرك (خارجي)'
+      ];
+      function renderAddonChips(){
         const wrap = document.getElementById('addonChips');
         if(!wrap) return;
         wrap.innerHTML = '';
-        if(!labels || !labels.length){
-          wrap.innerHTML = '<span class="text-muted">لا توجد خدمات إضافية</span>';
-          return;
-        }
-        labels.forEach((label)=>{
+        ADDON_OPTIONS.forEach((label)=>{
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'addon-chip';
@@ -1001,8 +1033,7 @@
           wrap.appendChild(btn);
         });
       }
-      // fetch chips on load
-      fetchAdditionalServices();
+      renderAddonChips();
 
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
       $('#timeFilter').on('change', function(){ currentTimeFilter=this.value; renderSelectedDateTimes(lastSelectedISO); });
@@ -1117,7 +1148,7 @@
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* ===== Service Description fetch/render (with fallback by name & APP_ID) ===== */
+    /* ===== Service Description fetch/render (with fallback by name) ===== */
     function escapeHTML(s){
       return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
@@ -1145,7 +1176,7 @@
         const params = new URLSearchParams();
         params.set('route','serviceDescription');
         params.set('appId', APP_ID);
-        if (serviceId)   params.set('serviceId', serviceId);
+        if (serviceId) params.set('serviceId', serviceId);
         if (serviceName) params.set('serviceName', serviceName);
         const url = `${GAS_BASE_URL}?${params.toString()}`;
 
@@ -1160,14 +1191,14 @@
           body.innerHTML = `<p style="margin:0; white-space:pre-wrap">${escapeHTML(desc)}</p>`;
           card.style.display='block';
           console.log('[ServiceDesc] Received from GAS', {
-            appId: APP_ID, serviceId, serviceName,
+            serviceId, serviceName,
             length: (desc || '').length,
             sample: String(desc || '').slice(0, 40)
           });
         } else {
           body.innerHTML = '<span class="text-muted">لا يوجد وصف متاح لهذه الخدمة</span>';
           card.style.display='block';
-          console.log('[ServiceDesc] Not found', { appId: APP_ID, serviceId, serviceName, data });
+          console.log('[ServiceDesc] Not found', { serviceId, serviceName, data });
         }
       }catch(_e){
         const card = document.getElementById('serviceDesc');
@@ -1180,96 +1211,93 @@
       }
     }
 
-    /* Google Map + Places + Geometry with polygon limit */
+    /* Google Map + Places + Geometry with polygon limit (from GAS settings) */
     let map, marker, autocomplete, allowedPoly;
-    const SA_BOUNDS = { north: 32.154, south: 16.370, west: 34.495, east: 55.666 };
-
-    const ALLOWED_POLY_PATH = [
-      {lat:24.9550, lng:46.4630},
-      {lat:25.0000, lng:46.6400},
-      {lat:24.9900, lng:46.8200},
-      {lat:24.9000, lng:46.9500},
-      {lat:24.7200, lng:46.9800},
-      {lat:24.5600, lng:46.8800},
-      {lat:24.4700, lng:46.7200},
-      {lat:24.4600, lng:46.5400},
-      {lat:24.5600, lng:46.4200},
-      {lat:24.7400, lng:46.3900}
-    ];
 
     function initMap(){
-      const def={lat:24.7136,lng:46.6753};
-      map=new google.maps.Map(document.getElementById('googleMap'),{
-        center:def, zoom:12, disableDoubleClickZoom:true, mapTypeControl:false, fullscreenControl:true,
-        restriction:{latLngBounds: SA_BOUNDS, strictBounds:false}
-      });
+      // Ensure settings loaded; if not yet, load them then continue
+      const proceed = async ()=>{
+        if(!_mapSettingsLoaded){ await loadMapSettings(); }
 
-      allowedPoly = new google.maps.Polygon({
-        map,
-        paths: ALLOWED_POLY_PATH,
-        strokeColor: '#027A93',
-        strokeOpacity: 0.9,
-        strokeWeight: 1.5,
-        fillColor: '#027A93',
-        fillOpacity: 0.05
-      });
+        const def={lat:24.7136,lng:46.6753};
+        map=new google.maps.Map(document.getElementById('googleMap'),{
+          center:def, zoom:12, disableDoubleClickZoom:true, mapTypeControl:false, fullscreenControl:true,
+        });
 
-      const polyBounds = new google.maps.LatLngBounds();
-      ALLOWED_POLY_PATH.forEach(p => polyBounds.extend(p));
-      map.fitBounds(polyBounds);
-      map.setOptions({ restriction: { latLngBounds: polyBounds, strictBounds: false } });
+        allowedPoly = new google.maps.Polygon({
+          map,
+          paths: MAP_ALLOWED_POLY_PATH,
+          strokeColor: '#027A93',
+          strokeOpacity: 0.9,
+          strokeWeight: 1.5,
+          fillColor: '#027A93',
+          fillOpacity: 0.05
+        });
 
-      marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
+        const polyBounds = new google.maps.LatLngBounds();
+        MAP_ALLOWED_POLY_PATH.forEach(p => polyBounds.extend(p));
+        map.fitBounds(polyBounds);
+        // Restrict panning/zooming roughly to SA_BOUNDS coming from sheet
+        map.setOptions({ restriction: { latLngBounds: new google.maps.LatLngBounds(
+          new google.maps.LatLng(MAP_SA_BOUNDS.south, MAP_SA_BOUNDS.west),
+          new google.maps.LatLng(MAP_SA_BOUNDS.north, MAP_SA_BOUNDS.east)
+        ), strictBounds: false } });
 
-      const setPos=(latLng,pan=false)=>{
-        if(!latLng) return;
-        if (!google.maps.geometry.poly.containsLocation(latLng, allowedPoly)) {
-          showToast('error','خارج النطاق المسموح للخدمة');
-          return;
-        }
-        marker.setPosition(latLng);
-        if(pan){ map.panTo(latLng); }
-        map.setZoom(17);
-        positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
-        const hint=document.getElementById('mapHint');
-        if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`;
-        renderSummary('page6'); updateNextAvailability();
+        marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
+
+        const setPos=(latLng,pan=false)=>{
+          if(!latLng) return;
+          if (!google.maps.geometry.poly.containsLocation(latLng, allowedPoly)) {
+            showToast('error','خارج النطاق المسموح للخدمة');
+            return;
+          }
+          marker.setPosition(latLng);
+          if(pan){ map.panTo(latLng); }
+          map.setZoom(17);
+          positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
+          const hint=document.getElementById('mapHint');
+          if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`;
+          renderSummary('page6'); updateNextAvailability();
+        };
+
+        marker.addListener('dragend',({latLng})=>setPos(latLng));
+        map.addEventListener?.('click',({latLng})=>setPos(latLng,true));
+        // Fallback for Maps old click signature:
+        google.maps.event.addListener(map,'click', (e)=>{ if(e && e.latLng) setPos(e.latLng,true); });
+
+        const input=document.getElementById('mapSearch');
+        const opts={ fields:['geometry','name'], componentRestrictions:{country:'sa'}, strictBounds:true };
+        autocomplete=new google.maps.places.Autocomplete(input, opts);
+        autocomplete.bindTo('bounds', map);
+        autocomplete.setBounds(polyBounds);
+        autocomplete.addListener('place_changed', ()=>{
+          const place=autocomplete.getPlace(); if(!place?.geometry) return;
+          const loc=place.geometry.location;
+          if (!google.maps.geometry.poly.containsLocation(loc, allowedPoly)) {
+            showToast('error','الموقع المحدد خارج نطاق الخدمة');
+            return;
+          }
+          map.panTo(loc); map.setZoom(16); setPos(loc,true);
+        });
+
+        const btn=document.getElementById('show-my-location');
+        btn?.addEventListener('click',()=>{
+          if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
+          navigator.geolocation.getCurrentPosition(
+            pos=>{
+              const here = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
+              if (!google.maps.geometry.poly.containsLocation(here, allowedPoly)) {
+                showToast('error','موقعك الحالي خارج نطاق الخدمة');
+                return;
+              }
+              setPos(here,true);
+            },
+            _err=>{ showToast('error','تعذر تحديد موقعك'); },
+            { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
+          );
+        });
       };
-
-      marker.addListener('dragend',({latLng})=>setPos(latLng));
-      map.addListener('click',({latLng})=>setPos(latLng,true));
-
-      const input=document.getElementById('mapSearch');
-      const opts={ fields:['geometry','name'], componentRestrictions:{country:'sa'}, strictBounds:true };
-      autocomplete=new google.maps.places.Autocomplete(input, opts);
-      autocomplete.bindTo('bounds', map);
-      autocomplete.setBounds(polyBounds);
-      autocomplete.addListener('place_changed', ()=>{
-        const place=autocomplete.getPlace(); if(!place?.geometry) return;
-        const loc=place.geometry.location;
-        if (!google.maps.geometry.poly.containsLocation(loc, allowedPoly)) {
-          showToast('error','الموقع المحدد خارج نطاق الخدمة');
-          return;
-        }
-        map.panTo(loc); map.setZoom(16); setPos(loc,true);
-      });
-
-      const btn=document.getElementById('show-my-location');
-      btn?.addEventListener('click',()=>{
-        if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
-        navigator.geolocation.getCurrentPosition(
-          pos=>{
-            const here = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
-            if (!google.maps.geometry.poly.containsLocation(here, allowedPoly)) {
-              showToast('error','موقعك الحالي خارج نطاق الخدمة');
-              return;
-            }
-            setPos(here,true);
-          },
-          _err=>{ showToast('error','تعذر تحديد موقعك'); },
-          { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
-        );
-      });
+      proceed();
     }
     window.initMap=initMap;
   </script>
