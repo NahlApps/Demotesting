@@ -6,15 +6,18 @@
   <title>حجوزات المواعيد</title>
 
   <!-- ===== Favicon (robust, cross-browser) ===== -->
-  <!-- Use working PNGs (don’t rely on /favicon.ico if it’s missing on host) -->
   <link rel="icon" type="image/png" sizes="32x32" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
   <link rel="icon" type="image/png" sizes="16x16" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
   <link rel="apple-touch-icon" sizes="180x180" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png">
   <meta name="theme-color" content="#027A93"/>
+  <!-- Optional if you truly have /favicon.ico on the SAME origin:
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="shortcut icon" href="/favicon.ico">
+  -->
 
-  <!-- Optional: only keep these if /favicon.ico exists on your host -->
-  <!-- <link rel="icon" href="/favicon.ico" sizes="any"> -->
-  <!-- <link rel="shortcut icon" href="/favicon.ico"> -->
+  <!-- Speed up Supabase asset fetch -->
+  <link rel="preconnect" href="https://pdnmghkpepvsfaiqlafk.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//pdnmghkpepvsfaiqlafk.supabase.co">
 
   <!-- ===== Preload page backgrounds (faster first paint) ===== -->
   <link rel="preload" as="image" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg">
@@ -29,10 +32,10 @@
   <link rel="canonical" href="https://nahl.app/booking"/>
   <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"/>
 
-  <!-- ===== Primary Meta Description (AR) ===== -->
+  <!-- ===== Primary Meta (AR) ===== -->
   <meta name="description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
 
-  <!-- ===== Open Graph (Social) ===== -->
+  <!-- ===== Social ===== -->
   <meta property="og:title" content="حجوزات المواعيد — نحل | Nahl"/>
   <meta property="og:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
   <meta property="og:type" content="website"/>
@@ -41,8 +44,6 @@
   <meta property="og:locale" content="ar_SA"/>
   <meta property="og:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG3.jpg"/>
   <meta property="og:image:alt" content="حجز موعد غسيل سيارات متنقل من نحل"/>
-
-  <!-- ===== Twitter Card ===== -->
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="حجوزات المواعيد — نحل | Nahl"/>
   <meta name="twitter:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
@@ -76,10 +77,10 @@
 
     html,body{height:100%}
     body{
+      /* single variable for the photo, layered with gradient */
       --page-bg-img: url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg");
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
 
-      /* Stable 2-layer background (no shorthand var pitfalls) */
       background-color:#0B2630;
       background-image:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
@@ -163,8 +164,6 @@
     .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .form-label{display:inline-block; margin-bottom:6px; font-size:.9rem; font-weight:800; color:#224652}
     .field-error{color:#dc2626; font-size:.85rem; margin-top:6px; display:none}
-    .has-error .form-control, .has-error .select2-selection{ border-color:#dc2626 !important; }
-    .has-error .field-error{display:block}
 
     .select2-container .select2-selection--single .select2-selection__rendered{color:#0B2630!important; line-height:52px!important;}
     .select2-container .select2-selection--single{height:52px!important; display:flex; align-items:center}
@@ -173,8 +172,6 @@
 
     .time-toolbar{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:8px}
     @media (min-width:768px){ .time-toolbar{grid-template-columns: 1fr; } }
-    .btn-toggle{display:flex; gap:8px}
-    .btn-toggle .btn{flex:1}
 
     .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
     @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
@@ -251,7 +248,7 @@
       text-align: left; direction: ltr;
     }
 
-    /* ===== Additional Services chips ===== */
+    /* Addons */
     .addon-wrap{margin-top:12px}
     .addon-title{display:flex; align-items:center; gap:8px; font-weight:800; color:#224652; margin-bottom:6px}
     .addon-chips{display:flex; flex-wrap:wrap; gap:8px}
@@ -268,7 +265,7 @@
       font-weight:800;
     }
 
-    /* ===== Service Description card ===== */
+    /* Service Description card */
     .service-desc{
       margin-top:12px;
       border:1px dashed var(--border-300);
@@ -579,7 +576,7 @@
     const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
-    // GAS Web App base URL (replace after you deploy Code.gs)
+    // ===== GAS Web App base URL (already deployed) =====
     const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec';
 
     let controllers=[];
@@ -645,10 +642,17 @@
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', addons:[], locale:'ar'};
 
+    /* ===== Background switching (safe) ===== */
     function setPageBackground(id){
       const src = PAGE_BACKGROUNDS[id] || PAGE_BACKGROUNDS.page1;
       document.body.style.setProperty('--page-bg-img', `url("${src}")`);
     }
+
+    /* ===== JS image preloader to guarantee paint ===== */
+    (function preloadBGs(){
+      const list = Object.values(PAGE_BACKGROUNDS||{});
+      list.forEach(src=>{ const i=new Image(); i.decoding='async'; i.loading='eager'; i.src=src; });
+    })();
 
     function showPage(idx){
       const cur=document.querySelector('.page.active');
@@ -683,7 +687,7 @@
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* Plate logic (any length) */
+    /* Plate helpers */
     function isSpecialPlate(num){
       if(!/^\d+$/.test(num) || num.length < 3) return false;
       const same = /^(\d)\1+$/.test(num);
@@ -703,7 +707,7 @@
       const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
     }
 
-    /* Summary chips */
+    /* ===== Summary chips ===== */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
@@ -736,7 +740,7 @@
       });
     }
 
-    /* Welcome slideshow */
+    /* ===== Welcome slideshow ===== */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -757,7 +761,7 @@
     }
     function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
-    /* Times helpers */
+    /* ===== Times helpers ===== */
     function parseTimeToLuxon(raw){
       let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true});
       if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
@@ -864,7 +868,7 @@
       });
     }
 
-    /* Padding sync with fixed header & footer */
+    /* Header/Footer paddings sync */
     function installResizeObservers(){
       const header=document.getElementById('siteHeader');
       const footer=document.getElementById('siteFooter');
@@ -888,11 +892,12 @@
         serviceCat:(svcC!==null&&svcC!=='')?String(svcC):undefined,
         customerM:phoneDigits, customerN:nForm.customerN,
         paymentMethod:(nForm.paymentMethod||'').toLowerCase(),
-        urlLocation:nForm.urlLocation, locationDescription:nForm.locationDescription||'', locale:'ar'
+        urlLocation:nForm.urlLocation, locationDescription:nForm.locationDescription||'', locale:'ar',
+        addons: nForm.addons || []
       };
     }
 
-    /* ---------- GAS helpers (Additional Services, Service Description, Map Settings) ---------- */
+    /* ===== GAS helpers (Descriptions, Addons, Map Settings) ===== */
     function escapeHTML(s){
       return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
@@ -911,10 +916,7 @@
       card.style.display = 'none';
     }
     async function fetchServiceDescription(serviceId, serviceName){
-      if(!GAS_BASE_URL || GAS_BASE_URL === 'YOUR_GAS_WEBAPP_URL'){ 
-        clearServiceDescriptionUI();
-        return; 
-      }
+      if(!GAS_BASE_URL){ clearServiceDescriptionUI(); return; }
       showServiceDescSkeleton();
       try{
         const params = new URLSearchParams();
@@ -934,11 +936,9 @@
           const desc = data.data.description || '—';
           body.innerHTML = `<p style="margin:0; white-space:pre-wrap">${escapeHTML(desc)}</p>`;
           card.style.display='block';
-          console.log('[ServiceDesc] Received from GAS', { serviceId, serviceName, length: (desc || '').length, sample: String(desc || '').slice(0, 40) });
         } else {
           body.innerHTML = '<span class="text-muted">لا يوجد وصف متاح لهذه الخدمة</span>';
           card.style.display='block';
-          console.log('[ServiceDesc] Not found', { serviceId, serviceName, data });
         }
       }catch(_e){
         const card = document.getElementById('serviceDesc');
@@ -947,7 +947,6 @@
           body.innerHTML = '<span class="text-muted">تعذر تحميل وصف الخدمة حالياً</span>';
           card.style.display='block';
         }
-        console.warn('[ServiceDesc] Fetch error', _e);
       }
     }
 
@@ -960,14 +959,15 @@
         const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store' });
         const data = await res.json().catch(()=>null);
         if(res.ok && data && data.success && Array.isArray(data.data)){
-          const options = data.data.map(x => String(x.label || '').trim()).filter(Boolean);
+          const options = data.data
+            .map(x => String(x.label || '').trim())
+            .filter(Boolean);
           renderAddonChips(options);
         }else{
           wrap.innerHTML = '<span class="text-muted">لا توجد خدمات إضافية</span>';
         }
       }catch(e){
         wrap.innerHTML = '<span class="text-muted">تعذر تحميل الخدمات الإضافية</span>';
-        console.warn('[AdditionalServices] Fetch error', e);
       }
     }
 
@@ -1005,9 +1005,8 @@
       });
     }
 
-    // Map settings (defaults + dynamic from GAS)
+    // ===== Map settings (defaults + dynamic from GAS) =====
     let map, marker, autocomplete, allowedPoly;
-    // Fallback: Riyadh rough bounds & polygon if GAS not available
     let SA_BOUNDS = { north: 25.0500, south: 24.3000, west: 46.2000, east: 47.1000 };
     let ALLOWED_POLY_PATH = [
       {lat:24.9550, lng:46.4630},
@@ -1038,12 +1037,9 @@
               .map(p=>({lat:Number(p.lat), lng:Number(p.lng)}))
               .filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
           }
-          console.log('[MapSettings] Loaded from GAS', { SA_BOUNDS, points: ALLOWED_POLY_PATH.length });
-        }else{
-          console.warn('[MapSettings] Using fallback defaults');
         }
       }catch(e){
-        console.warn('[MapSettings] Fetch error, using fallback', e);
+        /* keep fallbacks */
       }
     }
 
@@ -1051,27 +1047,29 @@
     $(function(){
       installResizeObservers();
 
-      // Initialize selects
+      // Selects
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة لخدمة العناية الفاخرة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
       $('#service').select2({width:'100%',placeholder:'باقتك المختارة', dir:'rtl'});
       $('#carBrand').select2({width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
       $('#area, #serviceCat, #service, #carBrand').on('select2:open', ()=>{$('.select2-search__field').attr('dir','rtl');});
 
+      // Phone input
       const mobileEl = document.getElementById('mobile');
       if (mobileEl) {
-        itiPhone=window.intlTelInput(mobileEl,{
+        window.itiPhone=window.intlTelInput(mobileEl,{
           initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
           separateDialCode:true, placeholderNumberType:'MOBILE',
           utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
         });
         $('#mobile').attr({placeholder:'رقم التواصل الخاص — مثال 5XXXXXXXX', inputmode:'tel', autocomplete:'tel'})
                     .on('blur', ()=> {
-                      const ok = itiPhone && itiPhone.isValidNumber();
+                      const ok = window.itiPhone && window.itiPhone.isValidNumber();
                       document.getElementById('err-mobile').style.display = ok ? 'none':'block';
                     });
       }
 
+      // Basic field bindings
       $('#name').on('input', function(){ nForm.customerN=this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
       $('#mobile').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
       $('#carName').on('input', function(){ updateNextAvailability(); });
@@ -1081,10 +1079,10 @@
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
-      // Load Additional Services from GAS (by APP_ID)
+      // ===== Additional Services (from GAS) =====
       fetchAdditionalServicesAndRender();
 
-      // Load locations & services
+      // ===== Load Locations -> Services & Categories (from platform) =====
       setLoadingServices(true);
       callContent2(`/locations`, res=>{
         const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
@@ -1108,7 +1106,9 @@
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
         clearServiceDescriptionUI();
-        const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
+        const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)
+          ?.sort((a,b)=>a.TS_service_id-b.TS_service_id)
+          ?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
         $('#service').empty().select2({data:items,width:'100%',placeholder:'باقتك المختارة', dir:'rtl'});
         if(items.length) $('#service').val(items[0].id).trigger('change');
         renderSummary('page2'); updateNextAvailability();
@@ -1122,24 +1122,19 @@
         else clearServiceDescriptionUI();
       });
 
+      // Brands (luxury first)
       const luxuryFirstBrands = [
-        // Ultra-luxury & exotics
         'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati','Bugatti',
-        // Luxury / premium
         'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti','Volvo',
-        // Popular in GCC (mainstream & premium)
         'Toyota','Nissan','Hyundai','Kia','Honda','Mitsubishi','Mazda','GMC','Chevrolet','Ford','Jeep','Dodge','RAM',
         'Volkswagen','Peugeot','Renault','Skoda','Subaru','Suzuki','Isuzu','Mini','Opel','Citroën',
-        // Chinese brands (active/visible in GCC)
         'MG','Geely','Haval','GWM (Great Wall)','TANK','ORA','BYD','Changan','Oshan','GAC','JAC','Chery','Exeed','Omoda','Jetour',
         'Hongqi','BAIC','DFSK (Glory)','Foton','Maxus','Roewe','Lynk & Co','Zeekr','Neta (Hozon)','Seres',
-        // EV startups (availability varies by country)
-        'NIO','XPeng','Leapmotor',
-        // Fallback
-        'Other'
+        'NIO','XPeng','Leapmotor','Other'
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
+      // Date/time interactions
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
       $('#timeFilter').on('change', function(){ currentTimeFilter=this.value; renderSelectedDateTimes(lastSelectedISO); });
 
@@ -1163,11 +1158,11 @@
         if(id==='page3'){ if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; } showPage(3); return; }
 
         if(id==='page4'){
-          const nameOk=($('#name').val()||'').trim().length>0; const phoneOk=itiPhone && itiPhone.isValidNumber();
+          const nameOk=($('#name').val()||'').trim().length>0; const phoneOk=window.itiPhone && window.itiPhone.isValidNumber();
           document.getElementById('err-name').style.display=nameOk?'none':'block';
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
-          nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
+          nForm.customerN=$('#name').val().trim(); nForm.customerM=window.itiPhone.getNumber().replace(/^\+/,'');
           const parts = [
             $('#carBrand').val()||'',
             $('#carName').val()||'',
@@ -1223,6 +1218,7 @@
       document.getElementById('footer-next').addEventListener('click', gotoNext);
       document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
+      // Pay selection
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
       payCards.forEach((card)=>{
         const input=card.querySelector('input');
@@ -1238,7 +1234,7 @@
 
       $('#rebook').on('click', ()=>location.href='/');
 
-      // First paint background + progress
+      // First paint + progress
       setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
       updateNextAvailability();
     });
@@ -1248,15 +1244,14 @@
       if(i===0){ enable=true; }
       else if(i===1){ enable=!!($('#area').val()&&$('#service').val()); }
       else if(i===2){ enable=!!selectedTime; }
-      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
+      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? window.itiPhone.isValidNumber() : true); }
       else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
       else if(i===5){ enable=!!positionUrl; }
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* Google Map + Places + Geometry with polygon limit (dynamic settings) */
+    /* ===== Google Map (Places + Geometry) with GAS map settings ===== */
     async function initMap(){
-      // Load Map Settings from GAS first (best-effort; falls back to defaults)
       await loadMapSettingsFromGAS();
 
       const def={lat:24.7136,lng:46.6753};
@@ -1265,7 +1260,6 @@
         restriction:{latLngBounds: SA_BOUNDS, strictBounds:false}
       });
 
-      // Draw allowed polygon zone
       if(Array.isArray(ALLOWED_POLY_PATH) && ALLOWED_POLY_PATH.length >= 3){
         allowedPoly = new google.maps.Polygon({
           map,
@@ -1278,7 +1272,7 @@
         });
       }
 
-      // Fit to polygon if exists, else to bounds
+      // Fit to polygon if exists; else to bounds
       let polyBounds = null;
       if(allowedPoly){
         polyBounds = new google.maps.LatLngBounds();
@@ -1293,17 +1287,12 @@
 
       const setPos=(latLng,pan=false)=>{
         if(!latLng) return;
-
         const insideAllowed =
           !allowedPoly ||
           (google.maps.geometry &&
            google.maps.geometry.poly &&
            google.maps.geometry.poly.containsLocation(latLng, allowedPoly));
-
-        if (!insideAllowed) {
-          showToast('error','خارج النطاق المسموح للخدمة');
-          return;
-        }
+        if (!insideAllowed) { showToast('error','خارج النطاق المسموح للخدمة'); return; }
 
         marker.setPosition(latLng);
         if(pan){ map.panTo(latLng); }
@@ -1315,7 +1304,6 @@
       };
 
       marker.addListener('dragend',({latLng})=>setPos(latLng));
-      // Use Maps' event system only (avoid DOM addEventListener on Map)
       map.addListener('click', ({latLng})=>setPos(latLng,true));
 
       const input=document.getElementById('mapSearch');
@@ -1326,17 +1314,12 @@
       autocomplete.addListener('place_changed', ()=>{
         const place=autocomplete.getPlace(); if(!place?.geometry) return;
         const loc=place.geometry.location;
-
         const insideAllowed =
           !allowedPoly ||
           (google.maps.geometry &&
            google.maps.geometry.poly &&
            google.maps.geometry.poly.containsLocation(loc, allowedPoly));
-
-        if (!insideAllowed) {
-          showToast('error','الموقع المحدد خارج نطاق الخدمة');
-          return;
-        }
+        if (!insideAllowed) { showToast('error','الموقع المحدد خارج نطاق الخدمة'); return; }
         map.panTo(loc); map.setZoom(16); setPos(loc,true);
       });
 
@@ -1346,17 +1329,12 @@
         navigator.geolocation.getCurrentPosition(
           pos=>{
             const here = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
-
             const insideAllowed =
               !allowedPoly ||
               (google.maps.geometry &&
                google.maps.geometry.poly &&
                google.maps.geometry.poly.containsLocation(here, allowedPoly));
-
-            if (!insideAllowed) {
-              showToast('error','موقعك الحالي خارج نطاق الخدمة');
-              return;
-            }
+            if (!insideAllowed) { showToast('error','موقعك الحالي خارج نطاق الخدمة'); return; }
             setPos(here,true);
           },
           _err=>{ showToast('error','تعذر تحديد موقعك'); },
@@ -1367,11 +1345,9 @@
     window.initMap=initMap;
   </script>
 
-  <!-- Google Maps (stable; no loading=async param in URL; keep async/defer attrs) -->
+  <!-- Google Maps (use async+defer; stable quarterly channel) -->
   <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=quarterly&libraries=places,geometry&language=ar&region=SA"
-    async
-    defer
-  ></script>
+    async defer></script>
 </body>
 </html>
