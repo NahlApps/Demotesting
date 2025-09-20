@@ -563,7 +563,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbxl8Vpu5C5ToW5HD3NfWWQyMpItquFpOSlmUzpa2uwn4cc2SW5u-5iOpNXeujXxBlNgtw/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec';
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -951,22 +951,32 @@
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
-      // Additional services chips
-      const ADDON_OPTIONS = [
-        'غسيل داخلي عميق',
-        'تعقيم بالبخار',
-        'تلميع خارجي',
-        'حماية النانو',
-        'إزالة روائح',
-        'تنظيف مقاعد جلد',
-        'تنظيف السجاد/الأرضيات',
-        'تنظيف المحرك (خارجي)'
-      ];
-      function renderAddonChips(){
+      // === Additional Services chips (dynamic from GAS by APP_ID) ===
+      async function fetchAdditionalServices(){
+        const wrap = document.getElementById('addonChips');
+        if(!wrap) return;
+        wrap.innerHTML = '<span class="text-muted">…جاري التحميل</span>';
+        try{
+          const url = `${GAS_BASE_URL}?route=additionalServices&appId=${encodeURIComponent(APP_ID)}`;
+          const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store', headers:{'Accept':'application/json'}});
+          const data = await res.json().catch(()=>null);
+          const items = (res.ok && data && data.success && Array.isArray(data.data)) ? data.data : [];
+          renderAddonChips(items.map(x=>x.label).filter(Boolean));
+          console.log('[AdditionalServices] Loaded', { appId: APP_ID, count: items.length, sample: items.slice(0,3) });
+        }catch(err){
+          console.warn('[AdditionalServices] fetch error', err);
+          renderAddonChips([]); // empty on failure
+        }
+      }
+      function renderAddonChips(labels){
         const wrap = document.getElementById('addonChips');
         if(!wrap) return;
         wrap.innerHTML = '';
-        ADDON_OPTIONS.forEach((label)=>{
+        if(!labels || !labels.length){
+          wrap.innerHTML = '<span class="text-muted">لا توجد خدمات إضافية</span>';
+          return;
+        }
+        labels.forEach((label)=>{
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.className = 'addon-chip';
@@ -991,7 +1001,8 @@
           wrap.appendChild(btn);
         });
       }
-      renderAddonChips();
+      // fetch chips on load
+      fetchAdditionalServices();
 
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
       $('#timeFilter').on('change', function(){ currentTimeFilter=this.value; renderSelectedDateTimes(lastSelectedISO); });
@@ -1133,7 +1144,7 @@
       try{
         const params = new URLSearchParams();
         params.set('route','serviceDescription');
-        params.set('appId', APP_ID);            // <<< ADDED: pass appId to backend
+        params.set('appId', APP_ID);
         if (serviceId)   params.set('serviceId', serviceId);
         if (serviceName) params.set('serviceName', serviceName);
         const url = `${GAS_BASE_URL}?${params.toString()}`;
