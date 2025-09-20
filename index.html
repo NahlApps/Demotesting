@@ -19,9 +19,11 @@
   <!-- ===== SEO: Canonical & Robots ===== -->
   <link rel="canonical" href="https://nahl.app/booking"/>
   <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"/>
+
+  <!-- ===== Primary Meta Description (AR) ===== -->
   <meta name="description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
 
-  <!-- ===== Open Graph / Twitter ===== -->
+  <!-- ===== Open Graph (Social) ===== -->
   <meta property="og:title" content="حجوزات المواعيد — نحل | Nahl"/>
   <meta property="og:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
   <meta property="og:type" content="website"/>
@@ -30,6 +32,8 @@
   <meta property="og:locale" content="ar_SA"/>
   <meta property="og:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG3.jpg"/>
   <meta property="og:image:alt" content="حجز موعد غسيل سيارات متنقل من نحل"/>
+
+  <!-- ===== Twitter Card ===== -->
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="حجوزات المواعيد — نحل | Nahl"/>
   <meta name="twitter:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
@@ -45,21 +49,11 @@
   <link href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css" rel="stylesheet"/>
 
   <style>
-    /* (styles unchanged – truncated in this snippet for brevity)
-       ——— KEEP YOUR FULL STYLES FROM YOUR CURRENT PAGE ——— */
-    /* ... paste your full styles from the latest version here ... */
-
-    /* Small muted consult line under service description */
-    .desc-consult {
-      display:block;
-      margin-top:8px;
-      font-size:.82rem;
-      color:#6b7280;
-    }
+    /* ...[unchanged CSS from your last version, including addons + service-desc styling]... */
   </style>
 </head>
 <body>
-  <!-- ... HTML content unchanged up to scripts (use your latest working file) ... -->
+  <!-- ...[unchanged body markup from your last version]... -->
 
   <!-- libs -->
   <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
@@ -69,57 +63,38 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    /* ---------- API ---------- */
-    // (keep your existing constants)
-    const GAS_BASE_URL = 'YOUR_GAS_WEBAPP_URL'; // <— replace after deploy
+    /* ---------- (all your existing JS stays the same; below is only the tiny addition) ---------- */
 
-    /* ===== Service Description fetch/render (with consultable log) ===== */
-    function escapeHTML(s){
-      return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-    function showServiceDescSkeleton(){
-      const card = document.getElementById('serviceDesc');
-      const body = document.getElementById('serviceDescBody');
-      if(!card || !body) return;
-      card.style.display = 'block';
-      body.innerHTML = '<div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:70%"></div><div class="skeleton" style="width:82%"></div>';
-    }
-    function clearServiceDescriptionUI(){
-      const card = document.getElementById('serviceDesc');
-      const body = document.getElementById('serviceDescBody');
-      if(!card || !body) return;
-      body.innerHTML = '';
-      card.style.display = 'none';
-    }
+    // GAS Web App base URL (replace after you deploy Code.gs)
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwAILeFKp7Pzg-fvRZfyVr3uMuAkfPzLpCgfeaHHEv8nW0EzpdKU4OE-g6aq-R4nPMhqA/exec';
 
-    // UPDATED: includeLog=1 and show consult info
+    // ...[all previously provided JS remains exactly the same up to fetchServiceDescription()]...
+
     async function fetchServiceDescription(serviceId){
-      if(!GAS_BASE_URL || GAS_BASE_URL === 'https://script.google.com/macros/s/AKfycbzW1gKmZKr3AwJgJnx3tu8S9mC961eumsdjt-H7-V1FV8D14haW3qBLzNWAVkLReRJA0g/exec'){ 
+      if(!GAS_BASE_URL || GAS_BASE_URL === 'YOUR_GAS_WEBAPP_URL'){ 
         clearServiceDescriptionUI(); 
         return; 
       }
       showServiceDescSkeleton();
       try{
         const serviceName = ($('#service').find(':selected').text() || '').trim();
-        const url = `${GAS_BASE_URL}?route=serviceDescription&serviceId=${encodeURIComponent(serviceId)}&serviceName=${encodeURIComponent(serviceName)}&includeLog=1`;
+        const url = `${GAS_BASE_URL}?route=serviceDescription&serviceId=${encodeURIComponent(serviceId)}&serviceName=${encodeURIComponent(serviceName)}`;
         const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store', headers:{ 'Accept':'application/json' }});
         const data = await res.json().catch(()=>null);
         const card = document.getElementById('serviceDesc');
         const body = document.getElementById('serviceDescBody');
         if(!card || !body) return;
 
-        // Console consult (developer-friendly)
-        if (data && data.log) {
-          console.info('[ServiceDescription:Consult]', data.log);
-        }
-
         if(res.ok && data && data.success && data.data){
           const desc = data.data.description || '—';
-          const consult = data.log ? 
-            `<small class="desc-consult">مصدر: الورقة "${escapeHTML(data.log.source.sheet)}" • صف #${data.log.source.rowNumber || '?'} • طول الوصف ${data.log.source.descriptionLength} • ${data.log.source.fromCache ? 'من الذاكرة المؤقتة' : 'من الورقة مباشرة'}</small>` 
-            : '';
-          body.innerHTML = `<p style="margin:0; white-space:pre-wrap">${escapeHTML(desc)}</p>${consult}`;
+          body.innerHTML = `<p style="margin:0; white-space:pre-wrap">${escapeHTML(desc)}</p>`;
           card.style.display='block';
+
+          // === Dev console audit line (non-breaking) ===
+          try {
+            console.info('[svc-desc] fetched',
+              { serviceId, serviceName, descLength: (desc||'').length, traceId: data.traceId });
+          } catch(_) {}
         } else {
           body.innerHTML = '<span class="text-muted">لا يوجد وصف متاح لهذه الخدمة</span>';
           card.style.display='block';
@@ -133,9 +108,11 @@
         }
       }
     }
+
+    // ...[rest of your existing JS remains unchanged]...
   </script>
 
-  <!-- Google Maps (keep your current script include) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_MAPS_KEY&callback=initMap&v=weekly&loading=async&libraries=places,geometry&language=ar&region=SA" async defer></script>
+  <!-- Google Maps (with Places + Geometry) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places,geometry&language=ar&region=SA" async defer></script>
 </body>
 </html>
