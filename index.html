@@ -563,7 +563,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbxl8Vpu5C5ToW5HD3NfWWQyMpItquFpOSlmUzpa2uwn4cc2SW5u-5iOpNXeujXxBlNgtw/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -1106,7 +1106,7 @@
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* ===== Service Description fetch/render (with fallback by name) ===== */
+    /* ===== Service Description fetch/render (with fallback by name & APP_ID) ===== */
     function escapeHTML(s){
       return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
@@ -1133,7 +1133,8 @@
       try{
         const params = new URLSearchParams();
         params.set('route','serviceDescription');
-        if (serviceId) params.set('serviceId', serviceId);
+        params.set('appId', APP_ID);            // <<< ADDED: pass appId to backend
+        if (serviceId)   params.set('serviceId', serviceId);
         if (serviceName) params.set('serviceName', serviceName);
         const url = `${GAS_BASE_URL}?${params.toString()}`;
 
@@ -1147,16 +1148,15 @@
           const desc = data.data.description || '—';
           body.innerHTML = `<p style="margin:0; white-space:pre-wrap">${escapeHTML(desc)}</p>`;
           card.style.display='block';
-          // Frontend console to verify arrival
           console.log('[ServiceDesc] Received from GAS', {
-            serviceId, serviceName,
+            appId: APP_ID, serviceId, serviceName,
             length: (desc || '').length,
             sample: String(desc || '').slice(0, 40)
           });
         } else {
           body.innerHTML = '<span class="text-muted">لا يوجد وصف متاح لهذه الخدمة</span>';
           card.style.display='block';
-          console.log('[ServiceDesc] Not found', { serviceId, serviceName, data });
+          console.log('[ServiceDesc] Not found', { appId: APP_ID, serviceId, serviceName, data });
         }
       }catch(_e){
         const card = document.getElementById('serviceDesc');
