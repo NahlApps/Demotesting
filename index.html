@@ -638,13 +638,13 @@
     const orderedPages=["page1","page2","page3","page4","page5","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","تم"];
     const PAGE_BACKGROUNDS={
-      page1:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg",
-      page2:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg",
-      page3:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG3.jpg",
-      page4:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG4.jpg",
-      page5:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg",
-      page6:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg",
-      page7:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"
+      page1:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg",
+      page2:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG2.jpg",
+      page3:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG3.jpg",
+      page4:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG4.jpg",
+      page5:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG5.jpg",
+      page6:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG6.jpg",
+      page7:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG7.jpg"
     };
     const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6};
     let selectedTime=null, servicesCache=null, categoriesCache=null, itiPhone=null, positionUrl="";
@@ -960,23 +960,73 @@
       }
     }
 
+    // ==== FIXED: robust fetch of Additional Services — new AbortController for each retry ====
     async function fetchAdditionalServicesAndRender(){
       const wrap = document.getElementById('addonChips');
       if(!wrap) return;
+
+      const showNone = (msg='لا توجد خدمات إضافية')=>{
+        wrap.innerHTML = `<span class="text-muted">${msg}</span>`;
+      };
+
+      const qs = new URLSearchParams({ route:'additionalServices', appId: APP_ID });
+      const url = `${GAS_BASE_URL}?${qs.toString()}`;
+
       wrap.innerHTML = '<span class="text-muted">...تحميل الإضافات</span>';
-      try{
-        const url = `${GAS_BASE_URL}?route=additionalServices&appId=${encodeURIComponent(APP_ID)}`;
-        const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store' });
-        const data = await res.json().catch(()=>null);
-        if(res.ok && data && data.success && Array.isArray(data.data)){
-          const options = data.data.map(x => String(x.label || '').trim()).filter(Boolean);
-          renderAddonChips(options);
-        }else{
-          wrap.innerHTML = '<span class="text-muted">لا توجد خدمات إضافية</span>';
+
+      // Try up to 3 attempts; create a fresh controller+timeout each time
+      for (let attempt = 0; attempt < 3; attempt++){
+        const controller = new AbortController();
+        const timer = setTimeout(()=>controller.abort(), 8000);
+        try{
+          const res = await fetch(url, {
+            method:'GET',
+            mode:'cors',
+            cache:'no-store',
+            headers:{ 'Accept':'application/json' },
+            signal: controller.signal
+          });
+
+          // attempt to parse JSON (may fail on non-JSON)
+          let data = null;
+          try { data = await res.json(); } catch(_){ data = null; }
+
+          if (res.ok && data && data.success && Array.isArray(data.data)){
+            const options = data.data
+              .map(x => String(x?.label ?? '').trim())
+              .filter(Boolean);
+
+            if (!options.length){
+              showNone();
+              clearTimeout(timer);
+              return;
+            }
+
+            renderAddonChips(options);
+            clearTimeout(timer);
+            return;
+          } else {
+            if (attempt < 2){
+              await new Promise(r=>setTimeout(r, 500));
+              clearTimeout(timer);
+              continue;
+            }
+            showNone('تعذر تحميل الخدمات الإضافية');
+            console.warn('[AdditionalServices] Unexpected payload', { status: res.status, data });
+            clearTimeout(timer);
+            return;
+          }
+        }catch(err){
+          if (attempt < 2){
+            await new Promise(r=>setTimeout(r, 500));
+            clearTimeout(timer);
+            continue;
+          }
+          showNone('تعذر تحميل الخدمات الإضافية');
+          console.warn('[AdditionalServices] Fetch error', err);
+          clearTimeout(timer);
+          return;
         }
-      }catch(e){
-        wrap.innerHTML = '<span class="text-muted">تعذر تحميل الخدمات الإضافية</span>';
-        console.warn('[AdditionalServices] Fetch error', e);
       }
     }
 
