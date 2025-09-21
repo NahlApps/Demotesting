@@ -1,4 +1,3 @@
-<!-- === index.html === -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -79,7 +78,7 @@
       --header-h:76px;
       --footer-h:118px;
 
-      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg");
+      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
 
     html,body{height:100%}
@@ -961,7 +960,7 @@
       }
     }
 
-    // ==== UPDATED: robust fetch of Additional Services (normalize + dedupe) ====
+    // ==== FIXED: robust fetch of Additional Services (with timeout + retries) ====
     async function fetchAdditionalServicesAndRender(){
       const wrap = document.getElementById('addonChips');
       if(!wrap) return;
@@ -970,11 +969,9 @@
         wrap.innerHTML = `<span class="text-muted">${msg}</span>`;
       };
 
+      // Build URL safely
       const qs = new URLSearchParams({ route:'additionalServices', appId: APP_ID });
       const url = `${GAS_BASE_URL}?${qs.toString()}`;
-
-      // helper: normalize whitespace
-      const norm = s => String(s || '').replace(/\s+/g,' ').trim();
 
       // Abort + timeout
       const controller = new AbortController();
@@ -982,6 +979,7 @@
 
       wrap.innerHTML = '<span class="text-muted">...تحميل الإضافات</span>';
 
+      // Small retry loop (2 retries)
       for (let attempt=0; attempt<3; attempt++){
         try{
           const res = await fetch(url, {
@@ -993,6 +991,7 @@
           });
           clearTimeout(t);
 
+          // 204 or non-JSON responses fallback
           if (res.status === 204){
             showNone();
             return;
@@ -1001,14 +1000,10 @@
           const data = await res.json().catch(()=>null);
 
           if (res.ok && data && data.success && Array.isArray(data.data)){
-            // Normalize + dedupe
-            const options = Array.from(
-              new Set(
-                data.data
-                  .map(x => norm(x?.label))
-                  .filter(Boolean)
-              )
-            );
+            // Normalize labels and render
+            const options = data.data
+              .map(x => String(x?.label ?? '').trim())
+              .filter(Boolean);
 
             if (!options.length){
               showNone();
@@ -1018,6 +1013,7 @@
             renderAddonChips(options);
             return; // success
           } else {
+            // Try again if server-side said no
             if (attempt < 2) continue;
             showNone('تعذر تحميل الخدمات الإضافية');
             console.warn('[AdditionalServices] Unexpected payload', { status: res.status, data });
@@ -1188,13 +1184,20 @@
       });
 
       const luxuryFirstBrands = [
+        // Ultra-luxury & exotics
         'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati','Bugatti',
+        // Luxury / premium
         'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti','Volvo',
+        // Popular in GCC (mainstream & premium)
         'Toyota','Nissan','Hyundai','Kia','Honda','Mitsubishi','Mazda','GMC','Chevrolet','Ford','Jeep','Dodge','RAM',
         'Volkswagen','Peugeot','Renault','Skoda','Subaru','Suzuki','Isuzu','Mini','Opel','Citroën',
+        // Chinese brands (active/visible in GCC)
         'MG','Geely','Haval','GWM (Great Wall)','TANK','ORA','BYD','Changan','Oshan','GAC','JAC','Chery','Exeed','Omoda','Jetour',
         'Hongqi','BAIC','DFSK (Glory)','Foton','Maxus','Roewe','Lynk & Co','Zeekr','Neta (Hozon)','Seres',
-        'NIO','XPeng','Leapmotor','Other'
+        // EV startups (availability varies by country)
+        'NIO','XPeng','Leapmotor',
+        // Fallback
+        'Other'
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
