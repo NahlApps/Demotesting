@@ -1,3 +1,4 @@
+<!-- === index.html === -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -11,11 +12,11 @@
   <link rel="shortcut icon" href="/favicon.ico?v=1">
   <!-- Add explicit PNG favicon so the browser tab always shows an icon even if /favicon.ico isn't reachable -->
   <link rel="icon" type="image/png" sizes="32x32"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlTime%20Logo%20Design%20(2).png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
   <link rel="icon" type="image/png" sizes="16x16"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlTime%20Logo%20Design%20(2).png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
   <link rel="apple-touch-icon" sizes="180x180"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlTime%20Logo%20Design%20(2).png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
   <meta name="theme-color" content="#027A93"/>
 
   <!-- ===== SEO: Canonical & Robots ===== -->
@@ -34,6 +35,12 @@
   <meta property="og:locale" content="ar_SA"/>
   <meta property="og:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg"/>
   <meta property="og:image:alt" content="حجز موعد غسيل سيارات متنقل من نحل"/>
+
+  <!-- ===== Twitter Card ===== -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="حجوزات المواعيد — نحل | Nahl"/>
+  <meta name="twitter:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
+  <meta name="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png"/>
 
   <!-- ===== Resource Hints for Supabase CDN (backgrounds + icons) ===== -->
 <link rel="preconnect" href="https://pdnmghkpepvsfaiqlafk.supabase.co" crossorigin>
@@ -79,22 +86,23 @@
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
 
-      /* layered background */
+      /* === Split layered background to avoid 'fixed' paint bugs and ensure preload reuse === */
       background-image:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
         var(--page-bg);
       background-position: center, center;
       background-repeat: no-repeat, no-repeat;
       background-size: auto, cover;
+      /* mobile-safe (no fixed). We'll re-enable fixed image on pointer=fine (desktop) below */
       background-attachment: scroll, scroll;
 
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
       padding-top:var(--header-h);
       padding-bottom:var(--footer-h);
-      background-color:#0B2630; /* safe fallback */
     }
 
+    /* Desktop parallax-like effect without breaking mobile Safari */
     @media (pointer:fine){
       body{ background-attachment: scroll, fixed; }
     }
@@ -582,8 +590,8 @@
     const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
-    // GAS Web App base URL
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec';
+    // GAS Web App base URL (replace after you deploy Code.gs)
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -648,32 +656,9 @@
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', addons:[], locale:'ar'};
 
-    // ========= FIX: robust background swap (preload+apply to :root and body) =========
-    const bgMemory = new Map(); // cache decoded images
-    async function setPageBackground(id){
-      const url = PAGE_BACKGROUNDS[id] || PAGE_BACKGROUNDS.page1;
-      if(!url) return;
-
-      // if decoded before, apply immediately
-      if(bgMemory.has(url)){
-        document.documentElement.style.setProperty('--page-bg', `url("${url}")`);
-        document.body.style.setProperty('--page-bg', `url("${url}")`);
-        return;
-      }
-
-      try{
-        const img = new Image();
-        img.decoding = 'async';
-        img.src = url;
-        // try to decode; if it throws, we still apply and let browser load it
-        if(img.decode){ await img.decode().catch(()=>{}); }
-        bgMemory.set(url, true);
-      }catch(_){ /* ignore */ }
-
-      document.documentElement.style.setProperty('--page-bg', `url("${url}")`);
-      document.body.style.setProperty('--page-bg', `url("${url}")`);
+    function setPageBackground(id){
+      document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`);
     }
-    // =========================================================================
 
     function showPage(idx){
       const cur=document.querySelector('.page.active');
@@ -976,7 +961,7 @@
       }
     }
 
-    // ==== Additional Services (unchanged logic from your fixed version) ====
+    // ==== UPDATED: robust fetch of Additional Services (normalize + dedupe) ====
     async function fetchAdditionalServicesAndRender(){
       const wrap = document.getElementById('addonChips');
       if(!wrap) return;
@@ -988,8 +973,10 @@
       const qs = new URLSearchParams({ route:'additionalServices', appId: APP_ID });
       const url = `${GAS_BASE_URL}?${qs.toString()}`;
 
+      // helper: normalize whitespace
       const norm = s => String(s || '').replace(/\s+/g,' ').trim();
 
+      // Abort + timeout
       const controller = new AbortController();
       const t = setTimeout(()=>controller.abort(), 8000);
 
@@ -1014,13 +1001,22 @@
           const data = await res.json().catch(()=>null);
 
           if (res.ok && data && data.success && Array.isArray(data.data)){
-            const options = Array.from(new Set(data.data.map(x => norm(x?.label)).filter(Boolean)));
+            // Normalize + dedupe
+            const options = Array.from(
+              new Set(
+                data.data
+                  .map(x => norm(x?.label))
+                  .filter(Boolean)
+              )
+            );
+
             if (!options.length){
               showNone();
               return;
             }
+
             renderAddonChips(options);
-            return;
+            return; // success
           } else {
             if (attempt < 2) continue;
             showNone('تعذر تحميل الخدمات الإضافية');
@@ -1075,6 +1071,7 @@
 
     // Map settings (defaults + dynamic from GAS)
     let map, marker, autocomplete, allowedPoly;
+    // Fallback: Riyadh rough bounds & polygon if GAS not available
     let SA_BOUNDS = { north: 25.0500, south: 24.3000, west: 46.2000, east: 47.1000 };
     let ALLOWED_POLY_PATH = [
       {lat:24.9550, lng:46.4630},
@@ -1118,12 +1115,8 @@
     $(function(){
       installResizeObservers();
 
-      // Warm image cache (decode) so background swaps are instant
-      Object.values(PAGE_BACKGROUNDS).forEach(src=>{
-        const i=new Image(); i.decoding='async'; i.src=src;
-        if(i.decode){ i.decode().catch(()=>{}); }
-        bgMemory.set(src,true);
-      });
+      // Warm image cache as a fallback to preload
+      Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.decoding='async'; i.src=src; });
 
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة لخدمة العناية الفاخرة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
@@ -1154,7 +1147,7 @@
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
-      // Additional Services
+      // Load Additional Services from GAS (by APP_ID)
       fetchAdditionalServicesAndRender();
 
       setLoadingServices(true);
@@ -1318,8 +1311,9 @@
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* Google Map + Places + Geometry */
+    /* Google Map + Places + Geometry with polygon limit (dynamic settings) */
     async function initMap(){
+      // Load Map Settings from GAS first (best-effort; falls back to defaults)
       await loadMapSettingsFromGAS();
 
       const def={lat:24.7136,lng:46.6753};
@@ -1328,6 +1322,7 @@
         restriction:{latLngBounds: SA_BOUNDS, strictBounds:false}
       });
 
+      // Draw allowed polygon zone
       if(Array.isArray(ALLOWED_POLY_PATH) && ALLOWED_POLY_PATH.length >= 3){
         allowedPoly = new google.maps.Polygon({
           map,
@@ -1340,6 +1335,7 @@
         });
       }
 
+      // Fit to polygon if exists, else to bounds
       let polyBounds = null;
       if(allowedPoly){
         polyBounds = new google.maps.LatLngBounds();
