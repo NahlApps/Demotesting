@@ -3,57 +3,28 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>حجوزات المواعيد</title>
+  <title>Happy Wash</title>
 
-  <!-- ===== Favicon (robust, cross-browser) ===== -->
-  <!-- Keep your /favicon.ico for hosts that auto-serve it -->
-  <link rel="icon" href="/favicon.ico?v=1" sizes="any">
-  <link rel="shortcut icon" href="/favicon.ico?v=1">
-  <!-- Add explicit PNG favicon so the browser tab always shows an icon even if /favicon.ico isn't reachable -->
-  <link rel="icon" type="image/png" sizes="32x32"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
-  <link rel="icon" type="image/png" sizes="16x16"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
-  <link rel="apple-touch-icon" sizes="180x180"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
-  <meta name="theme-color" content="#027A93"/>
+  <!-- ─────────────────────────── Security: CSP (starter, tune origins) ─────────────────────────── -->
+  <!-- Keep 'unsafe-inline' until you migrate inline <script>/<style> to nonce or external files -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    img-src 'self' data: https://*.supabase.co https://*.googleusercontent.com https://*.google.com;
+    script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://maps.googleapis.com 'unsafe-inline';
+    style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+    font-src 'self' https://fonts.gstatic.com;
+    connect-src 'self' https://nahl-platform.vercel.app;
+    frame-src https://*.google.com;
+  ">
 
-  <!-- ===== SEO: Canonical & Robots ===== -->
-  <link rel="canonical" href="https://nahl.app/booking"/>
-  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"/>
+  <!-- ─────────────────────────── Performance: connection hints ─────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://pdnmghkpepvsfaiqlafk.supabase.co" crossorigin>
 
-  <!-- ===== Primary Meta Description (AR) ===== -->
-  <meta name="description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
-
-  <!-- ===== Open Graph (Social) ===== -->
-  <meta property="og:title" content="حجوزات المواعيد — نحل | Nahl"/>
-  <meta property="og:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
-  <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://nahl.app/booking"/>
-  <meta property="og:site_name" content="Nahl"/>
-  <meta property="og:locale" content="ar_SA"/>
-  <meta property="og:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg"/>
-  <meta property="og:image:alt" content="حجز موعد غسيل سيارات متنقل من نحل"/>
-
-  <!-- ===== Twitter Card ===== -->
-  <meta name="twitter:card" content="summary_large_image"/>
-  <meta name="twitter:title" content="حجوزات المواعيد — نحل | Nahl"/>
-  <meta name="twitter:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
-  <meta name="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png"/>
-
-  <!-- ===== Resource Hints for Supabase CDN (backgrounds + icons) ===== -->
-<link rel="preconnect" href="https://pdnmghkpepvsfaiqlafk.supabase.co" crossorigin>
-<link rel="dns-prefetch" href="//pdnmghkpepvsfaiqlafk.supabase.co">
-
-<link rel="preload" as="image" crossorigin="anonymous" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg">
-<link rel="preload" as="image" crossorigin="anonymous" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG2.jpg">
-<link rel="preload" as="image" crossorigin="anonymous" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG3.jpg">
-<link rel="preload" as="image" crossorigin="anonymous" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG4.jpg">
-<link rel="preload" as="image" crossorigin="anonymous" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG5.jpg">
-<link rel="preload" as="image" crossorigin="anonymous" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG6.jpg">
-<link rel="preload" as="image" crossorigin="anonymous" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG7.jpg">
-
-  <!-- UI libs -->
+  <!-- UI libs (Version-pinned; add SRI in CI/CD) -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -64,7 +35,7 @@
 
   <style>
     :root{
-      --brand-700:#01657A; --brand-600:#027A93; --brand-200:#BFE6F0; --brand-050:#F0FAFC;
+      --brand-700:#82662C; --brand-600:#9D7D39; --brand-200:#E2D7C0; --brand-050:#EFECE7;
       --ink-900:#0B2630; --surface-000:#FFF; --border-300:#D4E0E6;
 
       --radius-md:14px; --radius-pill:999px;
@@ -78,32 +49,25 @@
       --header-h:76px;
       --footer-h:118px;
 
-      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
+      /* Use image-set for future responsive variants (same URLs for now) */
+      --page-bg: url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
 
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
-
-      /* === Split layered background to avoid 'fixed' paint bugs and ensure preload reuse === */
-      background-image:
+      background:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-        var(--page-bg);
-      background-position: center, center;
-      background-repeat: no-repeat, no-repeat;
-      background-size: auto, cover;
-      /* mobile-safe (no fixed). We'll re-enable fixed image on pointer=fine (desktop) below */
-      background-attachment: scroll, scroll;
-
+        var(--page-bg) center/cover no-repeat fixed;
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
       padding-top:var(--header-h);
       padding-bottom:var(--footer-h);
     }
 
-    /* Desktop parallax-like effect without breaking mobile Safari */
-    @media (pointer:fine){
-      body{ background-attachment: scroll, fixed; }
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition:none !important }
     }
 
     header{
@@ -260,62 +224,27 @@
       padding-right: 12px;
       text-align: left; direction: ltr;
     }
-
-    /* ===== Additional Services chips ===== */
-    .addon-wrap{margin-top:12px}
-    .addon-title{display:flex; align-items:center; gap:8px; font-weight:800; color:#224652; margin-bottom:6px}
-    .addon-chips{display:flex; flex-wrap:wrap; gap:8px}
-    .addon-chip{
-      display:inline-flex; align-items:center; gap:6px; padding:8px 12px;
-      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:999px;
-      box-shadow:var(--shadow-xs); cursor:pointer; user-select:none;
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
-    }
-    .addon-chip:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
-    .addon-chip[aria-pressed="true"]{
-      border-color:var(--brand-600);
-      outline:3px solid rgba(2,122,147,.18); outline-offset:1px;
-      font-weight:800;
-    }
-
-    /* ===== Service Description card ===== */
-    .service-desc{
-      margin-top:12px;
-      border:1px dashed var(--border-300);
-      border-radius:14px;
-      background:#fff;
-      color:#0B2630;
-      padding:14px;
-    }
-    .service-desc .title{
-      display:flex; align-items:center; gap:8px;
-      font-weight:800; color:#224652; margin-bottom:6px;
-    }
-    .service-desc .body{line-height:1.7}
-    .service-desc .skeleton{
-      height:12px; border-radius:999px; background:#e8eef1; margin:8px 0;
-      animation: shimmer 1.2s infinite;
-    }
-    @keyframes shimmer{
-      0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6}
-    }
   </style>
 </head>
 <body>
-  <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
+  <!-- A11y: role=status for toast announcements -->
+  <div id="toastWrap" role="status" aria-live="polite" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
 
   <header id="siteHeader">
     <div class="header-inner">
       <div class="brand">
         <img id="brandLogo"
              alt="Nahl Time"
-             src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/ChatGPT%20Image%20Sep%2013,%202025,%2001_21_33%20PM.png"
+             decoding="async" fetchpriority="high"
+             src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimePro/Happy_Day_Wash-pica-removebg-preview.png"
              onerror="handleLogoError(this)" />
       </div>
 
       <div class="header-right">
-        <div class="mini-progress" aria-hidden="true">
-          <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
+        <div class="mini-progress" aria-hidden="false">
+          <div class="bar" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="7" aria-valuenow="1">
+            <span id="miniBarFill" style="width:0%"></span>
+          </div>
           <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
         <div id="summaryChips" class="summary-chips" aria-live="polite"></div>
@@ -328,9 +257,9 @@
       <div class="stage">
         <!-- 1) Welcome -->
         <section id="page1" class="page active" aria-label="الترحيب">
-          <h1>✨ غسيل بدون طوابير</h1>
+          <h1>✨ Happy Wash  </h1>
 
-          <div id="pptDeck" class="ppt-deck">
+          <div id="pptDeck" class="ppt-deck" aria-live="off">
             <div class="ppt-slide is-active">
               <div class="slide-card">
                 <h3 class="mb-2">نجيك لين باب بيتك</h3>
@@ -386,18 +315,6 @@
               </div>
             </div>
 
-            <!-- Additional services (chips) -->
-            <div class="addon-wrap">
-              <div class="addon-title"><i class="fa-solid fa-plus"></i> خدمات إضافية (اختياري)</div>
-              <div id="addonChips" class="addon-chips" role="group" aria-label="خدمات إضافية"></div>
-            </div>
-
-            <!-- Service Description -->
-            <div id="serviceDesc" class="service-desc" style="display:none">
-              <div class="title"><i class="fa-regular fa-file-lines"></i> وصف الخدمة</div>
-              <div id="serviceDescBody" class="body"></div>
-            </div>
-
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
               <strong>جاري تحميل الخدمات…</strong>
@@ -412,7 +329,7 @@
             <div class="row g-3">
               <div class="col-12 col-md-5">
                 <label class="form-label" for="date">التاريخ</label>
-                <input id="date" type="date" class="form-control"/>
+                <input id="date" type="date" class="form-control" aria-describedby="err-date"/>
                 <div class="field-error" id="err-date">يرجى اختيار تاريخ صحيح</div>
               </div>
             </div>
@@ -432,7 +349,7 @@
 
             <div class="position-relative mt-3">
               <div id="time-container" class="time-grid" role="radiogroup" aria-label="اختيار الوقت"></div>
-              <div id="timeLoading" class="load-overlay">
+              <div id="timeLoading" class="load-overlay" aria-hidden="true">
                 <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
                 <strong>جاري جلب المواعيد…</strong>
               </div>
@@ -447,12 +364,13 @@
             <div class="row g-3">
               <div class="col-12 col-md-6">
                 <label for="name" class="form-label">الاسم</label>
-                <input id="name" type="text" class="form-control" placeholder="الاسم كما سيظهر في الفاتورة" autocomplete="name"/>
+                <input id="name" type="text" class="form-control" placeholder="الاسم كما سيظهر في الفاتورة" autocomplete="name" aria-describedby="err-name"/>
                 <div class="field-error" id="err-name">يرجى إدخال الاسم</div>
               </div>
               <div class="col-12 col-md-6">
                 <label for="mobile" class="form-label">رقم الجوال</label>
-                <input id="mobile" type="tel" class="form-control" placeholder="رقم التواصل الخاص — مثال 5XXXXXXXX" autocomplete="tel"/>
+                <input id="mobile" type="tel" class="form-control" placeholder="5XXXXXXXX" autocomplete="tel" aria-describedby="err-mobile"/>
+                <small class="text-muted d-block mt-1" style="opacity:.9">أدخل رقمك بدون الصفر الأول</small>
                 <div class="field-error" id="err-mobile">الرجاء إدخال رقم جوال صحيح</div>
               </div>
             </div>
@@ -471,7 +389,7 @@
               </div>
               <div class="col-12 col-md-4">
                 <label class="form-label" for="plateNumber">رقم اللوحة (اختياري)</label>
-                <input id="plateNumber" type="text" inputmode="numeric" class="form-control" placeholder="أرقام اللوحة — اختياري" autocomplete="off"/>
+                <input id="plateNumber" type="text" inputmode="numeric" class="form-control" placeholder="أرقام اللوحة — اختياري" autocomplete="off" aria-describedby="plateHelp"/>
                 <small id="plateHelp" class="text-muted d-block mt-1" style="opacity:.9">اختياري — يساعد فريقنا على التعرف على مركبتك بسرعة</small>
                 <div class="field-error" id="err-plate" style="display:none"></div>
               </div>
@@ -484,15 +402,15 @@
         <section id="page5" class="page" aria-label="طريقة الدفع">
           <h1>طريقة الدفع</h1>
           <div class="pay-grid" role="radiogroup" aria-label="طريقة الدفع" id="payGroup">
-            <label class="pay-card" tabindex="0" role="radio" aria-checked="false">
-              <input type="radio" name="payingMethod" value="stc pay" class="visually-hidden"/>
+            <label class="pay-card" tabindex="0" role="radio" aria-checked="false" aria-label="STC Pay">
+              <input type="radio" name="payingMethod" value="stc pay" class="visually-hidden" />
               <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay">
             </label>
-            <label class="pay-card" tabindex="-1" role="radio" aria-checked="false">
+            <label class="pay-card" tabindex="0" role="radio" aria-checked="false" aria-label="كاش">
               <input type="radio" name="payingMethod" value="cash" class="visually-hidden"/>
               <strong>كاش</strong>
             </label>
-            <label class="pay-card" style="grid-column:1/-1" tabindex="-1" role="radio" aria-checked="false">
+            <label class="pay-card" style="grid-column:1/-1" tabindex="0" role="radio" aria-checked="false" aria-label="مدى">
               <input type="radio" name="payingMethod" value="mada" class="visually-hidden"/>
               <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada">
             </label>
@@ -505,10 +423,10 @@
           <h1>الموقع على خريطة قوقل</h1>
           <div class="card">
             <div class="map-search">
-              <input id="mapSearch" class="form-control" type="text" placeholder="ابحث عن برج، حي، أو عنوان داخل السعودية"/>
-              <i class="fa-solid fa-magnifying-glass"></i>
+              <input id="mapSearch" class="form-control" type="text" placeholder="ابحث عن برج، حي، أو عنوان داخل السعودية" aria-label="ابحث عن عنوان"/>
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             </div>
-            <div id="googleMap"></div>
+            <div id="googleMap" aria-label="خريطة جوجل"></div>
           </div>
           <div class="card text-center">
             <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
@@ -534,6 +452,7 @@
               <a id="ts-whatsapp" class="btn btn-success" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> مشاركة عبر واتساب</a>
               <button id="rebook" class="btn btn-primary" type="button" style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px">🔁 حجز جديد</button>
             </div>
+            <small class="text-muted d-block mt-2">لن نشارك موقعك تلقائياً في الرسائل.</small>
           </div>
         </section>
       </div>
@@ -544,7 +463,7 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a></span>
-        <div class="footer-social">
+        <div class="footer-social" aria-label="قنوات التواصل">
           <a href="https://wa.me/966509027172" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
           <a href="https://www.instagram.com/nahl.app?igsh=ZmljaXNncGtudjJ2" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
           <a href="https://www.tiktok.com/@nahl.app?_t=ZS-8zgmzEQTSQW&_r=1" target="_blank" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
@@ -562,7 +481,7 @@
     </div>
   </footer>
 
-  <!-- libs -->
+  <!-- libs (add SRI in CI) -->
   <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
@@ -573,7 +492,7 @@
     /* ---------- Logo fallback ---------- */
     function handleLogoError(img){
       const fallbacks = [
-        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%20%20Soap/spong&Soap%20-%20logo.png",
+        "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%20Soap/spong&Soap%20-%20logo.png",
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png",
         "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/logo.png",
         "https://dummyimage.com/180x54/027A93/ffffff.png&text=Sponge+%26+Soap"
@@ -584,13 +503,10 @@
     }
 
     /* ---------- API ---------- */
-    const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';
+    const APP_ID='c28e0189-e37e-4884-9b57-2f20bd6480e5';
     const defaultLink2=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
     const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
-
-    // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -616,9 +532,10 @@
       }catch(err){ return {ok:false,status:0,error:String(err)} }
     }
     async function postReservation(payload){
-      let r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'text/plain;charset=UTF-8');
-      if(!r.ok && (r.status===415||r.status===406||r.status===0)) r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'application/json;charset=UTF-8');
-      if(!r.ok && r.status===404) r=await postReservationTry(RESERVE_URL_FALLBACK,payload,'text/plain;charset=UTF-8');
+      // Prefer JSON first (clear contract); fallback to text/plain for legacy endpoints.
+      let r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'application/json;charset=UTF-8');
+      if(!r.ok && (r.status===415||r.status===406||r.status===0)) r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'text/plain;charset=UTF-8');
+      if(!r.ok && r.status===404) r=await postReservationTry(RESERVE_URL_FALLBACK,payload,'application/json;charset=UTF-8');
       return r;
     }
 
@@ -635,16 +552,20 @@
 
     /* ---------- STATE ---------- */
     const DateTime=luxon.DateTime;
+    // RTL/i18n: Force Arabic locale and Riyadh timezone before any DateTime usage
+    luxon.Settings.defaultLocale='ar';
+    luxon.Settings.defaultZone='Asia/Riyadh';
+
     const orderedPages=["page1","page2","page3","page4","page5","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","تم"];
     const PAGE_BACKGROUNDS={
-      page1:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg",
-      page2:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG2.jpg",
-      page3:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG3.jpg",
-      page4:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG4.jpg",
-      page5:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG5.jpg",
-      page6:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG6.jpg",
-      page7:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG7.jpg"
+      page1:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg",
+      page2:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg",
+      page3:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG3.jpg",
+      page4:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG4.jpg",
+      page5:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg",
+      page6:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg",
+      page7:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"
     };
     const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6};
     let selectedTime=null, servicesCache=null, categoriesCache=null, itiPhone=null, positionUrl="";
@@ -653,11 +574,9 @@
 
     let currentTimeFilter='all';
 
-    const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', addons:[], locale:'ar'};
+    const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', locale:'ar'};
 
-    function setPageBackground(id){
-      document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`);
-    }
+    function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
 
     function showPage(idx){
       const cur=document.querySelector('.page.active');
@@ -686,6 +605,11 @@
       next.classList.toggle('hidden', onThanks);
       wait.classList.remove('show');
 
+      // Progressbar aria-valuenow
+      const bar=document.querySelector('.mini-progress .bar');
+      if(bar) bar.setAttribute('aria-valuenow', String(i+1));
+
+      // Make Next act as "Skip" on welcome
       next.textContent = (i===0) ? 'تخطي العرض' : 'التالي';
     }
 
@@ -712,7 +636,7 @@
       const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
     }
 
-    /* Summary chips */
+    /* Summary chips (hidden on welcome) */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
@@ -723,7 +647,7 @@
 
       const areaTxt=$('#area').find(':selected').text()||'';
       const srvTxt=$('#service').find(':selected').text()||'';
-      const dt=nForm.date ? DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '';
+      const dt=nForm.date ? DateTime.fromISO(nForm.date).setLocale('ar').toFormat('d LLL yyyy') : '';
       const tm=nForm.time||'';
       const pay=(nForm.paymentMethod||'');
       const locOk=!!positionUrl;
@@ -850,25 +774,38 @@
 
       const viewList = dayTimes
         .filter(x=>passesFilter(x.mins))
-        .sort((a,b)=> a.mins - b.mins);
+        .sort((a,b)=> a.mins - b.mins); /* always early → late */
 
       if(!viewList.length){
         timeContainer.innerHTML=`<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد ضمن الفلتر المحدد</div>`;
         return;
       }
 
-      viewList.forEach(t=>{
+      viewList.forEach((t, idx)=>{
         const btn=document.createElement('button');
-        btn.type='button'; btn.className='time-option'; btn.setAttribute('role','radio'); btn.setAttribute('aria-checked','false'); btn.setAttribute('dir','ltr'); btn.textContent=t.label;
-        btn.addEventListener('click',()=>{
+        btn.type='button'; btn.className='time-option';
+        btn.setAttribute('role','radio');
+        btn.setAttribute('aria-checked','false');
+        btn.setAttribute('dir','ltr');
+        btn.setAttribute('tabindex','0');
+        btn.setAttribute('aria-setsize', String(viewList.length));
+        btn.setAttribute('aria-posinset', String(idx+1));
+        btn.textContent=t.label;
+
+        const selectThis=()=>{
           [...timeContainer.children].forEach(el=>el.setAttribute('aria-checked','false'));
           btn.setAttribute('aria-checked','true');
           const parsed=DateTime.fromObject({hour:t.h,minute:t.m});
           nForm.date=selectedISO; nForm.time=parsed.toFormat('HH:mm');
           window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime;
           renderSummary('page3'); updateNextAvailability();
+          /* Auto-advance to Contact page after selecting a time */
           showPage(3);
-        });
+        };
+
+        btn.addEventListener('click', selectThis);
+        btn.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selectThis(); }});
+
         timeContainer.appendChild(btn);
       });
     }
@@ -901,217 +838,11 @@
       };
     }
 
-    /* ---------- GAS helpers (Additional Services, Service Description, Map Settings) ---------- */
-    function escapeHTML(s){
-      return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-    function showServiceDescSkeleton(){
-      const card = document.getElementById('serviceDesc');
-      const body = document.getElementById('serviceDescBody');
-      if(!card || !body) return;
-      card.style.display = 'block';
-      body.innerHTML = '<div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:70%"></div><div class="skeleton" style="width:82%"></div>';
-    }
-    function clearServiceDescriptionUI(){
-      const card = document.getElementById('serviceDesc');
-      const body = document.getElementById('serviceDescBody');
-      if(!card || !body) return;
-      body.innerHTML = '';
-      card.style.display = 'none';
-    }
-    async function fetchServiceDescription(serviceId, serviceName){
-      if(!GAS_BASE_URL || GAS_BASE_URL === 'YOUR_GAS_WEBAPP_URL'){ 
-        clearServiceDescriptionUI();
-        return; 
-      }
-      showServiceDescSkeleton();
-      try{
-        const params = new URLSearchParams();
-        params.set('route','serviceDescription');
-        params.set('appId', APP_ID);
-        if (serviceId) params.set('serviceId', serviceId);
-        if (serviceName) params.set('serviceName', serviceName);
-        const url = `${GAS_BASE_URL}?${params.toString()}`;
-
-        const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store', headers:{ 'Accept':'application/json' }});
-        const data = await res.json().catch(()=>null);
-        const card = document.getElementById('serviceDesc');
-        const body = document.getElementById('serviceDescBody');
-        if(!card || !body) return;
-
-        if(res.ok && data && data.success && data.data){
-          const desc = data.data.description || '—';
-          body.innerHTML = `<p style="margin:0; white-space:pre-wrap">${escapeHTML(desc)}</p>`;
-          card.style.display='block';
-          console.log('[ServiceDesc] Received from GAS', { serviceId, serviceName, length: (desc || '').length, sample: String(desc || '').slice(0, 40) });
-        } else {
-          body.innerHTML = '<span class="text-muted">لا يوجد وصف متاح لهذه الخدمة</span>';
-          card.style.display='block';
-          console.log('[ServiceDesc] Not found', { serviceId, serviceName, data });
-        }
-      }catch(_e){
-        const card = document.getElementById('serviceDesc');
-        const body = document.getElementById('serviceDescBody');
-        if(card && body){
-          body.innerHTML = '<span class="text-muted">تعذر تحميل وصف الخدمة حالياً</span>';
-          card.style.display='block';
-        }
-        console.warn('[ServiceDesc] Fetch error', _e);
-      }
-    }
-
-    // ==== FIXED: robust fetch of Additional Services — new AbortController for each retry ====
-    async function fetchAdditionalServicesAndRender(){
-      const wrap = document.getElementById('addonChips');
-      if(!wrap) return;
-
-      const showNone = (msg='لا توجد خدمات إضافية')=>{
-        wrap.innerHTML = `<span class="text-muted">${msg}</span>`;
-      };
-
-      const qs = new URLSearchParams({ route:'additionalServices', appId: APP_ID });
-      const url = `${GAS_BASE_URL}?${qs.toString()}`;
-
-      wrap.innerHTML = '<span class="text-muted">...تحميل الإضافات</span>';
-
-      // Try up to 3 attempts; create a fresh controller+timeout each time
-      for (let attempt = 0; attempt < 3; attempt++){
-        const controller = new AbortController();
-        const timer = setTimeout(()=>controller.abort(), 8000);
-        try{
-          const res = await fetch(url, {
-            method:'GET',
-            mode:'cors',
-            cache:'no-store',
-            headers:{ 'Accept':'application/json' },
-            signal: controller.signal
-          });
-
-          // attempt to parse JSON (may fail on non-JSON)
-          let data = null;
-          try { data = await res.json(); } catch(_){ data = null; }
-
-          if (res.ok && data && data.success && Array.isArray(data.data)){
-            const options = data.data
-              .map(x => String(x?.label ?? '').trim())
-              .filter(Boolean);
-
-            if (!options.length){
-              showNone();
-              clearTimeout(timer);
-              return;
-            }
-
-            renderAddonChips(options);
-            clearTimeout(timer);
-            return;
-          } else {
-            if (attempt < 2){
-              await new Promise(r=>setTimeout(r, 500));
-              clearTimeout(timer);
-              continue;
-            }
-            showNone('تعذر تحميل الخدمات الإضافية');
-            console.warn('[AdditionalServices] Unexpected payload', { status: res.status, data });
-            clearTimeout(timer);
-            return;
-          }
-        }catch(err){
-          if (attempt < 2){
-            await new Promise(r=>setTimeout(r, 500));
-            clearTimeout(timer);
-            continue;
-          }
-          showNone('تعذر تحميل الخدمات الإضافية');
-          console.warn('[AdditionalServices] Fetch error', err);
-          clearTimeout(timer);
-          return;
-        }
-      }
-    }
-
-    function renderAddonChips(options){
-      const wrap = document.getElementById('addonChips');
-      if(!wrap) return;
-      wrap.innerHTML = '';
-      if(!options || !options.length){
-        wrap.innerHTML = '<span class="text-muted">لا توجد إضافات متاحة</span>';
-        return;
-      }
-      options.forEach((label)=>{
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'addon-chip';
-        btn.setAttribute('aria-pressed', nForm.addons.includes(label) ? 'true' : 'false');
-        btn.setAttribute('data-value', label);
-        btn.innerHTML = `<i class="fa-solid fa-circle-plus"></i><span>${label}</span>`;
-        btn.addEventListener('click', ()=>{
-          const val = String(btn.getAttribute('data-value')||'').trim();
-          const selected = nForm.addons.includes(val);
-          if(selected){
-            nForm.addons = nForm.addons.filter(x=>x!==val);
-            btn.setAttribute('aria-pressed','false');
-          }else{
-            nForm.addons = [...nForm.addons, val];
-            btn.setAttribute('aria-pressed','true');
-          }
-          updateNextAvailability();
-        });
-        btn.addEventListener('keydown', e=>{
-          if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); }
-        });
-        wrap.appendChild(btn);
-      });
-    }
-
-    // Map settings (defaults + dynamic from GAS)
-    let map, marker, autocomplete, allowedPoly;
-    // Fallback: Riyadh rough bounds & polygon if GAS not available
-    let SA_BOUNDS = { north: 25.0500, south: 24.3000, west: 46.2000, east: 47.1000 };
-    let ALLOWED_POLY_PATH = [
-      {lat:24.9550, lng:46.4630},
-      {lat:25.0000, lng:46.6400},
-      {lat:24.9900, lng:46.8200},
-      {lat:24.9000, lng:46.9500},
-      {lat:24.7200, lng:46.9800},
-      {lat:24.5600, lng:46.8800},
-      {lat:24.4700, lng:46.7200},
-      {lat:24.4600, lng:46.5400},
-      {lat:24.5600, lng:46.4200},
-      {lat:24.7400, lng:46.3900}
-    ];
-
-    async function loadMapSettingsFromGAS(){
-      try{
-        const url = `${GAS_BASE_URL}?route=mapSettings&appId=${encodeURIComponent(APP_ID)}`;
-        const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store' });
-        const data = await res.json().catch(()=>null);
-        if(res.ok && data && data.success && data.data){
-          const bounds = data.data.SA_BOUNDS;
-          const poly   = data.data.ALLOWED_POLY_PATH;
-          if(bounds && Number.isFinite(bounds.north) && Number.isFinite(bounds.south) && Number.isFinite(bounds.west) && Number.isFinite(bounds.east)){
-            SA_BOUNDS = { north: Number(bounds.north), south: Number(bounds.south), west: Number(bounds.west), east: Number(bounds.east) };
-          }
-          if(Array.isArray(poly) && poly.length){
-            ALLOWED_POLY_PATH = poly
-              .map(p=>({lat:Number(p.lat), lng:Number(p.lng)}))
-              .filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
-          }
-          console.log('[MapSettings] Loaded from GAS', { SA_BOUNDS, points: ALLOWED_POLY_PATH.length });
-        }else{
-          console.warn('[MapSettings] Using fallback defaults');
-        }
-      }catch(e){
-        console.warn('[MapSettings] Fetch error, using fallback', e);
-      }
-    }
-
     /* ---------- Init ---------- */
     $(function(){
       installResizeObservers();
 
-      // Warm image cache as a fallback to preload
-      Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.decoding='async'; i.src=src; });
+      Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.src=src; });
 
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة لخدمة العناية الفاخرة', dir:'rtl'});
       $('#serviceCat').select2({width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
@@ -1119,31 +850,23 @@
       $('#carBrand').select2({width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
       $('#area, #serviceCat, #service, #carBrand').on('select2:open', ()=>{$('.select2-search__field').attr('dir','rtl');});
 
-      const mobileEl = document.getElementById('mobile');
-      if (mobileEl) {
-        itiPhone=window.intlTelInput(mobileEl,{
-          initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
-          separateDialCode:true, placeholderNumberType:'MOBILE',
-          utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
-        });
-        $('#mobile').attr({placeholder:'رقم التواصل الخاص — مثال 5XXXXXXXX', inputmode:'tel', autocomplete:'tel'})
-                    .on('blur', ()=> {
-                      const ok = itiPhone && itiPhone.isValidNumber();
-                      document.getElementById('err-mobile').style.display = ok ? 'none':'block';
-                    });
-      }
+      itiPhone=window.intlTelInput(document.querySelector('#mobile'),{
+        initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
+        separateDialCode:true, placeholderNumberType:'MOBILE',
+        utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
+      });
+      $('#mobile').attr({placeholder:'رقم التواصل الخاص — مثال 5XXXXXXXX', inputmode:'tel', autocomplete:'tel'})
+                  .on('blur', ()=> {
+                    const ok = itiPhone && itiPhone.isValidNumber();
+                    document.getElementById('err-mobile').style.display = ok ? 'none':'block';
+                  });
 
-      $('#name').on('input', function(){ nForm.customerN=this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
-      $('#mobile').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
-      $('#carName').on('input', function(){ updateNextAvailability(); });
-      $('#serviceCount').on('change', function(){ nForm.serviceCount=this.value||'1'; renderSummary('page2'); updateNextAvailability(); });
-      $('#plateNumber').on('input', function(){ updatePlateHint(); renderSummary('page4'); updateNextAvailability(); });
+      $('#name').attr('placeholder','الاسم كما سيظهر في الفاتورة');
+      $('#carName').attr('placeholder','الموديل/الفئة — مثال: S-Class، LX 570');
+      $('#plateNumber').attr('placeholder','أرقام اللوحة — اختياري');
 
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
-
-      // Load Additional Services from GAS (by APP_ID)
-      fetchAdditionalServicesAndRender();
 
       setLoadingServices(true);
       callContent2(`/locations`, res=>{
@@ -1155,7 +878,6 @@
 
       $('#area').on('change', function(){
         nForm.location=this.value; setLoadingServices(true);
-        clearServiceDescriptionUI();
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
           servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
@@ -1167,49 +889,39 @@
 
       $('#serviceCat').on('change', function(){
         nForm.serviceCat=this.value; const cid=Number(this.value);
-        clearServiceDescriptionUI();
         const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
         $('#service').empty().select2({data:items,width:'100%',placeholder:'باقتك المختارة', dir:'rtl'});
         if(items.length) $('#service').val(items[0].id).trigger('change');
         renderSummary('page2'); updateNextAvailability();
       });
 
-      $('#service').on('change', function(){
-        nForm.service=this.value||'';
-        renderSummary('page2'); updateNextAvailability();
-        const selectedText = $('#service').find(':selected').text() || '';
-        if (this.value || selectedText) fetchServiceDescription(this.value, selectedText);
-        else clearServiceDescriptionUI();
-      });
+      $('#service').on('change', function(){ nForm.service=this.value||''; renderSummary('page2'); updateNextAvailability(); });
 
       const luxuryFirstBrands = [
-        // Ultra-luxury & exotics
-        'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati','Bugatti',
-        // Luxury / premium
-        'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti','Volvo',
-        // Popular in GCC (mainstream & premium)
-        'Toyota','Nissan','Hyundai','Kia','Honda','Mitsubishi','Mazda','GMC','Chevrolet','Ford','Jeep','Dodge','RAM',
-        'Volkswagen','Peugeot','Renault','Skoda','Subaru','Suzuki','Isuzu','Mini','Opel','Citroën',
-        // Chinese brands (active/visible in GCC)
-        'MG','Geely','Haval','GWM (Great Wall)','TANK','ORA','BYD','Changan','Oshan','GAC','JAC','Chery','Exeed','Omoda','Jetour',
-        'Hongqi','BAIC','DFSK (Glory)','Foton','Maxus','Roewe','Lynk & Co','Zeekr','Neta (Hozon)','Seres',
-        // EV startups (availability varies by country)
-        'NIO','XPeng','Leapmotor',
-        // Fallback
-        'Other'
+        'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati',
+        'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti',
+        'GMC','Toyota','Nissan','Hyundai','Kia','Honda','Chevrolet','Ford','Mazda','Mitsubishi','Other'
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
+
+      $('#name').on('input', function(){ nForm.customerN=this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
+      $('#mobile').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
+      $('#carName').on('input', function(){ updateNextAvailability(); });
+      $('#serviceCount').on('change', function(){ nForm.serviceCount=this.value||'1'; renderSummary('page2'); updateNextAvailability(); });
+
+      $('#plateNumber').on('input', function(){ updatePlateHint(); renderSummary('page4'); updateNextAvailability(); });
 
       $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
       $('#timeFilter').on('change', function(){ currentTimeFilter=this.value; renderSelectedDateTimes(lastSelectedISO); });
 
+      /* Footer nav */
       const $prev=document.getElementById('footer-prev');
       const $next=document.getElementById('footer-next');
       const $wait=document.getElementById('footer-wait');
 
       async function gotoNext(){
         const i=getActiveIndex(); const id=orderedPages[i];
-        if(id==='page1'){ stopWelcomeDeck(); showPage(1); return; }
+        if(id==='page1'){ stopWelcomeDeck(); showPage(1); return; } // acts as Skip
 
         if(id==='page2'){
           const areaOk=!!$('#area').val(), catOk=!!$('#serviceCat').val(), svcOk=!!$('#service').val();
@@ -1228,15 +940,7 @@
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
           nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
-          const parts = [
-            $('#carBrand').val()||'',
-            $('#carName').val()||'',
-            $('#plateNumber').val()||''
-          ].filter(Boolean);
-          if(nForm.addons && nForm.addons.length){
-            parts.push('إضافي: ' + nForm.addons.join('، '));
-          }
-          nForm.locationDescription = parts.join(', ');
+          nForm.locationDescription=[$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
           showPage(4); return;
         }
 
@@ -1261,9 +965,9 @@
             showToast('success','تم إنشاء الحجز');
             document.getElementById('ts-area').textContent = $('#area').find(':selected').text()||'—';
             document.getElementById('ts-service').textContent = $('#service').find(':selected').text()||'—';
-            document.getElementById('ts-dt').textContent = (nForm.date?DateTime.fromISO(nForm.date).toFormat('d LLL yyyy'):'') + (nForm.time?(' • '+nForm.time):'');
+            document.getElementById('ts-dt').textContent = (nForm.date?DateTime.fromISO(nForm.date).setLocale('ar').toFormat('d LLL yyyy'):'') + (nForm.time?(' • '+nForm.time):'');
             document.getElementById('ts-pay').textContent = (nForm.paymentMethod||'').toUpperCase()||'—';
-            const waMsg = encodeURIComponent(`تم إرسال طلب حجز: \nالخدمة: ${$('#service').find(':selected').text()}\nالتاريخ: ${nForm.date} ${nForm.time}\nالرابط: ${location.href}`);
+            const waMsg = encodeURIComponent(`تم إرسال طلب حجز:\nالخدمة: ${$('#service').find(':selected').text()}\nالتاريخ: ${nForm.date} ${nForm.time}\nالرابط: ${location.href}`);
             document.getElementById('ts-whatsapp').href = `https://wa.me/?text=${waMsg}`;
 
             showPage(6);
@@ -1283,12 +987,13 @@
       document.getElementById('footer-next').addEventListener('click', gotoNext);
       document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
+      /* Payment cards — keyboard & click; auto-advance to Map after choosing */
       const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
       payCards.forEach((card)=>{
         const input=card.querySelector('input');
         const choose=()=>{ 
-          payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; });
-          card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; 
+          payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','0'); c.querySelector('input').checked=false; });
+          card.setAttribute('aria-checked','true'); input.checked=true; 
           nForm.paymentMethod=input.value; renderSummary('page5'); updateNextAvailability();
           showPage(5);
         };
@@ -1299,7 +1004,6 @@
       $('#rebook').on('click', ()=>location.href='/');
 
       setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
-      updateNextAvailability();
     });
 
     function updateNextAvailability(){
@@ -1313,49 +1017,19 @@
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* Google Map + Places + Geometry with polygon limit (dynamic settings) */
-    async function initMap(){
-      // Load Map Settings from GAS first (best-effort; falls back to defaults)
-      await loadMapSettingsFromGAS();
-
+    /* Google Map + Places (Saudi focus) */
+    let map, marker, autocomplete;
+    const SA_BOUNDS = { north: 32.154, south: 16.370, west: 34.495, east: 55.666 };
+    function initMap(){
       const def={lat:24.7136,lng:46.6753};
       map=new google.maps.Map(document.getElementById('googleMap'),{
         center:def, zoom:12, disableDoubleClickZoom:true, mapTypeControl:false, fullscreenControl:true,
         restriction:{latLngBounds: SA_BOUNDS, strictBounds:false}
       });
-
-      // Draw allowed polygon zone
-      if(Array.isArray(ALLOWED_POLY_PATH) && ALLOWED_POLY_PATH.length >= 3){
-        allowedPoly = new google.maps.Polygon({
-          map,
-          paths: ALLOWED_POLY_PATH,
-          strokeColor: '#027A93',
-          strokeOpacity: 0.9,
-          strokeWeight: 1.5,
-          fillColor: '#027A93',
-          fillOpacity: 0.05
-        });
-      }
-
-      // Fit to polygon if exists, else to bounds
-      let polyBounds = null;
-      if(allowedPoly){
-        polyBounds = new google.maps.LatLngBounds();
-        ALLOWED_POLY_PATH.forEach(p => polyBounds.extend(p));
-        map.fitBounds(polyBounds);
-        map.setOptions({ restriction: { latLngBounds: polyBounds, strictBounds: false } });
-      }else{
-        map.fitBounds(SA_BOUNDS);
-      }
-
       marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع'});
 
       const setPos=(latLng,pan=false)=>{
         if(!latLng) return;
-        if (allowedPoly && !google.maps.geometry.poly.containsLocation(latLng, allowedPoly)) {
-          showToast('error','خارج النطاق المسموح للخدمة');
-          return;
-        }
         marker.setPosition(latLng);
         if(pan){ map.panTo(latLng); }
         map.setZoom(17);
@@ -1367,20 +1041,15 @@
 
       marker.addListener('dragend',({latLng})=>setPos(latLng));
       map.addEventListener?.('click',({latLng})=>setPos(latLng,true));
-      map.addListener && map.addListener('click', ({latLng})=>setPos(latLng,true));
+      google.maps.event.addListener(map,'click',({latLng})=>setPos(latLng,true)); // for older Maps
 
       const input=document.getElementById('mapSearch');
-      const opts={ fields:['geometry','name'], componentRestrictions:{country:'sa'}, strictBounds:true };
+      const opts={ fields:['geometry','name'], componentRestrictions:{country:'sa'}, strictBounds:false };
       autocomplete=new google.maps.places.Autocomplete(input, opts);
       autocomplete.bindTo('bounds', map);
-      if(polyBounds){ autocomplete.setBounds(polyBounds); }
       autocomplete.addListener('place_changed', ()=>{
         const place=autocomplete.getPlace(); if(!place?.geometry) return;
         const loc=place.geometry.location;
-        if (allowedPoly && !google.maps.geometry.poly.containsLocation(loc, allowedPoly)) {
-          showToast('error','الموقع المحدد خارج نطاق الخدمة');
-          return;
-        }
         map.panTo(loc); map.setZoom(16); setPos(loc,true);
       });
 
@@ -1388,15 +1057,8 @@
       btn?.addEventListener('click',()=>{
         if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
         navigator.geolocation.getCurrentPosition(
-          pos=>{
-            const here = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
-            if (allowedPoly && !google.maps.geometry.poly.containsLocation(here, allowedPoly)) {
-              showToast('error','موقعك الحالي خارج نطاق الخدمة');
-              return;
-            }
-            setPos(here,true);
-          },
-          _err=>{ showToast('error','تعذر تحديد موقعك'); },
+          pos=>setPos(new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude),true),
+          err=>{ showToast('error','تعذر تحديد موقعك'); },
           { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
         );
       });
@@ -1404,7 +1066,7 @@
     window.initMap=initMap;
   </script>
 
-  <!-- Google Maps (with Places + Geometry) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places,geometry&language=ar&region=SA" async defer></script>
+  <!-- Google Maps (with Places) — ensure key is referrer/API restricted in Google Cloud -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places&language=ar&region=SA" async defer></script>
 </body>
 </html>
