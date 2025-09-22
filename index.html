@@ -78,18 +78,22 @@
       --header-h:76px;
       --footer-h:118px;
 
-      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg");
+      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
 
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
 
-      /* === New shorthand background method === */
-      /* Mobile-safe default: no fixed attachment */
-      background:
+      /* === Split layered background to avoid 'fixed' paint bugs and ensure preload reuse === */
+      background-image:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-        var(--page-bg) center/cover no-repeat scroll;
+        var(--page-bg);
+      background-position: center, center;
+      background-repeat: no-repeat, no-repeat;
+      background-size: auto, cover;
+      /* mobile-safe (no fixed). We'll re-enable fixed image on pointer=fine (desktop) below */
+      background-attachment: scroll, scroll;
 
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
@@ -99,11 +103,7 @@
 
     /* Desktop parallax-like effect without breaking mobile Safari */
     @media (pointer:fine){
-      body{
-        background:
-          linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-          var(--page-bg) center/cover no-repeat fixed;
-      }
+      body{ background-attachment: scroll, fixed; }
     }
 
     header{
@@ -1228,7 +1228,6 @@
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
           nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
-
           const parts = [
             $('#carBrand').val()||'',
             $('#carName').val()||'',
@@ -1238,7 +1237,6 @@
             parts.push('إضافي: ' + nForm.addons.join('، '));
           }
           nForm.locationDescription = parts.join(', ');
-
           showPage(4); return;
         }
 
