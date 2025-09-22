@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" sizes="180x180"
         href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
   <meta name="theme-color" content="#027A93"/>
- 
+
   <link rel="preload" as="image" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg">
 
   <!-- ===== SEO: Canonical & Robots ===== -->
@@ -101,7 +101,10 @@
     #app{width:100%; max-width:1120px}
     .stage{position:relative; min-height:560px; padding:8px 0 20px}
     .page{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
-      padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none; }
+      padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;
+      /* Progressive rendering for perf */
+      content-visibility:auto; contain-intrinsic-size: 800px;
+    }
     .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
     .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
     @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
@@ -117,7 +120,14 @@
     }
     .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .form-label{display:inline-block; margin-bottom:6px; font-size:.9rem; font-weight:800; color:#224652}
-    .field-error{color:#dc2626; font-size:.85rem; margin-top:6px; display:none}
+
+    /* Field errors: hidden by default, shown with [data-show="true"] */
+    .field-error{display:none; color:#dc2626; font-size:.85rem; margin-top:6px;}
+    .field-error[data-show="true"]{display:block;}
+
+    /* ===== Chips ===== */
+    .chip{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:#f3f7f9; font-size:.8rem; color:#0B2630; border:1px solid var(--border-300); cursor:pointer; }
+    .chip.current{ outline:2px dashed var(--brand-600); outline-offset:2px; }
 
     /* ===== Cart (Tabs + Cards) ===== */
     .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;border:0!important}
@@ -158,7 +168,6 @@
     }
     .s-badge.popular{ background:var(--brand-050); border-color:var(--brand-600); }
     .srv-meta{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
-    .chip{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:#f3f7f9; font-size:.8rem; color:#0B2630; border:1px solid var(--border-300); }
     .chip.price{ font-weight:800; }
     .srv-actions{ margin-top:auto; display:flex; gap:8px; padding:12px; border-top:1px solid var(--border-300); }
     .btn-add, .btn-remove{
@@ -181,10 +190,85 @@
     .cart-cta{ min-height:48px; font-weight:800; border-radius:12px }
     .cart-breakdown{ margin-top:10px; font-size:.95rem; color:#224652 }
     .cart-breakdown .row{ --bs-gutter-x: 0.6rem; }
+
+    /* ===== Addons ===== */
+    .addon-title{ font-weight:800; color:#224652; margin-top:16px; margin-bottom:8px; }
+    .addon-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .addon-chip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border-300); background:#fff; border-radius:999px; padding:8px 12px; min-height:40px; cursor:pointer; }
+    .addon-chip[aria-pressed="true"]{ background:var(--brand-050); outline:2px solid var(--brand-600); outline-offset:2px; }
+
+    /* ===== Service description ===== */
+    .service-desc{ margin-top:12px; border:1px solid var(--border-300); border-radius:14px; background:#fff; color:#0B2630; padding:16px; }
+    .service-desc .title{ font-weight:800; color:#224652; margin-bottom:6px; }
+    .skeleton{ height:12px; background:linear-gradient(90deg,#eef5f8,#fff,#eef5f8); background-size:180% 100%; border-radius:8px; animation:s 1.2s var(--ease) infinite; }
+    @keyframes s{ 0%{background-position:0% 0} 100%{background-position:-180% 0} }
+
+    /* ===== Time grid ===== */
+    .time-grid {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px;
+    }
+    .time-option {
+      border:1px solid var(--border-300); background:#fff; color:#0B2630; border-radius:12px;
+      min-height:44px; padding:10px 12px; font-weight:800; cursor:pointer;
+      transition:box-shadow var(--dur-xs) var(--ease), transform var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+    }
+    .time-option[aria-checked="true"] { outline:3px solid var(--brand-600); outline-offset:2px; background:var(--brand-050); }
+    .time-option:focus-visible { box-shadow:0 0 0 4px rgba(2,122,147,.18); }
+
+    /* ===== Loading overlays ===== */
+    .load-overlay {
+      position:absolute; inset:0; display:none; align-items:center; justify-content:center; gap:10px;
+      background:rgba(255,255,255,.65); backdrop-filter:blur(3px); border-radius:14px; color:#0B2630;
+    }
+    .load-overlay.show { display:flex; }
+
+    /* ===== Pay grid / cards ===== */
+    .pay-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; }
+    .pay-card {
+      display:flex; align-items:center; justify-content:center; gap:10px; cursor:pointer;
+      border:1px solid var(--border-300); background:#fff; color:#0B2630; border-radius:14px; min-height:64px; padding:8px 12px;
+      transition:box-shadow var(--dur-xs) var(--ease), transform var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+    }
+    .pay-card img { max-height:28px; width:auto; object-fit:contain; }
+    .pay-card[aria-checked="true"] { outline:3px solid var(--brand-600); outline-offset:2px; background:var(--brand-050); }
+
+    /* ===== Map ===== */
+    #googleMap { width:100%; min-height:360px; border-radius:14px; border:1px solid var(--border-300); box-shadow:var(--shadow-xs); }
+    .map-search { position:relative; }
+    .map-search i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#405a66; }
+
+    /* ===== Footer buttons ===== */
+    .sticky-nav{ position:fixed; bottom:0; left:0; right:0; background:rgba(11,38,48,.36); backdrop-filter:blur(8px); border-top:1px solid rgba(255,255,255,.15); }
+    .footer-inner{ max-width:1120px; margin:0 auto; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:12px; color:#fff; }
+    .footer-brand a{ color:#fff; text-decoration:underline; }
+    .footer-actions{ display:flex; align-items:center; gap:10px; }
+    .btn-footer {
+      min-height:48px; border-radius:12px; padding:10px 16px; font-weight:800;
+      background:#fff; color:var(--brand-600); border:1px solid var(--border-300); box-shadow:var(--shadow-xs);
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
+    }
+    .btn-footer.primary { background:var(--brand-600); color:#fff; border-color:var(--brand-600); }
+    .btn-footer.disabled, .btn-footer:disabled { opacity:.6; pointer-events:none; }
+    .hidden{ display:none!important; }
+
+    #footer-wait{ display:none; align-items:center; gap:8px; }
+    #footer-wait.show{ display:flex; }
+
+    /* ===== Welcome deck dots ====== */
+    .ppt-deck .slide-card{ background:rgba(255,255,255,.9); color:#0B2630; border-radius:14px; padding:18px; box-shadow:var(--shadow-md); }
+    .ppt-dots { display:flex; gap:6px; justify-content:center; margin-top:8px; }
+    .ppt-dot { width:8px; height:8px; border-radius:999px; background:rgba(255,255,255,.5); }
+    .ppt-dot.active { background:#fff; }
+
+    /* ===== Reduced motion ===== */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+    }
   </style>
 </head>
 <body>
-  <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
+  <!-- Toasts: accessible announcements -->
+  <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px" aria-live="assertive" aria-atomic="true"></div>
 
   <header id="siteHeader">
     <div class="header-inner">
@@ -192,7 +276,7 @@
         <img id="brandLogo"
              alt="Nahl Time"
              src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png"
-             onerror="handleLogoError(this)" />
+             onerror="handleLogoError(this)" decoding="async" />
       </div>
 
       <div class="header-right">
@@ -246,23 +330,23 @@
           <div class="card position-relative" id="servicesCard">
             <!-- Legacy selects kept for compatibility -->
             <div id="legacySelects">
-              <label class="form-label">اختيار المنطقة</label>
+              <label class="form-label" for="area">اختيار المنطقة</label>
               <select id="area" style="width:100%"></select>
-              <div class="field-error" id="err-area">يرجى اختيار المنطقة</div>
+              <div class="field-error" id="err-area" role="alert">يرجى اختيار المنطقة</div>
 
               <div class="row g-3 mt-3">
                 <div class="col-12 col-md-6">
-                  <label class="form-label">التصنيف</label>
+                  <label class="form-label" for="serviceCat">التصنيف</label>
                   <select id="serviceCat" style="width:100%"></select>
-                  <div class="field-error" id="err-serviceCat">يرجى اختيار التصنيف</div>
+                  <div class="field-error" id="err-serviceCat" role="alert">يرجى اختيار التصنيف</div>
                 </div>
                 <div class="col-12 col-md-6">
-                  <label class="form-label">الخدمة</label>
+                  <label class="form-label" for="service">الخدمة</label>
                   <select id="service" style="width:100%"></select>
-                  <div class="field-error" id="err-service">يرجى اختيار الخدمة</div>
+                  <div class="field-error" id="err-service" role="alert">يرجى اختيار الخدمة</div>
                 </div>
                 <div class="col-12">
-                  <label class="form-label">عدد السيارات</label>
+                  <label class="form-label" for="serviceCount">عدد السيارات</label>
                   <select id="serviceCount" class="form-select">
                     <option value="1" selected>1</option><option value="2">2</option>
                     <option value="3">3</option><option value="4">4</option><option value="5">5</option>
@@ -308,8 +392,8 @@
             <div class="row g-3">
               <div class="col-12 col-md-5">
                 <label class="form-label" for="date">التاريخ</label>
-                <input id="date" type="date" class="form-control"/>
-                <div class="field-error" id="err-date">يرجى اختيار تاريخ صحيح</div>
+                <input id="date" type="date" class="form-control" aria-describedby="err-date"/>
+                <div class="field-error" id="err-date" role="alert">يرجى اختيار تاريخ صحيح</div>
               </div>
             </div>
 
@@ -343,13 +427,13 @@
             <div class="row g-3">
               <div class="col-12 col-md-6">
                 <label for="name" class="form-label">الاسم</label>
-                <input id="name" type="text" class="form-control" placeholder="الاسم كما سيظهر في الفاتورة" autocomplete="name"/>
-                <div class="field-error" id="err-name">يرجى إدخال الاسم</div>
+                <input id="name" type="text" class="form-control" placeholder="الاسم كما سيظهر في الفاتورة" autocomplete="name" aria-describedby="err-name"/>
+                <div class="field-error" id="err-name" role="alert">يرجى إدخال الاسم</div>
               </div>
               <div class="col-12 col-md-6">
                 <label for="mobile" class="form-label">رقم الجوال</label>
-                <input id="mobile" type="tel" class="form-control" placeholder="رقم التواصل الخاص — مثال 5XXXXXXXX" autocomplete="tel"/>
-                <div class="field-error" id="err-mobile">الرجاء إدخال رقم جوال صحيح</div>
+                <input id="mobile" type="tel" class="form-control" placeholder="رقم التواصل الخاص — مثال 5XXXXXXXX" autocomplete="tel" aria-describedby="err-mobile"/>
+                <div class="field-error" id="err-mobile" role="alert">يفضل إدخال رقم صحيح لتأكيد الحجز عبر واتساب</div>
               </div>
             </div>
           </div>
@@ -382,7 +466,7 @@
           <div class="pay-grid" role="radiogroup" aria-label="طريقة الدفع" id="payGroup">
             <label class="pay-card" tabindex="0" role="radio" aria-checked="false">
               <input type="radio" name="payingMethod" value="stc pay" class="visually-hidden"/>
-              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay">
+              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay" loading="lazy" decoding="async">
             </label>
             <label class="pay-card" tabindex="-1" role="radio" aria-checked="false">
               <input type="radio" name="payingMethod" value="cash" class="visually-hidden"/>
@@ -390,10 +474,11 @@
             </label>
             <label class="pay-card" style="grid-column:1/-1" tabindex="-1" role="radio" aria-checked="false">
               <input type="radio" name="payingMethod" value="mada" class="visually-hidden"/>
-              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada">
+              <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada" loading="lazy" decoding="async">
             </label>
           </div>
-          <div class="field-error" id="err-pay" style="text-align:center">يرجى اختيار طريقة الدفع</div>
+          <div class="field-error" id="err-pay" style="text-align:center" role="alert">يرجى اختيار طريقة الدفع</div>
+          <small class="d-block text-center text-muted mt-2">مدفوعات آمنة — لا رسوم خفية</small>
         </section>
 
         <!-- 6) Map -->
@@ -402,15 +487,15 @@
           <div class="card">
             <div class="map-search">
               <input id="mapSearch" class="form-control" type="text" placeholder="ابحث عن برج، حي، أو عنوان داخل السعودية"/>
-              <i class="fa-solid fa-magnifying-glass"></i>
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             </div>
-            <div id="googleMap"></div>
+            <div id="googleMap" aria-describedby="err-map"></div>
           </div>
           <div class="card text-center">
             <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
           </div>
           <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
-          <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
+          <div class="field-error" id="err-map" style="text-align:center" role="alert">الرجاء تحديد الموقع على الخريطة</div>
         </section>
 
         <!-- 7) Done -->
@@ -428,7 +513,7 @@
 
             <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
               <a id="ts-whatsapp" class="btn btn-success" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> مشاركة عبر واتساب</a>
-              <button id="rebook" class="btn btn-primary" type="button" style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px">🔁 حجز جديد</button>
+              <button id="rebook" class="btn btn-primary" type="button" style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px">🔁 احجز نفس الخدمة</button>
             </div>
           </div>
         </section>
@@ -448,7 +533,7 @@
       </div>
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
-        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>تخطي العرض</button>
+        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>ابدأ الآن</button>
 
         <div id="footer-wait" class="">
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -468,6 +553,9 @@
   <script>
     /* ---------- Feature flag for Cart UI ---------- */
     const USE_TABS_AND_CARDS = true;
+
+    /* ---------- Soft phone validation (respect trial flows) ---------- */
+    const SOFT_PHONE_VALIDATION = true;
 
     /* ---------- Logo fallback ---------- */
     function handleLogoError(img){
@@ -489,7 +577,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwOqhrYMXBBevYLr2zzzkhcxfNtjQupxSQyk2RCBSrBA6Bx6zcPoiMLvE096A3fHo5o/exec';
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwl9d8YRt5HUoSdku54d6CeXQ28LgDXycGA31Qe9hLrPgQfFC0LhhJc4L5YTu_6v3r76Q/exec';
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -528,6 +616,7 @@
       div.style.minWidth='260px'; div.style.color='#fff'; div.style.padding='10px 14px';
       div.style.borderRadius='10px'; div.style.boxShadow='0 10px 28px rgba(11,38,48,.14)';
       div.style.background = type==='error' ? '#dc2626' : type==='success' ? '#16a34a' : '#0284c7';
+      div.setAttribute('role','status');
       div.textContent=msg; wrap.appendChild(div);
       setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2400);
     }
@@ -536,6 +625,7 @@
     const DateTime=luxon.DateTime;
     const orderedPages=["page1","page2","page3","page4","page5","page6","page7"];
     const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","تم"];
+    const NEXT_LABELS = { page1:'ابدأ الآن', page2:'عرض المواعيد', page3:'معلومات العميل', page4:'اختيار الدفع', page5:'تحديد الموقع', page6:'تأكيد الحجز' };
     const PAGE_BACKGROUNDS={
       page1:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg",
       page2:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg",
@@ -552,7 +642,6 @@
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', addons:[], locale:'ar'};
 
-    /* ====== Cart/Tabs/Cards state ====== */
     let activeCatId=null;
     let selectedServiceId=null;
     let syncingFromCards=false;
@@ -583,25 +672,27 @@
       prev.classList.toggle('hidden', i===0 || onThanks);
       next.classList.toggle('hidden', onThanks);
       wait.classList.remove('show');
-      next.textContent = (i===0) ? 'تخطي العرض' : 'التالي';
+      // Action-oriented CTA
+      const id=orderedPages[i];
+      if(!onThanks) next.textContent = NEXT_LABELS[id] || 'التالي';
     }
 
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* Plate logic (unchanged) */
+    /* Plate logic */
     function isSpecialPlate(num){
       if(!/^\d+$/.test(num) || num.length < 3) return false;
-      const same = /^(\d)\1+$/.test(num);
-      const asc  = ('01234567890123456789').includes(num);
-      const desc = ('98765432109876543210').includes(num);
-      const pal  = num === num.split('').reverse().join('');
-      const pairRepeat = (num.length%2===0) && /^(\d{2})\1+$/.test(num);
-      return same || asc || desc || pal || pairRepeat;
+      const same=/^(\d)\1+$/.test(num);
+      const asc=('01234567890123456789').includes(num);
+      const desc=('98765432109876543210').includes(num);
+      const pal=num===num.split('').reverse().join('');
+      const pairRepeat=(num.length%2===0)&&/^(\d{2})\1+$/.test(num);
+      return same||asc||desc||pal||pairRepeat;
     }
     function updatePlateHint(){
-      const raw = ($('#plateNumber').val()||'');
-      const v   = raw.replace(/\D/g,'');
+      const raw=($('#plateNumber').val()||'');
+      const v=raw.replace(/\D/g,'');
       $('#plateNumber').val(v);
       const txt = v ? (isSpecialPlate(v) ? 'رقم مميز 👌 — ممتاز للتوثيق السريع.' : 'اختياري — يساعد فريقنا على التعرف على مركبتك.')
                     : 'اختياري — يساعد فريقنا على التعرف على مركبتك';
@@ -609,7 +700,7 @@
       const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
     }
 
-    /* Summary chips (minor typo fix: الموعد) */
+    /* Summary chips (interactive) */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
@@ -626,23 +717,24 @@
       const locOk=!!positionUrl;
 
       const chips=[
-        {i:'fa-location-dot',t:'المنطقة',v:areaTxt,g:1},
-        {i:'fa-screwdriver-wrench',t:'الخدمة',v:srvTxt,g:1},
-        {i:'fa-clock',t:'الموعد',v:(dt&&tm)?`${dt} • ${tm}`:'',g:2},
-        {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4},
-        {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
+        {i:'fa-location-dot',t:'المنطقة',v:areaTxt,g:1, target:'page2'},
+        {i:'fa-screwdriver-wrench',t:'الخدمة',v:srvTxt,g:1, target:'page2'},
+        {i:'fa-clock',t:'الموعد',v:(dt&&tm)?`${dt} • ${tm}`:'',g:2, target:'page3'},
+        {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4, target:'page5'},
+        {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5, target:'page6'},
       ];
 
       wrap.innerHTML='';
       chips.filter(c=>c.v && c.g<=currGroup).forEach(c=>{
         const el=document.createElement('div');
         el.className='chip'+(c.g===currGroup?' current':'');
+        el.setAttribute('data-target', c.target || '');
         el.innerHTML=`<i class="fa-solid ${c.i}"></i><span class="title">${c.t}:</span><span class="value">${c.v}</span>`;
         wrap.appendChild(el);
       });
     }
 
-    /* Welcome slideshow (unchanged) */
+    /* Welcome slideshow */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -662,7 +754,7 @@
     }
     function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
-    /* Time helpers (unchanged) */
+    /* Time helpers */
     function parseTimeToLuxon(raw){
       let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true});
       if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
@@ -751,7 +843,10 @@
         return;
       }
 
-      viewList.forEach(t=>{
+      const preselect = !selectedTime || !viewList.some(v => (v.h*60+v.m) === (DateTime.fromFormat(selectedTime.iso||'','HH:mm').hour*60 + DateTime.fromFormat(selectedTime.iso||'','HH:mm').minute));
+      let firstBtn = null;
+
+      viewList.forEach((t, idx)=>{
         const btn=document.createElement('button');
         btn.type='button'; btn.className='time-option'; btn.setAttribute('role','radio'); btn.setAttribute('aria-checked','false'); btn.setAttribute('dir','ltr'); btn.textContent=t.label;
         btn.addEventListener('click',()=>{
@@ -761,13 +856,23 @@
           nForm.date=selectedISO; nForm.time=parsed.toFormat('HH:mm');
           window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime;
           renderSummary('page3'); updateNextAvailability();
-          showPage(3);
         });
         timeContainer.appendChild(btn);
+        if(idx===0) firstBtn = btn;
       });
+
+      // Preselect earliest available (does not auto-advance)
+      if(preselect && firstBtn){
+        const t=viewList[0];
+        firstBtn.setAttribute('aria-checked','true');
+        const parsed=DateTime.fromObject({hour:t.h,minute:t.m});
+        nForm.date=selectedISO; nForm.time=parsed.toFormat('HH:mm');
+        window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime;
+        renderSummary('page3'); updateNextAvailability();
+      }
     }
 
-    /* Padding sync (unchanged) */
+    /* Padding sync */
     function installResizeObservers(){
       const header=document.getElementById('siteHeader');
       const footer=document.getElementById('siteFooter');
@@ -795,7 +900,7 @@
       };
     }
 
-    /* ---------- GAS helpers (unchanged) ---------- */
+    /* ---------- GAS helpers ---------- */
     function escapeHTML(s){
       return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
@@ -851,7 +956,7 @@
       }
     }
 
-    // ==== Additional Services (unchanged; re-renders cart) ====
+    // ==== Additional Services ====
     async function fetchAdditionalServicesAndRender(){
       const wrap = document.getElementById('addonChips');
       if(!wrap) return;
@@ -929,7 +1034,7 @@
       });
     }
 
-    // Map settings (unchanged)
+    // Map settings
     let map, marker, autocomplete, allowedPoly;
     let SA_BOUNDS = { north: 25.0500, south: 24.3000, west: 46.2000, east: 47.1000 };
     let ALLOWED_POLY_PATH = [
@@ -1014,7 +1119,7 @@
 
     function buildBadges(s){
       const badges=[];
-      if(s.TS_badges){ // comma-separated
+      if(s.TS_badges){
         String(s.TS_badges).split(',').map(b=>b.trim()).filter(Boolean).forEach(b=>badges.push({text:b, popular:false}));
       }
       if(String(s.TS_popular||'').toLowerCase()==='true'){ badges.unshift({text:'الأكثر طلبًا', popular:true}); }
@@ -1024,8 +1129,7 @@
     function serviceCardTemplate(s, selected){
       const id=String(s.TS_service_id);
       const title=s.TS_service_arabic_name || ('خدمة '+id);
-      const priceText = s.TS_price ? `${s.TS_price}` : ''; // keep original formatting
-      const unitPrice = parseNumberFromPrice(s.TS_price);
+      const priceText = s.TS_price ? `${s.TS_price}` : '';
       const duration = s.TS_duration ? `${s.TS_duration}` : '';
       const short = s.TS_short_desc ? String(s.TS_short_desc) : '';
       const badges = buildBadges(s);
@@ -1055,7 +1159,6 @@
     function installCardKeyboard(grid){
       const cards=[...grid.querySelectorAll('.srv-card')];
       if(!cards.length) return;
-      // set initial roving tabindex
       const focused = cards.find(c=>c.classList.contains('selected')) || cards[0];
       cards.forEach(c=>c.setAttribute('tabindex','-1'));
       focused.setAttribute('tabindex','0');
@@ -1091,7 +1194,6 @@
 
       grid.innerHTML = list.map(s=>serviceCardTemplate(s, String(selectedServiceId)===String(s.TS_service_id))).join('');
 
-      // wire events
       [...grid.querySelectorAll('.srv-card')].forEach(card=>{
         const id = card.dataset.id;
         const svc = (servicesCache||[]).find(s=>String(s.TS_service_id)===String(id));
@@ -1167,9 +1269,9 @@
                 <div class="row"><div class="col">الكمية</div><div class="col text-end">× ${qty}</div></div>
                 <hr class="my-2"/>
                 <div class="row fw-bold"><div class="col">الإجمالي</div><div class="col text-end">${currencyFormat(total)}</div></div>
-                <small class="text-muted d-block mt-1">* قد تُضاف رسوم على الموقع أو الوقت حسب التوافر.</small>
+                <small class="text-muted d-block mt-1">* لا رسوم خفية — قد تُضاف رسوم موقع/وقت حسب التوافر.</small>
               ` : `
-                <small class="text-muted d-block mt-2">لا تتوفر معلومات تسعير — سنؤكد السعر عبر واتساب.</small>
+                <small class="text-muted d-block mt-2">لا تتوفر معلومات تسعير — سنؤكد السعر عبر واتساب قبل الوصول.</small>
               `}
             </div>
           </div>
@@ -1221,11 +1323,24 @@
           utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
         });
         $('#mobile').attr({placeholder:'رقم التواصل الخاص — مثال 5XXXXXXXX', inputmode:'tel', autocomplete:'tel'})
-                    .on('blur', ()=> {
+                    .on('blur', ()=>{
+                      // Soft hint only (does not block)
                       const ok = itiPhone && itiPhone.isValidNumber();
-                      document.getElementById('err-mobile').style.display = ok ? 'none':'block';
+                      const el=document.getElementById('err-mobile');
+                      el.dataset.show = ok ? 'false' : 'true';
                     });
       }
+
+      // Tie errors to inputs (aria-describedby)
+      [['area','err-area'],['serviceCat','err-serviceCat'],['service','err-service'],['date','err-date'],['name','err-name'],['mobile','err-mobile'],['googleMap','err-map']]
+      .forEach(([i,e])=>{ const input=document.getElementById(i), err=document.getElementById(e); if(input&&err){ input.setAttribute('aria-describedby', e); } });
+
+      // Interactive summary chips to jump back
+      document.getElementById('summaryChips')?.addEventListener('click',(e)=>{
+        const chip=e.target.closest('.chip'); if(!chip) return;
+        const target=chip.getAttribute('data-target')||''; const idx=orderedPages.indexOf(target);
+        if(idx>=0) showPage(idx);
+      });
 
       $('#name').on('input', function(){ nForm.customerN=this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
       $('#mobile').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
@@ -1236,9 +1351,15 @@
       const today=DateTime.now().toFormat('yyyy-LL-dd');
       $('#date').val(today).attr('min',today);
 
-      // Load Additional Services from GAS (by APP_ID)
+      // Debounced time fetching
+      let debounceT=null;
+      $('#date').on('input', ()=>{ clearTimeout(debounceT); debounceT=setTimeout(()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); },220); });
+      $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
+
+      // Load Additional Services
       fetchAdditionalServicesAndRender();
 
+      // Locations -> Services
       setLoadingServices(true);
       callContent2(`/locations`, res=>{
         const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
@@ -1318,7 +1439,6 @@
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
-      $('#date').on('change', ()=>{ fetchTimesForSelectedDate(); renderSummary('page3'); });
       $('#timeFilter').on('change', function(){ currentTimeFilter=this.value; renderSelectedDateTimes(lastSelectedISO); });
 
       const $prev=document.getElementById('footer-prev');
@@ -1331,9 +1451,9 @@
 
         if(id==='page2'){
           const areaOk=!!$('#area').val(), catOk=!!$('#serviceCat').val(), svcOk=!!$('#service').val();
-          document.getElementById('err-area').style.display=areaOk?'none':'block';
-          document.getElementById('err-serviceCat').style.display=catOk?'none':'block';
-          document.getElementById('err-service').style.display=svcOk?'none':'block';
+          document.getElementById('err-area').dataset.show=areaOk?'false':'true';
+          document.getElementById('err-serviceCat').dataset.show=catOk?'false':'true';
+          document.getElementById('err-service').dataset.show=svcOk?'false':'true';
           if(!areaOk||!catOk||!svcOk){ showToast('error','يرجى إكمال اختيار المنطقة/التصنيف/الخدمة'); return; }
           showPage(2); document.getElementById('date').dispatchEvent(new Event('change')); return;
         }
@@ -1341,33 +1461,25 @@
         if(id==='page3'){ if(!selectedTime){ showToast('error','الرجاء اختيار وقت'); return; } showPage(3); return; }
 
         if(id==='page4'){
-          const nameOk=($('#name').val()||'').trim().length>0; const phoneOk=itiPhone && itiPhone.isValidNumber();
-          document.getElementById('err-name').style.display=nameOk?'none':'block';
-          document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
-          if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
-          nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
-
-          const parts = [
-            $('#carBrand').val()||'',
-            $('#carName').val()||'',
-            $('#plateNumber').val()||''
-          ].filter(Boolean);
-          if(nForm.addons && nForm.addons.length){
-            parts.push('إضافي: ' + nForm.addons.join('، '));
-          }
-          nForm.locationDescription = parts.join(', ');
-
+          const nameOk=($('#name').val()||'').trim().length>0;
+          const phoneOk= itiPhone ? itiPhone.isValidNumber() : true; // only used for hint
+          document.getElementById('err-name').dataset.show=nameOk?'false':'true';
+          document.getElementById('err-mobile').dataset.show=(!phoneOk && SOFT_PHONE_VALIDATION)?'true':'false';
+          if(!nameOk){ showToast('error','يرجى إدخال الاسم'); return; }
+          // SOFT validation: do not block on phone
+          nForm.customerN=$('#name').val().trim();
+          nForm.customerM= itiPhone?.getNumber?.()?.replace(/^\+/, '') || ($('#mobile').val()||'').replace(/\D/g,'');
           showPage(4); return;
         }
 
         if(id==='page5'){
-          if(!nForm.paymentMethod){ document.getElementById('err-pay').style.display='block'; showToast('error','اختر طريقة الدفع'); return; }
-          document.getElementById('err-pay').style.display='none'; showPage(5); return;
+          if(!nForm.paymentMethod){ document.getElementById('err-pay').dataset.show='true'; showToast('error','اختر طريقة الدفع'); return; }
+          document.getElementById('err-pay').dataset.show='false'; showPage(5); return;
         }
 
         if(id==='page6'){
-          if(!positionUrl){ document.getElementById('err-map').style.display='block'; showToast('error','الرجاء تحديد الموقع'); return; }
-          document.getElementById('err-map').style.display='none'; nForm.urlLocation=positionUrl;
+          if(!positionUrl){ document.getElementById('err-map').dataset.show='true'; showToast('error','الرجاء تحديد الموقع'); return; }
+          document.getElementById('err-map').dataset.show='false'; nForm.urlLocation=positionUrl;
 
           if(isSubmitting) return;
           isSubmitting=true;
@@ -1403,19 +1515,26 @@
       document.getElementById('footer-next').addEventListener('click', gotoNext);
       document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
-      const payCards=[...document.getElementById('payGroup').querySelectorAll('.pay-card')];
-      payCards.forEach((card)=>{
-        const input=card.querySelector('input');
-        const choose=()=>{ 
-          payCards.forEach(c=>{ c.setAttribute('aria-checked','false'); c.setAttribute('tabindex','-1'); c.querySelector('input').checked=false; });
-          card.setAttribute('aria-checked','true'); card.setAttribute('tabindex','0'); input.checked=true; 
-          nForm.paymentMethod=input.value; renderSummary('page5'); updateNextAvailability();
-          showPage(5);
+      // Payment radio roving focus + state binding
+      (function installRovingRadioGroup(groupEl, itemSelector='.pay-card'){
+        if(!groupEl) return;
+        const items = [...groupEl.querySelectorAll(itemSelector)];
+        if(!items.length) return;
+        const setActive = (el)=>{
+          items.forEach(i=>{ i.setAttribute('aria-checked','false'); i.setAttribute('tabindex','-1'); i.querySelector('input').checked=false; });
+          el.setAttribute('aria-checked','true'); el.setAttribute('tabindex','0'); const input=el.querySelector('input'); if(input){ input.checked=true; nForm.paymentMethod=input.value; renderSummary('page5'); updateNextAvailability(); }
         };
-        card.addEventListener('click',choose);
-        card.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();} });
-      });
+        items.forEach((el,i)=>{ if(i===0) el.setAttribute('tabindex','0'); else el.setAttribute('tabindex','-1'); el.addEventListener('click',()=>setActive(el)); el.addEventListener('keydown',(e)=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setActive(el);} }); });
+        groupEl.addEventListener('keydown', (e)=>{
+          const cur = document.activeElement.closest(itemSelector);
+          if(!cur) return;
+          const idx = items.indexOf(cur);
+          if(e.key==='ArrowLeft' || e.key==='ArrowUp'){ e.preventDefault(); const nxt=items[Math.max(0, idx-1)]; if(nxt){ nxt.focus(); } }
+          if(e.key==='ArrowRight'|| e.key==='ArrowDown'){ e.preventDefault(); const nxt=items[Math.min(items.length-1, idx+1)]; if(nxt){ nxt.focus(); } }
+        }, {passive:false});
+      })(document.getElementById('payGroup'));
 
+      // Thanks actions
       $('#rebook').on('click', ()=>location.href='/');
 
       setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
@@ -1429,13 +1548,13 @@
       if(i===0){ enable=true; }
       else if(i===1){ enable=!!($('#area').val()&&$('#service').val()); }
       else if(i===2){ enable=!!selectedTime; }
-      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
-      else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
+      else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk; /* phone soft */ }
+      else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked') || nForm.paymentMethod); }
       else if(i===5){ enable=!!positionUrl; }
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* Google Map + Places + Geometry (unchanged) */
+    /* Google Map + Places + Geometry */
     async function initMap(){
       await loadMapSettingsFromGAS();
 
@@ -1472,7 +1591,10 @@
       const setPos=(latLng,pan=false)=>{
         if(!latLng) return;
         if (allowedPoly && !google.maps.geometry.poly.containsLocation(latLng, allowedPoly)) {
-          showToast('error','خارج النطاق المسموح للخدمة'); return;
+          showToast('error','خارج النطاق المسموح للخدمة');
+          const hint = document.getElementById('mapHint');
+          if(hint) hint.innerHTML = 'الموقع خارج نطاق الخدمة. رجاءً ابحث عن حي/عنوان داخل النطاق المظلل ثم حدده.';
+          return;
         }
         marker.setPosition(latLng);
         if(pan){ map.panTo(latLng); }
@@ -1497,6 +1619,8 @@
         const loc=place.geometry.location;
         if (allowedPoly && !google.maps.geometry.poly.containsLocation(loc, allowedPoly)) {
           showToast('error','الموقع المحدد خارج نطاق الخدمة');
+          const hint = document.getElementById('mapHint');
+          if(hint) hint.innerHTML = 'الموقع خارج نطاق الخدمة. رجاءً ابحث عن حي/عنوان داخل النطاق المظلل ثم حدده.';
           return;
         }
         map.panTo(loc); map.setZoom(16); setPos(loc,true);
@@ -1510,6 +1634,8 @@
             const here = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
             if (allowedPoly && !google.maps.geometry.poly.containsLocation(here, allowedPoly)) {
               showToast('error','موقعك الحالي خارج نطاق الخدمة');
+              const hint = document.getElementById('mapHint');
+              if(hint) hint.innerHTML = 'الموقع خارج نطاق الخدمة. رجاءً ابحث عن حي/عنوان داخل النطاق المظلل ثم حدده.';
               return;
             }
             setPos(here,true);
