@@ -11,11 +11,11 @@
   <link rel="shortcut icon" href="/favicon.ico?v=1">
   <!-- Add explicit PNG favicon so the browser tab always shows an icon even if /favicon.ico isn't reachable -->
   <link rel="icon" type="image/png" sizes="32x32"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlTime%20Logo%20Design%20(2).png">
   <link rel="icon" type="image/png" sizes="16x16"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlTime%20Logo%20Design%20(2).png">
   <link rel="apple-touch-icon" sizes="180x180"
-        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
+        href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlTime%20Logo%20Design%20(2).png">
   <meta name="theme-color" content="#027A93"/>
 
   <!-- ===== SEO: Canonical & Robots ===== -->
@@ -39,12 +39,11 @@
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="حجوزات المواعيد — نحل | Nahl"/>
   <meta name="twitter:description" content="حجز غسيل سيارات متنقل داخل السعودية — اختر المنطقة والخدمة والوقت، وحدد موقعك على الخريطة. خدمة فاخرة وسريعة مع خيارات دفع مرنة."/>
-  <meta name="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png"/>
+  <meta name="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlTime%20Logo%20Design%20(2).png"/>
 
   <!-- ===== Resource Hints for Supabase CDN (backgrounds + icons) ===== -->
-<link rel="preconnect" href="https://pdnmghkpepvsfaiqlafk.supabase.co" crossorigin>
-<link rel="dns-prefetch" href="//pdnmghkpepvsfaiqlafk.supabase.co">
-
+  <link rel="preconnect" href="https://pdnmghkpepvsfaiqlafk.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//pdnmghkpepvsfaiqlafk.supabase.co">
 
   <!-- UI libs -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
@@ -71,6 +70,7 @@
       --header-h:76px;
       --footer-h:118px;
 
+      /* store full url(...) here */
       --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg");
     }
 
@@ -78,11 +78,15 @@
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
 
-      /* === New shorthand background method === */
-      /* Mobile-safe default: no fixed attachment */
-      background:
+      /* ===== FIXED: use longhand props; 2 layers (gradient, image) ===== */
+      background-color:#0B2630; /* fallback while image loads */
+      background-image:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-        var(--page-bg) center/cover no-repeat scroll;
+        var(--page-bg);
+      background-position: center, center;
+      background-size: cover, cover;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: scroll, scroll; /* mobile-safe (no fixed on phones) */
 
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
@@ -90,12 +94,10 @@
       padding-bottom:var(--footer-h);
     }
 
-    /* Desktop parallax-like effect without breaking mobile Safari */
+    /* Desktop parallax-like effect for image layer only */
     @media (pointer:fine){
       body{
-        background:
-          linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-          var(--page-bg) center/cover no-repeat fixed;
+        background-attachment: scroll, fixed; /* gradient scrolls, image fixed */
       }
     }
 
@@ -1150,7 +1152,7 @@
         nForm.location=this.value; setLoadingServices(true);
         clearServiceDescriptionUI();
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
-          servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
+          servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[]; 
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
           $('#serviceCat').empty().select2({data:cats,width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
           if(cats.length) $('#serviceCat').val(cats[0].id).trigger('change');
@@ -1176,20 +1178,13 @@
       });
 
       const luxuryFirstBrands = [
-        // Ultra-luxury & exotics
         'Rolls-Royce','Bentley','Mercedes-Benz (Maybach)','Aston Martin','Ferrari','Lamborghini','McLaren','Maserati','Bugatti',
-        // Luxury / premium
         'Porsche','Land Rover (Range Rover)','Mercedes-Benz','BMW','Audi','Lexus','Genesis','Jaguar','Cadillac','Infiniti','Volvo',
-        // Popular in GCC (mainstream & premium)
         'Toyota','Nissan','Hyundai','Kia','Honda','Mitsubishi','Mazda','GMC','Chevrolet','Ford','Jeep','Dodge','RAM',
         'Volkswagen','Peugeot','Renault','Skoda','Subaru','Suzuki','Isuzu','Mini','Opel','Citroën',
-        // Chinese brands (active/visible in GCC)
         'MG','Geely','Haval','GWM (Great Wall)','TANK','ORA','BYD','Changan','Oshan','GAC','JAC','Chery','Exeed','Omoda','Jetour',
         'Hongqi','BAIC','DFSK (Glory)','Foton','Maxus','Roewe','Lynk & Co','Zeekr','Neta (Hozon)','Seres',
-        // EV startups (availability varies by country)
-        'NIO','XPeng','Leapmotor',
-        // Fallback
-        'Other'
+        'NIO','XPeng','Leapmotor','Other'
       ].map(b=>({id:b,text:b}));
       $('#carBrand').empty().select2({data:luxuryFirstBrands,width:'100%',placeholder:'اختر ماركة المركبة (الأسماء الفاخرة أولاً)', dir:'rtl'});
 
