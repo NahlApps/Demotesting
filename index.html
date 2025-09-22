@@ -85,16 +85,11 @@
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
 
-      /* === Split layered background to avoid 'fixed' paint bugs and ensure preload reuse === */
-      /* Fix: provide a fallback image directly in the var() so first paint never misses */
-      background-image:
+      /* === New shorthand background method === */
+      /* Mobile-safe default: no fixed attachment */
+      background:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-        var(--page-bg, url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg"));
-      background-position: center, center;
-      background-repeat: no-repeat, no-repeat;
-      background-size: auto, cover;
-      /* mobile-safe (no fixed). We'll re-enable fixed image on pointer=fine (desktop) below */
-      background-attachment: scroll, scroll;
+        var(--page-bg) center/cover no-repeat scroll;
 
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
@@ -104,7 +99,11 @@
 
     /* Desktop parallax-like effect without breaking mobile Safari */
     @media (pointer:fine){
-      body{ background-attachment: scroll, fixed; }
+      body{
+        background:
+          linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
+          var(--page-bg) center/cover no-repeat fixed;
+      }
     }
 
     header{
@@ -591,7 +590,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwl9d8YRt5HUoSdku54d6CeXQ28LgDXycGA31Qe9hLrPgQfFC0LhhJc4L5YTu_6v3r76Q/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -1229,6 +1228,7 @@
           document.getElementById('err-mobile').style.display=phoneOk?'none':'block';
           if(!nameOk||!phoneOk){ showToast('error','يرجى التحقق من الاسم ورقم الجوال'); return; }
           nForm.customerN=$('#name').val().trim(); nForm.customerM=itiPhone.getNumber().replace(/^\+/,'');
+
           const parts = [
             $('#carBrand').val()||'',
             $('#carName').val()||'',
@@ -1238,6 +1238,7 @@
             parts.push('إضافي: ' + nForm.addons.join('، '));
           }
           nForm.locationDescription = parts.join(', ');
+
           showPage(4); return;
         }
 
