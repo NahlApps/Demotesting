@@ -960,7 +960,7 @@
       }
     }
 
-    // ==== FIXED: robust fetch of Additional Services (with timeout + retries) ====
+    // ==== FIXED: robust fetch of Additional Services — new AbortController for each retry ====
     async function fetchAdditionalServicesAndRender(){
       const wrap = document.getElementById('addonChips');
       if(!wrap) return;
@@ -969,18 +969,15 @@
         wrap.innerHTML = `<span class="text-muted">${msg}</span>`;
       };
 
-      // Build URL safely
       const qs = new URLSearchParams({ route:'additionalServices', appId: APP_ID });
       const url = `${GAS_BASE_URL}?${qs.toString()}`;
 
-      // Abort + timeout
-      const controller = new AbortController();
-      const t = setTimeout(()=>controller.abort(), 8000);
-
       wrap.innerHTML = '<span class="text-muted">...تحميل الإضافات</span>';
 
-      // Small retry loop (2 retries)
-      for (let attempt=0; attempt<3; attempt++){
+      // Try up to 3 attempts; create a fresh controller+timeout each time
+      for (let attempt = 0; attempt < 3; attempt++){
+        const controller = new AbortController();
+        const timer = setTimeout(()=>controller.abort(), 8000);
         try{
           const res = await fetch(url, {
             method:'GET',
@@ -989,43 +986,45 @@
             headers:{ 'Accept':'application/json' },
             signal: controller.signal
           });
-          clearTimeout(t);
 
-          // 204 or non-JSON responses fallback
-          if (res.status === 204){
-            showNone();
-            return;
-          }
-
-          const data = await res.json().catch(()=>null);
+          // attempt to parse JSON (may fail on non-JSON)
+          let data = null;
+          try { data = await res.json(); } catch(_){ data = null; }
 
           if (res.ok && data && data.success && Array.isArray(data.data)){
-            // Normalize labels and render
             const options = data.data
               .map(x => String(x?.label ?? '').trim())
               .filter(Boolean);
 
             if (!options.length){
               showNone();
+              clearTimeout(timer);
               return;
             }
 
             renderAddonChips(options);
-            return; // success
+            clearTimeout(timer);
+            return;
           } else {
-            // Try again if server-side said no
-            if (attempt < 2) continue;
+            if (attempt < 2){
+              await new Promise(r=>setTimeout(r, 500));
+              clearTimeout(timer);
+              continue;
+            }
             showNone('تعذر تحميل الخدمات الإضافية');
             console.warn('[AdditionalServices] Unexpected payload', { status: res.status, data });
+            clearTimeout(timer);
             return;
           }
         }catch(err){
           if (attempt < 2){
             await new Promise(r=>setTimeout(r, 500));
+            clearTimeout(timer);
             continue;
           }
           showNone('تعذر تحميل الخدمات الإضافية');
           console.warn('[AdditionalServices] Fetch error', err);
+          clearTimeout(timer);
           return;
         }
       }
