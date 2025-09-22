@@ -78,7 +78,7 @@
       --header-h:76px;
       --footer-h:118px;
 
-      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg");
+      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
 
     html,body{height:100%}
@@ -86,10 +86,9 @@
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
 
       /* === Split layered background to avoid 'fixed' paint bugs and ensure preload reuse === */
-      /* Fix: provide a fallback image directly in the var() so first paint never misses */
       background-image:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-        var(--page-bg, url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg"));
+        var(--page-bg);
       background-position: center, center;
       background-repeat: no-repeat, no-repeat;
       background-size: auto, cover;
