@@ -111,10 +111,12 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 }
 .srv-tab[aria-selected="true"]{ background:var(--brand-600); color:#fff; border-color:var(--brand-600); box-shadow:var(--shadow-sm); }
 
+/* Default (desktop/tablet) grid */
 #srvCards{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px }
 @media(min-width:560px){ #srvCards{ grid-template-columns:repeat(2,1fr) } }
 @media(min-width:900px){ #srvCards{ grid-template-columns:repeat(3,1fr) } }
 
+/* Card */
 .srv-card{
   position:relative; background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px; box-shadow:var(--shadow-xs);
   padding:0; min-height:180px; display:flex; flex-direction:column; overflow:hidden;
@@ -133,6 +135,15 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 .s-badge.popular{ background:var(--brand-050); border-color:var(--brand-600); }
 .srv-meta{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
 .chip.price{ font-weight:800; }
+.srv-desc{ font-size:.86rem; color:#365563; line-height:1.5; }
+
+/* clamp description on mobile */
+@media (max-width:640px){
+  .srv-desc{
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  }
+}
+
 .srv-actions{ margin-top:auto; display:flex; gap:8px; padding:12px; border-top:1px solid var(--border-300); }
 .btn-add, .btn-remove{
   flex:1; border:1px solid var(--border-300); border-radius:12px; padding:10px 12px; font-weight:800; min-height:44px;
@@ -141,28 +152,13 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 .btn-add:hover, .btn-remove:hover{ background:var(--brand-050) }
 .btn-remove{ color:#0B2630 }
 
-/* Bottom cart */
-#cartDrawer{
-  position:sticky; bottom:0; background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px;
-  box-shadow:var(--shadow-md); margin-top:12px; padding:14px; max-width:920px;
-}
-@media(min-width:992px){ #cartDrawer{ position:static; align-self:stretch } }
-.qty-group{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border-300); border-radius:12px; padding:4px }
-.qty-group button{ width:36px; height:36px; border:0; background:#f8fafc; border-radius:8px; font-weight:800 }
-.qty-val{ min-width:28px; text-align:center; font-weight:800 }
-.cart-title{ font-weight:800; color:#224652 }
-.cart-muted{ color:#405a66; font-size:.95rem }
-.cart-cta{ min-height:48px; font-weight:800; border-radius:12px }
-.cart-breakdown{ margin-top:10px; font-size:.95rem; color:#224652 }
-.cart-breakdown .row{ --bs-gutter-x: 0.6rem; }
-
-/* Addons */
+/* Addons (in-page chips are kept for desktop; mobile uses popup) */
 .addon-title{ font-weight:800; color:#224652; margin-top:16px; margin-bottom:8px; }
 .addon-chips{ display:flex; flex-wrap:wrap; gap:8px; }
 .addon-chip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border-300); background:#fff; border-radius:999px; padding:8px 12px; min-height:40px; cursor:pointer; }
 .addon-chip[aria-pressed="true"]{ background:var(--brand-050); outline:2px solid var(--brand-600); outline-offset:2px; }
 
-/* Service description */
+/* Service description panel (legacy) */
 .service-desc{ margin-top:12px; border:1px solid var(--border-300); border-radius:14px; background:#fff; color:#0B2630; padding:16px; }
 .service-desc .title{ font-weight:800; color:#224652; margin-bottom:6px; }
 .skeleton{ height:12px; background:linear-gradient(90deg,#eef5f8,#fff,#eef5f8); background-size:180% 100%; border-radius:8px; animation:s 1.2s var(--ease) infinite; }
@@ -200,22 +196,40 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 .map-search { position:relative; }
 .map-search i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#405a66; }
 
-/* Footer CTA */
-.sticky-nav{ position:fixed; bottom:0; left:0; right:0; background:rgba(11,38,48,.36); backdrop-filter:blur(8px); border-top:1px solid rgba(255,255,255,.15); }
-.footer-inner{ max-width:1120px; margin:0 auto; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; gap:12px; color:#fff; }
-.footer-brand a{ color:#fff; text-decoration:underline; }
-.footer-actions{ display:flex; align-items:center; gap:10px; width:100%; }
+/* Footer: sticky nav + mini-cart */
+.sticky-nav{
+  position:fixed; bottom:0; left:0; right:0;
+  background:rgba(11,38,48,.36); backdrop-filter:blur(8px);
+  border-top:1px solid rgba(255,255,255,.15);
+}
+.footer-inner{
+  max-width:1120px; margin:0 auto; padding:10px 12px;
+  display:grid; grid-template-columns:1fr auto; align-items:center; gap:10px; color:#fff;
+}
+.footer-brand{ display:none } /* hide to leave space for cart on mobile; keep in desktop if needed */
+.footer-actions{ display:flex; align-items:center; gap:10px }
 .btn-footer{
   min-height:48px; border-radius:12px; padding:10px 16px; font-weight:800;
   background:#fff; color:var(--brand-600); border:1px solid var(--border-300); box-shadow:var(--shadow-xs);
   transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
   flex:1;
 }
-.btn-footer.primary{ background:var(--brand-600); color:#fff; border-color:var(--brand-600); flex:2 }
+.btn-footer.primary{ background:var(--brand-600); color:#fff; border-color:var(--brand-600); }
 .btn-footer.disabled, .btn-footer:disabled{ opacity:.6; pointer-events:none; }
 .hidden{ display:none!important; }
 #footer-wait{ display:none; align-items:center; gap:8px; }
 #footer-wait.show{ display:flex; }
+
+/* Mini-cart area in footer */
+.footer-cart{
+  background:rgba(255,255,255,.92); color:#0B2630;
+  border:1px solid var(--border-300); border-radius:12px; padding:10px 12px;
+  box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:4px; min-width:0;
+}
+.footer-cart .fc-line{ display:flex; justify-content:space-between; gap:8px; font-weight:800 }
+.footer-cart .fc-title{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.footer-cart .fc-total{ white-space:nowrap }
+.footer-cart .fc-sub{ color:#365563; font-size:.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
 /* Welcome deck */
 .ppt-deck .slide-card{ background:rgba(255,255,255,.9); color:#0B2630; border-radius:14px; padding:18px; box-shadow:var(--shadow-md); }
@@ -229,11 +243,21 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 }
 
 /* =========================
-   Mobile Polish (≤ 480px)
+   Mobile polish & row cards
    ========================= */
-@media (max-width:480px){
+@media (max-width:640px){
   header .brand img{ height:56px }
   .card{ padding:16px; border-radius:12px }
+
+  /* Horizontal row of cards (snap) */
+  #srvCards{
+    display:flex; overflow-x:auto; gap:10px; padding:2px 2px 6px;
+    scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+  }
+  .srv-card{
+    min-width:84%; flex:0 0 auto; scroll-snap-align:center;
+    box-shadow:0 2px 8px rgba(11,38,48,.08); border-color:#E5EFF4
+  }
   .srv-thumb{ height:96px }
   .srv-actions{ padding:10px }
   .btn-add,.btn-remove{ min-height:48px; border-radius:10px }
@@ -253,39 +277,37 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
   .qty-group{ gap:8px; padding:6px; border-radius:12px }
   .qty-group button{ width:44px; height:44px; border-radius:10px; font-size:18px }
 
-  .srv-card{ box-shadow:0 2px 8px rgba(11,38,48,.08); border-color:#E5EFF4 }
-  .cart-breakdown hr{ opacity:.35 }
-
   .sticky-nav{ padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
-  .footer-inner{ gap:8px }
-  #footer-prev{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.35); flex:1 }
-  #footer-next{ flex:2 }
+  .footer-inner{ grid-template-columns:1fr auto; gap:8px }
+  #footer-prev{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.35); }
 }
 
 /* =========================
-   Bottom Sheet Cart (≤ 640px)
+   Small Popup (Addons)
    ========================= */
-@media (max-width:640px){
-  #cartDrawer{
-    position:fixed; left:12px; right:12px;
-    bottom:calc(62px + env(safe-area-inset-bottom));
-    z-index:1000; border-radius:14px; box-shadow:0 12px 30px rgba(11,38,48,.22);
-    transition:transform .24s var(--ease), opacity .2s var(--ease)
-  }
-  #cartDrawer[data-collapsed="true"]{
-    padding:10px 14px; overflow:hidden
-  }
-  #cartDrawer[data-collapsed="true"] #cartBody{ display:none }
-  #cartDrawer .cart-title{ display:flex; align-items:center; justify-content:space-between; cursor:pointer }
-  #cartMini{ font-weight:800; color:#0B2630 }
+.modal-wrap{ position:fixed; inset:0; display:none; z-index:1200 }
+.modal-wrap[aria-hidden="false"]{ display:block }
+.modal-backdrop{
+  position:absolute; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(2px);
 }
+.modal-sheet{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(92vw,520px); background:#fff; color:#0B2630; border-radius:16px; box-shadow:0 20px 60px rgba(11,38,48,.28);
+  padding:16px;
+}
+.modal-title{ font-weight:800; color:#224652; margin:0 0 10px }
+.modal-body{ display:flex; flex-wrap:wrap; gap:8px; max-height:56vh; overflow:auto; }
+.modal-actions{ display:flex; gap:8px; justify-content:space-between; margin-top:12px }
+.modal-actions .btn{ min-height:44px; border-radius:10px; font-weight:800 }
+.modal-actions .btn.secondary{ background:#fff; color:#0B2630; border:1px solid var(--border-300) }
+.modal-actions .btn.primary{ background:var(--brand-600); color:#fff; border:1px solid var(--brand-600) }
+
 
 </style>
   <!-- Your compiled stylesheet with the improvements -->
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
-  <!-- Toasts -->
   <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px" aria-live="assertive" aria-atomic="true"></div>
 
   <!-- ===== Header ===== -->
@@ -348,7 +370,7 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
           <h1>وين تحب نجيك؟</h1>
 
           <div class="card position-relative" id="servicesCard">
-            <!-- Legacy selects -->
+            <!-- Legacy selects (kept) -->
             <div id="legacySelects">
               <label class="form-label" for="area">اختيار المنطقة</label>
               <select id="area" style="width:100%"></select>
@@ -379,29 +401,19 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
             <div id="srvTabs" class="visually-hidden" role="tablist" aria-label="التصنيفات"></div>
             <div id="srvCards" class="visually-hidden" role="list" aria-label="الخدمات"></div>
 
-            <!-- Addons -->
-            <div class="addon-wrap">
+            <!-- Desktop addon chips (mobile uses popup) -->
+            <div class="addon-wrap d-none d-md-block">
               <div class="addon-title"><i class="fa-solid fa-plus"></i> خدمات إضافية (اختياري)</div>
               <div id="addonChips" class="addon-chips" role="group" aria-label="خدمات إضافية"></div>
             </div>
 
-            <!-- Service Description -->
+            <!-- Legacy service description pane -->
             <div id="serviceDesc" class="service-desc" style="display:none">
               <div class="title"><i class="fa-regular fa-file-lines"></i> وصف الخدمة</div>
               <div id="serviceDescBody" class="body"></div>
             </div>
 
-            <!-- Cart (Bottom sheet on mobile) -->
-            <div id="cartDrawer" class="visually-hidden" aria-live="polite">
-              <div class="cart-title mb-2">
-                <span><i class="fa-solid fa-basket-shopping"></i> السلة</span>
-                <span id="cartMini"></span>
-              </div>
-              <div id="cartBody">
-                <div class="cart-muted">اختر خدمة من البطاقات أعلاه لإضافتها إلى السلة.</div>
-              </div>
-            </div>
-
+            <!-- Removed sticky cart here — info now lives in footer -->
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
               <strong>جاري تحميل الخدمات…</strong>
@@ -546,17 +558,18 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
     </div>
   </main>
 
-  <!-- ===== Footer CTA ===== -->
+  <!-- ===== Footer: Mini Cart + CTA ===== -->
   <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a></span>
-        <div class="footer-social">
-          <a href="https://wa.me/966509027172" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-          <a href="https://www.instagram.com/nahl.app?igsh=ZmljaXNncGtudjJ2" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="https://www.tiktok.com/@nahl.app?_t=ZS-8zgmzEQTSQW&_r=1" target="_blank" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+      <!-- Mini cart lives here -->
+      <div id="footer-cart" class="footer-cart" aria-live="polite">
+        <div class="fc-line">
+          <span class="fc-title" id="fc-title">السلة — لم يتم اختيار خدمة</span>
+          <span class="fc-total" id="fc-total">—</span>
         </div>
+        <div class="fc-sub" id="fc-sub">اختر خدمة ثم أكمل الخطوات</div>
       </div>
+
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>ابدأ الآن</button>
@@ -568,6 +581,20 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
       </div>
     </div>
   </footer>
+
+  <!-- ===== Addons Popup (small window) ===== -->
+  <div id="addonModal" class="modal-wrap" aria-hidden="true">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="addonTitle">
+      <h3 id="addonTitle" class="modal-title"><i class="fa-solid fa-plus"></i> اختر خدمات إضافية (اختياري)</h3>
+      <div id="addonList" class="modal-body"><!-- chips injected by JS --></div>
+      <div class="modal-actions">
+        <button type="button" id="addonCancel" class="btn secondary">لا شكرًا</button>
+        <button type="button" id="addonApply" class="btn primary">تأكيد الإضافات</button>
+      </div>
+    </div>
+  </div>
+
 
 
 
@@ -1154,36 +1181,159 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
       return badges;
     }
 
-    function serviceCardTemplate(s, selected){
-      const id=String(s.TS_service_id);
-      const title=s.TS_service_arabic_name || ('خدمة '+id);
-      const priceText = s.TS_price ? `${s.TS_price}` : '';
-      const duration = s.TS_duration ? `${s.TS_duration}` : '';
-      const short = s.TS_short_desc ? String(s.TS_short_desc) : '';
-      const badges = buildBadges(s);
-      const thumb = s.TS_thumb_url || '';
+function serviceCardTemplate(s, selected){
+  const id=String(s.TS_service_id);
+  const title=s.TS_service_arabic_name || ('خدمة '+id);
+  const priceText = s.TS_price ? `${s.TS_price}` : '';
+  const duration = s.TS_duration ? `${s.TS_duration}` : '';
+  const badges = buildBadges(s);
+  const thumb = s.TS_thumb_url || '';
+  const desc = (s.TS_service_description_ar || s.TS_short_desc || '').toString().trim();
 
-      return `
-        <div class="srv-card ${selected?'selected':''}" role="listitem" aria-selected="${selected?'true':'false'}" data-id="${id}" tabindex="-1" title="${escapeHTML(short || title)}">
-          <div class="srv-thumb" style="${thumb ? `background-image:url('${thumb}')` : ''}"></div>
-          <div class="srv-body">
-            <div class="srv-title">${escapeHTML(title)}</div>
-            <div class="srv-meta">
-              ${priceText?`<span class="chip price"><i class="fa-solid fa-tag"></i> ${escapeHTML(priceText)}</span>`:''}
-              ${duration?`<span class="chip"><i class="fa-regular fa-clock"></i> ${escapeHTML(duration)}</span>`:''}
-            </div>
-            <div class="srv-badges">
-              ${badges.map(b=>`<span class="s-badge ${b.popular?'popular':''}"><i class="fa-solid fa-star${b.popular?'':'-half-stroke'}"></i> ${escapeHTML(b.text)}</span>`).join('')}
-            </div>
-          </div>
-          <div class="srv-actions">
-            <button class="btn-add" type="button">${selected?'تم الاختيار':'إضافة إلى السلة'}</button>
-            ${selected?'<button class="btn-remove" type="button">إزالة</button>':''}
-          </div>
+  return `
+    <div class="srv-card ${selected?'selected':''}" role="listitem" aria-selected="${selected?'true':'false'}" data-id="${id}" tabindex="-1" title="${escapeHTML(title)}">
+      <div class="srv-thumb" style="${thumb ? `background-image:url('${thumb}')` : ''}"></div>
+      <div class="srv-body">
+        <div class="srv-title">${escapeHTML(title)}</div>
+        <div class="srv-meta">
+          ${priceText?`<span class="chip price"><i class="fa-solid fa-tag"></i> ${escapeHTML(priceText)}</span>`:''}
+          ${duration?`<span class="chip"><i class="fa-regular fa-clock"></i> ${escapeHTML(duration)}</span>`:''}
         </div>
-      `;
-    }
+        ${desc?`<div class="srv-desc">${escapeHTML(desc)}</div>`:''}
+        <div class="srv-badges">
+          ${badges.map(b=>`<span class="s-badge ${b.popular?'popular':''}"><i class="fa-solid fa-star${b.popular?'':'-half-stroke'}"></i> ${escapeHTML(b.text)}</span>`).join('')}
+        </div>
+      </div>
+      <div class="srv-actions">
+        <button class="btn-add" type="button">${selected?'تم الاختيار':'إضافة إلى السلة'}</button>
+        ${selected?'<button class="btn-remove" type="button">إزالة</button>':''}
+      </div>
+    </div>
+  `;
+}
+/* 2) FOOTER MINI-CART: update summary in footer instead of mid-page cart */
+function updateFooterCartSummary(){
+  const titleEl = document.getElementById('fc-title');
+  const totalEl = document.getElementById('fc-total');
+  const subEl   = document.getElementById('fc-sub');
 
+  const cntSel = document.getElementById('serviceCount');
+  const qty = Number(cntSel?.value||1);
+  const svc = (Array.isArray(servicesCache)?servicesCache:[]).find(s=> String(s.TS_service_id)===String(selectedServiceId));
+
+  if(!svc){
+    titleEl.textContent = 'السلة — لم يتم اختيار خدمة';
+    totalEl.textContent = '—';
+    subEl.textContent = 'اختر خدمة ثم أكمل الخطوات';
+    return;
+  }
+
+  const title = svc.TS_service_arabic_name || ('خدمة '+selectedServiceId);
+  const unitPrice = parseNumberFromPrice(svc?.TS_price);
+  const hasPrice = Number.isFinite(unitPrice);
+  const total = hasPrice ? unitPrice * qty : NaN;
+
+  titleEl.textContent = title;
+  totalEl.textContent = hasPrice ? currencyFormat(total) : 'سيتم الإبلاغ بالسعر';
+  const addonsTxt = (nForm.addons&&nForm.addons.length) ? (' • إضافات: ' + nForm.addons.join('، ')) : '';
+  subEl.textContent = `الكمية × ${qty}${addonsTxt}`;
+}
+
+/* Patch existing renderCartSummary() to just call footer summary (and keep your logic) */
+const _renderCartSummary_old = renderCartSummary;
+renderCartSummary = function(){
+  if(typeof _renderCartSummary_old === 'function'){ _renderCartSummary_old(); }
+  updateFooterCartSummary();
+};
+
+/* Also call it whenever quantity/addons change */
+document.addEventListener('click', (e)=>{
+  if(e.target && (e.target.id==='qtyMinus' || e.target.id==='qtyPlus' || e.target.id==='cartConfirm')){
+    setTimeout(updateFooterCartSummary,0);
+  }
+});
+document.getElementById('serviceCount')?.addEventListener('change', updateFooterCartSummary);
+
+/* 3) OPEN ADDONS POPUP automatically when a service is selected from cards */
+function openAddonModal(){
+  const modal = document.getElementById('addonModal');
+  const list  = document.getElementById('addonList');
+  if(!modal || !list) return;
+
+  // Build chips from fetched options
+  list.innerHTML = '';
+  const options = (nForm._addonsOptions || []);
+  if(!options.length){ list.innerHTML = '<span class="text-muted">لا توجد خدمات إضافية حالياً</span>'; }
+
+  options.forEach(label=>{
+    const b = document.createElement('button');
+    b.type='button';
+    b.className='addon-chip';
+    b.setAttribute('aria-pressed', nForm.addons.includes(label)?'true':'false');
+    b.innerHTML = `<i class="fa-solid fa-circle-plus"></i><span>${label}</span>`;
+    b.onclick = ()=> {
+      const on = b.getAttribute('aria-pressed')==='true';
+      b.setAttribute('aria-pressed', on?'false':'true');
+    };
+    list.appendChild(b);
+  });
+
+  modal.setAttribute('aria-hidden','false');
+
+  const apply = document.getElementById('addonApply');
+  const cancel= document.getElementById('addonCancel');
+  const close = ()=> modal.setAttribute('aria-hidden','true');
+
+  apply.onclick = ()=>{
+    // Collect selected chips
+    const chosen = [...list.querySelectorAll('.addon-chip[aria-pressed="true"]')].map(x=>x.textContent.trim());
+    nForm.addons = chosen;
+    renderCartSummary();
+    close();
+  };
+  cancel.onclick = close;
+  modal.querySelector('.modal-backdrop')?.addEventListener('click', close);
+}
+
+/* Keep options fetched once for the popup (hook into your existing GAS call) */
+const _fetchAdditionalServicesAndRender = fetchAdditionalServicesAndRender;
+fetchAdditionalServicesAndRender = async function(){
+  await _fetchAdditionalServicesAndRender();
+  // Save labels for popup
+  try{
+    const wrap = document.getElementById('addonChips');
+    const labels = [...wrap.querySelectorAll('.addon-chip')].map(x=>x.textContent.trim());
+    if(labels.length){ nForm._addonsOptions = labels; }
+  }catch(_){}
+};
+
+/* When a service is chosen via cards, open the popup on mobile/tablet */
+document.addEventListener('click', (e)=>{
+  const addBtn = e.target.closest('.srv-card .btn-add');
+  if(!addBtn) return;
+  // Only trigger once after selecting (avoid on "تم الاختيار")
+  if(!addBtn.classList.contains('is-selected')){
+    addBtn.classList.add('is-selected');
+    openAddonModal();
+  }
+});
+
+/* 4) Ensure footer cart stays up-to-date across navigation */
+(function(){
+  const mo = new MutationObserver(()=>updateFooterCartSummary());
+  mo.observe(document.querySelector('.stage'), { attributes:true, subtree:true, attributeFilter:['class'] });
+  updateFooterCartSummary();
+})();
+
+/* 5) Accessibility – ESC closes addon popup */
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){
+    const modal = document.getElementById('addonModal');
+    if(modal && modal.getAttribute('aria-hidden')==='false'){
+      modal.setAttribute('aria-hidden','true');
+    }
+  }
+});
     function installCardKeyboard(grid){
       const cards=[...grid.querySelectorAll('.srv-card')];
       if(!cards.length) return;
