@@ -78,7 +78,7 @@
       --header-h:76px;
       --footer-h:118px;
 
-      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
+      --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg");
     }
 
     html,body{height:100%}
@@ -86,9 +86,10 @@
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
 
       /* === Split layered background to avoid 'fixed' paint bugs and ensure preload reuse === */
+      /* Fix: provide a fallback image directly in the var() so first paint never misses */
       background-image:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
-        var(--page-bg);
+        var(--page-bg, url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Nahl%20Time%20Pro%20From/NahlDemoBG1.jpg"));
       background-position: center, center;
       background-repeat: no-repeat, no-repeat;
       background-size: auto, cover;
@@ -590,7 +591,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwl9d8YRt5HUoSdku54d6CeXQ28LgDXycGA31Qe9hLrPgQfFC0LhhJc4L5YTu_6v3r76Q/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbziN3i6iZOaDVHXeOvO-zqFaNVNcbh2yyjbtw2ABuLDMc-mLDCdkPnigVxuF5oJ16hD4w/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
