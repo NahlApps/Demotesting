@@ -577,7 +577,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwl9d8YRt5HUoSdku54d6CeXQ28LgDXycGA31Qe9hLrPgQfFC0LhhJc4L5YTu_6v3r76Q/exec';
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycby_iSQk4zH6iMClXdEsYdCLLK4In58QpzWqO0w5-HY3OeaNv1pgTSelLrZaOFO0hZA8/exec';
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -1646,6 +1646,58 @@
       });
     }
     window.initMap=initMap;
+<!-- find this block in your existing <script> ... $('#area').on('change', function(){ ... }) -->
+
+
+  $('#area').on('change', function(){
+    nForm.location=this.value; setLoadingServices(true);
+    clearServiceDescriptionUI();
+
+    // 🔁 CHANGED: Fetch Services/Categories from GAS instead of platform
+    (async ()=>{
+      try{
+        const qs = new URLSearchParams({ route:'services', appId: APP_ID });
+        const url = `${GAS_BASE_URL}?${qs.toString()}`;
+        const res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store', headers:{ 'Accept':'application/json' }});
+        const data = await res.json().catch(()=>null);
+
+        if(res.ok && data && data.success && data.data){
+          servicesCache   = Array.isArray(data.data.services)   ? data.data.services   : [];
+          categoriesCache = Array.isArray(data.data.servicesCat)? data.data.servicesCat: [];
+
+          // Legacy selects (preserved)
+          const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
+          $('#serviceCat').empty().select2({data:cats,width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
+          if(cats.length) $('#serviceCat').val(cats[0].id).trigger('change');
+
+          // Tabs + Cards (your existing renderers)
+          if(USE_TABS_AND_CARDS){
+            enableCartUI(true);
+            activeCatId = cats.length ? String(cats[0].id) : null;
+            selectedServiceId = nForm.service || null;
+            renderCategoryTabs(categoriesCache);
+            renderServiceCards();
+            renderCartSummary();
+          }
+
+          setLoadingServices(false);
+          renderSummary('page2');
+          updateNextAvailability();
+        } else {
+          setLoadingServices(false);
+          servicesCache=[]; categoriesCache=[];
+          showToast('error','تعذر تحميل الخدمات من المصدر');
+        }
+      }catch(_e){
+        setLoadingServices(false);
+        servicesCache=[]; categoriesCache=[];
+        showToast('error','تعذر تحميل الخدمات الآن');
+      }
+    })();
+  });
+
+
+
   </script>
 
   <!-- Google Maps (with Places + Geometry) -->
