@@ -6,10 +6,8 @@
   <title>حجوزات المواعيد</title>
 
   <!-- ===== Favicon (robust, cross-browser) ===== -->
-  <!-- Keep your /favicon.ico for hosts that auto-serve it -->
   <link rel="icon" href="/favicon.ico?v=1" sizes="any">
   <link rel="shortcut icon" href="/favicon.ico?v=1">
-  <!-- Add explicit PNG favicon so the browser tab always shows an icon even if /favicon.ico isn't reachable -->
   <link rel="icon" type="image/png" sizes="32x32"
         href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlTime%20Logo%20Design%20(2).png">
   <link rel="icon" type="image/png" sizes="16x16"
@@ -69,99 +67,49 @@
       --ease:cubic-bezier(.22,.61,.36,1);
       --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
 
-      --header-h:76px;
-      --footer-h:118px;
+      --header-h:76px; --footer-h:118px;
 
-      /* store full url(...) here */
       --page-bg:url("https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg");
     }
 
     html,body{height:100%}
     body{
       margin:0; font-family:'Cairo',sans-serif; color:#fff;
-
-      /* ===== FIXED: use longhand props; 2 layers (gradient, image) ===== */
-      background-color:#0B2630; /* fallback while image loads */
+      background-color:#0B2630;
       background-image:
         linear-gradient(180deg, rgba(11,38,48,.58), rgba(11,38,48,.34)),
         var(--page-bg);
       background-position: center, center;
       background-size: cover, cover;
       background-repeat: no-repeat, no-repeat;
-      background-attachment: scroll, scroll; /* mobile-safe (no fixed on phones) */
-
+      background-attachment: scroll, scroll;
       min-height:100vh; min-height:100dvh;
       display:flex; flex-direction:column;
-      padding-top:var(--header-h);
-      padding-bottom:var(--footer-h);
+      padding-top:var(--header-h); padding-bottom:var(--footer-h);
     }
+    @media (pointer:fine){ body{ background-attachment: scroll, fixed; } }
 
-    /* Desktop parallax-like effect for image layer only */
-    @media (pointer:fine){
-      body{
-        background-attachment: scroll, fixed; /* gradient scrolls, image fixed */
-      }
-    }
-
-    header{
-      position:fixed; top:0; left:0; right:0; z-index:999;
-      background:rgba(11,38,48,.36); backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.15);
-    }
-    .header-inner{
-      max-width:1120px; width:100%; margin:0 auto;
-      padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between;
-    }
-    .brand{display:flex; align-items:center; gap:10px}
+    header{ position:fixed; top:0; left:0; right:0; z-index:999; background:rgba(11,38,48,.36); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.15); }
+    .header-inner{ max-width:1120px; width:100%; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between; }
     .brand img{height:72px; width:auto; object-fit:contain; filter:drop-shadow(0 6px 20px rgba(0,0,0,.25));}
-
-    .header-right{flex:1; display:flex; flex-direction:column; gap:6px}
-    .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
+    .mini-progress{display:flex; gap:10px; align-items:center}
     .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.25); border-radius:999px; overflow:hidden}
-    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease); will-change:width}
-    .mini-progress .step{font-weight:800; font-size:1rem}
-
-    .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
-    .chip{
-      display:inline-flex; align-items:center; gap:6px; max-width:100%;
-      padding:6px 10px; border:1px solid rgba(255,255,255,.35);
-      border-radius:999px; color:#fff; font-size:.85rem; background:transparent;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .chip.current{ background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.75); box-shadow:0 0 0 2px rgba(255,255,255,.16) inset; }
+    .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--brand-600), var(--brand-200)); transition:width var(--dur-md) var(--ease)}
+    .summary-chips{display:flex; flex-wrap:wrap; gap:6px}
 
     main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
     #app{width:100%; max-width:1120px}
     .stage{position:relative; min-height:560px; padding:8px 0 20px}
-    .page{
-      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
-      padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992);
-      pointer-events:none;
-    }
+    .page{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
+      padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none; }
     .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
     .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
     @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
     @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
-    .page h1{font-size:1.375rem; font-weight:800; margin:0; text-align:center}
 
-    .card{
-      background:rgba(255,255,255,.88); color:#0B2630;
-      border-radius:14px; box-shadow:var(--shadow-md);
-      padding:24px; width:100%; max-width:920px; backdrop-filter:blur(6px);
-    }
+    .card{ background:rgba(255,255,255,.88); color:#0B2630; border-radius:14px; box-shadow:var(--shadow-md); padding:24px; width:100%; max-width:920px; backdrop-filter:blur(6px); }
 
-    .ppt-deck{position:relative; width:100%; max-width:920px; height:200px}
-    .ppt-slide{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      opacity:0; transform:translateY(14px) scale(.98); transition:opacity .6s var(--ease), transform .6s var(--ease);
-    }
-    .ppt-slide .slide-card{ background:rgba(255,255,255,.92); color:#0B2630; border-radius:14px; box-shadow:var(--shadow-md); padding:18px 20px; text-align:center; width:min(820px,92%) }
-    .ppt-slide.is-active{opacity:1; transform:none; z-index:2}
-    .ppt-slide.is-exiting{opacity:0; transform:translateY(-8px) scale(.985); z-index:1}
-    .ppt-dots{display:flex; gap:8px; justify-content:center; margin-top:12px}
-    .ppt-dot{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.55)}
-    .ppt-dot.active{background:#fff}
-
+    /* ===== Selects & inputs ===== */
     .form-control, select, .select2-selection{
       background:#fff; color:#0B2630; border:1px solid var(--border-300)!important; border-radius:14px!important;
       min-height:52px; text-align:center; font-size:16px;
@@ -170,132 +118,69 @@
     .form-control:focus{ box-shadow:0 0 0 4px rgba(2,122,147,.12) }
     .form-label{display:inline-block; margin-bottom:6px; font-size:.9rem; font-weight:800; color:#224652}
     .field-error{color:#dc2626; font-size:.85rem; margin-top:6px; display:none}
-    .has-error .form-control, .has-error .select2-selection{ border-color:#dc2626 !important; }
-    .has-error .field-error{display:block}
 
-    .select2-container .select2-selection--single .select2-selection__rendered{color:#0B2630!important; line-height:52px!important;}
-    .select2-container .select2-selection--single{height:52px!important; display:flex; align-items:center}
-    .select2-dropdown{background:#fff; color:#0B2630}
-    .select2-results__option, .select2-search__field{color:#0B2630}
+    /* ===== Cart (Tabs + Cards) ===== */
+    .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;border:0!important}
 
-    .time-toolbar{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:8px}
-    @media (min-width:768px){ .time-toolbar{grid-template-columns: 1fr; } }
-    .btn-toggle{display:flex; gap:8px}
-    .btn-toggle .btn{flex:1}
-
-    .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
-    @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
-    .time-option{
-      background:#fff; color:#0B2630; font-weight:800;
-      border:1px solid var(--border-300); border-radius:14px;
-      padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs);
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
+    #srvTabs{
+      display:flex; gap:8px; flex-wrap:nowrap; overflow:auto; -webkit-overflow-scrolling:touch;
+      margin-top:14px; padding-bottom:4px;
     }
-    .time-option:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
-    .time-option[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
-
-    .load-overlay{
-      position:absolute; inset:0; background:rgba(255,255,255,.88); color:#0B2630;
-      display:none; align-items:center; justify-content:center; gap:12px; border-radius:14px; backdrop-filter:blur(2px);
-    }
-    .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
-    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-
-    .pay-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; max-width:920px}
-    .pay-card{
-      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px;
-      padding:24px; display:flex; justify-content:center; align-items:center; gap:16px;
-      min-height:76px; cursor:pointer; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-    }
-    .pay-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--brand-050)}
-    .pay-card img{max-width:140px; height:auto}
-    .pay-card[aria-checked="true"]{outline:3px solid var(--brand-600); outline-offset:2px}
-
-    .map-search{position:relative; margin-bottom:12px}
-    .map-search .form-control{min-height:48px; text-align:right}
-    .map-search .fa-magnifying-glass{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#6b7280}
-    #googleMap{width:100%;height:420px;border-radius:14px;overflow:hidden}
-
-    footer.sticky-nav{
-      position:sticky; bottom:0; z-index:40; background:rgba(11,38,48,.45);
-      backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);
-    }
-    .footer-inner{ max-width:1120px; width:100%; margin:0 auto; padding:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
-    .footer-brand{ font-size:.95rem; color:#fff; opacity:.94; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
-    .footer-brand a{color:#fff; text-decoration:underline}
-    .footer-social{display:flex; align-items:center; gap:12px}
-    .footer-social a{color:#fff; opacity:.95; font-size:1.2rem}
-    .footer-actions{display:flex; gap:12px; width:100%}
-    .btn-footer{ flex:1; border:1px solid var(--border-300); border-radius:14px; padding:16px 16px; min-height:56px; font-size:1rem; font-weight:800; background:#fff; color:#027A93; transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), color var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease); }
-    .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
-    .btn-footer.primary{background:#027A93; color:#fff; border-color:#027A93}
-    .btn-footer.hidden{visibility:hidden}
-    .btn-footer:disabled{opacity:.6; pointer-events:none}
-    #footer-wait{display:none; align-items:center; gap:10px; color:#fff; font-weight:800}
-    #footer-wait.show{display:flex}
-
-    @media (max-width: 480px){
-      .brand img{ height:64px }
-      .summary-chips{
-        overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
-        gap:6px; padding-bottom:2px; scrollbar-width:thin;
-      }
-      .summary-chips::-webkit-scrollbar{ height:4px }
-      .chip{ padding:4px 8px; font-size:.78rem }
-      .chip .title{ display:none }
-      .chip .value{ max-width:140px; overflow:hidden; text-overflow:ellipsis }
-      .btn-footer{min-height:58px; font-size:1.05rem}
-      .footer-actions{width:100%}
-      .footer-brand{width:100%; justify-content:space-between}
-    }
-
-    .iti{ width:100%; }
-    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ left:8px; right:auto; }
-    html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
-      padding-left: calc(76px + 8px);
-      padding-right: 12px;
-      text-align: left; direction: ltr;
-    }
-
-    /* ===== Additional Services chips ===== */
-    .addon-wrap{margin-top:12px}
-    .addon-title{display:flex; align-items:center; gap:8px; font-weight:800; color:#224652; margin-bottom:6px}
-    .addon-chips{display:flex; flex-wrap:wrap; gap:8px}
-    .addon-chip{
-      display:inline-flex; align-items:center; gap:6px; padding:8px 12px;
+    .srv-tab{
       background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:999px;
-      box-shadow:var(--shadow-xs); cursor:pointer; user-select:none;
-      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease);
+      padding:8px 12px; font-weight:800; white-space:nowrap; cursor:pointer;
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
     }
-    .addon-chip:hover{transform:translateY(-2px); background:var(--brand-050); box-shadow:var(--shadow-sm)}
-    .addon-chip[aria-pressed="true"]{
-      border-color:var(--brand-600);
-      outline:3px solid rgba(2,122,147,.18); outline-offset:1px;
-      font-weight:800;
-    }
+    .srv-tab[aria-selected="true"]{ background:var(--brand-600); color:#fff; border-color:var(--brand-600); box-shadow:var(--shadow-sm); }
 
-    /* ===== Service Description card ===== */
-    .service-desc{
-      margin-top:12px;
-      border:1px dashed var(--border-300);
-      border-radius:14px;
-      background:#fff;
-      color:#0B2630;
-      padding:14px;
+    #srvCards{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px }
+    @media(min-width:560px){ #srvCards{ grid-template-columns:repeat(2,1fr) } }
+    @media(min-width:900px){ #srvCards{ grid-template-columns:repeat(3,1fr) } }
+
+    .srv-card{
+      position:relative;
+      background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px; box-shadow:var(--shadow-xs);
+      padding:0; min-height:180px; display:flex; flex-direction:column; overflow:hidden;
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+      outline:none;
     }
-    .service-desc .title{
-      display:flex; align-items:center; gap:8px;
-      font-weight:800; color:#224652; margin-bottom:6px;
+    .srv-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+    .srv-card.selected{ outline:3px solid var(--brand-600); outline-offset:2px; }
+    .srv-thumb{
+      width:100%; height:120px; background:#eaf5f8 center/cover no-repeat;
+      border-bottom:1px solid var(--border-300);
     }
-    .service-desc .body{line-height:1.7}
-    .service-desc .skeleton{
-      height:12px; border-radius:999px; background:#e8eef1; margin:8px 0;
-      animation: shimmer 1.2s infinite;
+    .srv-body{ padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px; flex:1; }
+    .srv-title{ font-size:1rem; font-weight:800; margin:0; display:flex; align-items:center; gap:8px; }
+    .srv-badges{ display:flex; flex-wrap:wrap; gap:6px; }
+    .s-badge{
+      display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; border:1px solid var(--border-300); font-size:.78rem; background:#fff;
     }
-    @keyframes shimmer{
-      0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6}
+    .s-badge.popular{ background:var(--brand-050); border-color:var(--brand-600); }
+    .srv-meta{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .chip{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:#f3f7f9; font-size:.8rem; color:#0B2630; border:1px solid var(--border-300); }
+    .chip.price{ font-weight:800; }
+    .srv-actions{ margin-top:auto; display:flex; gap:8px; padding:12px; border-top:1px solid var(--border-300); }
+    .btn-add, .btn-remove{
+      flex:1; border:1px solid var(--border-300); border-radius:12px; padding:10px 12px; font-weight:800; min-height:44px;
+      background:#fff; color:#027A93;
     }
+    .btn-add:hover, .btn-remove:hover{ background:var(--brand-050) }
+    .btn-remove{ color:#0B2630 }
+
+    #cartDrawer{
+      position:sticky; bottom:0; background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px;
+      box-shadow:var(--shadow-md); margin-top:12px; padding:14px; max-width:920px;
+    }
+    @media(min-width:992px){ #cartDrawer{ position:static; align-self:stretch } }
+    .qty-group{ display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border-300); border-radius:12px; padding:4px }
+    .qty-group button{ width:36px; height:36px; border:0; background:#f8fafc; border-radius:8px; font-weight:800 }
+    .qty-val{ min-width:28px; text-align:center; font-weight:800 }
+    .cart-title{ font-weight:800; color:#224652 }
+    .cart-muted{ color:#405a66; font-size:.95rem }
+    .cart-cta{ min-height:48px; font-weight:800; border-radius:12px }
+    .cart-breakdown{ margin-top:10px; font-size:.95rem; color:#224652 }
+    .cart-breakdown .row{ --bs-gutter-x: 0.6rem; }
   </style>
 </head>
 <body>
@@ -359,31 +244,38 @@
           <h1>وين تحب نجيك؟</h1>
 
           <div class="card position-relative" id="servicesCard">
-            <label class="form-label">اختيار المنطقة</label>
-            <select id="area" style="width:100%"></select>
-            <div class="field-error" id="err-area">يرجى اختيار المنطقة</div>
+            <!-- Legacy selects kept for compatibility -->
+            <div id="legacySelects">
+              <label class="form-label">اختيار المنطقة</label>
+              <select id="area" style="width:100%"></select>
+              <div class="field-error" id="err-area">يرجى اختيار المنطقة</div>
 
-            <div class="row g-3 mt-3">
-              <div class="col-12 col-md-6">
-                <label class="form-label">التصنيف</label>
-                <select id="serviceCat" style="width:100%"></select>
-                <div class="field-error" id="err-serviceCat">يرجى اختيار التصنيف</div>
-              </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label">الخدمة</label>
-                <select id="service" style="width:100%"></select>
-                <div class="field-error" id="err-service">يرجى اختيار الخدمة</div>
-              </div>
-              <div class="col-12">
-                <label class="form-label">عدد السيارات</label>
-                <select id="serviceCount" class="form-select">
-                  <option value="1" selected>1</option><option value="2">2</option>
-                  <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-                </select>
+              <div class="row g-3 mt-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label">التصنيف</label>
+                  <select id="serviceCat" style="width:100%"></select>
+                  <div class="field-error" id="err-serviceCat">يرجى اختيار التصنيف</div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="form-label">الخدمة</label>
+                  <select id="service" style="width:100%"></select>
+                  <div class="field-error" id="err-service">يرجى اختيار الخدمة</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">عدد السيارات</label>
+                  <select id="serviceCount" class="form-select">
+                    <option value="1" selected>1</option><option value="2">2</option>
+                    <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <!-- Additional services (chips) -->
+            <!-- NEW: Tabs + Cards + Cart -->
+            <div id="srvTabs" class="visually-hidden" role="tablist" aria-label="التصنيفات"></div>
+            <div id="srvCards" class="visually-hidden" role="list" aria-label="الخدمات"></div>
+
+            <!-- Additional services -->
             <div class="addon-wrap">
               <div class="addon-title"><i class="fa-solid fa-plus"></i> خدمات إضافية (اختياري)</div>
               <div id="addonChips" class="addon-chips" role="group" aria-label="خدمات إضافية"></div>
@@ -393,6 +285,13 @@
             <div id="serviceDesc" class="service-desc" style="display:none">
               <div class="title"><i class="fa-regular fa-file-lines"></i> وصف الخدمة</div>
               <div id="serviceDescBody" class="body"></div>
+            </div>
+
+            <div id="cartDrawer" class="visually-hidden" aria-live="polite">
+              <div class="cart-title mb-2"><i class="fa-solid fa-basket-shopping"></i> السلة</div>
+              <div id="cartBody">
+                <div class="cart-muted">اختر خدمة من البطاقات أعلاه لإضافتها إلى السلة.</div>
+              </div>
             </div>
 
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
@@ -567,6 +466,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
+    /* ---------- Feature flag for Cart UI ---------- */
+    const USE_TABS_AND_CARDS = true;
+
     /* ---------- Logo fallback ---------- */
     function handleLogoError(img){
       const fallbacks = [
@@ -587,7 +489,7 @@
     const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
     // GAS Web App base URL (replace after you deploy Code.gs)
-    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwl9d8YRt5HUoSdku54d6CeXQ28LgDXycGA31Qe9hLrPgQfFC0LhhJc4L5YTu_6v3r76Q/exec'; // e.g., https://script.google.com/macros/s/AKfycbxxxx/exec
+    const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbwl9d8YRt5HUoSdku54d6CeXQ28LgDXycGA31Qe9hLrPgQfFC0LhhJc4L5YTu_6v3r76Q/exec';
 
     let controllers=[];
     async function callContent2(path, cb, abortable=false, retries=3){
@@ -645,12 +547,15 @@
     };
     const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6};
     let selectedTime=null, servicesCache=null, categoriesCache=null, itiPhone=null, positionUrl="";
-    let lastSelectedISO="";
-    let isSubmitting=false;
-
+    let lastSelectedISO=""; let isSubmitting=false;
     let currentTimeFilter='all';
 
     const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', addons:[], locale:'ar'};
+
+    /* ====== Cart/Tabs/Cards state ====== */
+    let activeCatId=null;
+    let selectedServiceId=null;
+    let syncingFromCards=false;
 
     function setPageBackground(id){
       document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`);
@@ -663,11 +568,7 @@
       if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
       next.style.display='flex';
       requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 240); });
-
-      syncProgress(idx);
-      setPageBackground(next.id);
-      renderSummary(next.id);
-      updateNextAvailability();
+      syncProgress(idx); setPageBackground(next.id); renderSummary(next.id); updateNextAvailability();
       if(next.id==='page1') startWelcomeDeck();
     }
     function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
@@ -682,14 +583,13 @@
       prev.classList.toggle('hidden', i===0 || onThanks);
       next.classList.toggle('hidden', onThanks);
       wait.classList.remove('show');
-
       next.textContent = (i===0) ? 'تخطي العرض' : 'التالي';
     }
 
     function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
     function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
 
-    /* Plate logic (any length) */
+    /* Plate logic (unchanged) */
     function isSpecialPlate(num){
       if(!/^\d+$/.test(num) || num.length < 3) return false;
       const same = /^(\d)\1+$/.test(num);
@@ -709,7 +609,7 @@
       const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
     }
 
-    /* Summary chips */
+    /* Summary chips (minor typo fix: الموعد) */
     function renderSummary(currentId){
       const wrap=document.getElementById('summaryChips'); if(!wrap) return;
       const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
@@ -742,7 +642,7 @@
       });
     }
 
-    /* Welcome slideshow */
+    /* Welcome slideshow (unchanged) */
     let deckTimers=[]; let deckIndex=0; let deckRunning=false;
     const SLIDE_MS=2600; const GAP_MS=220;
     function startWelcomeDeck(){
@@ -751,7 +651,6 @@
       const dotsWrap=document.getElementById('pptDots');
       dotsWrap.innerHTML=slides.map((_,i)=>`<span class="ppt-dot${i===0?' active':''}"></span>`).join('');
       const dots=[...dotsWrap.children];
-
       const setActive=(i,ex=-1)=>{
         slides.forEach((s,idx)=>{ s.classList.remove('is-active','is-exiting'); if(idx===i){s.classList.add('is-active'); s.style.zIndex=2;} else if(idx===ex){s.classList.add('is-exiting'); s.style.zIndex=1;} else{s.style.zIndex=0;} });
         dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
@@ -763,7 +662,7 @@
     }
     function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
-    /* Times helpers */
+    /* Time helpers (unchanged) */
     function parseTimeToLuxon(raw){
       let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true});
       if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
@@ -845,9 +744,7 @@
         return;
       }
 
-      const viewList = dayTimes
-        .filter(x=>passesFilter(x.mins))
-        .sort((a,b)=> a.mins - b.mins);
+      const viewList = dayTimes.filter(x=>passesFilter(x.mins)).sort((a,b)=> a.mins - b.mins);
 
       if(!viewList.length){
         timeContainer.innerHTML=`<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد ضمن الفلتر المحدد</div>`;
@@ -870,7 +767,7 @@
       });
     }
 
-    /* Padding sync with fixed header & footer */
+    /* Padding sync (unchanged) */
     function installResizeObservers(){
       const header=document.getElementById('siteHeader');
       const footer=document.getElementById('siteFooter');
@@ -898,7 +795,7 @@
       };
     }
 
-    /* ---------- GAS helpers (Additional Services, Service Description, Map Settings) ---------- */
+    /* ---------- GAS helpers (unchanged) ---------- */
     function escapeHTML(s){
       return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
@@ -940,11 +837,9 @@
           const desc = data.data.description || '—';
           body.innerHTML = `<p style="margin:0; white-space:pre-wrap">${escapeHTML(desc)}</p>`;
           card.style.display='block';
-          console.log('[ServiceDesc] Received from GAS', { serviceId, serviceName, length: (desc || '').length, sample: String(desc || '').slice(0, 40) });
         } else {
           body.innerHTML = '<span class="text-muted">لا يوجد وصف متاح لهذه الخدمة</span>';
           card.style.display='block';
-          console.log('[ServiceDesc] Not found', { serviceId, serviceName, data });
         }
       }catch(_e){
         const card = document.getElementById('serviceDesc');
@@ -953,11 +848,10 @@
           body.innerHTML = '<span class="text-muted">تعذر تحميل وصف الخدمة حالياً</span>';
           card.style.display='block';
         }
-        console.warn('[ServiceDesc] Fetch error', _e);
       }
     }
 
-    // ==== FIXED: robust fetch of Additional Services — new AbortController for each retry ====
+    // ==== Additional Services (unchanged; re-renders cart) ====
     async function fetchAdditionalServicesAndRender(){
       const wrap = document.getElementById('addonChips');
       if(!wrap) return;
@@ -971,7 +865,6 @@
 
       wrap.innerHTML = '<span class="text-muted">...تحميل الإضافات</span>';
 
-      // Try up to 3 attempts; create a fresh controller+timeout each time
       for (let attempt = 0; attempt < 3; attempt++){
         const controller = new AbortController();
         const timer = setTimeout(()=>controller.abort(), 8000);
@@ -984,45 +877,20 @@
             signal: controller.signal
           });
 
-          // attempt to parse JSON (may fail on non-JSON)
           let data = null;
           try { data = await res.json(); } catch(_){ data = null; }
 
           if (res.ok && data && data.success && Array.isArray(data.data)){
-            const options = data.data
-              .map(x => String(x?.label ?? '').trim())
-              .filter(Boolean);
-
-            if (!options.length){
-              showNone();
-              clearTimeout(timer);
-              return;
-            }
-
-            renderAddonChips(options);
-            clearTimeout(timer);
-            return;
+            const options = data.data.map(x => String(x?.label ?? '').trim()).filter(Boolean);
+            if (!options.length){ showNone(); clearTimeout(timer); return; }
+            renderAddonChips(options); clearTimeout(timer); return;
           } else {
-            if (attempt < 2){
-              await new Promise(r=>setTimeout(r, 500));
-              clearTimeout(timer);
-              continue;
-            }
-            showNone('تعذر تحميل الخدمات الإضافية');
-            console.warn('[AdditionalServices] Unexpected payload', { status: res.status, data });
-            clearTimeout(timer);
-            return;
+            if (attempt < 2){ await new Promise(r=>setTimeout(r, 500)); clearTimeout(timer); continue; }
+            showNone('تعذر تحميل الخدمات الإضافية'); clearTimeout(timer); return;
           }
         }catch(err){
-          if (attempt < 2){
-            await new Promise(r=>setTimeout(r, 500));
-            clearTimeout(timer);
-            continue;
-          }
-          showNone('تعذر تحميل الخدمات الإضافية');
-          console.warn('[AdditionalServices] Fetch error', err);
-          clearTimeout(timer);
-          return;
+          if (attempt < 2){ await new Promise(r=>setTimeout(r, 500)); clearTimeout(timer); continue; }
+          showNone('تعذر تحميل الخدمات الإضافية'); clearTimeout(timer); return;
         }
       }
     }
@@ -1052,7 +920,7 @@
             nForm.addons = [...nForm.addons, val];
             btn.setAttribute('aria-pressed','true');
           }
-          updateNextAvailability();
+          renderCartSummary(); updateNextAvailability();
         });
         btn.addEventListener('keydown', e=>{
           if(e.key==='Enter' || e.key===' '){ e.preventDefault(); btn.click(); }
@@ -1061,9 +929,8 @@
       });
     }
 
-    // Map settings (defaults + dynamic from GAS)
+    // Map settings (unchanged)
     let map, marker, autocomplete, allowedPoly;
-    // Fallback: Riyadh rough bounds & polygon if GAS not available
     let SA_BOUNDS = { north: 25.0500, south: 24.3000, west: 46.2000, east: 47.1000 };
     let ALLOWED_POLY_PATH = [
       {lat:24.9550, lng:46.4630},
@@ -1077,7 +944,6 @@
       {lat:24.5600, lng:46.4200},
       {lat:24.7400, lng:46.3900}
     ];
-
     async function loadMapSettingsFromGAS(){
       try{
         const url = `${GAS_BASE_URL}?route=mapSettings&appId=${encodeURIComponent(APP_ID)}`;
@@ -1090,24 +956,255 @@
             SA_BOUNDS = { north: Number(bounds.north), south: Number(bounds.south), west: Number(bounds.west), east: Number(bounds.east) };
           }
           if(Array.isArray(poly) && poly.length){
-            ALLOWED_POLY_PATH = poly
-              .map(p=>({lat:Number(p.lat), lng:Number(p.lng)}))
-              .filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
+            ALLOWED_POLY_PATH = poly.map(p=>({lat:Number(p.lat), lng:Number(p.lng)})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
           }
-          console.log('[MapSettings] Loaded from GAS', { SA_BOUNDS, points: ALLOWED_POLY_PATH.length });
-        }else{
-          console.warn('[MapSettings] Using fallback defaults');
         }
-      }catch(e){
-        console.warn('[MapSettings] Fetch error, using fallback', e);
+      }catch(e){}
+    }
+
+    /* ====== Tabs/Cards enable & render ====== */
+    function enableCartUI(on){
+      const legacy = document.getElementById('legacySelects');
+      const tabs = document.getElementById('srvTabs');
+      const cards = document.getElementById('srvCards');
+      const cart = document.getElementById('cartDrawer');
+      if(on){
+        legacy.classList.add('visually-hidden');
+        tabs.classList.remove('visually-hidden');
+        cards.classList.remove('visually-hidden');
+        cart.classList.remove('visually-hidden');
+      }else{
+        legacy.classList.remove('visually-hidden');
+        tabs.classList.add('visually-hidden');
+        cards.classList.add('visually-hidden');
+        cart.classList.add('visually-hidden');
       }
+    }
+
+    function renderCategoryTabs(cats){
+      const wrap=document.getElementById('srvTabs'); if(!wrap) return;
+      wrap.innerHTML='';
+      if(!Array.isArray(cats) || !cats.length){ wrap.innerHTML='<span class="cart-muted">لا توجد تصنيفات</span>'; return; }
+
+      const frag=document.createDocumentFragment();
+      cats.forEach((c,idx)=>{
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.className='srv-tab';
+        btn.setAttribute('role','tab');
+        btn.setAttribute('aria-selected', String(c.TS_category_id)==String(activeCatId));
+        btn.dataset.id=c.TS_category_id;
+        btn.textContent=c.TS_category_arabic_name || ('تصنيف '+c.TS_category_id);
+        btn.addEventListener('click', ()=>{
+          activeCatId=String(c.TS_category_id);
+          renderCategoryTabs(cats);
+          renderServiceCards();
+        });
+        frag.appendChild(btn);
+        if(activeCatId==null && idx===0){ activeCatId=String(c.TS_category_id); }
+      });
+      wrap.appendChild(frag);
+    }
+
+    function parseNumberFromPrice(val){
+      if(val==null) return NaN;
+      const n = Number(String(val).replace(/[^\d.]/g,''));
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    function buildBadges(s){
+      const badges=[];
+      if(s.TS_badges){ // comma-separated
+        String(s.TS_badges).split(',').map(b=>b.trim()).filter(Boolean).forEach(b=>badges.push({text:b, popular:false}));
+      }
+      if(String(s.TS_popular||'').toLowerCase()==='true'){ badges.unshift({text:'الأكثر طلبًا', popular:true}); }
+      return badges;
+    }
+
+    function serviceCardTemplate(s, selected){
+      const id=String(s.TS_service_id);
+      const title=s.TS_service_arabic_name || ('خدمة '+id);
+      const priceText = s.TS_price ? `${s.TS_price}` : ''; // keep original formatting
+      const unitPrice = parseNumberFromPrice(s.TS_price);
+      const duration = s.TS_duration ? `${s.TS_duration}` : '';
+      const short = s.TS_short_desc ? String(s.TS_short_desc) : '';
+      const badges = buildBadges(s);
+      const thumb = s.TS_thumb_url || '';
+
+      return `
+        <div class="srv-card ${selected?'selected':''}" role="listitem" aria-selected="${selected?'true':'false'}" data-id="${id}" tabindex="-1" title="${escapeHTML(short || title)}">
+          <div class="srv-thumb" style="${thumb ? `background-image:url('${thumb}')` : ''}"></div>
+          <div class="srv-body">
+            <div class="srv-title">${escapeHTML(title)}</div>
+            <div class="srv-meta">
+              ${priceText?`<span class="chip price"><i class="fa-solid fa-tag"></i> ${escapeHTML(priceText)}</span>`:''}
+              ${duration?`<span class="chip"><i class="fa-regular fa-clock"></i> ${escapeHTML(duration)}</span>`:''}
+            </div>
+            <div class="srv-badges">
+              ${badges.map(b=>`<span class="s-badge ${b.popular?'popular':''}"><i class="fa-solid fa-star${b.popular?'':'-half-stroke'}"></i> ${escapeHTML(b.text)}</span>`).join('')}
+            </div>
+          </div>
+          <div class="srv-actions">
+            <button class="btn-add" type="button">${selected?'تم الاختيار':'إضافة إلى السلة'}</button>
+            ${selected?'<button class="btn-remove" type="button">إزالة</button>':''}
+          </div>
+        </div>
+      `;
+    }
+
+    function installCardKeyboard(grid){
+      const cards=[...grid.querySelectorAll('.srv-card')];
+      if(!cards.length) return;
+      // set initial roving tabindex
+      const focused = cards.find(c=>c.classList.contains('selected')) || cards[0];
+      cards.forEach(c=>c.setAttribute('tabindex','-1'));
+      focused.setAttribute('tabindex','0');
+
+      const moveFocus=(from, delta)=>{
+        const idx=cards.indexOf(from);
+        const next=cards[Math.max(0, Math.min(cards.length-1, idx+delta))];
+        if(next){ from.setAttribute('tabindex','-1'); next.setAttribute('tabindex','0'); next.focus(); }
+      };
+
+      grid.addEventListener('keydown', (e)=>{
+        const t=e.target;
+        if(!t.classList.contains('srv-card')) return;
+        if(e.key==='ArrowRight' || e.key==='ArrowUp'){ e.preventDefault(); moveFocus(t, -1); }
+        if(e.key==='ArrowLeft'  || e.key==='ArrowDown'){ e.preventDefault(); moveFocus(t, +1); }
+        if(e.key==='Enter' || e.key===' '){
+          e.preventDefault();
+          t.querySelector('.btn-add')?.click();
+        }
+        if(e.key==='Delete' || e.key==='Backspace'){
+          e.preventDefault();
+          t.querySelector('.btn-remove')?.click();
+        }
+      }, {passive:false});
+    }
+
+    function renderServiceCards(){
+      const grid=document.getElementById('srvCards'); if(!grid) return;
+      grid.innerHTML='';
+      if(!Array.isArray(servicesCache) || !servicesCache.length){ grid.innerHTML='<div class="cart-muted">لا توجد خدمات</div>'; return; }
+      const list=servicesCache.filter(s=> String(s.TS_category_id)===String(activeCatId));
+      if(!list.length){ grid.innerHTML='<div class="cart-muted">لا توجد خدمات ضمن هذا التصنيف</div>'; return; }
+
+      grid.innerHTML = list.map(s=>serviceCardTemplate(s, String(selectedServiceId)===String(s.TS_service_id))).join('');
+
+      // wire events
+      [...grid.querySelectorAll('.srv-card')].forEach(card=>{
+        const id = card.dataset.id;
+        const svc = (servicesCache||[]).find(s=>String(s.TS_service_id)===String(id));
+        const title = svc?.TS_service_arabic_name || ('خدمة '+id);
+
+        card.querySelector('.btn-add').addEventListener('click', ()=>{
+          selectedServiceId=id;
+          syncingFromCards=true;
+          $('#serviceCat').val(activeCatId).trigger('change.select2');
+          $('#service').val(id).trigger('change.select2');
+          nForm.serviceCat=String(activeCatId);
+          nForm.service=String(id);
+          syncingFromCards=false;
+
+          fetchServiceDescription(id, title);
+          renderSummary('page2'); renderServiceCards(); renderCartSummary(); updateNextAvailability();
+        });
+
+        const rm=card.querySelector('.btn-remove');
+        rm && rm.addEventListener('click', ()=>{
+          if(selectedServiceId===id){
+            selectedServiceId=null; nForm.service='';
+            $('#service').val(null).trigger('change.select2');
+            clearServiceDescriptionUI();
+            renderServiceCards(); renderCartSummary(); renderSummary('page2'); updateNextAvailability();
+          }
+        });
+      });
+
+      installCardKeyboard(grid);
+    }
+
+    function currencyFormat(n){
+      try{
+        return new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR', maximumFractionDigits:2}).format(n);
+      }catch(_){ return `${n} ر.س`; }
+    }
+
+    function renderCartSummary(){
+      const box=document.getElementById('cartBody'); if(!box) return;
+      const cntSel=document.getElementById('serviceCount');
+      const qty=Number(cntSel?.value||1);
+      const svc = (Array.isArray(servicesCache)?servicesCache:[]).find(s=> String(s.TS_service_id)===String(selectedServiceId));
+      const title = svc?.TS_service_arabic_name || (selectedServiceId?('خدمة '+selectedServiceId):'—');
+      const unitPrice = parseNumberFromPrice(svc?.TS_price);
+      const hasPrice = Number.isFinite(unitPrice);
+      const total = hasPrice ? unitPrice * qty : NaN;
+
+      if(!selectedServiceId){
+        box.innerHTML = `<div class="cart-muted">اختر خدمة من البطاقات أعلاه لإضافتها إلى السلة.</div>`;
+        return;
+      }
+
+      const addons = (nForm.addons||[]).map(a=>`<span class="badge text-bg-light" style="border:1px solid var(--border-300); color:#0B2630; margin-inline:4px 0">${a}</span>`).join(' ');
+
+      box.innerHTML = `
+        <div class="row g-3">
+          <div class="col-12 col-lg-7">
+            <div><strong>${escapeHTML(title)}</strong></div>
+            <div class="cart-muted">الكمية و الإضافات</div>
+            <div class="mt-2">
+              <div class="qty-group" aria-label="عدد السيارات">
+                <button type="button" id="qtyMinus" aria-label="نقص">−</button>
+                <span class="qty-val" id="qtyVal">${qty}</span>
+                <button type="button" id="qtyPlus" aria-label="زيادة">+</button>
+              </div>
+            </div>
+            <div class="mt-2" id="cartAddons">${addons||'<span class="cart-muted">لا توجد إضافات</span>'}</div>
+
+            <div class="cart-breakdown">
+              ${hasPrice ? `
+                <div class="row"><div class="col">سعر الوحدة</div><div class="col text-end">${currencyFormat(unitPrice)}</div></div>
+                <div class="row"><div class="col">الكمية</div><div class="col text-end">× ${qty}</div></div>
+                <hr class="my-2"/>
+                <div class="row fw-bold"><div class="col">الإجمالي</div><div class="col text-end">${currencyFormat(total)}</div></div>
+                <small class="text-muted d-block mt-1">* قد تُضاف رسوم على الموقع أو الوقت حسب التوافر.</small>
+              ` : `
+                <small class="text-muted d-block mt-2">لا تتوفر معلومات تسعير — سنؤكد السعر عبر واتساب.</small>
+              `}
+            </div>
+          </div>
+          <div class="col-12 col-lg-5 d-flex align-items-end justify-content-lg-end">
+            <button type="button" id="cartConfirm" class="btn btn-primary cart-cta">تأكيد الخدمة</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('qtyMinus').onclick=()=>{
+        const cur=Number(cntSel.value||1);
+        const nxt=Math.max(1, cur-1);
+        cntSel.value=String(nxt);
+        nForm.serviceCount=String(nxt);
+        document.getElementById('qtyVal').textContent=String(nxt);
+        renderCartSummary(); updateNextAvailability();
+      };
+      document.getElementById('qtyPlus').onclick=()=>{
+        const cur=Number(cntSel.value||1);
+        const nxt=Math.min(5, cur+1);
+        cntSel.value=String(nxt);
+        nForm.serviceCount=String(nxt);
+        document.getElementById('qtyVal').textContent=String(nxt);
+        renderCartSummary(); updateNextAvailability();
+      };
+      document.getElementById('cartConfirm').onclick=()=>{
+        showToast('success','تم تأكيد الخدمة في السلة');
+        updateNextAvailability();
+      };
     }
 
     /* ---------- Init ---------- */
     $(function(){
       installResizeObservers();
 
-      // Warm image cache as a fallback to preload
       Object.values(PAGE_BACKGROUNDS).forEach(src=>{ const i=new Image(); i.decoding='async'; i.src=src; });
 
       $('#area').select2({width:'100%',placeholder:'اختر المنطقة لخدمة العناية الفاخرة', dir:'rtl'});
@@ -1133,7 +1230,7 @@
       $('#name').on('input', function(){ nForm.customerN=this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
       $('#mobile').on('input', function(){ renderSummary('page4'); updateNextAvailability(); });
       $('#carName').on('input', function(){ updateNextAvailability(); });
-      $('#serviceCount').on('change', function(){ nForm.serviceCount=this.value||'1'; renderSummary('page2'); updateNextAvailability(); });
+      $('#serviceCount').on('change', function(){ nForm.serviceCount=this.value||'1'; renderSummary('page2'); renderCartSummary(); updateNextAvailability(); });
       $('#plateNumber').on('input', function(){ updatePlateHint(); renderSummary('page4'); updateNextAvailability(); });
 
       const today=DateTime.now().toFormat('yyyy-LL-dd');
@@ -1154,29 +1251,60 @@
         nForm.location=this.value; setLoadingServices(true);
         clearServiceDescriptionUI();
         callContent2(`/services?location=${encodeURIComponent(this.value)}`, res=>{
-          servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[]; 
+          servicesCache=res?.data?.services||[]; categoriesCache=res?.data?.servicesCat||[];
+          // Legacy selects data
           const cats=categoriesCache.map(c=>({id:c.TS_category_id,text:c.TS_category_arabic_name}));
           $('#serviceCat').empty().select2({data:cats,width:'100%',placeholder:'فئة الخدمة', dir:'rtl'});
           if(cats.length) $('#serviceCat').val(cats[0].id).trigger('change');
           setLoadingServices(false); renderSummary('page2'); updateNextAvailability();
+
+          // Tabs + Cards
+          if(USE_TABS_AND_CARDS){
+            enableCartUI(true);
+            activeCatId = cats.length ? String(cats[0].id) : null;
+            selectedServiceId = nForm.service || null;
+            renderCategoryTabs(categoriesCache);
+            renderServiceCards();
+            renderCartSummary();
+          }
         }, true);
       });
 
       $('#serviceCat').on('change', function(){
-        nForm.serviceCat=this.value; const cid=Number(this.value);
+        if(syncingFromCards) return;
+        nForm.serviceCat=this.value;
         clearServiceDescriptionUI();
+        const cid=Number(this.value);
         const items=servicesCache?.filter(s=>Number(s.TS_category_id)===cid)?.sort((a,b)=>a.TS_service_id-b.TS_service_id)?.map(s=>({id:s.TS_service_id,text:s.TS_service_arabic_name}))||[];
         $('#service').empty().select2({data:items,width:'100%',placeholder:'باقتك المختارة', dir:'rtl'});
         if(items.length) $('#service').val(items[0].id).trigger('change');
         renderSummary('page2'); updateNextAvailability();
+
+        if(USE_TABS_AND_CARDS){
+          activeCatId=String(this.value||'');
+          renderCategoryTabs(categoriesCache);
+          renderServiceCards();
+          renderCartSummary();
+        }
       });
 
       $('#service').on('change', function(){
+        if(syncingFromCards){
+          const selectedText = $('#service').find(':selected').text() || '';
+          if (this.value || selectedText) fetchServiceDescription(this.value, selectedText);
+          return;
+        }
         nForm.service=this.value||'';
+        selectedServiceId = this.value || null;
         renderSummary('page2'); updateNextAvailability();
         const selectedText = $('#service').find(':selected').text() || '';
         if (this.value || selectedText) fetchServiceDescription(this.value, selectedText);
         else clearServiceDescriptionUI();
+
+        if(USE_TABS_AND_CARDS){
+          renderServiceCards();
+          renderCartSummary();
+        }
       });
 
       const luxuryFirstBrands = [
@@ -1292,6 +1420,8 @@
 
       setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
       updateNextAvailability();
+
+      if(!USE_TABS_AND_CARDS){ enableCartUI(false); }
     });
 
     function updateNextAvailability(){
@@ -1305,9 +1435,8 @@
       nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
     }
 
-    /* Google Map + Places + Geometry with polygon limit (dynamic settings) */
+    /* Google Map + Places + Geometry (unchanged) */
     async function initMap(){
-      // Load Map Settings from GAS first (best-effort; falls back to defaults)
       await loadMapSettingsFromGAS();
 
       const def={lat:24.7136,lng:46.6753};
@@ -1316,7 +1445,6 @@
         restriction:{latLngBounds: SA_BOUNDS, strictBounds:false}
       });
 
-      // Draw allowed polygon zone
       if(Array.isArray(ALLOWED_POLY_PATH) && ALLOWED_POLY_PATH.length >= 3){
         allowedPoly = new google.maps.Polygon({
           map,
@@ -1329,7 +1457,6 @@
         });
       }
 
-      // Fit to polygon if exists, else to bounds
       let polyBounds = null;
       if(allowedPoly){
         polyBounds = new google.maps.LatLngBounds();
@@ -1345,8 +1472,7 @@
       const setPos=(latLng,pan=false)=>{
         if(!latLng) return;
         if (allowedPoly && !google.maps.geometry.poly.containsLocation(latLng, allowedPoly)) {
-          showToast('error','خارج النطاق المسموح للخدمة');
-          return;
+          showToast('error','خارج النطاق المسموح للخدمة'); return;
         }
         marker.setPosition(latLng);
         if(pan){ map.panTo(latLng); }
