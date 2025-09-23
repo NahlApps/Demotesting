@@ -120,15 +120,15 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 /* Card */
 .srv-card{
   position:relative; background:#fff; color:#0B2630; border:1px solid var(--border-300); border-radius:14px; box-shadow:var(--shadow-xs);
-  padding:0; min-height:180px; display:flex; flex-direction:column; overflow:hidden;
+  padding:0; min-height:200px; display:flex; flex-direction:column; overflow:hidden;
   transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), border-color var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
   outline:none;
 }
 .srv-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); }
 .srv-card.selected{ outline:3px solid var(--brand-600); outline-offset:2px; }
-.srv-thumb{ width:100%; height:120px; background:#eaf5f8 center/cover no-repeat; border-bottom:1px solid var(--border-300); }
-.srv-body{ padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px; flex:1; }
-.srv-title{ font-size:1rem; font-weight:800; margin:0; display:flex; align-items:center; gap:8px; }
+.srv-thumb{ width:100%; height:140px; background:#eaf5f8 center/cover no-repeat; border-bottom:1px solid var(--border-300); }
+.srv-body{ padding:14px 14px 16px; display:flex; flex-direction:column; gap:8px; flex:1; }
+.srv-title{ font-size:1.02rem; font-weight:800; margin:0; display:flex; align-items:center; gap:8px; }
 .srv-badges{ display:flex; flex-wrap:wrap; gap:6px; }
 .s-badge{
   display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; border:1px solid var(--border-300); font-size:.78rem; background:#fff;
@@ -136,34 +136,25 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 .s-badge.popular{ background:var(--brand-050); border-color:var(--brand-600); }
 .srv-meta{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
 .chip.price{ font-weight:800; }
-.srv-desc{ font-size:.86rem; color:#365563; line-height:1.5; }
+.srv-desc{ font-size:.9rem; color:#365563; line-height:1.55; }
+.srv-desc.clamp{ display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
 
-/* clamp desc on mobile */
-@media (max-width:640px){
-  .srv-desc{
-    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
-  }
-}
-
+/* Card actions */
 .srv-actions{ margin-top:auto; display:flex; gap:8px; padding:12px; border-top:1px solid var(--border-300); }
-.btn-add, .btn-remove{
+.btn-add, .btn-remove, .btn-more{
   flex:1; border:1px solid var(--border-300); border-radius:12px; padding:10px 12px; font-weight:800; min-height:44px;
-  background:#fff; color:#027A93;
+  background:#fff; color:#027A93; cursor:pointer;
 }
-.btn-add:hover, .btn-remove:hover{ background:var(--brand-050) }
+.btn-add:hover, .btn-remove:hover, .btn-more:hover{ background:var(--brand-050) }
 .btn-remove{ color:#0B2630 }
+.btn-more{ flex:0 0 auto; min-width:110px }
 
-/* Addons (desktop) */
-.addon-title{ font-weight:800; color:#224652; margin-top:16px; margin-bottom:8px; }
-.addon-chips{ display:flex; flex-wrap:wrap; gap:8px; }
-.addon-chip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border-300); background:#fff; border-radius:999px; padding:8px 12px; min-height:40px; cursor:pointer; }
-.addon-chip[aria-pressed="true"]{ background:var(--brand-050); outline:2px solid var(--brand-600); outline-offset:2px; }
-
-/* Description Panel */
-.service-desc{ margin-top:12px; border:1px solid var(--border-300); border-radius:14px; background:#fff; color:#0B2630; padding:16px; }
-.service-desc .title{ font-weight:800; color:#224652; margin-bottom:6px; }
-.skeleton{ height:12px; background:linear-gradient(90deg,#eef5f8,#fff,#eef5f8); background-size:180% 100%; border-radius:8px; animation:s 1.2s var(--ease) infinite; }
-@keyframes s{ 0%{background-position:0% 0} 100%{background-position:-180% 0} }
+/* Loading overlays */
+.load-overlay {
+  position:absolute; inset:0; display:none; align-items:center; justify-content:center; gap:10px;
+  background:rgba(255,255,255,.65); backdrop-filter:blur(3px); border-radius:14px; color:#0B2630;
+}
+.load-overlay.show { display:flex; }
 
 /* Time grid */
 .time-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; }
@@ -174,13 +165,6 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 }
 .time-option[aria-checked="true"] { outline:3px solid var(--brand-600); outline-offset:2px; background:var(--brand-050); }
 .time-option:focus-visible { box-shadow:0 0 0 4px rgba(2,122,147,.18); }
-
-/* Loading overlays */
-.load-overlay {
-  position:absolute; inset:0; display:none; align-items:center; justify-content:center; gap:10px;
-  background:rgba(255,255,255,.65); backdrop-filter:blur(3px); border-radius:14px; color:#0B2630;
-}
-.load-overlay.show { display:flex; }
 
 /* Pay grid */
 .pay-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; }
@@ -235,28 +219,31 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
   header .brand img{ height:56px }
   .card{ padding:16px; border-radius:12px }
 
+  /* Mobile cards: fuller width, taller thumb, better tap targets */
   #srvCards{
-    display:flex; overflow-x:auto; gap:10px; padding:2px 2px 6px;
+    display:flex; overflow-x:auto; gap:12px; padding:2px 2px 8px;
     scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
   }
   .srv-card{
-    min-width:84%; flex:0 0 auto; scroll-snap-align:center;
+    min-width:92%; /* wider than before */
+    flex:0 0 auto; scroll-snap-align:center;
     box-shadow:0 2px 8px rgba(11,38,48,.08); border-color:#E5EFF4
   }
-  .srv-thumb{ height:96px }
+  .srv-thumb{ height:160px }
+  .srv-body{ padding:14px }
   .srv-actions{ padding:10px }
-  .btn-add,.btn-remove{ min-height:48px; border-radius:10px }
-
+  .btn-add,.btn-remove,.btn-more{ min-height:48px; border-radius:10px }
+  .srv-desc.clamp{ -webkit-line-clamp:5 }
+  .srv-title{ font-size:1.06rem }
   .summary-chips{ gap:6px; overflow:auto; padding-bottom:2px }
   .summary-chips .chip{
     border:0; background:rgba(255,255,255,.14); color:#fff; font-size:.78rem;
     padding:6px 10px; border-radius:999px; white-space:nowrap
   }
-
   .time-option{ min-height:48px; font-size:15px }
 }
 
-/* Modal (addons) */
+/* Modal (Add-ons Bottom Sheet) */
 .modal-wrap{ position:fixed; inset:0; display:none; z-index:1200 }
 .modal-wrap[aria-hidden="false"]{ display:block }
 .modal-backdrop{
@@ -266,9 +253,20 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
   width:min(92vw,520px); background:#fff; color:#0B2630; border-radius:16px; box-shadow:0 20px 60px rgba(11,38,48,.28);
   padding:16px;
+  max-height:min(80dvh, 560px); overflow:auto;
 }
-.modal-title{ font-weight:800; color:#224652; margin:0 0 10px }
-.modal-body{ display:flex; flex-wrap:wrap; gap:8px; max-height:56vh; overflow:auto; }
+@media (max-width:640px){
+  .modal-sheet{
+    top:auto; bottom:calc(var(--footer-h) + 10px); transform:translateX(-50%);
+    width:min(96vw,560px); border-bottom-left-radius:0; border-bottom-right-radius:0;
+    max-height:min(72dvh, 560px);
+  }
+}
+.modal-title{ font-weight:800; color:#224652; margin:0 0 10px; display:flex; align-items:center; justify-content:space-between }
+.modal-title .x{ background:none;border:0;font-size:22px;line-height:1;cursor:pointer }
+.modal-body{ display:flex; flex-wrap:wrap; gap:8px; }
+.addon-chip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border-300); background:#fff; border-radius:999px; padding:10px 14px; min-height:40px; cursor:pointer; }
+.addon-chip[aria-pressed="true"]{ background:var(--brand-050); outline:2px solid var(--brand-600); outline-offset:2px; }
 .modal-actions{ display:flex; gap:8px; justify-content:space-between; margin-top:12px }
 .modal-actions .btn{ min-height:44px; border-radius:10px; font-weight:800 }
 .modal-actions .btn.secondary{ background:#fff; color:#0B2630; border:1px solid var(--border-300) }
@@ -347,17 +345,8 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
             <div id="srvTabs" class="visually-hidden" role="tablist" aria-label="التصنيفات"></div>
             <div id="srvCards" class="visually-hidden" role="list" aria-label="الخدمات"></div>
 
-            <!-- Desktop addon chips (mobile uses popup) -->
-            <div class="addon-wrap d-none d-md-block">
-              <div class="addon-title"><i class="fa-solid fa-plus"></i> خدمات إضافية (اختياري)</div>
-              <div id="addonChips" class="addon-chips" role="group" aria-label="خدمات إضافية"></div>
-            </div>
-
-            <!-- Service description pane -->
-            <div id="serviceDesc" class="service-desc" style="display:none">
-              <div class="title"><i class="fa-regular fa-file-lines"></i> وصف الخدمة</div>
-              <div id="serviceDescBody" class="body"></div>
-            </div>
+            <!-- (Removed) outside add-ons & outside description panel -->
+            <!-- intentionally empty -->
 
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
@@ -527,11 +516,14 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
     </div>
   </footer>
 
-  <!-- ===== Addons Popup (small window) ===== -->
+  <!-- ===== Addons Popup (bottom sheet only) ===== -->
   <div id="addonModal" class="modal-wrap" aria-hidden="true">
     <div class="modal-backdrop" data-close="1"></div>
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="addonTitle">
-      <h3 id="addonTitle" class="modal-title"><i class="fa-solid fa-plus"></i> اختر خدمات إضافية (اختياري)</h3>
+      <h3 id="addonTitle" class="modal-title">
+        <span><i class="fa-solid fa-plus"></i> اختر خدمات إضافية (اختياري)</span>
+        <button class="x" type="button" title="إغلاق" aria-label="إغلاق" data-close="1">&times;</button>
+      </h3>
       <div id="addonList" class="modal-body"></div>
       <div class="modal-actions">
         <button type="button" id="addonCancel" class="btn secondary">لا شكرًا</button>
@@ -549,7 +541,7 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 
   <script>
 /* =========================================================
-   Config + Flags (NO shorthand/NO spread inside objects)
+   Config + Flags
    ========================================================= */
 var USE_TABS_AND_CARDS = true;
 var SOFT_PHONE_VALIDATION = true;
@@ -563,10 +555,10 @@ var RESERVE_URL_PRIMARY  = defaultLink2 + '/reserveAppointment';
 var RESERVE_URL_FALLBACK = defaultLink2.replace(/\/form\/?$/,'') + '/reserveAppointment';
 
 // GAS Web App (update to your deployment URL)
-var GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbzJeAv7NCQuxQGEcMa-P5mzuZCWFVaV88DeRCwY5d-Zhg4ckZsfw0_uwV8qhEGbDke0/exec';
+var GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycby_iSQk4zH6iMClXdEsYdCLLK4In58QpzWqO0w5-HY3OeaNv1pgTSelLrZaOFO0hZA8/exec';
 
 /* =========================================================
-   Utilities (compat safe)
+   Utilities
    ========================================================= */
 function handleLogoError(img){
   var fallbacks = [
@@ -609,7 +601,7 @@ function parseNumberFromPrice(val){
 }
 
 /* =========================================================
-   API – GAS (NO spread/NO shorthand)
+   API – GAS
    ========================================================= */
 async function api(route, params){
   var obj = Object.assign({ route: route }, params || {});
@@ -621,7 +613,7 @@ async function api(route, params){
 }
 
 /* =========================================================
-   Platform calls – for appointments + reservation (unchanged)
+   Platform calls – for appointments + reservation
    ========================================================= */
 var controllers=[];
 async function callContent2(path, cb, abortable, retries){
@@ -726,7 +718,7 @@ function renderSummary(){
 
   var areaTxt=$('#area').find(':selected').text()||'';
   var srvTxt=$('#service').find(':selected').text()||'';
-  var dt=nForm.date ? DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '';
+  var dt=nForm.date ? luxon.DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '';
   var tm=nForm.time||'';
   var pay=(nForm.paymentMethod||'');
   var locOk=!!positionUrl;
@@ -775,10 +767,10 @@ function updatePlateHint(){
 
 /* Time helpers */
 function parseTimeToLuxon(raw){
-  var t=DateTime.fromISO(String(raw||'').trim(),{setZone:true});
-  if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
-  if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true});
-  if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true});
+  var t=luxon.DateTime.fromISO(String(raw||'').trim(),{setZone:true});
+  if(!t.isValid) t=luxon.DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
+  if(!t.isValid) t=luxon.DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true});
+  if(!t.isValid) t=luxon.DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true});
   return t.isValid?t:null;
 }
 
@@ -807,7 +799,7 @@ function fetchTimesForSelectedDate(){
   var dateEl=document.getElementById('date');
   var timeContainer=document.getElementById('time-container');
   var loc=$('#area').val()||''; var srv=$('#service').val()||'';
-  var selectedISO=(dateEl.value||DateTime.now().toFormat('yyyy-LL-dd')).trim();
+  var selectedISO=(dateEl.value||luxon.DateTime.now().toFormat('yyyy-LL-dd')).trim();
   lastSelectedISO=selectedISO;
 
   if(!loc||!srv){
@@ -818,14 +810,14 @@ function fetchTimesForSelectedDate(){
   dateEl.disabled=true; setLoadingTimes(true);
   timeContainer.innerHTML='<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"></div>';
 
-  var now=DateTime.now().setZone('Asia/Riyadh');
+  var now=luxon.DateTime.now().setZone('Asia/Riyadh');
   var isToday=selectedISO===now.toISODate();
 
   var qs='/appointments?startDate='+encodeURIComponent(selectedISO)+'&location='+encodeURIComponent(loc)+'&service='+encodeURIComponent(srv)+'&onlyAvailable=1';
   callContent2(qs,function(res){
     var rows=(res && res.data && res.data.appointments) ? res.data.appointments : [];
     var filtered=rows.filter(function(r){
-      var d=DateTime.fromISO(r.TS_appointment_date,{setZone:true}); if(!d.isValid||d.toISODate()!==selectedISO) return false;
+      var d=luxon.DateTime.fromISO(r.TS_appointment_date,{setZone:true}); if(!d.isValid||d.toISODate()!==selectedISO) return false;
       var t=parseTimeToLuxon(r.TS_appointment_time); if(!t) return false;
       var na=normalizeAvailability(r); if(!na.looksOpen) return false;
       if(isToday){ var slot=now.set({hour:t.hour,minute:t.minute,second:0}); if(slot<now.plus({minutes:5})) return false; }
@@ -835,7 +827,7 @@ function fetchTimesForSelectedDate(){
     var list=filtered.map(function(r){
       var t=parseTimeToLuxon(r.TS_appointment_time);
       var mins = t.hour*60 + t.minute;
-      return {label:t.toLocaleString(DateTime.TIME_SIMPLE), h:t.hour, m:t.minute, mins:mins};
+      return {label:t.toLocaleString(luxon.DateTime.TIME_SIMPLE), h:t.hour, m:t.minute, mins:mins};
     });
 
     var seen={};
@@ -864,7 +856,7 @@ function renderSelectedDateTimes(selectedISO){
   }
 
   var preselect = !selectedTime || !viewList.some(function(v){
-    var d = DateTime.fromFormat((selectedTime && selectedTime.iso) || '','HH:mm'); 
+    var d = luxon.DateTime.fromFormat((selectedTime && selectedTime.iso) || '','HH:mm'); 
     return (v.h*60+v.m) === (d.hour*60 + d.minute);
   });
 
@@ -875,7 +867,7 @@ function renderSelectedDateTimes(selectedISO){
     btn.addEventListener('click',function(){
       var kids=[].slice.call(timeContainer.children); kids.forEach(function(el){ el.setAttribute('aria-checked','false'); });
       btn.setAttribute('aria-checked','true');
-      var parsed=DateTime.fromObject({hour:t.h,minute:t.m});
+      var parsed=luxon.DateTime.fromObject({hour:t.h,minute:t.m});
       nForm.date=selectedISO; nForm.time=parsed.toFormat('HH:mm');
       window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime;
       renderSummary('page3'); updateNextAvailability();
@@ -887,7 +879,7 @@ function renderSelectedDateTimes(selectedISO){
   if(preselect && firstBtn){
     var t=viewList[0];
     firstBtn.setAttribute('aria-checked','true');
-    var parsed=DateTime.fromObject({hour:t.h,minute:t.m});
+    var parsed=luxon.DateTime.fromObject({hour:t.h,minute:t.m});
     nForm.date=selectedISO; nForm.time=parsed.toFormat('HH:mm');
     window.selectedTime={ui:t.label,iso:nForm.time}; selectedTime=window.selectedTime;
     renderSummary('page3'); updateNextAvailability();
@@ -895,7 +887,7 @@ function renderSelectedDateTimes(selectedISO){
 }
 
 /* =========================================================
-   Services Cards (from GAS only)
+   Services Cards (from GAS only) — descriptions INSIDE cards
    ========================================================= */
 function buildBadges(s){
   var out=[];
@@ -913,7 +905,7 @@ function serviceCardTemplate(s, selected){
   var duration = s.TS_duration ? String(s.TS_duration) : '';
   var badges = buildBadges(s);
   var thumb = s.TS_thumb_url || '';
-  var desc = String(s.TS_service_description_ar || s.TS_short_desc || '').trim();
+  var desc = String(s.TS_short_desc || '').trim(); /* description shown here */
 
   var metaHTML = '';
   if(priceText){ metaHTML += '<span class="chip price"><i class="fa-solid fa-tag"></i> '+escapeHTML(priceText)+'</span>'; }
@@ -924,17 +916,18 @@ function serviceCardTemplate(s, selected){
   }).join('');
 
   return ''+
-    '<div class="srv-card '+(selected?'selected':'')+'" role="listitem" aria-selected="'+(selected?'true':'false')+'" data-id="'+id+'" tabindex="-1" title="'+escapeHTML(title)+'">'+
+    '<div class="srv-card '+(selected?'selected':'')+'" role="listitem" aria-selected="'+(selected?'true':'false')+'" data-id="'+id+'" data-title="'+escapeHTML(title)+'" tabindex="-1">'+
       '<div class="srv-thumb" style="'+(thumb ? ('background-image:url(\''+thumb+'\')') : '')+'"></div>'+
       '<div class="srv-body">'+
         '<div class="srv-title">'+escapeHTML(title)+'</div>'+
         '<div class="srv-meta">'+metaHTML+'</div>'+
-        (desc?('<div class="srv-desc">'+escapeHTML(desc)+'</div>'):'')+
+        (desc?('<div class="srv-desc clamp" data-short="1">'+escapeHTML(desc)+'</div>'):'')+
         '<div class="srv-badges">'+badgesHTML+'</div>'+
       '</div>'+
       '<div class="srv-actions">'+
         '<button class="btn-add" type="button">'+(selected?'تم الاختيار':'إضافة إلى السلة')+'</button>'+
         (selected?'<button class="btn-remove" type="button">إزالة</button>':'')+
+        '<button class="btn-more" type="button" title="تفاصيل">التفاصيل</button>'+
       '</div>'+
     '</div>';
 }
@@ -967,12 +960,12 @@ function updateFooterCartSummary(){
   subEl.textContent = 'الكمية × ' + qty + addonsTxt;
 }
 
-/* Cart summary (side) – purely for logic; footer is the primary surface */
-function renderCartSummary(){
-  updateFooterCartSummary();
-}
+function renderCartSummary(){ updateFooterCartSummary(); }
 
 /* Addons popup */
+function lockBodyScroll(on){
+  document.body.style.overflow = on ? 'hidden' : '';
+}
 function openAddonModal(){
   var modal = document.getElementById('addonModal');
   var list  = document.getElementById('addonList');
@@ -998,11 +991,11 @@ function openAddonModal(){
   });
 
   modal.setAttribute('aria-hidden','false');
+  lockBodyScroll(true);
 
   var apply = document.getElementById('addonApply');
   var cancel= document.getElementById('addonCancel');
-  var close = function(){ modal.setAttribute('aria-hidden','true'); };
-
+  function close(){ modal.setAttribute('aria-hidden','true'); lockBodyScroll(false); }
   apply.onclick = function(){
     var chosen = [].slice.call(list.querySelectorAll('.addon-chip[aria-pressed="true"]')).map(function(x){ return x.textContent.trim(); });
     nForm.addons = chosen;
@@ -1010,97 +1003,20 @@ function openAddonModal(){
     close();
   };
   cancel.onclick = close;
-  var bdrop = modal.querySelector('.modal-backdrop');
-  if(bdrop){ bdrop.addEventListener('click', close); }
+  modal.addEventListener('click', function(e){ if(e.target && e.target.getAttribute('data-close')==='1') close(); }, {once:false});
 }
 
 /* =========================================================
    GAS-backed features
    ========================================================= */
-function showServiceDescSkeleton(){
-  var card = document.getElementById('serviceDesc');
-  var body = document.getElementById('serviceDescBody');
-  if(!card || !body) return;
-  card.style.display = 'block';
-  body.innerHTML = '<div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:70%"></div><div class="skeleton" style="width:82%"></div>';
-}
-function clearServiceDescriptionUI(){
-  var card = document.getElementById('serviceDesc');
-  var body = document.getElementById('serviceDescBody');
-  if(!card || !body) return;
-  body.innerHTML = '';
-  card.style.display = 'none';
-}
-async function fetchServiceDescription(serviceId, serviceName){
-  if(!GAS_BASE_URL || GAS_BASE_URL==='YOUR_GAS_WEBAPP_URL'){ clearServiceDescriptionUI(); return; }
-  showServiceDescSkeleton();
-  try{
-    var params = new URLSearchParams();
-    params.set('route','serviceDescription');
-    params.set('appId', APP_ID);
-    if (serviceId) params.set('serviceId', serviceId);
-    if (serviceName) params.set('serviceName', serviceName);
-    var url = GAS_BASE_URL + '?' + params.toString();
-
-    var res = await fetch(url, { method:'GET', mode:'cors', cache:'no-store', headers:{ 'Accept':'application/json' }});
-    var data = null; try{ data=await res.json(); }catch(_){}
-    var card = document.getElementById('serviceDesc');
-    var body = document.getElementById('serviceDescBody');
-    if(!card || !body) return;
-
-    if(res.ok && data && data.success && data.data){
-      var desc = data.data.description || '—';
-      body.innerHTML = '<p style="margin:0; white-space:pre-wrap">'+escapeHTML(desc)+'</p>';
-      card.style.display='block';
-    } else {
-      body.innerHTML = '<span class="text-muted">لا يوجد وصف متاح لهذه الخدمة</span>';
-      card.style.display='block';
-    }
-  }catch(_e){
-    var card = document.getElementById('serviceDesc');
-    var body = document.getElementById('serviceDescBody');
-    if(card && body){
-      body.innerHTML = '<span class="text-muted">تعذر تحميل وصف الخدمة حالياً</span>';
-      card.style.display='block';
-    }
-  }
-}
-
-async function fetchAdditionalServicesAndRender(){
-  var wrap = document.getElementById('addonChips');
-  if(!wrap) return;
-  wrap.innerHTML = '<span class="text-muted">...تحميل الإضافات</span>';
+async function fetchAdditionalServices(){
   try{
     var data = await api('additionalServices', { appId: APP_ID });
     var list = (data && data.success && Array.isArray(data.data)) ? data.data : [];
     var options = list.map(function(x){ return String((x && x.label) || '').trim(); }).filter(Boolean);
-    if(!options.length){ wrap.innerHTML='<span class="text-muted">لا توجد خدمات إضافية</span>'; return; }
-    // Desktop chips
-    wrap.innerHTML='';
-    options.forEach(function(label){
-      var btn=document.createElement('button');
-      btn.type='button'; btn.className='addon-chip';
-      btn.setAttribute('aria-pressed', nForm.addons.indexOf(label)!==-1 ? 'true' : 'false');
-      btn.setAttribute('data-value', label);
-      btn.innerHTML='<i class="fa-solid fa-circle-plus"></i><span>'+escapeHTML(label)+'</span>';
-      btn.addEventListener('click', function(){
-        var val = String(btn.getAttribute('data-value')||'').trim();
-        var selected = (nForm.addons.indexOf(val)!==-1);
-        if(selected){
-          nForm.addons = nForm.addons.filter(function(x){return x!==val;});
-          btn.setAttribute('aria-pressed','false');
-        }else{
-          nForm.addons = nForm.addons.concat([val]);
-          btn.setAttribute('aria-pressed','true');
-        }
-        renderCartSummary(); updateFooterCartSummary(); updateNextAvailability();
-      });
-      wrap.appendChild(btn);
-    });
-    // Keep for popup
-    nForm._addonsOptions = options.slice();
+    nForm._addonsOptions = options.slice(); // store for modal only
   }catch(_){
-    wrap.innerHTML='<span class="text-muted">تعذر تحميل الخدمات الإضافية</span>';
+    nForm._addonsOptions = [];
   }
 }
 
@@ -1154,10 +1070,10 @@ function renderServiceCards(){
 
   [].slice.call(grid.querySelectorAll('.srv-card')).forEach(function(card){
     var id = card.dataset.id;
-    var svc = (servicesCache||[]).find(function(x){ return String(x.TS_service_id)===String(id); });
-    var title = (svc && (svc.TS_service_arabic_name || ('خدمة '+id))) || ('خدمة '+id);
 
     var addBtn = card.querySelector('.btn-add');
+    var moreBtn= card.querySelector('.btn-more');
+
     if(addBtn){
       addBtn.addEventListener('click', function(){
         selectedServiceId=id;
@@ -1168,10 +1084,8 @@ function renderServiceCards(){
         nForm.service=String(id);
         syncingFromCards=false;
 
-        fetchServiceDescription(id, title);
         renderSummary('page2'); renderServiceCards(); renderCartSummary(); updateNextAvailability();
 
-        // mobile hint + popup
         addBtn.textContent='✓ تمت الإضافة';
         addBtn.classList.add('is-selected');
         openAddonModal();
@@ -1184,9 +1098,19 @@ function renderServiceCards(){
         if(selectedServiceId===id){
           selectedServiceId=null; nForm.service='';
           $('#service').val(null).trigger('change.select2');
-          clearServiceDescriptionUI();
           renderServiceCards(); renderCartSummary(); renderSummary('page2'); updateNextAvailability();
         }
+      });
+    }
+
+    if(moreBtn){
+      moreBtn.addEventListener('click', function(){
+        // Expand/collapse card description (no outside field)
+        var desc = card.querySelector('.srv-desc');
+        if(!desc){ return; }
+        var clamped = desc.classList.contains('clamp');
+        desc.classList.toggle('clamp', !clamped);
+        moreBtn.textContent = clamped ? 'إخفاء' : 'التفاصيل';
       });
     }
   });
@@ -1260,7 +1184,6 @@ async function loadMapSettingsFromGAS(){
 }
 
 function initMap(){
-  // ensure settings before initializing
   loadMapSettingsFromGAS().then(function(){
     var def={lat:24.7136,lng:46.6753};
     map=new google.maps.Map(document.getElementById('googleMap'),{
@@ -1349,7 +1272,7 @@ function initMap(){
     }
   });
 }
-// IMPORTANT: expose before Maps script callback tries to call it
+// Expose before Maps loads
 window.initMap = initMap;
 
 /* =========================================================
@@ -1405,17 +1328,17 @@ $(function(){
   $('#plateNumber').on('input', function(){ updatePlateHint(); renderSummary('page4'); updateNextAvailability(); });
 
   // Date defaults
-  var today=DateTime.now().toFormat('yyyy-LL-dd');
+  var today=luxon.DateTime.now().toFormat('yyyy-LL-dd');
   $('#date').val(today).attr('min',today);
 
   var debounceT=null;
   $('#date').on('input', function(){ clearTimeout(debounceT); debounceT=setTimeout(function(){ fetchTimesForSelectedDate(); renderSummary('page3'); },220); });
   $('#date').on('change', function(){ fetchTimesForSelectedDate(); renderSummary('page3'); });
 
-  // Load Addons (GAS)
-  fetchAdditionalServicesAndRender();
+  // Load Addons (only for modal)
+  fetchAdditionalServices();
 
-  // Load Areas (from platform just to populate — if you want to lock to GAS, you can hardcode or sheet-drive areas)
+  // Load Areas (from platform to populate select)
   setLoadingServices(true);
   callContent2('/locations', function(res){
     var list=(res && res.data) || [];
@@ -1428,7 +1351,6 @@ $(function(){
   // When Area changes → fetch Services/Categories **from GAS only**
   $('#area').on('change', function(){
     nForm.location=this.value; setLoadingServices(true);
-    clearServiceDescriptionUI();
     (async function(){
       try{
         var data = await api('services', { appId: APP_ID });
@@ -1464,7 +1386,6 @@ $(function(){
   $('#serviceCat').on('change', function(){
     if(syncingFromCards) return;
     nForm.serviceCat=this.value;
-    clearServiceDescriptionUI();
     var cid=Number(this.value);
     var items=(servicesCache||[]).filter(function(s){return Number(s.TS_category_id)===cid;})
       .sort(function(a,b){return Number(a.TS_service_id)-Number(b.TS_service_id);})
@@ -1482,17 +1403,10 @@ $(function(){
   });
 
   $('#service').on('change', function(){
-    if(syncingFromCards){
-      var selectedText = $('#service').find(':selected').text() || '';
-      if (this.value || selectedText) fetchServiceDescription(this.value, selectedText);
-      return;
-    }
+    if(syncingFromCards) return;
     nForm.service=this.value||'';
     selectedServiceId = this.value || null;
     renderSummary('page2'); updateNextAvailability();
-    var selectedText = $('#service').find(':selected').text() || '';
-    if (this.value || selectedText) fetchServiceDescription(this.value, selectedText);
-    else clearServiceDescriptionUI();
 
     if(USE_TABS_AND_CARDS){
       renderServiceCards();
@@ -1564,7 +1478,7 @@ $(function(){
         showToast('success','تم إنشاء الحجز');
         document.getElementById('ts-area').textContent = $('#area').find(':selected').text()||'—';
         document.getElementById('ts-service').textContent = $('#service').find(':selected').text()||'—';
-        document.getElementById('ts-dt').textContent = (nForm.date?DateTime.fromISO(nForm.date).toFormat('d LLL yyyy'):'') + (nForm.time?(' • '+nForm.time):'');
+        document.getElementById('ts-dt').textContent = (nForm.date?luxon.DateTime.fromISO(nForm.date).toFormat('d LLL yyyy'):'') + (nForm.time?(' • '+nForm.time):'');
         document.getElementById('ts-pay').textContent = (nForm.paymentMethod||'').toUpperCase()||'—';
         var waMsg = encodeURIComponent('تم إرسال طلب حجز: \nالخدمة: '+($('#service').find(':selected').text())+'\nالتاريخ: '+nForm.date+' '+nForm.time+'\nالرابط: '+location.href);
         document.getElementById('ts-whatsapp').href = 'https://wa.me/?text='+waMsg;
@@ -1604,28 +1518,12 @@ $(function(){
     }, {passive:false});
   })(document.getElementById('payGroup'), '.pay-card');
 
-  // Addons popup shortcuts
-  document.addEventListener('click', function(e){
-    var addBtn = e.target.closest('.srv-card .btn-add');
-    var rmBtn  = e.target.closest('.srv-card .btn-remove');
-
-    if(addBtn){
-      // Already handled in renderServiceCards -> click; keep text state
-      updateFooterCartSummary();
-    }
-    if(rmBtn){
-      var add = rmBtn.parentElement.querySelector('.btn-add');
-      if(add){ add.textContent='إضافة إلى السلة'; add.classList.remove('is-selected'); }
-      updateFooterCartSummary();
-    }
-  });
-
   // ESC closes addon popup
   document.addEventListener('keydown', function(e){
     if(e.key==='Escape'){
       var modal = document.getElementById('addonModal');
       if(modal && modal.getAttribute('aria-hidden')==='false'){
-        modal.setAttribute('aria-hidden','true');
+        modal.setAttribute('aria-hidden','true'); lockBodyScroll(false);
       }
     }
   });
@@ -1653,7 +1551,7 @@ $(function(){
   })();
 
 });
-/* Debug helper without shorthand */
+/* Debug helper */
 window._nahl_debug_state = function(){
   return {
     form: nForm,
