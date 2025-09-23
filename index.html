@@ -475,8 +475,8 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
             </div>
           </div>
 
-          <h1>معلومات المركبة</h1>
-          <div class="card">
+          <!-- <h1>معلومات المركبة</h1> -->
+          <div class="card" اhidden>
             <div class="row g-3">
               <div class="col-12 col-md-4">
                 <label class="form-label" for="carBrand">ماركة السيارة 🚘</label>
@@ -1560,7 +1560,7 @@ async function loadMapSettingsFromGAS(){
 async function initMap(){
   await loadMapSettingsFromGAS();
 
-  const def={lat:24.7136,lng:46.6753};
+  const def={lat:25.328381184505538,lng:49.59614756326062};, 
   const fallbackBounds = new google.maps.LatLngBounds(
     new google.maps.LatLng(SA_BOUNDS.south, SA_BOUNDS.west),
     new google.maps.LatLng(SA_BOUNDS.north, SA_BOUNDS.east)
