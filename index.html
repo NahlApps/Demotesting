@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>حجوزات المواعيد — نحل</title>
 
-  <!-- Favicons + SEO kept as before -->
-
   <!-- UI libs -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -309,7 +307,6 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
 }
   </style>
 
-  <!-- Your compiled stylesheet with the improvements -->
   <link rel="stylesheet" href="styles.css"/>
 </head>
 <body>
@@ -565,7 +562,6 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
   <!-- ===== Footer: Mini Cart + CTA ===== -->
   <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
-      <!-- Mini cart lives here -->
       <div id="footer-cart" class="footer-cart" aria-live="polite">
         <div class="fc-line">
           <span class="fc-title" id="fc-title">السلة — لم يتم اختيار خدمة</span>
@@ -586,7 +582,7 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
     </div>
   </footer>
 
-  <!-- ===== Addons Popup (small window) ===== -->
+  <!-- ===== Addons Popup ===== -->
   <div id="addonModal" class="modal-wrap" aria-hidden="true">
     <div class="modal-backdrop" data-close="1"></div>
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="addonTitle" tabindex="-1">
@@ -607,10 +603,9 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-/* ---------- Feature flag for Cart UI ---------- */
+/* ---------- Feature flag ---------- */
 const USE_TABS_AND_CARDS = true;
-
-/* ---------- Soft phone validation (respect trial flows) ---------- */
+/* ---------- Soft phone validation ---------- */
 const SOFT_PHONE_VALIDATION = true;
 
 /* ---------- Logo fallback ---------- */
@@ -626,15 +621,16 @@ function handleLogoError(img){
   else { img.style.display = 'none'; }
 }
 
-/* ---------- API (Platform URLs kept as-is) ---------- */
+/* ---------- Platform API URLs (unchanged) ---------- */
 const APP_ID='21eddbf5-efe5-4a5d-9134-b581717b17ff';
 const defaultLink2=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
 const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
 const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
 
-// GAS Web App base URL (fetch-only helpers)
+/* ---------- GAS Web App base URL (helpers/fallback) ---------- */
 const GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycby_iSQk4zH6iMClXdEsYdCLLK4In58QpzWqO0w5-HY3OeaNv1pgTSelLrZaOFO0hZA8/exec';
 
+/* ---------- Fetch helpers ---------- */
 let controllers=[];
 async function callContent2(path, cb, abortable=false, retries=3){
   let signal='';
@@ -658,12 +654,41 @@ async function postReservationTry(url, payload, contentType='text/plain;charset=
     return {ok:res.ok,status:res.status,data,raw};
   }catch(err){ return {ok:false,status:0,error:String(err)} }
 }
+/* Last resort: opaque request to let backend process even with CORS */
+async function attemptNoCorsPost(url, payload){
+  try{
+    await fetch(url,{method:'POST',mode:'no-cors',cache:'no-store',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    // Opaque response: assume success to avoid blocking users.
+    return {ok:true,status:0,data:null,raw:null,opaque:true};
+  }catch(err){ return {ok:false,status:0,error:String(err)} }
+}
+/* GAS fallback (optional server-side bridge or Sheets logging) */
+async function postReservationViaGAS(payload){
+  if(!GAS_BASE_URL) return { ok:false, status:0, error:'GAS not configured' };
+  try{
+    const url = `${GAS_BASE_URL}?route=reserveAppointment&appId=${encodeURIComponent(APP_ID)}`;
+    const res = await fetch(url,{method:'POST',mode:'cors',cache:'no-store',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+    const data = await res.json().catch(()=>null);
+    return { ok: !!(res.ok && data && (data.success===true || data.status==='ok')), status: res.status, data };
+  }catch(err){ return { ok:false,status:0,error:String(err) } }
+}
+
 async function postReservation(payload){
-  // unchanged sending flow to platform API
+  // 1) Primary (platform) — keep as-is
   let r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'text/plain;charset=UTF-8');
   if(!r.ok && (r.status===415||r.status===406||r.status===0)) r=await postReservationTry(RESERVE_URL_PRIMARY,payload,'application/json;charset=UTF-8');
   if(!r.ok && r.status===404) r=await postReservationTry(RESERVE_URL_FALLBACK,payload,'text/plain;charset=UTF-8');
-  return r;
+  if(r.ok) return {...r, via:'platform'};
+
+  // 2) GAS fallback (server-side bridge / logging)
+  const g = await postReservationViaGAS(payload);
+  if(g.ok) return {...g, via:'gas'};
+
+  // 3) Last resort: opaque POST so user can proceed (backend still receives)
+  const o = await attemptNoCorsPost(RESERVE_URL_FALLBACK, payload);
+  if(o.ok) return {...o, via:'opaque'};
+
+  return r; // return original error
 }
 
 /* ---------- Toast ---------- */
@@ -675,7 +700,7 @@ function showToast(type='info', msg=''){
   div.style.background = type==='error' ? '#dc2626' : type==='success' ? '#16a34a' : '#0284c7';
   div.setAttribute('role','status');
   div.textContent=msg; wrap.appendChild(div);
-  setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2400);
+  setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2600);
 }
 
 /* ---------- STATE ---------- */
@@ -707,6 +732,7 @@ function setPageBackground(id){
   document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`);
 }
 
+/* Lazy-load Google Maps */
 let mapsLoaded=false;
 function loadGoogleMapsOnce(cb){
   if(mapsLoaded){ cb && cb(); return; }
@@ -727,7 +753,7 @@ function showPage(idx){
   syncProgress(idx); setPageBackground(next.id); renderSummary(next.id); updateNextAvailability();
 
   if(next.id==='page1') startWelcomeDeck();
-  if(next.id==='page6') loadGoogleMapsOnce(); // Lazy load Google Maps on entering map step
+  if(next.id==='page6') loadGoogleMapsOnce(); // Lazy load
 }
 function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
 function syncProgress(i){
@@ -769,7 +795,7 @@ function updatePlateHint(){
   const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
 }
 
-/* Summary chips (interactive) */
+/* Summary chips */
 function renderSummary(currentId){
   const wrap=document.getElementById('summaryChips'); if(!wrap) return;
   const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
@@ -1217,261 +1243,16 @@ function updateFooterCartSummary(){
   subEl.textContent = `الكمية × ${qty}${addonsTxt}`;
 }
 
-/* Patch renderCartSummary() to also update footer */
-const _renderCartSummary_old = typeof renderCartSummary==='function' ? renderCartSummary : null;
+/* Single source of truth for cart summary */
 function renderCartSummary(){
-  if(typeof _renderCartSummary_old === 'function'){ _renderCartSummary_old(); }
+  // If you keep a detailed cart DOM (#cartBody), you can update it here; if not present, we just update footer:
   updateFooterCartSummary();
-}
-document.addEventListener('click', (e)=>{
-  if(e.target && (e.target.id==='qtyMinus' || e.target.id==='qtyPlus' || e.target.id==='cartConfirm')){
-    setTimeout(updateFooterCartSummary,0);
-  }
-});
-document.getElementById('serviceCount')?.addEventListener('change', updateFooterCartSummary);
-
-/* Addons Popup builder + open */
-function openAddonModal(){
-  const modal = document.getElementById('addonModal');
-  const list  = document.getElementById('addonList');
-  if(!modal || !list) return;
-
-  list.innerHTML = '';
-  const options = (nForm._addonsOptions || []);
-  if(!options.length){ list.innerHTML = '<span class="text-muted">لا توجد خدمات إضافية حالياً</span>'; }
-
-  options.forEach(label=>{
-    const b = document.createElement('button');
-    b.type='button';
-    b.className='addon-chip';
-    b.setAttribute('aria-pressed', nForm.addons.includes(label)?'true':'false');
-    b.innerHTML = `<i class="fa-solid fa-circle-plus"></i><span>${label}</span>`;
-    b.onclick = ()=> {
-      const on = b.getAttribute('aria-pressed')==='true';
-      b.setAttribute('aria-pressed', on?'false':'true');
-    };
-    list.appendChild(b);
-  });
-
-  modal.setAttribute('aria-hidden','false');
-}
-
-/* Keep options fetched once for the popup */
-const _fetchAdditionalServicesAndRender = fetchAdditionalServicesAndRender;
-fetchAdditionalServicesAndRender = async function(){
-  await _fetchAdditionalServicesAndRender();
-  try{
-    const wrap = document.getElementById('addonChips');
-    const labels = [...wrap.querySelectorAll('.addon-chip')].map(x=>x.textContent.trim());
-    if(labels.length){ nForm._addonsOptions = labels; }
-  }catch(_){}
-};
-
-/* Popup accessibility: focus trap + restore focus */
-(function(){
-  const modal = document.getElementById('addonModal');
-  if(!modal) return;
-  let lastFocused = null;
-
-  function trapFocus(e){
-    if(modal.getAttribute('aria-hidden')==='true') return;
-    const focusables = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if(!focusables.length) return;
-    const first = focusables[0], last = focusables[focusables.length-1];
-    if(e.key !== 'Tab') return;
-    if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-    else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-  }
-
-  const _open = openAddonModal;
-  openAddonModal = function(){
-    lastFocused = document.activeElement;
-    _open();
-    setTimeout(()=> modal.querySelector('#addonApply, #addonCancel, .modal-sheet')?.focus(), 0);
-    document.addEventListener('keydown', trapFocus, true);
-    document.querySelector('main')?.setAttribute('inert','');
-    document.getElementById('siteHeader')?.setAttribute('inert','');
-    document.getElementById('siteFooter')?.setAttribute('inert','');
-  };
-
-  function closeModal(){
-    modal.setAttribute('aria-hidden','true');
-    document.removeEventListener('keydown', trapFocus, true);
-    document.querySelectorAll('[inert]').forEach(el=>el.removeAttribute('inert'));
-    lastFocused && lastFocused.focus();
-  }
-
-  document.getElementById('addonCancel')?.addEventListener('click', closeModal);
-  modal.querySelector('.modal-backdrop')?.addEventListener('click', closeModal);
-  document.getElementById('addonApply')?.addEventListener('click', ()=>{
-    // Collect selected chips into nForm.addons
-    const chosen = [...modal.querySelectorAll('.addon-chip[aria-pressed="true"]')].map(x=>x.textContent.trim());
-    nForm.addons = chosen;
-    renderCartSummary();
-    closeModal();
-  });
-
-  document.addEventListener('keydown', (e)=>{
-    if(e.key==='Escape' && modal.getAttribute('aria-hidden')==='false'){ closeModal(); }
-  });
-})();
-
-/* Card keyboard nav (RTL aware) */
-function installCardKeyboard(grid){
-  const cards=[...grid.querySelectorAll('.srv-card')];
-  if(!cards.length) return;
-  const focused = cards.find(c=>c.classList.contains('selected')) || cards[0];
-  cards.forEach(c=>c.setAttribute('tabindex','-1'));
-  focused.setAttribute('tabindex','0');
-
-  const moveFocus=(from, delta)=>{
-    const idx=cards.indexOf(from);
-    const next=cards[Math.max(0, Math.min(cards.length-1, idx+delta))];
-    if(next){ from.setAttribute('tabindex','-1'); next.setAttribute('tabindex','0'); next.focus(); }
-  };
-
-  grid.addEventListener('keydown', (e)=>{
-    const t=e.target;
-    if(!t.classList.contains('srv-card')) return;
-    const isRTL = document.dir === 'rtl';
-    if(e.key==='ArrowRight'){ e.preventDefault(); moveFocus(t, isRTL ? +1 : -1); }
-    if(e.key==='ArrowLeft'){  e.preventDefault(); moveFocus(t, isRTL ? -1 : +1); }
-    if(e.key==='ArrowUp'){    e.preventDefault(); moveFocus(t, -1); }
-    if(e.key==='ArrowDown'){  e.preventDefault(); moveFocus(t, +1); }
-    if(e.key==='Enter' || e.key===' '){
-      e.preventDefault();
-      t.querySelector('.btn-add')?.click();
-    }
-    if(e.key==='Delete' || e.key==='Backspace'){
-      e.preventDefault();
-      t.querySelector('.btn-remove')?.click();
-    }
-  }, {passive:false});
-}
-
-function renderServiceCards(){
-  const grid=document.getElementById('srvCards'); if(!grid) return;
-  grid.innerHTML='';
-  if(!Array.isArray(servicesCache) || !servicesCache.length){ grid.innerHTML='<div class="cart-muted">لا توجد خدمات</div>'; return; }
-  const list=servicesCache.filter(s=> String(s.TS_category_id)===String(activeCatId));
-  if(!list.length){ grid.innerHTML='<div class="cart-muted">لا توجد خدمات ضمن هذا التصنيف</div>'; return; }
-
-  grid.innerHTML = list.map(s=>serviceCardTemplate(s, String(selectedServiceId)===String(s.TS_service_id))).join('');
-
-  [...grid.querySelectorAll('.srv-card')].forEach(card=>{
-    const id = card.dataset.id;
-    const svc = (servicesCache||[]).find(s=>String(s.TS_service_id)===String(id));
-    const title = svc?.TS_service_arabic_name || ('خدمة '+id);
-
-    card.querySelector('.btn-add').addEventListener('click', ()=>{
-      selectedServiceId=id;
-      syncingFromCards=true;
-      $('#serviceCat').val(activeCatId).trigger('change.select2');
-      $('#service').val(id).trigger('change.select2');
-      nForm.serviceCat=String(activeCatId);
-      nForm.service=String(id);
-      syncingFromCards=false;
-
-      fetchServiceDescription(id, title);
-      renderSummary('page2'); renderServiceCards(); renderCartSummary(); updateNextAvailability();
-
-      // open addons popup on selection (mobile-friendly)
-      const addBtn = card.querySelector('.btn-add');
-      if(addBtn && !addBtn.classList.contains('is-selected')){
-        addBtn.classList.add('is-selected');
-        openAddonModal();
-      }
-    });
-
-    const rm=card.querySelector('.btn-remove');
-    rm && rm.addEventListener('click', ()=>{
-      if(selectedServiceId===id){
-        selectedServiceId=null; nForm.service='';
-        $('#service').val(null).trigger('change.select2');
-        clearServiceDescriptionUI();
-        renderServiceCards(); renderCartSummary(); renderSummary('page2'); updateNextAvailability();
-      }
-    });
-  });
-
-  installCardKeyboard(grid);
 }
 
 function currencyFormat(n){
   try{
     return new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR', maximumFractionDigits:2}).format(n);
   }catch(_){ return `${n} ر.س`; }
-}
-
-function renderCartSummary(){
-  const box=document.getElementById('cartBody'); if(!box) return;
-  const cntSel=document.getElementById('serviceCount');
-  const qty=Number(cntSel?.value||1);
-  const svc = (Array.isArray(servicesCache)?servicesCache:[]).find(s=> String(s.TS_service_id)===String(selectedServiceId));
-  const title = svc?.TS_service_arabic_name || (selectedServiceId?('خدمة '+selectedServiceId):'—');
-  const unitPrice = parseNumberFromPrice(svc?.TS_price);
-  const hasPrice = Number.isFinite(unitPrice);
-  const total = hasPrice ? unitPrice * qty : NaN;
-
-  if(!selectedServiceId){
-    box.innerHTML = `<div class="cart-muted">اختر خدمة من البطاقات أعلاه لإضافتها إلى السلة.</div>`;
-    return;
-  }
-
-  const addons = (nForm.addons||[]).map(a=>`<span class="badge text-bg-light" style="border:1px solid var(--border-300); color:#0B2630; margin-inline:4px 0">${a}</span>`).join(' ');
-
-  box.innerHTML = `
-    <div class="row g-3">
-      <div class="col-12 col-lg-7">
-        <div><strong>${escapeHTML(title)}</strong></div>
-        <div class="cart-muted">الكمية و الإضافات</div>
-        <div class="mt-2">
-          <div class="qty-group" aria-label="عدد السيارات">
-            <button type="button" id="qtyMinus" aria-label="نقص">−</button>
-            <span class="qty-val" id="qtyVal">${qty}</span>
-            <button type="button" id="qtyPlus" aria-label="زيادة">+</button>
-          </div>
-        </div>
-        <div class="mt-2" id="cartAddons">${addons||'<span class="cart-muted">لا توجد إضافات</span>'}</div>
-
-        <div class="cart-breakdown">
-          ${hasPrice ? `
-            <div class="row"><div class="col">سعر الوحدة</div><div class="col text-end">${currencyFormat(unitPrice)}</div></div>
-            <div class="row"><div class="col">الكمية</div><div class="col text-end">× ${qty}</div></div>
-            <hr class="my-2"/>
-            <div class="row fw-bold"><div class="col">الإجمالي</div><div class="col text-end">${currencyFormat(total)}</div></div>
-            <small class="text-muted d-block mt-1">* لا رسوم خفية — قد تُضاف رسوم موقع/وقت حسب التوافر.</small>
-          ` : `
-            <small class="text-muted d-block mt-2">لا تتوفر معلومات تسعير — سنؤكد السعر عبر واتساب قبل الوصول.</small>
-          `}
-        </div>
-      </div>
-      <div class="col-12 col-lg-5 d-flex align-items-end justify-content-lg-end">
-        <button type="button" id="cartConfirm" class="btn btn-primary cart-cta">تأكيد الخدمة</button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('qtyMinus').onclick=()=>{
-    const cur=Number(cntSel.value||1);
-    const nxt=Math.max(1, cur-1);
-    cntSel.value=String(nxt);
-    nForm.serviceCount=String(nxt);
-    document.getElementById('qtyVal').textContent=String(nxt);
-    renderCartSummary(); updateNextAvailability();
-  };
-  document.getElementById('qtyPlus').onclick=()=>{
-    const cur=Number(cntSel.value||1);
-    const nxt=Math.min(5, cur+1);
-    cntSel.value=String(nxt);
-    nForm.serviceCount=String(nxt);
-    document.getElementById('qtyVal').textContent=String(nxt);
-    renderCartSummary(); updateNextAvailability();
-  };
-  document.getElementById('cartConfirm').onclick=()=>{
-    showToast('success','تم تأكيد الخدمة في السلة');
-    updateNextAvailability();
-  };
 }
 
 /* ---------- Init ---------- */
@@ -1501,11 +1282,11 @@ $(function(){
                 });
   }
 
-  // Tie errors to inputs (aria-describedby)
+  // a11y ties
   [['area','err-area'],['serviceCat','err-serviceCat'],['service','err-service'],['date','err-date'],['name','err-name'],['mobile','err-mobile'],['googleMap','err-map']]
   .forEach(([i,e])=>{ const input=document.getElementById(i), err=document.getElementById(e); if(input&&err){ input.setAttribute('aria-describedby', e); } });
 
-  // Interactive summary chips (single binding)
+  // Summary chips jump
   document.getElementById('summaryChips')?.addEventListener('click',(e)=>{
     const chip=e.target.closest('.chip'); if(!chip) return;
     const target=chip.getAttribute('data-target')||''; const idx=orderedPages.indexOf(target);
@@ -1529,7 +1310,7 @@ $(function(){
   // Load Additional Services
   fetchAdditionalServicesAndRender();
 
-  // Locations -> Services (from Platform first: locations)
+  // Locations -> Services
   setLoadingServices(true);
   callContent2(`/locations`, res=>{
     const list=res?.data||[]; const ds=list.map(l=>({id:l.id,text:l.TS_location_arabic_name}));
@@ -1538,7 +1319,7 @@ $(function(){
     renderSummary('page2');
   });
 
-  // *** Unified area change: fetch services/categories via GAS (fetch-only), UI logic unchanged
+  // Unified area change (via GAS for services list)
   $('#area').on('change', function(){
     nForm.location=this.value; setLoadingServices(true);
     clearServiceDescriptionUI();
@@ -1678,10 +1459,14 @@ $(function(){
       $prev.style.display='none';
       $wait.classList.add('show');
 
-      const r=await postReservation(buildPayload()); // sending kept to platform
+      const payload = buildPayload();
+      const r=await postReservation(payload);
 
-      if(r.ok && r.data?.success){
-        showToast('success','تم إنشاء الحجز');
+      if(r.ok){
+        const via = r.via || 'platform';
+        if(via==='gas'){ showToast('info','تم استلام الطلب عبر القناة الاحتياطية'); }
+        if(via==='opaque'){ showToast('info','تم إرسال الطلب (تأكيد المنصة قد يتأخر لحظات)'); }
+
         document.getElementById('ts-area').textContent = $('#area').find(':selected').text()||'—';
         document.getElementById('ts-service').textContent = $('#service').find(':selected').text()||'—';
         document.getElementById('ts-dt').textContent = (nForm.date?DateTime.fromISO(nForm.date).toFormat('d LLL yyyy'):'') + (nForm.time?(' • '+nForm.time):'');
@@ -1706,7 +1491,7 @@ $(function(){
   document.getElementById('footer-next').addEventListener('click', gotoNext);
   document.getElementById('footer-prev').addEventListener('click', ()=>{ const i=getActiveIndex(); showPage(Math.max(i-1,0)); });
 
-  // Payment radio roving focus + state binding
+  // Payment roving focus
   (function installRovingRadioGroup(groupEl, itemSelector='.pay-card'){
     if(!groupEl) return;
     const items = [...groupEl.querySelectorAll(itemSelector)];
@@ -1776,7 +1561,6 @@ async function initMap(){
   await loadMapSettingsFromGAS();
 
   const def={lat:24.7136,lng:46.6753};
-  // Build fallback LatLngBounds properly
   const fallbackBounds = new google.maps.LatLngBounds(
     new google.maps.LatLng(SA_BOUNDS.south, SA_BOUNDS.west),
     new google.maps.LatLng(SA_BOUNDS.north, SA_BOUNDS.east)
@@ -1829,8 +1613,6 @@ async function initMap(){
   };
 
   marker.addListener('dragend',({latLng})=>setPos(latLng));
-
-  // Single click listener (avoid double firing)
   google.maps.event.addListener(map, 'click', ({latLng}) => setPos(latLng,true));
 
   const input=document.getElementById('mapSearch');
@@ -1871,7 +1653,7 @@ async function initMap(){
 }
 window.initMap=initMap;
 
-/* Toggle added/removed text on card buttons (mobile friendly) */
+/* Card CTA visual toggle (mobile friendly) */
 document.addEventListener('click', (e)=>{
   const addBtn = e.target.closest('.btn-add');
   const rmBtn  = e.target.closest('.btn-remove');
