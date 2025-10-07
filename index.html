@@ -44,6 +44,12 @@
   <!-- country codes -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css">
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
+  
+  <!-- Speed up TLS + DNS to your Apps Script web app -->
+  <link rel="dns-prefetch" href="https://script.google.com">
+  <link rel="dns-prefetch" href="https://script.googleusercontent.com">
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 
   <!-- ===== Theme (Aqua + Warm CTA) ===== -->
   <style>
@@ -145,12 +151,7 @@
     .social-fab i{font-size:22px;line-height:1}
     #globalOverlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;flex-direction:column}
     #globalOverlay.is-visible{display:flex}
-    #serviceDescText{
-  color: var(--error) !important;   /* أحمر */
-  font-size: 1.15rem;               /* أكبر */
-  font-weight: 800;                 /* عريض */
-}
-
+    #serviceDescText{ color: var(--error)!important; font-size: 1.15rem; font-weight: 800; }
   </style>
 </head>
 <body>
@@ -383,30 +384,31 @@
         </div>
       </div>
 
-<!-- Status Page (Payment) — simple & static -->
-<div id="statusPage" class="page" style="display:none; padding:2rem; text-align:center;">
-  <div class="form-block">
-    <div class="section-card">
-      <h1>حالة الدفع</h1>
-      <p id="statusText1" style="margin-top:.75rem;">
-        تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم
-      </p>
+      <!-- Status Page (Payment) — simple & static -->
+      <div id="statusPage" class="page" style="display:none; padding:2rem; text-align:center;">
+        <div class="form-block">
+          <div class="section-card">
+            <h1>حالة الدفع</h1>
+            <p id="statusText1" style="margin-top:.75rem;">
+              تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم
+            </p>
+            <div style="margin-top:1rem;">
+              <button
+                id="backHome"
+                class="filter-button"
+                style="margin-inline-start:.5rem;"
+                onclick="window.open('https://spongnsoap.com/', '_blank', 'noopener');">
+                العودة
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Only one action -->
-<div style="margin-top:1rem;">
-  <button
-    id="backHome"
-    class="filter-button"
-    style="margin-inline-start:.5rem;"
-    onclick="window.open('https://spongnsoap.com/', '_blank', 'noopener');">
-    العودة
-  </button>
-</div>
-
-    </div>
-  </div>
-</div>
-
+      <!-- Hidden table to support the sheet-list demo renderer -->
+      <div style="display:none">
+        <table><tbody id="tableBody"></tbody></table>
+      </div>
 
       <footer>
         <div>Sponge & Soap</div>
@@ -466,8 +468,7 @@
 <script>
 /* ===========================================================
  * Sponge & Soap — Booking App (index.html)
- * Implements: If "Payment Gateway" selected → book first on NAHL,
- * then open Telr page. Also fixes regex + Google Maps callback.
+ * Fast-path improvements: prefetch + cache for Page 2 data.
  * =========================================================== */
 
 /* -----------------------------
@@ -560,7 +561,7 @@ if (dateEl){
 }
 
 /* -----------------------------
- *  Payload & validation (regex FIXED)
+ *  Payload & validation
  * ----------------------------- */
 const MAP_URL_RE = /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/;
 
@@ -612,53 +613,74 @@ function syncNFormFromUI(){
 }
 
 /* -----------------------------
- *  Networking
+ *  Cache helpers for FAST page-2
  * ----------------------------- */
-async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
-  try{
-    const res = await fetch(url, {
-      method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
-      headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const raw = await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
-    return { ok: res.ok, status: res.status, data, raw };
-  }catch(err){ return { ok:false, status:0, error:String(err) }; }
-}
-async function postReservation(payload){
-  let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
-  if(!r.ok && (r.status===415 || r.status===404 || r.status===406)){
-    const rJson = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
-    if (rJson.ok) return rJson;
-    r = rJson;
+const SS = window.sessionStorage;
+const CACHE = {
+  get(key){
+    try{
+      const raw = SS.getItem(key);
+      if(!raw) return null;
+      const o = JSON.parse(raw);
+      if (!o || !o.t || !o.ttl) return null;
+      if (Date.now() - o.t > o.ttl) return null;
+      return o.data;
+    }catch{ return null; }
+  },
+  set(key, data, ttlMs){
+    try{ SS.setItem(key, JSON.stringify({ t:Date.now(), ttl:ttlMs, data })); }catch(_){}
   }
-  if(!r.ok && (r.status===404 || r.status===405)){
-    let r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
-    if(!r2.ok) r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'application/json;charset=UTF-8');
-    return r2;
-  }
-  return r;
+};
+function keyLocations(){ return `locs:v1`; }
+function keyServices(locId){ return `svcs:v1:${locId}`; }
+function keyAppts(locId, svcId, startISO){ return `apts:v1:${locId}:${svcId}:${startISO}`; }
+
+/* -----------------------------
+ *  Networking (abort + timeout)
+ * ----------------------------- */
+function fetchJSON(url, { timeoutMs=4500, signal:null } = {}){
+  const ctrl = new AbortController();
+  const t = setTimeout(()=>ctrl.abort('timeout'), timeoutMs);
+  const mix = signal
+    ? new AbortController()
+    : ctrl;
+  const finalSignal = signal
+    ? (mix.signal)
+    : ctrl.signal;
+  const doFetch = fetch(url, { method:'GET', cache:'no-store', credentials:'omit', redirect:'follow', signal: finalSignal })
+    .then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status))));
+  return doFetch.finally(()=>clearTimeout(t));
 }
-function callContent2(routText, callback, abortable=false, retries=3){
-  return new Promise((resolve,reject)=>{
-    let signal = '';
-    if (abortable) {
-      if(controllers.length>0){ controllers.forEach(c=>c[0].abort()); controllers=[]; }
-      const controller = new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
-    }
-    setTimeout(()=>{
-      fetch(baseForm + `${routText}`, { method:'GET', redirect:'follow', ...(abortable && { signal }) })
-        .then(async (response)=>{
-          if(!response.ok){ if(retries>0) return resolve(callContent2(routText, callback, abortable, retries-1)); else throw new Error('Network response was not ok'); }
-          const json = await response.json(); callback(json); resolve(json);
-        })
-        .catch(err=>{
-          if(String(err.message).includes('aborted')) return;
-          if(retries>0) setTimeout(()=>resolve(callContent2(routText, callback, abortable, retries-1)), 900);
-          else reject(err);
-        });
-    },300);
-  });
+
+/* -----------------------------
+ *  Data fetch with cache
+ * ----------------------------- */
+async function getLocationsFast(){
+  const ck = keyLocations();
+  const cached = CACHE.get(ck);
+  if (cached?.length) return { data: cached, cache:true };
+  const json = await fetchJSON(baseForm + '/locations', { timeoutMs:3500 });
+  const arr = json?.data || [];
+  if (arr.length) CACHE.set(ck, arr, 10*60*1000); // 10 min
+  return { data: arr, cache:false };
+}
+async function getServicesFast(locationId){
+  const ck = keyServices(locationId);
+  const cached = CACHE.get(ck);
+  if (cached?.services?.length) return { data: cached, cache:true };
+  const json = await fetchJSON(baseForm + `/services?location=${encodeURIComponent(locationId)}`, { timeoutMs:3500 });
+  const pack = { services: json?.data?.services || [], servicesCat: json?.data?.servicesCat || [] };
+  if (pack.services.length) CACHE.set(ck, pack, 10*60*1000);
+  return { data: pack, cache:false };
+}
+async function getApptsFast(locationId, serviceId, startISO){
+  const ck = keyAppts(locationId, serviceId, startISO);
+  const cached = CACHE.get(ck);
+  if (cached?.appointments) return { data: cached, cache:true };
+  const json = await fetchJSON(baseForm + `/appointments?startDate=${encodeURIComponent(startISO)}&location=${encodeURIComponent(locationId)}&service=${encodeURIComponent(serviceId)}`, { timeoutMs:4500 });
+  const out = { appointments: json?.data?.appointments || [] };
+  if (out.appointments.length) CACHE.set(ck, out, 3*60*1000); // 3 min
+  return { data: out, cache:false };
 }
 
 /* -----------------------------
@@ -667,13 +689,17 @@ function callContent2(routText, callback, abortable=false, retries=3){
 document.getElementById("page2-spinner").style.display="block";
 $('.js-example-basic-single').select2({ data:[], width:"100%" });
 
-callContent2(`/locations`, (data)=>{
-  const locations = data.data || [];
-  const selectData = locations.map(l=>({ id:String(l.id), text:l.TS_location_arabic_name })).sort((a,b)=>Number(a.id)-Number(b.id));
-  $('.js-example-basic-single').empty().select2({ data:selectData, width:"100%" });
-  if (selectData.length && !$('#area').val()) { $('#area').val(selectData[0].id).trigger('change'); } else { $('#area').trigger('change'); }
-  document.getElementById("page2-spinner").style.display="none";
-});
+// Warm locations as soon as possible (so Page 2 pops)
+(async function warmLocations(){
+  try{
+    const { data } = await getLocationsFast();
+    const selectData = data.map(l=>({ id:String(l.id), text:l.TS_location_arabic_name })).sort((a,b)=>Number(a.id)-Number(b.id));
+    $('.js-example-basic-single').empty().select2({ data:selectData, width:"100%" });
+    if (selectData.length && !$('#area').val()) { $('#area').val(selectData[0].id).trigger('change'); } else { $('#area').trigger('change'); }
+  } finally {
+    document.getElementById("page2-spinner").style.display="none";
+  }
+})();
 
 function extractCatIdFromServiceObj(svc){
   const directId =
@@ -707,7 +733,7 @@ function setServiceCatHiddenAndState(cid){
   if (cid) nForm.serviceCat = String(cid);
 }
 
-/* ---- Service description via GAS ---- */
+/* ---- Service description via GAS (prefetch first choice) ---- */
 async function fetchServiceDescription(serviceId){
   try{
     const res = await fetch(`${GAS_BASE_URL}?action=getServiceDescription&serviceId=${encodeURIComponent(serviceId)}`);
@@ -730,40 +756,58 @@ function updateServiceDescriptionUI(text){
   updateLocationDescription();
 }
 
-/* Load services when area changes */
-$("#area").on("change", ()=>{
-  if (getComputedStyle(document.getElementById('page2')).display !== 'none') showOverlay('جاري تحميل الخدمات…');
-
+/* Load services when area changes — from cache immediately, then refresh */
+$("#area").on("change", async ()=>{
+  const locId = document.getElementById("area").value;
   document.getElementById("page3-2-spinner").style.display="block";
   document.getElementById('service').innerHTML = '';
 
-  callContent2(`/services?location=${encodeURIComponent(document.getElementById("area").value)}`, async (data)=>{
-    services = data?.data?.services || [];
-    serviceCategories = data?.data?.servicesCat || [];
-    servicesById.clear(); categoriesById.clear();
+  // 1) Instant paint from cache (if present)
+  let pack = null, fromCache = false;
+  try {
+    const cached = CACHE.get(keyServices(locId));
+    if (cached?.services?.length) {
+      pack = cached; fromCache = true;
+      paintServices(pack);
+    }
+  } catch(_){}
 
-    services.forEach(s=>{ const sid=String(s.TS_service_id ?? s.service_id ?? s.id); servicesById.set(sid, s); });
-    serviceCategories.forEach(c=>{ const cid=String(c.TS_service_category_id ?? c.category_id ?? c.id); categoriesById.set(cid, c); });
-
-    const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
-    const names = sorted.map(s => s.TS_service_arabic_name || s.TS_service_name || s.name_ar || s.name);
-    const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
-    add_dropdown_list(names, ids, "service");
-
-    const firstSvcId = ids[0] || '';
-    if(firstSvcId){
-      const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-      setServiceCatHiddenAndState(catId);
-      nForm.service = String(firstSvcId);
-      const desc = await fetchServiceDescription(firstSvcId);
-      updateServiceDescriptionUI(desc);
-    } else { updateServiceDescriptionUI(''); }
-
+  // 2) Always fetch fresh in background, update if changed
+  try{
+    const { data } = await getServicesFast(locId);
+    if (!fromCache || JSON.stringify(data.services)?.length !== JSON.stringify(pack?.services)?.length) {
+      paintServices(data);
+    }
+  } finally {
     document.getElementById("page3-2-spinner").style.display="none";
     hideOverlay();
     setTimeout(setBoundries, 0);
-  }, true);
+  }
 });
+
+function paintServices(data){
+  services = data?.services || [];
+  serviceCategories = data?.servicesCat || [];
+  servicesById.clear(); categoriesById.clear();
+
+  services.forEach(s=>{ const sid=String(s.TS_service_id ?? s.service_id ?? s.id); servicesById.set(sid, s); });
+  serviceCategories.forEach(c=>{ const cid=String(c.TS_service_category_id ?? c.category_id ?? c.id); categoriesById.set(cid, c); });
+
+  const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+  const names = sorted.map(s => s.TS_service_arabic_name || s.TS_service_name || s.name_ar || s.name);
+  const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+  add_dropdown_list(names, ids, "service");
+
+  const firstSvcId = ids[0] || '';
+  if(firstSvcId){
+    const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+    setServiceCatHiddenAndState(catId);
+    nForm.service = String(firstSvcId);
+    // prefetch desc
+    fetchServiceDescription(firstSvcId).then(updateServiceDescriptionUI);
+  } else { updateServiceDescriptionUI(''); }
+}
+
 function add_dropdown_list(show_list, value_list, element_id){
   const parent = document.getElementById(element_id); parent.innerHTML="";
   show_list.forEach((name, i)=>{
@@ -773,7 +817,7 @@ function add_dropdown_list(show_list, value_list, element_id){
 }
 
 /* -----------------------------
- *  Appointments (3-day window)
+ *  Appointments (3-day window) with cache
  * ----------------------------- */
 let appointments=[[],[],[]], ActualTimes=[[],[],[]];
 
@@ -807,27 +851,39 @@ async function fetchAppointmentsForSelectedDate(){
   });
 
   const startDate = day1.toFormat('yyyy-MM-dd');
+
+  // 1) Try cached appointments for instant grid
+  const cached = CACHE.get(keyAppts(areaVal, serviceVal, startDate));
+  if (cached?.appointments) {
+    paintAppts(cached.appointments, day1, day2, day3);
+  }
+
+  // 2) Fetch fresh and update if changed
   try{
-    await callContent2(`/appointments?startDate=${encodeURIComponent(startDate)}&location=${encodeURIComponent(areaVal)}&service=${encodeURIComponent(serviceVal)}`, (data)=>{
-      const rec = data.data.appointments || [];
-      let tempActualTimes=[];
-      for(let i=0;i<rec.length;i++){
-        const x=luxon.DateTime.fromISO(rec[i]['TS_appointment_date'], { setZone:true });
-        const y=luxon.DateTime.fromISO(rec[i]['TS_appointment_time'], { setZone:true });
-        rec[i]['TS_appointment_date']=x.toISODate();
-        rec[i]['TS_appointment_time']=y.toLocaleString(luxon.DateTime.TIME_SIMPLE).replace(" "," ");
-        tempActualTimes[i]=y.toFormat('hh:mm a');
-      }
-      const d1=day1.toFormat('yyyy-MM-dd'), d2=day2.toFormat('yyyy-MM-dd'), d3=day3.toFormat('yyyy-MM-dd');
-      for(let i=0;i<rec.length;i++){
-        if(rec[i]["TS_appointment_date"]===d1){ appointments[0].push(rec[i]['TS_appointment_time']); ActualTimes[0].push(tempActualTimes[i]); }
-        else if(rec[i]["TS_appointment_date"]===d2){ appointments[1].push(rec[i]['TS_appointment_time']); ActualTimes[1].push(tempActualTimes[i]); }
-        else if(rec[i]["TS_appointment_date"]===d3){ appointments[2].push(rec[i]['TS_appointment_time']); ActualTimes[2].push(tempActualTimes[i]); }
-      }
-      timesSetter(0);
-    }, true);
+    const { data } = await getApptsFast(areaVal, serviceVal, startDate);
+    paintAppts(data.appointments || [], day1, day2, day3);
   } finally { if (dateEl) dateEl.disabled=false; }
 }
+
+function paintAppts(rec, day1, day2, day3){
+  appointments=[[],[],[]]; ActualTimes=[[],[],[]];
+  let tempActualTimes=[];
+  for(let i=0;i<rec.length;i++){
+    const x=luxon.DateTime.fromISO(rec[i]['TS_appointment_date'], { setZone:true });
+    const y=luxon.DateTime.fromISO(rec[i]['TS_appointment_time'], { setZone:true });
+    rec[i]['TS_appointment_date']=x.toISODate();
+    rec[i]['TS_appointment_time']=y.toLocaleString(luxon.DateTime.TIME_SIMPLE).replace(" "," ");
+    tempActualTimes[i]=y.toFormat('hh:mm a');
+  }
+  const d1=day1.toFormat('yyyy-MM-dd'), d2=day2.toFormat('yyyy-MM-dd'), d3=day3.toFormat('yyyy-MM-dd');
+  for(let i=0;i<rec.length;i++){
+    if(rec[i]["TS_appointment_date"]===d1){ appointments[0].push(rec[i]['TS_appointment_time']); ActualTimes[0].push(tempActualTimes[i]); }
+    else if(rec[i]["TS_appointment_date"]===d2){ appointments[1].push(rec[i]['TS_appointment_time']); ActualTimes[1].push(tempActualTimes[i]); }
+    else if(rec[i]["TS_appointment_date"]===d3){ appointments[2].push(rec[i]['TS_appointment_time']); ActualTimes[2].push(tempActualTimes[i]); }
+  }
+  timesSetter(0);
+}
+
 if (dateEl){ dateEl.onchange = ()=>{ const hasArea=!!document.getElementById("area")?.value; const hasService=!!document.getElementById("service")?.value; if (!hasArea || !hasService) return; fetchAppointmentsForSelectedDate(); }; }
 $('#service').on('change', async ()=>{
   nForm.service = String(document.getElementById('service').value || '');
@@ -864,7 +920,7 @@ function choosedDate(time, date){
 document.getElementById('page1-button').onclick = ()=>{
   document.getElementById('page1').style.display='none';
   document.getElementById('page2').style.display='flex';
-  showOverlay('جاري تحميل الخدمات…');
+  // No blocking overlay anymore; we already warmed data.
 };
 document.getElementById('page2-button').onclick = ()=>{
   const area = document.getElementById("area");
@@ -872,7 +928,7 @@ document.getElementById('page2-button').onclick = ()=>{
   nForm.location = area.value;
   document.getElementById('page2').style.display='none';
   document.getElementById('page3').style.display='flex';
-  setTimeout(()=>{ document.getElementById('page3').style.display='none'; document.getElementById('page4').style.display='flex'; fetchAppointmentsForSelectedDate(); }, 450);
+  setTimeout(()=>{ document.getElementById('page3').style.display='none'; document.getElementById('page4').style.display='flex'; fetchAppointmentsForSelectedDate(); }, 250);
 };
 document.getElementById('page4-return').onclick = ()=>{
   document.getElementById('page4').style.display='none';
@@ -914,19 +970,42 @@ function updateLocationDescription(){
 /* -----------------------------
  *  Reservation (Create)
  * ----------------------------- */
+async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
+  try{
+    const res = await fetch(url, {
+      method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
+      headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
+      body: JSON.stringify(payload), keepalive: true
+    });
+    const raw = await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
+    return { ok: res.ok, status: res.status, data, raw };
+  }catch(err){ return { ok:false, status:0, error:String(err) }; }
+}
+async function postReservation(payload){
+  let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
+  if(!r.ok && (r.status===415 || r.status===404 || r.status===406)){
+    const rJson = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
+    if (rJson.ok) return rJson;
+    r = rJson;
+  }
+  if(!r.ok && (r.status===404 || r.status===405)){
+    let r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
+    if(!r2.ok) r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'application/json;charset=UTF-8');
+    return r2;
+  }
+  return r;
+}
+
 async function createReservationNow(payloadOverride={}){
   syncNFormFromUI();
   const payload = buildPayloadFromForm({ ...nForm, ...payloadOverride });
-
   const v = validatePayloadShape(payload);
   if(!v.ok){
     alert('الرجاء إدخال البيانات بالشكل الصحيح:\n• ' + v.errors.join('\n• '));
     return { ok:false, reason:'client_validation', payload };
   }
-
   const res = await postReservation(payload);
   const serverMsg = res?.data?.msgAR || res?.data?.message || res?.raw || '';
-
   if(res.ok && res.data?.success){
     try { sessionStorage.setItem('reservationMade','1'); sessionStorage.setItem('pendingBooking', JSON.stringify({ nForm, ts:Date.now() })); } catch(_){}
     return { ok:true, data:res.data };
@@ -938,7 +1017,6 @@ async function createReservationNow(payloadOverride={}){
 
 /* -----------------------------
  *  Telr Payment via GAS
- *  (Book FIRST on NAHL, then redirect)
  * ----------------------------- */
 function cachePendingTelr(cartId){
   const payload = { nForm, cartId, ts:Date.now(), reservationMade: sessionStorage.getItem('reservationMade')==='1' };
@@ -987,11 +1065,8 @@ async function startTelrCheckout(){
   }
 }
 
-
-
 /* -----------------------------
  *  Terms modal & confirm flow
- *  (BOOK FIRST if Telr selected)
  * ----------------------------- */
 const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
 const termsAccept = document.getElementById('termsAccept');
@@ -1020,16 +1095,13 @@ confirmTerms.addEventListener('click', async ()=>{
     const chosenId = document.querySelector('input[name="payingMethod"]:checked')?.id || '';
 
     if (chosenId === 'payTelrMada'){
-      // 1) Create reservation on NAHL first
       const booked = await createReservationNow();
       if (!booked.ok){ unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay(); return; }
-      // 2) THEN start Telr (redirect)
       const started = await startTelrCheckout();
       if (!started) { unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay(); }
-      return; // on success we navigate away
+      return;
     }
 
-    // Cash (no redirect)
     const result = await createReservationNow();
     unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay();
     if(result.ok){
@@ -1071,7 +1143,7 @@ document.querySelectorAll('input[name="payingMethod"]').forEach(r=>{ r.addEventL
 })();
 
 /* -----------------------------
- *  Google Maps (FIXED callback)
+ *  Google Maps
  * ----------------------------- */
 window.prePosition     = "https://www.google.com/maps/search/?api=1&query=";
 window.defaultLocation = { lat: 26.34165524787632, lng: 50.11524831545726 };
@@ -1202,41 +1274,41 @@ function ensureMapReady(){
 }
 $('#area').on('change', () => { setTimeout(setBoundries, 0); });
 
-
-// Minimal status page init: no checks, no spinner
+// Minimal status page init
 document.addEventListener('DOMContentLoaded', () => {
   const isStatus = (location.hash || '').replace('#','').toLowerCase() === 'status';
   if (!isStatus) return;
-
-  // Hide other pages
   ['page1','page2','page3','page4','page5','page6','page7'].forEach(id=>{
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
-
-  // Show static status page
   const statusPage = document.getElementById('statusPage');
   if (statusPage) statusPage.style.display = 'flex';
 });
 
-
+/* ----------------------------------------------------------
+ *  SUPER-FAST Google Sheet -> Page demo (chunked + cache)
+ * ---------------------------------------------------------- */
 (async function(){
   // CONFIG
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbzDljzUgjf_WjU9vIKx-q2i4TCOxK8TOpkTH04KnHMgqTi9oOhKoPAcSc2fhGqpmtiX/exec'; // your Web App URL
   const PARAMS  = new URLSearchParams({
     action:'listData',
-    cols:'A:F',           // or "1,2,5"
+    cols:'A:F',
     offset:'0',
-    limit:'500',
-    // since:'2025-10-01T00:00:00Z', // optional
+    limit:'500'
   });
 
   // Local cache key (versioned)
   const cacheKey = 'sheetCache';
   const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}'); // {version, data}
 
+  // requestIdleCallback polyfill
+  window.requestIdleCallback = window.requestIdleCallback || function(cb){ return setTimeout(()=>cb({ timeRemaining:()=>0, didTimeout:true }), 1); };
+
   const renderChunked = (headers, rows) => {
     const table = document.getElementById('tableBody');
+    if (!table) return;
     const frag = document.createDocumentFragment();
     let i = 0;
     function pump(){
@@ -1245,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tr = document.createElement('tr');
         rows[i].forEach(cell => {
           const td = document.createElement('td');
-          td.textContent = cell == null ? '' : cell; // escape by default
+          td.textContent = cell == null ? '' : cell;
           tr.appendChild(td);
         });
         frag.appendChild(tr);
@@ -1267,37 +1339,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchFresh(background){
     try{
-      // text/plain to avoid preflight (no custom headers)
       const res = await fetch(GAS_URL + '?' + PARAMS.toString(), {
         method:'GET',
         headers:{ 'Accept':'application/json', 'Content-Type':'text/plain;charset=UTF-8' },
-        cache:'no-store', credentials:'omit'
+        cache:'no-store', credentials:'omit', keepalive:true
       });
       const json = await res.json();
       if (!json.ok) throw new Error('API error');
 
       // If version changed, reset table and re-render
       if (!background || json.version !== cache.version){
-        if (!background){
-          // first paint
-        } else {
-          // clear existing
-          const tbody = document.getElementById('tableBody');
-          while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
-        }
-        renderChunked(json.headers, json.rows);
-        localStorage.setItem(cacheKey, JSON.stringify({ version: json.version, data: json }));
+        const tbody = document.getElementById('tableBody');
+        if (tbody) while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
       }
+      renderChunked(json.headers, json.rows);
+      localStorage.setItem(cacheKey, JSON.stringify({ version: json.version, data: json }));
     }catch(e){
       console.warn('Fetch failed', e);
     }
   }
 })();
-
-  
 </script>
 
-<!-- Google Maps (best practice: loading=async) -->
+<!-- Google Maps (async) -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&libraries=geometry&loading=async"></script>
 </body>
 </html>
