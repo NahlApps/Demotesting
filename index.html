@@ -1220,6 +1220,80 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+(async function(){
+  // CONFIG
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbzDljzUgjf_WjU9vIKx-q2i4TCOxK8TOpkTH04KnHMgqTi9oOhKoPAcSc2fhGqpmtiX/exec'; // your Web App URL
+  const PARAMS  = new URLSearchParams({
+    action:'listData',
+    cols:'A:F',           // or "1,2,5"
+    offset:'0',
+    limit:'500',
+    // since:'2025-10-01T00:00:00Z', // optional
+  });
+
+  // Local cache key (versioned)
+  const cacheKey = 'sheetCache';
+  const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}'); // {version, data}
+
+  const renderChunked = (headers, rows) => {
+    const table = document.getElementById('tableBody');
+    const frag = document.createDocumentFragment();
+    let i = 0;
+    function pump(){
+      const end = Math.min(i+200, rows.length);
+      for (; i<end; i++){
+        const tr = document.createElement('tr');
+        rows[i].forEach(cell => {
+          const td = document.createElement('td');
+          td.textContent = cell == null ? '' : cell; // escape by default
+          tr.appendChild(td);
+        });
+        frag.appendChild(tr);
+      }
+      table.appendChild(frag);
+      if (i < rows.length) requestIdleCallback(pump);
+    }
+    pump();
+  };
+
+  // 1) Show cached instantly (if any)
+  if (cache.version && cache.data){
+    renderChunked(cache.data.headers, cache.data.rows);
+    // background refresh
+    fetchFresh(true);
+  } else {
+    await fetchFresh(false);
+  }
+
+  async function fetchFresh(background){
+    try{
+      // text/plain to avoid preflight (no custom headers)
+      const res = await fetch(GAS_URL + '?' + PARAMS.toString(), {
+        method:'GET',
+        headers:{ 'Accept':'application/json', 'Content-Type':'text/plain;charset=UTF-8' },
+        cache:'no-store', credentials:'omit'
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error('API error');
+
+      // If version changed, reset table and re-render
+      if (!background || json.version !== cache.version){
+        if (!background){
+          // first paint
+        } else {
+          // clear existing
+          const tbody = document.getElementById('tableBody');
+          while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+        }
+        renderChunked(json.headers, json.rows);
+        localStorage.setItem(cacheKey, JSON.stringify({ version: json.version, data: json }));
+      }
+    }catch(e){
+      console.warn('Fetch failed', e);
+    }
+  }
+})();
+
   
 </script>
 
