@@ -1392,7 +1392,9 @@ document.addEventListener('DOMContentLoaded', () => {
       pay_title:'طريقة الدفع', page6_next:'التالي', page6_prev:'السابق', page6_processing:'جاري بدء عملية الدفع…',
       terms_title:'الشروط والأحكام – مغسلة سيارات متنقلة', terms_accept:'أوافق على الشروط والأحكام', terms_cancel:'إلغاء', terms_confirm:'تأكيد ومتابعة',
       thanks_h1:'شكراً لكم', thanks_h2:'تم حجز الموعد، وراح نأكده لكم على الواتساب', thanks_h3:'متحمسين نجيكم!!', rebook:'🔁 حجز جديد',
-      status_title:'حالة الدفع', status_text:'تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم', back_home:'العودة'
+      status_title:'حالة الدفع', status_text:'تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم', back_home:'العودة',  p1_hero: '✨ واكس يحمي سيارتك<br>🧼 فوط نظيفة & لمعان مضمون<br>🛞 إسفنجة للكفرات<br><br>... نهتم بكل التفاصيل',
+    p1_hashtag: '#غسيل_بدون_طوابير',
+    cta_whatsapp:'استفسار واتساب'
     },
     en:{_lang:'en',_dir:'ltr',
       overlay_loading:'Loading…',
@@ -1408,7 +1410,9 @@ document.addEventListener('DOMContentLoaded', () => {
       pay_title:'Payment method', page6_next:'Next', page6_prev:'Back', page6_processing:'Starting payment…',
       terms_title:'Terms & Conditions – Mobile Car Wash', terms_accept:'I accept the terms and conditions', terms_cancel:'Cancel', terms_confirm:'Confirm & continue',
       thanks_h1:'Thank you!', thanks_h2:'Your booking is placed; we will confirm via WhatsApp', thanks_h3:'Can’t wait to see you!', rebook:'🔁 New booking',
-      status_title:'Payment status', status_text:'Your booking is placed. We will send the payment status via WhatsApp and email.', back_home:'Back'
+      status_title:'Payment status', status_text:'Your booking is placed. We will send the payment status via WhatsApp and email.', back_home:'Back', p1_hero: '✨ Wax that protects your car<br>🧼 Clean towels & guaranteed shine<br>🛞 Dedicated tire sponge<br><br>...we care about every detail',
+    p1_hashtag: '#NoQueueCarWash',
+    cta_whatsapp:'WhatsApp enquiry'
     }
   };
 
@@ -1424,6 +1428,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ['.stepper .step-dot:nth-child(5) small','textContent','step_5'],
     ['.stepper .step-dot:nth-child(6) small','textContent','step_6'],
 
+      // Page 1 hero + WhatsApp CTA
+    ['#page1 .section-card h3','innerHTML','p1_hero'],
+    ['#page1 .section-card p span','textContent','p1_hashtag'],
+    ['#page1 .btn-ghost','textContent','cta_whatsapp'],
+    
     // Page 2
     ['#page2 .form-block h1','innerHTML','p2_title'],
     ['label[for="area"]','textContent','area_label'],
