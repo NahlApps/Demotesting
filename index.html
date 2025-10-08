@@ -510,6 +510,9 @@ const servicesById = new Map(); const categoriesById = new Map();
 let serviceDescText = '';
 let countryCodeInput = null;
 
+// [AR/EN] cache locations so we can re-render + keep Arabic name for polygons
+let __locationsCache = []; // [{id, TS_location_arabic_name, TS_location_english_name}]
+
 /* -----------------------------
  *  Overlay helpers
  * ----------------------------- */
@@ -624,6 +627,16 @@ function syncNFormFromUI(){
 }
 
 /* -----------------------------
+ *  [AR/EN] helpers for picking fields + current UI lang
+ * ----------------------------- */
+function __uiLang(){ try{ return (localStorage.getItem('ui_locale')==='en') ? 'en' : 'ar'; }catch(_){ return 'ar'; } }
+function __pick(item, arKey, enKey){
+  const lang = __uiLang();
+  const ar = item?.[arKey]; const en = item?.[enKey];
+  return lang==='en' ? (en ?? ar ?? '') : (ar ?? en ?? '');
+}
+
+/* -----------------------------
  *  Networking
  * ----------------------------- */
 async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
@@ -679,13 +692,38 @@ function callContent2(routText, callback, abortable=false, retries=3){
 document.getElementById("page2-spinner").style.display="block";
 $('.js-example-basic-single').select2({ data:[], width:"100%" });
 
+// [AR/EN] render area select from cache with current UI lang
+function __renderAreasSelectFromCache(){
+  if (!Array.isArray(__locationsCache) || !__locationsCache.length) return;
+  const selectData = __locationsCache
+    .map(l=>({
+      id: String(l.id),
+      text: __pick(l, 'TS_location_arabic_name', 'TS_location_english_name')
+    }))
+    .sort((a,b)=>Number(a.id)-Number(b.id));
+  const current = $('#area').val();
+  $('.js-example-basic-single').empty().select2({ data:selectData, width:"100%" });
+  if (current) { $('#area').val(current).trigger('change'); }
+}
+
 callContent2(`/locations`, (data)=>{
   const locations = data.data || [];
-  const selectData = locations.map(l=>({ id:String(l.id), text:l.TS_location_arabic_name })).sort((a,b)=>Number(a.id)-Number(b.id));
+  __locationsCache = locations.slice(); // [AR/EN] keep original payload for later re-render
+  const selectData = locations.map(l=>({
+    id:String(l.id),
+    // [AR/EN] was: l.TS_location_arabic_name
+    text: __pick(l,'TS_location_arabic_name','TS_location_english_name')
+  })).sort((a,b)=>Number(a.id)-Number(b.id));
   $('.js-example-basic-single').empty().select2({ data:selectData, width:"100%" });
   if (selectData.length && !$('#area').val()) { $('#area').val(selectData[0].id).trigger('change'); } else { $('#area').trigger('change'); }
   document.getElementById("page2-spinner").style.display="none";
 });
+
+// keep a quick Arabic-name lookup for boundaries logic
+function __arabicLocationNameById(id){
+  const row = __locationsCache.find(x => String(x.id) === String(id));
+  return row ? (row.TS_location_arabic_name || '') : '';
+}
 
 function extractCatIdFromServiceObj(svc){
   const directId =
@@ -758,7 +796,8 @@ $("#area").on("change", ()=>{
     serviceCategories.forEach(c=>{ const cid=String(c.TS_service_category_id ?? c.category_id ?? c.id); categoriesById.set(cid, c); });
 
     const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
-    const names = sorted.map(s => s.TS_service_arabic_name || s.TS_service_name || s.name_ar || s.name);
+    // [AR/EN] was: s.TS_service_arabic_name
+    const names = sorted.map(s => __pick(s,'TS_service_arabic_name','TS_service_english_name'));
     const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
     add_dropdown_list(names, ids, "service");
 
@@ -1143,7 +1182,10 @@ function placeOrMovePin(latLng){
 }
 function setBoundries(){
   if (!window.map) return;
-  const selectedArea = ($('#area option:selected').text() || '').trim();
+  // [AR/EN] always compare using the Arabic name (from cache), regardless of UI language
+  const selectedId = document.getElementById('area')?.value || '';
+  const selectedArea = __arabicLocationNameById(selectedId) || ($('#area option:selected').text() || '').trim();
+
   let coords;
   if (selectedArea === "العزيزية - الخبر") {
     coords = [
@@ -1213,6 +1255,29 @@ function ensureMapReady(){
                    else { window.map.setCenter(window.defaultLocation); window.map.setZoom(12); } }, 40);
 }
 $('#area').on('change', () => { setTimeout(setBoundries, 0); });
+
+// [AR/EN] re-render selects when language toggles are clicked (no refetch)
+document.getElementById('toAR')?.addEventListener('click', ()=>{ setTimeout(()=>{ __renderAreasSelectFromCache(); // keep selection
+  // rebuild services list (if services already fetched)
+  if (services && services.length){
+    const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+    const names = sorted.map(s => __pick(s,'TS_service_arabic_name','TS_service_english_name'));
+    const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+    const current = document.getElementById('service')?.value || '';
+    add_dropdown_list(names, ids, "service");
+    if (current){ document.getElementById('service').value=current; document.getElementById('service').dispatchEvent(new Event('change')); }
+  }
+}, 0); });
+document.getElementById('toEN')?.addEventListener('click', ()=>{ setTimeout(()=>{ __renderAreasSelectFromCache();
+  if (services && services.length){
+    const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+    const names = sorted.map(s => __pick(s,'TS_service_arabic_name','TS_service_english_name'));
+    const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+    const current = document.getElementById('service')?.value || '';
+    add_dropdown_list(names, ids, "service");
+    if (current){ document.getElementById('service').value=current; document.getElementById('service').dispatchEvent(new Event('change')); }
+  }
+}, 0); });
 
 
 // Minimal status page init: no checks, no spinner
@@ -1356,7 +1421,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['.stepper .step-dot:nth-child(2) small','textContent','step_2'],
     ['.stepper .step-dot:nth-child(3) small','textContent','step_3'],
     ['.stepper .step-dot:nth-child(4) small','textContent','step_4'],
-    ['.stepper .step-dot:nth-child(5) small','textContent','step_5'],
+    [''.stepper .step-dot:nth-child(5) small','textContent','step_5'],
     ['.stepper .step-dot:nth-child(6) small','textContent','step_6'],
 
     // Page 2
