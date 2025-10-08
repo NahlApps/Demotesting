@@ -801,14 +801,20 @@ $("#area").on("change", ()=>{
     const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
     add_dropdown_list(names, ids, "service");
 
-    const firstSvcId = ids[0] || '';
-    if(firstSvcId){
-      const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-      setServiceCatHiddenAndState(catId);
-      nForm.service = String(firstSvcId);
-      const desc = await fetchServiceDescription(firstSvcId);
-      updateServiceDescriptionUI(desc);
-    } else { updateServiceDescriptionUI(''); }
+const firstSvcId = ids[0] || '';
+if (firstSvcId){
+  const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+  setServiceCatHiddenAndState(catId);
+  nForm.service = String(firstSvcId);
+
+  // ⬇️ try local override first, then GAS
+  const local = getLocalServiceDescOverride(firstSvcId);
+  const desc  = local ?? await fetchServiceDescription(firstSvcId);
+  updateServiceDescriptionUI(desc);
+} else {
+  updateServiceDescriptionUI('');
+}
+
 
     document.getElementById("page3-2-spinner").style.display="none";
     hideOverlay();
@@ -884,9 +890,11 @@ $('#service').on('change', async ()=>{
   nForm.service = String(document.getElementById('service').value || '');
   const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
   setServiceCatHiddenAndState(catId);
-  const svcId = document.getElementById('service').value || '';
-  const desc = svcId ? await fetchServiceDescription(String(svcId)) : '';
-  updateServiceDescriptionUI(desc);
+const svcId = document.getElementById('service').value || '';
+const local = svcId ? getLocalServiceDescOverride(String(svcId)) : null;
+const desc  = (local != null) ? local : (svcId ? await fetchServiceDescription(String(svcId)) : '');
+updateServiceDescriptionUI(desc);
+
   const p4=document.getElementById('page4'); if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
 });
 function timesSetter(index){
@@ -1542,6 +1550,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('DOMContentLoaded', initLanguage);
 })();
+
+  /* --- Local service description overrides (AR/EN) --- */
+function getLocalServiceDescOverride(serviceId){
+  const id = String(serviceId || '');
+  const svc = servicesById.get(id) || {};
+  const arName = String(
+    svc.TS_service_arabic_name ?? svc.service_arabic_name ?? svc.name_ar ?? svc.name ?? ''
+  ).trim();
+  const enName = String(
+    svc.TS_service_name ?? svc.service_name ?? svc.name_en ?? svc.name ?? ''
+  ).trim();
+
+  // Normalize for matching
+  const en = enName.toLowerCase();
+  const ar = arName; // keep Arabic as-is
+
+  // Only for service id 187 (as requested)
+  if (id === '187') {
+    // "Small Car Wash 45 SAR"
+    if (en.includes('small car wash 45 sar') || enName === 'Small Car Wash 45 SAR') {
+      return (nForm.locale === 'en')
+        ? 'Opening Offer - Wash for 29 SAR'
+        : 'عرض الافتتاح - غسيل بـ 29 ريال';
+    }
+    // "Big Car Wash 60 SAR"
+    if (en.includes('big car wash 60 sar') || enName === 'Big Car Wash 60 SAR') {
+      return (nForm.locale === 'en')
+        ? 'Opening Offer - Wash for 39 SAR'
+        : 'عرض الافتتاح - غسيل بـ 39 ريال';
+    }
+    // (Optional) very loose AR fallback if your Arabic names contain keywords
+    // if (ar.includes('صغيرة')) { ... } / if (ar.includes('كبيرة')) { ... }
+  }
+
+  return null; // no local override
+}
+
 </script>
 
 <!-- Google Maps (best practice: loading=async) -->
