@@ -46,10 +46,8 @@
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
   
   <!-- Speed up TLS + DNS to your Apps Script web app -->
-  <link rel="dns-prefetch" href="https://script.google.com">
-  <link rel="dns-prefetch" href="https://script.googleusercontent.com">
-  <link rel="preconnect" href="https://script.google.com" crossorigin>
-  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 
   <!-- ===== Theme (Aqua + Warm CTA) ===== -->
   <style>
@@ -151,7 +149,15 @@
     .social-fab i{font-size:22px;line-height:1}
     #globalOverlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;flex-direction:column}
     #globalOverlay.is-visible{display:flex}
-    #serviceDescText{ color: var(--error)!important; font-size: 1.15rem; font-weight: 800; }
+    #serviceDescText{
+  color: var(--error) !important;   /* أحمر */
+  font-size: 1.15rem;               /* أكبر */
+  font-weight: 800;                 /* عريض */
+}
+/* === Language switcher (added) === */
+#langSwitcher .btn{ border-radius:10px; padding:.35rem .6rem }
+#langSwitcher .btn:focus { outline:2px solid rgba(255,255,255,.7); outline-offset:2px }
+
   </style>
 </head>
 <body>
@@ -168,6 +174,11 @@
     <div id="form-content">
       <div class="header">
         <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png" alt="Sponge & Soap">
+        <!-- === Language toggle (added) === -->
+        <div id="langSwitcher" style="margin-inline-start:auto; display:flex; gap:6px;">
+          <button id="toAR" type="button" class="btn btn-light btn-sm" style="font-weight:800">العربية</button>
+          <button id="toEN" type="button" class="btn btn-outline-light btn-sm" style="font-weight:700">English</button>
+        </div>
       </div>
 
       <div class="stepper" aria-hidden="true" role="tablist" aria-label="خطوات الحجز">
@@ -384,31 +395,30 @@
         </div>
       </div>
 
-      <!-- Status Page (Payment) — simple & static -->
-      <div id="statusPage" class="page" style="display:none; padding:2rem; text-align:center;">
-        <div class="form-block">
-          <div class="section-card">
-            <h1>حالة الدفع</h1>
-            <p id="statusText1" style="margin-top:.75rem;">
-              تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم
-            </p>
-            <div style="margin-top:1rem;">
-              <button
-                id="backHome"
-                class="filter-button"
-                style="margin-inline-start:.5rem;"
-                onclick="window.open('https://spongnsoap.com/', '_blank', 'noopener');">
-                العودة
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- Status Page (Payment) — simple & static -->
+<div id="statusPage" class="page" style="display:none; padding:2rem; text-align:center;">
+  <div class="form-block">
+    <div class="section-card">
+      <h1>حالة الدفع</h1>
+      <p id="statusText1" style="margin-top:.75rem;">
+        تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم
+      </p>
 
-      <!-- Hidden table to support the sheet-list demo renderer -->
-      <div style="display:none">
-        <table><tbody id="tableBody"></tbody></table>
-      </div>
+      <!-- Only one action -->
+<div style="margin-top:1rem;">
+  <button
+    id="backHome"
+    class="filter-button"
+    style="margin-inline-start:.5rem;"
+    onclick="window.open('https://spongnsoap.com/', '_blank', 'noopener');">
+    العودة
+  </button>
+</div>
+
+    </div>
+  </div>
+</div>
+
 
       <footer>
         <div>Sponge & Soap</div>
@@ -468,7 +478,8 @@
 <script>
 /* ===========================================================
  * Sponge & Soap — Booking App (index.html)
- * Fast-path improvements: prefetch + cache for Page 2 data.
+ * Implements: If "Payment Gateway" selected → book first on NAHL,
+ * then open Telr page. Also fixes regex + Google Maps callback.
  * =========================================================== */
 
 /* -----------------------------
@@ -561,7 +572,7 @@ if (dateEl){
 }
 
 /* -----------------------------
- *  Payload & validation
+ *  Payload & validation (regex FIXED)
  * ----------------------------- */
 const MAP_URL_RE = /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/;
 
@@ -613,77 +624,53 @@ function syncNFormFromUI(){
 }
 
 /* -----------------------------
- *  Cache helpers for FAST page-2
+ *  Networking
  * ----------------------------- */
-const SS = window.sessionStorage;
-const CACHE = {
-  get(key){
-    try{
-      const raw = SS.getItem(key);
-      if(!raw) return null;
-      const o = JSON.parse(raw);
-      if (!o || !o.t || !o.ttl) return null;
-      if (Date.now() - o.t > o.ttl) return null;
-      return o.data;
-    }catch{ return null; }
-  },
-  set(key, data, ttlMs){
-    try{ SS.setItem(key, JSON.stringify({ t:Date.now(), ttl:ttlMs, data })); }catch(_){}
+async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
+  try{
+    const res = await fetch(url, {
+      method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
+      headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const raw = await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
+    return { ok: res.ok, status: res.status, data, raw };
+  }catch(err){ return { ok:false, status:0, error:String(err) }; }
+}
+async function postReservation(payload){
+  let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
+  if(!r.ok && (r.status===415 || r.status===404 || r.status===406)){
+    const rJson = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
+    if (rJson.ok) return rJson;
+    r = rJson;
   }
-};
-function keyLocations(){ return `locs:v1`; }
-function keyServices(locId){ return `svcs:v1:${locId}`; }
-function keyAppts(locId, svcId, startISO){ return `apts:v1:${locId}:${svcId}:${startISO}`; }
-
-/* -----------------------------
- *  Networking (abort + timeout)
- * ----------------------------- */
-function fetchJSON(url, { timeoutMs = 4500, signal = null } = {}) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort('timeout'), timeoutMs);
-  const finalSignal = signal || ctrl.signal;
-
-  return fetch(url, {
-    method: 'GET',
-    cache: 'no-store',
-    credentials: 'omit',
-    redirect: 'follow',
-    signal: finalSignal
-  })
-  .then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status))))
-  .finally(() => clearTimeout(timer));
+  if(!r.ok && (r.status===404 || r.status===405)){
+    let r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
+    if(!r2.ok) r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'application/json;charset=UTF-8');
+    return r2;
+  }
+  return r;
 }
-
-
-/* -----------------------------
- *  Data fetch with cache
- * ----------------------------- */
-async function getLocationsFast(){
-  const ck = keyLocations();
-  const cached = CACHE.get(ck);
-  if (cached?.length) return { data: cached, cache:true };
-  const json = await fetchJSON(baseForm + '/locations', { timeoutMs:3500 });
-  const arr = json?.data || [];
-  if (arr.length) CACHE.set(ck, arr, 10*60*1000); // 10 min
-  return { data: arr, cache:false };
-}
-async function getServicesFast(locationId){
-  const ck = keyServices(locationId);
-  const cached = CACHE.get(ck);
-  if (cached?.services?.length) return { data: cached, cache:true };
-  const json = await fetchJSON(baseForm + `/services?location=${encodeURIComponent(locationId)}`, { timeoutMs:3500 });
-  const pack = { services: json?.data?.services || [], servicesCat: json?.data?.servicesCat || [] };
-  if (pack.services.length) CACHE.set(ck, pack, 10*60*1000);
-  return { data: pack, cache:false };
-}
-async function getApptsFast(locationId, serviceId, startISO){
-  const ck = keyAppts(locationId, serviceId, startISO);
-  const cached = CACHE.get(ck);
-  if (cached?.appointments) return { data: cached, cache:true };
-  const json = await fetchJSON(baseForm + `/appointments?startDate=${encodeURIComponent(startISO)}&location=${encodeURIComponent(locationId)}&service=${encodeURIComponent(serviceId)}`, { timeoutMs:4500 });
-  const out = { appointments: json?.data?.appointments || [] };
-  if (out.appointments.length) CACHE.set(ck, out, 3*60*1000); // 3 min
-  return { data: out, cache:false };
+function callContent2(routText, callback, abortable=false, retries=3){
+  return new Promise((resolve,reject)=>{
+    let signal = '';
+    if (abortable) {
+      if(controllers.length>0){ controllers.forEach(c=>c[0].abort()); controllers=[]; }
+      const controller = new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
+    }
+    setTimeout(()=>{
+      fetch(baseForm + `${routText}`, { method:'GET', redirect:'follow', ...(abortable && { signal }) })
+        .then(async (response)=>{
+          if(!response.ok){ if(retries>0) return resolve(callContent2(routText, callback, abortable, retries-1)); else throw new Error('Network response was not ok'); }
+          const json = await response.json(); callback(json); resolve(json);
+        })
+        .catch(err=>{
+          if(String(err.message).includes('aborted')) return;
+          if(retries>0) setTimeout(()=>resolve(callContent2(routText, callback, abortable, retries-1)), 900);
+          else reject(err);
+        });
+    },300);
+  });
 }
 
 /* -----------------------------
@@ -692,17 +679,13 @@ async function getApptsFast(locationId, serviceId, startISO){
 document.getElementById("page2-spinner").style.display="block";
 $('.js-example-basic-single').select2({ data:[], width:"100%" });
 
-// Warm locations as soon as possible (so Page 2 pops)
-(async function warmLocations(){
-  try{
-    const { data } = await getLocationsFast();
-    const selectData = data.map(l=>({ id:String(l.id), text:l.TS_location_arabic_name })).sort((a,b)=>Number(a.id)-Number(b.id));
-    $('.js-example-basic-single').empty().select2({ data:selectData, width:"100%" });
-    if (selectData.length && !$('#area').val()) { $('#area').val(selectData[0].id).trigger('change'); } else { $('#area').trigger('change'); }
-  } finally {
-    document.getElementById("page2-spinner").style.display="none";
-  }
-})();
+callContent2(`/locations`, (data)=>{
+  const locations = data.data || [];
+  const selectData = locations.map(l=>({ id:String(l.id), text:l.TS_location_arabic_name })).sort((a,b)=>Number(a.id)-Number(b.id));
+  $('.js-example-basic-single').empty().select2({ data:selectData, width:"100%" });
+  if (selectData.length && !$('#area').val()) { $('#area').val(selectData[0].id).trigger('change'); } else { $('#area').trigger('change'); }
+  document.getElementById("page2-spinner").style.display="none";
+});
 
 function extractCatIdFromServiceObj(svc){
   const directId =
@@ -736,7 +719,7 @@ function setServiceCatHiddenAndState(cid){
   if (cid) nForm.serviceCat = String(cid);
 }
 
-/* ---- Service description via GAS (prefetch first choice) ---- */
+/* ---- Service description via GAS ---- */
 async function fetchServiceDescription(serviceId){
   try{
     const res = await fetch(`${GAS_BASE_URL}?action=getServiceDescription&serviceId=${encodeURIComponent(serviceId)}`);
@@ -759,58 +742,40 @@ function updateServiceDescriptionUI(text){
   updateLocationDescription();
 }
 
-/* Load services when area changes — from cache immediately, then refresh */
-$("#area").on("change", async ()=>{
-  const locId = document.getElementById("area").value;
+/* Load services when area changes */
+$("#area").on("change", ()=>{
+  if (getComputedStyle(document.getElementById('page2')).display !== 'none') showOverlay('جاري تحميل الخدمات…');
+
   document.getElementById("page3-2-spinner").style.display="block";
   document.getElementById('service').innerHTML = '';
 
-  // 1) Instant paint from cache (if present)
-  let pack = null, fromCache = false;
-  try {
-    const cached = CACHE.get(keyServices(locId));
-    if (cached?.services?.length) {
-      pack = cached; fromCache = true;
-      paintServices(pack);
-    }
-  } catch(_){}
+  callContent2(`/services?location=${encodeURIComponent(document.getElementById("area").value)}`, async (data)=>{
+    services = data?.data?.services || [];
+    serviceCategories = data?.data?.servicesCat || [];
+    servicesById.clear(); categoriesById.clear();
 
-  // 2) Always fetch fresh in background, update if changed
-  try{
-    const { data } = await getServicesFast(locId);
-    if (!fromCache || JSON.stringify(data.services)?.length !== JSON.stringify(pack?.services)?.length) {
-      paintServices(data);
-    }
-  } finally {
+    services.forEach(s=>{ const sid=String(s.TS_service_id ?? s.service_id ?? s.id); servicesById.set(sid, s); });
+    serviceCategories.forEach(c=>{ const cid=String(c.TS_service_category_id ?? c.category_id ?? c.id); categoriesById.set(cid, c); });
+
+    const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+    const names = sorted.map(s => s.TS_service_arabic_name || s.TS_service_name || s.name_ar || s.name);
+    const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+    add_dropdown_list(names, ids, "service");
+
+    const firstSvcId = ids[0] || '';
+    if(firstSvcId){
+      const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+      setServiceCatHiddenAndState(catId);
+      nForm.service = String(firstSvcId);
+      const desc = await fetchServiceDescription(firstSvcId);
+      updateServiceDescriptionUI(desc);
+    } else { updateServiceDescriptionUI(''); }
+
     document.getElementById("page3-2-spinner").style.display="none";
     hideOverlay();
     setTimeout(setBoundries, 0);
-  }
+  }, true);
 });
-
-function paintServices(data){
-  services = data?.services || [];
-  serviceCategories = data?.servicesCat || [];
-  servicesById.clear(); categoriesById.clear();
-
-  services.forEach(s=>{ const sid=String(s.TS_service_id ?? s.service_id ?? s.id); servicesById.set(sid, s); });
-  serviceCategories.forEach(c=>{ const cid=String(c.TS_service_category_id ?? c.category_id ?? c.id); categoriesById.set(cid, c); });
-
-  const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
-  const names = sorted.map(s => s.TS_service_arabic_name || s.TS_service_name || s.name_ar || s.name);
-  const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
-  add_dropdown_list(names, ids, "service");
-
-  const firstSvcId = ids[0] || '';
-  if(firstSvcId){
-    const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-    setServiceCatHiddenAndState(catId);
-    nForm.service = String(firstSvcId);
-    // prefetch desc
-    fetchServiceDescription(firstSvcId).then(updateServiceDescriptionUI);
-  } else { updateServiceDescriptionUI(''); }
-}
-
 function add_dropdown_list(show_list, value_list, element_id){
   const parent = document.getElementById(element_id); parent.innerHTML="";
   show_list.forEach((name, i)=>{
@@ -820,7 +785,7 @@ function add_dropdown_list(show_list, value_list, element_id){
 }
 
 /* -----------------------------
- *  Appointments (3-day window) with cache
+ *  Appointments (3-day window)
  * ----------------------------- */
 let appointments=[[],[],[]], ActualTimes=[[],[],[]];
 
@@ -854,39 +819,27 @@ async function fetchAppointmentsForSelectedDate(){
   });
 
   const startDate = day1.toFormat('yyyy-MM-dd');
-
-  // 1) Try cached appointments for instant grid
-  const cached = CACHE.get(keyAppts(areaVal, serviceVal, startDate));
-  if (cached?.appointments) {
-    paintAppts(cached.appointments, day1, day2, day3);
-  }
-
-  // 2) Fetch fresh and update if changed
   try{
-    const { data } = await getApptsFast(areaVal, serviceVal, startDate);
-    paintAppts(data.appointments || [], day1, day2, day3);
+    await callContent2(`/appointments?startDate=${encodeURIComponent(startDate)}&location=${encodeURIComponent(areaVal)}&service=${encodeURIComponent(serviceVal)}`, (data)=>{
+      const rec = data.data.appointments || [];
+      let tempActualTimes=[];
+      for(let i=0;i<rec.length;i++){
+        const x=luxon.DateTime.fromISO(rec[i]['TS_appointment_date'], { setZone:true });
+        const y=luxon.DateTime.fromISO(rec[i]['TS_appointment_time'], { setZone:true });
+        rec[i]['TS_appointment_date']=x.toISODate();
+        rec[i]['TS_appointment_time']=y.toLocaleString(luxon.DateTime.TIME_SIMPLE).replace(" "," ");
+        tempActualTimes[i]=y.toFormat('hh:mm a');
+      }
+      const d1=day1.toFormat('yyyy-MM-dd'), d2=day2.toFormat('yyyy-MM-dd'), d3=day3.toFormat('yyyy-MM-dd');
+      for(let i=0;i<rec.length;i++){
+        if(rec[i]["TS_appointment_date"]===d1){ appointments[0].push(rec[i]['TS_appointment_time']); ActualTimes[0].push(tempActualTimes[i]); }
+        else if(rec[i]["TS_appointment_date"]===d2){ appointments[1].push(rec[i]['TS_appointment_time']); ActualTimes[1].push(tempActualTimes[i]); }
+        else if(rec[i]["TS_appointment_date"]===d3){ appointments[2].push(rec[i]['TS_appointment_time']); ActualTimes[2].push(tempActualTimes[i]); }
+      }
+      timesSetter(0);
+    }, true);
   } finally { if (dateEl) dateEl.disabled=false; }
 }
-
-function paintAppts(rec, day1, day2, day3){
-  appointments=[[],[],[]]; ActualTimes=[[],[],[]];
-  let tempActualTimes=[];
-  for(let i=0;i<rec.length;i++){
-    const x=luxon.DateTime.fromISO(rec[i]['TS_appointment_date'], { setZone:true });
-    const y=luxon.DateTime.fromISO(rec[i]['TS_appointment_time'], { setZone:true });
-    rec[i]['TS_appointment_date']=x.toISODate();
-    rec[i]['TS_appointment_time']=y.toLocaleString(luxon.DateTime.TIME_SIMPLE).replace(" "," ");
-    tempActualTimes[i]=y.toFormat('hh:mm a');
-  }
-  const d1=day1.toFormat('yyyy-MM-dd'), d2=day2.toFormat('yyyy-MM-dd'), d3=day3.toFormat('yyyy-MM-dd');
-  for(let i=0;i<rec.length;i++){
-    if(rec[i]["TS_appointment_date"]===d1){ appointments[0].push(rec[i]['TS_appointment_time']); ActualTimes[0].push(tempActualTimes[i]); }
-    else if(rec[i]["TS_appointment_date"]===d2){ appointments[1].push(rec[i]['TS_appointment_time']); ActualTimes[1].push(tempActualTimes[i]); }
-    else if(rec[i]["TS_appointment_date"]===d3){ appointments[2].push(rec[i]['TS_appointment_time']); ActualTimes[2].push(tempActualTimes[i]); }
-  }
-  timesSetter(0);
-}
-
 if (dateEl){ dateEl.onchange = ()=>{ const hasArea=!!document.getElementById("area")?.value; const hasService=!!document.getElementById("service")?.value; if (!hasArea || !hasService) return; fetchAppointmentsForSelectedDate(); }; }
 $('#service').on('change', async ()=>{
   nForm.service = String(document.getElementById('service').value || '');
@@ -923,7 +876,7 @@ function choosedDate(time, date){
 document.getElementById('page1-button').onclick = ()=>{
   document.getElementById('page1').style.display='none';
   document.getElementById('page2').style.display='flex';
-  // No blocking overlay anymore; we already warmed data.
+  showOverlay('جاري تحميل الخدمات…');
 };
 document.getElementById('page2-button').onclick = ()=>{
   const area = document.getElementById("area");
@@ -931,7 +884,7 @@ document.getElementById('page2-button').onclick = ()=>{
   nForm.location = area.value;
   document.getElementById('page2').style.display='none';
   document.getElementById('page3').style.display='flex';
-  setTimeout(()=>{ document.getElementById('page3').style.display='none'; document.getElementById('page4').style.display='flex'; fetchAppointmentsForSelectedDate(); }, 250);
+  setTimeout(()=>{ document.getElementById('page3').style.display='none'; document.getElementById('page4').style.display='flex'; fetchAppointmentsForSelectedDate(); }, 450);
 };
 document.getElementById('page4-return').onclick = ()=>{
   document.getElementById('page4').style.display='none';
@@ -973,42 +926,19 @@ function updateLocationDescription(){
 /* -----------------------------
  *  Reservation (Create)
  * ----------------------------- */
-async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
-  try{
-    const res = await fetch(url, {
-      method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
-      headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
-      body: JSON.stringify(payload), keepalive: true
-    });
-    const raw = await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
-    return { ok: res.ok, status: res.status, data, raw };
-  }catch(err){ return { ok:false, status:0, error:String(err) }; }
-}
-async function postReservation(payload){
-  let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
-  if(!r.ok && (r.status===415 || r.status===404 || r.status===406)){
-    const rJson = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
-    if (rJson.ok) return rJson;
-    r = rJson;
-  }
-  if(!r.ok && (r.status===404 || r.status===405)){
-    let r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
-    if(!r2.ok) r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'application/json;charset=UTF-8');
-    return r2;
-  }
-  return r;
-}
-
 async function createReservationNow(payloadOverride={}){
   syncNFormFromUI();
   const payload = buildPayloadFromForm({ ...nForm, ...payloadOverride });
+
   const v = validatePayloadShape(payload);
   if(!v.ok){
     alert('الرجاء إدخال البيانات بالشكل الصحيح:\n• ' + v.errors.join('\n• '));
     return { ok:false, reason:'client_validation', payload };
   }
+
   const res = await postReservation(payload);
   const serverMsg = res?.data?.msgAR || res?.data?.message || res?.raw || '';
+
   if(res.ok && res.data?.success){
     try { sessionStorage.setItem('reservationMade','1'); sessionStorage.setItem('pendingBooking', JSON.stringify({ nForm, ts:Date.now() })); } catch(_){}
     return { ok:true, data:res.data };
@@ -1020,6 +950,7 @@ async function createReservationNow(payloadOverride={}){
 
 /* -----------------------------
  *  Telr Payment via GAS
+ *  (Book FIRST on NAHL, then redirect)
  * ----------------------------- */
 function cachePendingTelr(cartId){
   const payload = { nForm, cartId, ts:Date.now(), reservationMade: sessionStorage.getItem('reservationMade')==='1' };
@@ -1068,8 +999,11 @@ async function startTelrCheckout(){
   }
 }
 
+
+
 /* -----------------------------
  *  Terms modal & confirm flow
+ *  (BOOK FIRST if Telr selected)
  * ----------------------------- */
 const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
 const termsAccept = document.getElementById('termsAccept');
@@ -1098,13 +1032,16 @@ confirmTerms.addEventListener('click', async ()=>{
     const chosenId = document.querySelector('input[name="payingMethod"]:checked')?.id || '';
 
     if (chosenId === 'payTelrMada'){
+      // 1) Create reservation on NAHL first
       const booked = await createReservationNow();
       if (!booked.ok){ unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay(); return; }
+      // 2) THEN start Telr (redirect)
       const started = await startTelrCheckout();
       if (!started) { unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay(); }
-      return;
+      return; // on success we navigate away
     }
 
+    // Cash (no redirect)
     const result = await createReservationNow();
     unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay();
     if(result.ok){
@@ -1146,7 +1083,7 @@ document.querySelectorAll('input[name="payingMethod"]').forEach(r=>{ r.addEventL
 })();
 
 /* -----------------------------
- *  Google Maps
+ *  Google Maps (FIXED callback)
  * ----------------------------- */
 window.prePosition     = "https://www.google.com/maps/search/?api=1&query=";
 window.defaultLocation = { lat: 26.34165524787632, lng: 50.11524831545726 };
@@ -1277,41 +1214,41 @@ function ensureMapReady(){
 }
 $('#area').on('change', () => { setTimeout(setBoundries, 0); });
 
-// Minimal status page init
+
+// Minimal status page init: no checks, no spinner
 document.addEventListener('DOMContentLoaded', () => {
   const isStatus = (location.hash || '').replace('#','').toLowerCase() === 'status';
   if (!isStatus) return;
+
+  // Hide other pages
   ['page1','page2','page3','page4','page5','page6','page7'].forEach(id=>{
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
+
+  // Show static status page
   const statusPage = document.getElementById('statusPage');
   if (statusPage) statusPage.style.display = 'flex';
 });
 
-/* ----------------------------------------------------------
- *  SUPER-FAST Google Sheet -> Page demo (chunked + cache)
- * ---------------------------------------------------------- */
+
 (async function(){
   // CONFIG
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbzDljzUgjf_WjU9vIKx-q2i4TCOxK8TOpkTH04KnHMgqTi9oOhKoPAcSc2fhGqpmtiX/exec'; // your Web App URL
   const PARAMS  = new URLSearchParams({
     action:'listData',
-    cols:'A:F',
+    cols:'A:F',           // or "1,2,5"
     offset:'0',
-    limit:'500'
+    limit:'500',
+    // since:'2025-10-01T00:00:00Z', // optional
   });
 
   // Local cache key (versioned)
   const cacheKey = 'sheetCache';
   const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}'); // {version, data}
 
-  // requestIdleCallback polyfill
-  window.requestIdleCallback = window.requestIdleCallback || function(cb){ return setTimeout(()=>cb({ timeRemaining:()=>0, didTimeout:true }), 1); };
-
   const renderChunked = (headers, rows) => {
     const table = document.getElementById('tableBody');
-    if (!table) return;
     const frag = document.createDocumentFragment();
     let i = 0;
     function pump(){
@@ -1320,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tr = document.createElement('tr');
         rows[i].forEach(cell => {
           const td = document.createElement('td');
-          td.textContent = cell == null ? '' : cell;
+          td.textContent = cell == null ? '' : cell; // escape by default
           tr.appendChild(td);
         });
         frag.appendChild(tr);
@@ -1342,29 +1279,198 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchFresh(background){
     try{
+      // text/plain to avoid preflight (no custom headers)
       const res = await fetch(GAS_URL + '?' + PARAMS.toString(), {
         method:'GET',
         headers:{ 'Accept':'application/json', 'Content-Type':'text/plain;charset=UTF-8' },
-        cache:'no-store', credentials:'omit', keepalive:true
+        cache:'no-store', credentials:'omit'
       });
       const json = await res.json();
       if (!json.ok) throw new Error('API error');
 
       // If version changed, reset table and re-render
       if (!background || json.version !== cache.version){
-        const tbody = document.getElementById('tableBody');
-        if (tbody) while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+        if (!background){
+          // first paint
+        } else {
+          // clear existing
+          const tbody = document.getElementById('tableBody');
+          while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+        }
+        renderChunked(json.headers, json.rows);
+        localStorage.setItem(cacheKey, JSON.stringify({ version: json.version, data: json }));
       }
-      renderChunked(json.headers, json.rows);
-      localStorage.setItem(cacheKey, JSON.stringify({ version: json.version, data: json }));
     }catch(e){
       console.warn('Fetch failed', e);
     }
   }
 })();
+
+  
 </script>
 
-<!-- Google Maps (async) -->
+<!-- === i18n Toggle Script (added; does not change other code) === -->
+<script>
+(function(){
+  const I18N = {
+    ar:{_lang:'ar',_dir:'rtl',
+      overlay_loading:'جاري التحميل…',
+      start_booking:'احجز موعدك', cta_whatsapp:'استفسار واتساب',
+      step_1:'ابدأ', step_2:'المنطقة والخدمة', step_3:'الموعد', step_4:'الموقع', step_5:'المعلومات', step_6:'التأكيد',
+      p2_title:'وين تحب نجيك ؟<br>اختيار المنطقة', area_label:'المنطقة', service_label:'الخدمة', next:'التالي', prev:'السابق',
+      p4_title:'متى تحب نجيك ؟<br>اختيار الموعد', date_label:'التاريخ',
+      p5_map_title:'الموقع على خريطة قوقل', p5_hint:'📍 اضغط على الخريطة لوضع المؤشر — ويمكنك سحب المؤشر لتعديل المكان',
+      p5_hint_small:'📍 انقر لإسقاط المؤشر أو اضغط على اظهار موقعي', my_location:'اظهار موقعي',
+      p6_contact_title:'معلومات الاتصال', name_label:'الإسم', name_ph:'اكتب اسمك الكامل', mobile_label:'رقم الجوال',
+      car_title:'معلومات المركبة', brand_label:'ماركة السيارة', brand_ph:'اختر ماركة السيارة',
+      carname_ph:'اسم السيارة (GT-R, كامري، إلنترا)', plateno_ph:'🔢 رقم اللوحة (مثال: 1234)',
+      pay_title:'طريقة الدفع', page6_next:'التالي', page6_prev:'السابق', page6_processing:'جاري بدء عملية الدفع…',
+      terms_title:'الشروط والأحكام – مغسلة سيارات متنقلة', terms_accept:'أوافق على الشروط والأحكام', terms_cancel:'إلغاء', terms_confirm:'تأكيد ومتابعة',
+      thanks_h1:'شكراً لكم', thanks_h2:'تم حجز الموعد، وراح نأكده لكم على الواتساب', thanks_h3:'متحمسين نجيكم!!', rebook:'🔁 حجز جديد',
+      status_title:'حالة الدفع', status_text:'تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم', back_home:'العودة'
+    },
+    en:{_lang:'en',_dir:'ltr',
+      overlay_loading:'Loading…',
+      start_booking:'Book now', cta_whatsapp:'WhatsApp Enquiry',
+      step_1:'Start', step_2:'Area & Service', step_3:'Appointment', step_4:'Location', step_5:'Info', step_6:'Confirm',
+      p2_title:'Where should we come to you?<br>Select area', area_label:'Area', service_label:'Service', next:'Next', prev:'Back',
+      p4_title:'When should we visit?<br>Select appointment', date_label:'Date',
+      p5_map_title:'Location on Google Maps', p5_hint:'📍 Click the map to drop a pin — you can drag it to adjust',
+      p5_hint_small:'📍 Click to drop a pin or tap Show my location', my_location:'Show my location',
+      p6_contact_title:'Contact info', name_label:'Full name', name_ph:'Type your full name', mobile_label:'Mobile number',
+      car_title:'Vehicle info', brand_label:'Car brand', brand_ph:'Choose brand',
+      carname_ph:'Model (GT-R, Camry, Elantra)', plateno_ph:'🔢 Plate number (e.g., 1234)',
+      pay_title:'Payment method', page6_next:'Next', page6_prev:'Back', page6_processing:'Starting payment…',
+      terms_title:'Terms & Conditions – Mobile Car Wash', terms_accept:'I accept the terms and conditions', terms_cancel:'Cancel', terms_confirm:'Confirm & continue',
+      thanks_h1:'Thank you!', thanks_h2:'Your booking is placed; we will confirm via WhatsApp', thanks_h3:'Can’t wait to see you!', rebook:'🔁 New booking',
+      status_title:'Payment status', status_text:'Your booking is placed. We will send the payment status via WhatsApp and email.', back_home:'Back'
+    }
+  };
+
+  const BIND = [
+    ['#globalOverlayMsg','textContent','overlay_loading'],
+    ['#page1-button','textContent','start_booking'],
+
+    // Stepper
+    ['.stepper .step-dot:nth-child(1) small','textContent','step_1'],
+    ['.stepper .step-dot:nth-child(2) small','textContent','step_2'],
+    ['.stepper .step-dot:nth-child(3) small','textContent','step_3'],
+    ['.stepper .step-dot:nth-child(4) small','textContent','step_4'],
+    ['.stepper .step-dot:nth-child(5) small','textContent','step_5'],
+    ['.stepper .step-dot:nth-child(6) small','textContent','step_6'],
+
+    // Page 2
+    ['#page2 .form-block h1','innerHTML','p2_title'],
+    ['label[for="area"]','textContent','area_label'],
+    ['label[for="service"]','textContent','service_label'],
+    ['#page2-button','textContent','next'],
+
+    // Page 4
+    ['#page4 .form-block h1','innerHTML','p4_title'],
+    ['label[for="date"]','textContent','date_label'],
+    ['#page4-return','textContent','prev'],
+
+    // Page 5
+    ['#page5 label[for="googleMap"]','textContent','p5_map_title'],
+    ['#drag-instructions p','textContent','p5_hint'],
+    ['#page5 p[style*="text-align:center"]','textContent','p5_hint_small'],
+    ['#show-my-location','textContent','my_location'],
+    ['#page5-button','textContent','next'],
+    ['#page5-return','textContent','prev'],
+
+    // Page 6
+    ['#page6 h2:nth-of-type(1)','textContent','p6_contact_title'],
+    ['label[for="name"]','textContent','name_label'],
+    ['#name','placeholder','name_ph'],
+    ['label[for="mobile"]','textContent','mobile_label'],
+    ['#page6 h2:nth-of-type(2)','textContent','car_title'],
+    ['label[for="carBrand"]','textContent','brand_label'],
+    ['#carBrand','data-i18n-placeholder','brand_ph'],
+    ['#carName','placeholder','carname_ph'],
+    ['#plateNumber','placeholder','plateno_ph'],
+    ['#page6 h2:last-of-type','textContent','pay_title'],
+    ['#page6-button','textContent','page6_next'],
+    ['#page6-return','textContent','page6_prev'],
+    ['#page6-spinner span.mt-2','textContent','page6_processing'],
+
+    // Terms
+    ['#termsModal .modal-title','textContent','terms_title'],
+    ['label[for="termsAccept"]','textContent','terms_accept'],
+    ['#termsModal .btn.btn-outline-secondary','textContent','terms_cancel'],
+    ['#confirmTerms','textContent','terms_confirm'],
+
+    // Thanks / Status
+    ['#page7 h1','textContent','thanks_h1'],
+    ['#page7 h2','textContent','thanks_h2'],
+    ['#page7 h3','textContent','thanks_h3'],
+    ['#rebook','textContent','rebook'],
+    ['#statusPage h1','textContent','status_title'],
+    ['#statusText1','textContent','status_text'],
+    ['#backHome','textContent','back_home'],
+  ];
+
+  function applyI18N(lang){
+    const pack = I18N[lang] || I18N.ar;
+
+    document.documentElement.lang = pack._lang;
+    document.documentElement.dir  = pack._dir;
+
+    BIND.forEach(([sel, prop, key])=>{
+      const el = document.querySelector(sel);
+      if (!el) return;
+      const val = pack[key] || '';
+      if (prop === 'innerHTML') el.innerHTML = val;
+      else if (prop === 'placeholder') el.setAttribute('placeholder', val);
+      else if (prop === 'data-i18n-placeholder') el.dataset.i18nPlaceholder = val;
+      else el[prop] = val;
+    });
+
+    // Select2 placeholders/dir (if initialized)
+    const isRTL = pack._dir === 'rtl';
+    try{
+      const area = $('#area'); const service = $('#service'); const brand = $('#carBrand');
+      if (area.data('select2')) area.select2({ width:'100%', dir: isRTL ? 'rtl':'ltr' });
+      if (service.data('select2')) service.select2({ width:'100%', dir: isRTL ? 'rtl':'ltr' });
+      if (brand.data('select2')) {
+        const brandPh = document.getElementById('carBrand')?.dataset.i18nPlaceholder || pack.brand_ph;
+        brand.select2({ placeholder: brandPh, allowClear:true, width:'100%', dir: isRTL ? 'rtl':'ltr' });
+      }
+    }catch(_){}
+
+    try { localStorage.setItem('ui_locale', pack._lang); } catch(_){}
+    if (window.nForm) window.nForm.locale = pack._lang;
+
+    const arBtn = document.getElementById('toAR');
+    const enBtn = document.getElementById('toEN');
+    if (arBtn && enBtn){
+      if (pack._lang === 'ar'){
+        arBtn.classList.add('btn-light'); arBtn.classList.remove('btn-outline-light');
+        enBtn.classList.add('btn-outline-light'); enBtn.classList.remove('btn-light');
+      } else {
+        enBtn.classList.add('btn-light'); enBtn.classList.remove('btn-outline-light');
+        arBtn.classList.add('btn-outline-light'); arBtn.classList.remove('btn-light');
+      }
+    }
+  }
+
+  function initLanguage(){
+    const urlLang = new URLSearchParams(location.search).get('lang');
+    const saved   = localStorage.getItem('ui_locale');
+    const nav     = (navigator.language || 'ar').slice(0,2);
+    const lang    = (urlLang==='en'||urlLang==='ar') ? urlLang : (saved==='en'||saved==='ar' ? saved : (nav==='en'?'en':'ar'));
+    applyI18N(lang);
+
+    const arBtn = document.getElementById('toAR');
+    const enBtn = document.getElementById('toEN');
+    if (arBtn) arBtn.onclick = ()=> applyI18N('ar');
+    if (enBtn) enBtn.onclick = ()=> applyI18N('en');
+  }
+
+  document.addEventListener('DOMContentLoaded', initLanguage);
+})();
+</script>
+
+<!-- Google Maps (best practice: loading=async) -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&libraries=geometry&loading=async"></script>
 </body>
 </html>
