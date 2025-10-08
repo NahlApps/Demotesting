@@ -638,19 +638,22 @@ function keyAppts(locId, svcId, startISO){ return `apts:v1:${locId}:${svcId}:${s
 /* -----------------------------
  *  Networking (abort + timeout)
  * ----------------------------- */
-function fetchJSON(url, { timeoutMs=4500, signal:null } = {}){
+function fetchJSON(url, { timeoutMs = 4500, signal = null } = {}) {
   const ctrl = new AbortController();
-  const t = setTimeout(()=>ctrl.abort('timeout'), timeoutMs);
-  const mix = signal
-    ? new AbortController()
-    : ctrl;
-  const finalSignal = signal
-    ? (mix.signal)
-    : ctrl.signal;
-  const doFetch = fetch(url, { method:'GET', cache:'no-store', credentials:'omit', redirect:'follow', signal: finalSignal })
-    .then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status))));
-  return doFetch.finally(()=>clearTimeout(t));
+  const timer = setTimeout(() => ctrl.abort('timeout'), timeoutMs);
+  const finalSignal = signal || ctrl.signal;
+
+  return fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'omit',
+    redirect: 'follow',
+    signal: finalSignal
+  })
+  .then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status))))
+  .finally(() => clearTimeout(timer));
 }
+
 
 /* -----------------------------
  *  Data fetch with cache
