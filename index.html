@@ -23,7 +23,7 @@
   <meta property="twitter:url" content="https://www.spongnsoap.com"/>
   <meta property="twitter:title" content="حجوزات المواعيد"/>
   <meta property="twitter:description" content="1. بنغسل سيارتك بخلطة خاصة مدعّمة بالواكس تحميها من الغبار والخدوش. 2. فوطنا دايمًا نظيفة. 3. ونستخدم إسفنجة مخصوصة للكفرات عشان نهتم بكل تفاصيل سيارتك. #غسيل_بدون_طوابير"/>
-  <meta property="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20%20Soap/Logo%20-%20Sponge%20and%20Soap%20-%201.png"/>
+  <meta property="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/Logo%20-%20Sponge%20and%20Soap%20-%201.png"/>
 
   <link rel="shortcut icon" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/Logo%20-%20Sponge%20and%20Soap%20-%201.png" type="image/x-icon"/>
 
@@ -46,8 +46,8 @@
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
   
   <!-- Speed up TLS + DNS to your Apps Script web app -->
-<link rel="preconnect" href="https://script.google.com" crossorigin>
-<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 
   <!-- ===== Theme (Aqua + Warm CTA) ===== -->
   <style>
@@ -150,13 +150,13 @@
     #globalOverlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;flex-direction:column}
     #globalOverlay.is-visible{display:flex}
     #serviceDescText{
-  color: var(--error) !important;
-  font-size: 1.15rem;
-  font-weight: 800;
-}
-#langSwitcher .btn{ border-radius:10px; padding:.35rem .6rem }
-#langSwitcher .btn:focus { outline:2px solid rgba(255,255,255,.7); outline-offset:2px }
-
+      color: var(--error) !important;
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+    /* === Language switcher (added) === */
+    #langSwitcher .btn{ border-radius:10px; padding:.35rem .6rem }
+    #langSwitcher .btn:focus { outline:2px solid rgba(255,255,255,.7); outline-offset:2px }
   </style>
 </head>
 <body>
@@ -173,7 +173,7 @@
     <div id="form-content">
       <div class="header">
         <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png" alt="Sponge & Soap">
-        <!-- Language toggle -->
+        <!-- === Language toggle (added) === -->
         <div id="langSwitcher" style="margin-inline-start:auto; display:flex; gap:6px;">
           <button id="toAR" type="button" class="btn btn-light btn-sm" style="font-weight:800">العربية</button>
           <button id="toEN" type="button" class="btn btn-outline-light btn-sm" style="font-weight:700">English</button>
@@ -194,12 +194,12 @@
       <div id="page1" class="page" style="display:flex;">
         <div class="form-block">
           <div class="section-card" style="text-align:center;">
-            <h3>✨ واكس يحمي سيارتك<br>🧼 فوط نظيفة & لمعان مضمون<br>🛞 إسفنجة للكفرات<br><br>... نهتم بكل التفاصيل</h3>
-            <p style="margin-top:4px;"><span style="font-weight:bold; font-size:18px; color:#0b2a33">#غسيل_بدون_طوابير</span></p>
+            <h3 id="heroText">✨ واكس يحمي سيارتك<br>🧼 فوط نظيفة & لمعان مضمون<br>🛞 إسفنجة للكفرات<br><br>... نهتم بكل التفاصيل</h3>
+            <p style="margin-top:4px;"><span id="heroHashtag" style="font-weight:bold; font-size:18px; color:#0b2a33">#غسيل_بدون_طوابير</span></p>
           </div>
           <div class="sticky-actions">
             <button id="page1-button" class="filter-button">احجز موعدك</button>
-            <a class="btn-ghost" href="https://wa.me/966503668222" target="_blank" rel="noopener">استفسار واتساب</a>
+            <a id="waEnquiryBtn" class="btn-ghost" href="https://wa.me/966503668222" target="_blank" rel="noopener">استفسار واتساب</a>
           </div>
         </div>
       </div>
@@ -213,12 +213,13 @@
               <label for="area">المنطقة</label>
               <div id="select2-container" style="position:relative; margin-bottom:12px;">
                 <select id="area" class="js-example-basic-single" required></select>
-                <!-- Removed Page-2 spinner entirely -->
+                <!-- spinner removed by request -->
               </div>
 
               <label for="service">الخدمة</label>
               <div style="position:relative;">
                 <select id="service" required></select>
+                <!-- tiny inline spinner optional: kept hidden by default -->
                 <div id="page3-2-spinner" style="position:absolute; top:0; left:50%; transform:translateX(-50%); display:none;">
                   <div class="spinner-border" role="status" style="width:1.2rem; height:1.2rem; margin-top:14%;"></div>
                 </div>
@@ -392,30 +393,26 @@
         </div>
       </div>
 
-<!-- Status Page (Payment) — simple & static -->
-<div id="statusPage" class="page" style="display:none; padding:2rem; text-align:center;">
-  <div class="form-block">
-    <div class="section-card">
-      <h1>حالة الدفع</h1>
-      <p id="statusText1" style="margin-top:.75rem;">
-        تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم
-      </p>
-
-      <!-- Only one action -->
-<div style="margin-top:1rem;">
-  <button
-    id="backHome"
-    class="filter-button"
-    style="margin-inline-start:.5rem;"
-    onclick="window.open('https://spongnsoap.com/', '_blank', 'noopener');">
-    العودة
-  </button>
-</div>
-
-    </div>
-  </div>
-</div>
-
+      <!-- Status Page (Payment) — simple & static -->
+      <div id="statusPage" class="page" style="display:none; padding:2rem; text-align:center;">
+        <div class="form-block">
+          <div class="section-card">
+            <h1>حالة الدفع</h1>
+            <p id="statusText1" style="margin-top:.75rem;">
+              تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم
+            </p>
+            <div style="margin-top:1rem;">
+              <button
+                id="backHome"
+                class="filter-button"
+                style="margin-inline-start:.5rem;"
+                onclick="window.open('https://spongnsoap.com/', '_blank', 'noopener');">
+                العودة
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <footer>
         <div>Sponge & Soap</div>
@@ -475,8 +472,8 @@
 <script>
 /* ===========================================================
  * Sponge & Soap — Booking App (index.html)
- * Implements: If "Payment Gateway" selected → book first on NAHL,
- * then open Telr page. Also fixes regex + Google Maps callback.
+ * Prefetch + SWR cache, i18n improvements, promo mapping, and
+ * Payment flow: Book on NAHL first, then Telr redirect.
  * =========================================================== */
 
 /* -----------------------------
@@ -506,23 +503,6 @@ let services = []; let serviceCategories = [];
 const servicesById = new Map(); const categoriesById = new Map();
 let serviceDescText = '';
 let countryCodeInput = null;
-
-/* ---- Hard-coded promos for specific services (AR/EN) ---- */
-const PROMO_DESC = {
-  "187": { // Small Car Wash 45 SAR
-    ar: "عرض الافتتاح - غسيل بـ 29 ريال",
-    en: "Opening Offer - Wash for 29 SAR"
-  },
-  "189": { // Big Car Wash 60 SAR
-    ar: "عرض الافتتاح - غسيل بـ 39 ريال",
-    en: "Opening Offer - Wash for 39 SAR"
-  }
-};
-function getServicePromoText(serviceId, lang){
-  const id = String(serviceId || "");
-  const l  = (lang === "en") ? "en" : "ar";
-  return PROMO_DESC[id]?.[l] || "";
-}
 
 /* -----------------------------
  *  Overlay helpers
@@ -586,7 +566,7 @@ if (dateEl){
 }
 
 /* -----------------------------
- *  Payload & validation (regex FIXED)
+ *  Payload & validation
  * ----------------------------- */
 const MAP_URL_RE = /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/;
 
@@ -688,15 +668,119 @@ function callContent2(routText, callback, abortable=false, retries=3){
 }
 
 /* -----------------------------
+ * Prefetch + SWR cache for Page 2
+ * ----------------------------- */
+// SWR cache keys
+const CACHE_KEYS = {
+  locations: 'cache.locations.v1',
+  servicesByLoc: lid => `cache.services.v1.${lid}`
+};
+function readCache(key){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || (Date.now() - (obj.ts||0) > 1000*60*30)) return null; // 30 min TTL
+    return obj.data;
+  }catch(_){ return null; }
+}
+function writeCache(key, data){
+  try{ localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); }catch(_){}
+}
+async function fetchJSONTimeout(url, {timeout=7000, retries=2} = {}){
+  for (let attempt=0; attempt<=retries; attempt++){
+    const controller = new AbortController();
+    const tm = setTimeout(()=>controller.abort(), timeout);
+    try{
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(tm);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return await res.json();
+    }catch(e){
+      clearTimeout(tm);
+      if (attempt === retries) throw e;
+      await new Promise(r=>setTimeout(r, 400*(attempt+1)));
+    }
+  }
+}
+window._bg = { locations: null, services: new Map(), ready: false };
+
+function paintAreasFromBG(){
+  const areaSel = $('#area');
+  const locs = window._bg.locations || [];
+  const data = locs.map(l => ({ id:String(l.id), text:l.TS_location_arabic_name }));
+  areaSel.empty().select2({ data, width:"100%" });
+  if (data.length) areaSel.val(data[0].id).trigger('change.select2');
+}
+async function prefetchServicesFor(locationId){
+  const ck = CACHE_KEYS.servicesByLoc(locationId);
+  const cached = readCache(ck);
+  if (cached) window._bg.services.set(locationId, cached);
+  try{
+    const json = await fetchJSONTimeout(baseForm + `/services?location=${encodeURIComponent(locationId)}`, { timeout: 7000, retries: 1 });
+    const svc = json?.data || {};
+    if (svc?.services?.length){
+      window._bg.services.set(locationId, svc);
+      writeCache(ck, svc);
+      if (document.getElementById('service')?.options.length === 0){
+        paintServicesFromBG(locationId);
+      }
+    }
+  }catch(_){}
+}
+function paintServicesFromBG(locationId){
+  const svcWrap = window._bg.services.get(locationId) || {};
+  services = svcWrap.services || [];
+  serviceCategories = svcWrap.servicesCat || [];
+  servicesById.clear(); categoriesById.clear();
+  services.forEach(s=>{ const sid=String(s.TS_service_id ?? s.service_id ?? s.id); servicesById.set(sid, s); });
+  serviceCategories.forEach(c=>{ const cid=String(c.TS_service_category_id ?? c.category_id ?? c.id); categoriesById.set(cid, c); });
+
+  const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+  const names = sorted.map(s => s.TS_service_arabic_name || s.TS_service_name || s.name_ar || s.name);
+  const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+  add_dropdown_list(names, ids, "service");
+
+  const firstSvcId = ids[0] || '';
+  if (firstSvcId){
+    const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+    setServiceCatHiddenAndState(catId);
+    nForm.service = String(firstSvcId);
+    let desc = getServicePromoText(String(firstSvcId), nForm.locale || "ar");
+    if (!desc) fetchServiceDescription(firstSvcId).then(updateServiceDescriptionUI);
+    else updateServiceDescriptionUI(desc);
+  } else {
+    updateServiceDescriptionUI('');
+  }
+}
+
+/* -----------------------------
  *  Content: Locations & Services
+ *  (Prefetch starts on DOMContentLoaded)
  * ----------------------------- */
 $('.js-example-basic-single').select2({ data:[], width:"100%" });
 
-callContent2(`/locations`, (data)=>{
-  const locations = (data && data.data) || [];
-  const selectData = locations.map(l=>({ id:String(l.id), text:l.TS_location_arabic_name })).sort((a,b)=>Number(a.id)-Number(b.id));
-  $('.js-example-basic-single').empty().select2({ data:selectData, width:"100%" });
-  if (selectData.length && !$('#area').val()) { $('#area').val(selectData[0].id).trigger('change'); } else { $('#area').trigger('change'); }
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1) try cached locations immediately
+  const cachedLoc = readCache(CACHE_KEYS.locations);
+  if (cachedLoc) window._bg.locations = cachedLoc;
+
+  // 2) background fetch SWR
+  (async () => {
+    try{
+      const json = await fetchJSONTimeout(baseForm + '/locations', { timeout: 6000, retries: 1 });
+      const locations = (json && json.data) || [];
+      if (locations?.length){
+        window._bg.locations = locations;
+        writeCache(CACHE_KEYS.locations, locations);
+        const areaSel = document.getElementById('area');
+        if (areaSel && !areaSel.options.length) paintAreasFromBG();
+      }
+      const firstId = String(locations?.[0]?.id || '');
+      if (firstId) prefetchServicesFor(firstId);
+    }catch(_){}
+    window._bg.ready = true;
+  })();
 });
 
 function extractCatIdFromServiceObj(svc){
@@ -731,10 +815,24 @@ function setServiceCatHiddenAndState(cid){
   if (cid) nForm.serviceCat = String(cid);
 }
 
-/* ---- Service description via GAS (with frontend override for promos) ---- */
+/* ---- Service description rules (frontend mapping) ---- */
+function getServicePromoText(serviceId, locale){
+  const id = String(serviceId);
+  if (id === '187'){ // Small Car Wash 45 SAR
+    return (locale === 'en')
+      ? 'Opening Offer – Wash for 29 SAR'
+      : 'عرض الافتتاح – غسيل بـ 29 ريال';
+  }
+  if (id === '189'){ // Big Car Wash 60 SAR
+    return (locale === 'en')
+      ? 'Opening Offer – Wash for 39 SAR'
+      : 'عرض الافتتاح – غسيل بـ 39 ريال';
+  }
+  return '';
+}
+
+/* ---- Service description via GAS (fallback) ---- */
 async function fetchServiceDescription(serviceId){
-  const forced = getServicePromoText(serviceId, nForm.locale || "ar");
-  if (forced) return forced;
   try{
     const res = await fetch(`${GAS_BASE_URL}?action=getServiceDescription&serviceId=${encodeURIComponent(serviceId)}`);
     const data = await res.json();
@@ -756,43 +854,25 @@ function updateServiceDescriptionUI(text){
   updateLocationDescription();
 }
 
-/* Load services when area changes */
+/* Load/paint services when area changes */
 $("#area").on("change", ()=>{
-  if (getComputedStyle(document.getElementById('page2')).display !== 'none') showOverlay('جاري تحميل الخدمات…');
-
-  document.getElementById("page3-2-spinner").style.display="block";
-  document.getElementById('service').innerHTML = '';
-
-  callContent2(`/services?location=${encodeURIComponent(document.getElementById("area").value)}`, async (data)=>{
-    services = data?.data?.services || [];
-    serviceCategories = data?.data?.servicesCat || [];
-    servicesById.clear(); categoriesById.clear();
-
-    services.forEach(s=>{ const sid=String(s.TS_service_id ?? s.service_id ?? s.id); servicesById.set(sid, s); });
-    serviceCategories.forEach(c=>{ const cid=String(c.TS_service_category_id ?? c.category_id ?? c.id); categoriesById.set(cid, c); });
-
-    const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
-    const names = sorted.map(s => s.TS_service_arabic_name || s.TS_service_name || s.name_ar || s.name);
-    const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
-    add_dropdown_list(names, ids, "service");
-
-    const firstSvcId = ids[0] || '';
-    if(firstSvcId){
-      const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-      setServiceCatHiddenAndState(catId);
-      nForm.service = String(firstSvcId);
-
-      // prefer promo
-      let desc = getServicePromoText(String(firstSvcId), nForm.locale || "ar");
-      if (!desc) desc = await fetchServiceDescription(firstSvcId);
-      updateServiceDescriptionUI(desc);
-    } else { updateServiceDescriptionUI(''); }
-
-    document.getElementById("page3-2-spinner").style.display="none";
-    hideOverlay();
+  const lid = String(document.getElementById("area").value || "");
+  // if we have services prefetched for this location, paint instantly
+  if (lid && window._bg.services.has(lid)){
+    paintServicesFromBG(lid);
     setTimeout(setBoundries, 0);
-  }, true);
+    return;
+  }
+  // else start a background fetch (non-blocking)
+  document.getElementById("page3-2-spinner").style.display="block";
+  paintServicesFromBG(lid); // paints empty list initially
+  prefetchServicesFor(lid).then(()=>{
+    paintServicesFromBG(lid);
+    document.getElementById("page3-2-spinner").style.display="none";
+    setTimeout(setBoundries, 0);
+  }).catch(()=>{ document.getElementById("page3-2-spinner").style.display="none"; });
 });
+
 function add_dropdown_list(show_list, value_list, element_id){
   const parent = document.getElementById(element_id); parent.innerHTML="";
   show_list.forEach((name, i)=>{
@@ -826,6 +906,7 @@ async function fetchAppointmentsForSelectedDate(){
     const d = datesSet[i-1];
     document.getElementById(`day${i}`).innerText = d.setLocale('ar').toFormat('EEEE');
     document.getElementById(`day${i}date`).innerText = d.toFormat('yyyy-MM-dd');
+    document.getElementById(`dayHeader${i}`).hidden = false;
   }
   ['dayHeader1','dayHeader2','dayHeader3'].forEach((id, i) => {
     const el = document.getElementById(id);
@@ -863,12 +944,12 @@ $('#service').on('change', async ()=>{
   const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
   setServiceCatHiddenAndState(catId);
   const svcId = document.getElementById('service').value || '';
-  // Prefer hard-coded promo; fallback to GAS
-  let desc = getServicePromoText(String(svcId), nForm.locale || "ar");
-  if (!desc) {
-    desc = svcId ? await fetchServiceDescription(String(svcId)) : '';
-  }
-  updateServiceDescriptionUI(desc);
+
+  // frontend promo first, then GAS fallback
+  const promo = getServicePromoText(String(svcId), nForm.locale || 'ar');
+  if (promo) updateServiceDescriptionUI(promo);
+  else updateServiceDescriptionUI(await fetchServiceDescription(String(svcId)));
+
   const p4=document.getElementById('page4'); if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
 });
 function timesSetter(index){
@@ -897,7 +978,13 @@ function choosedDate(time, date){
 document.getElementById('page1-button').onclick = ()=>{
   document.getElementById('page1').style.display='none';
   document.getElementById('page2').style.display='flex';
-  showOverlay('جاري تحميل الخدمات…');
+
+  // Paint cached/prefetched locations instantly (no overlay/spinner)
+  if (window._bg.locations && window._bg.locations.length){
+    paintAreasFromBG();
+  } else {
+    $('.js-example-basic-single').select2({ data:[], width:"100%" });
+  }
 };
 document.getElementById('page2-button').onclick = ()=>{
   const area = document.getElementById("area");
@@ -971,7 +1058,6 @@ async function createReservationNow(payloadOverride={}){
 
 /* -----------------------------
  *  Telr Payment via GAS
- *  (Book FIRST on NAHL, then redirect)
  * ----------------------------- */
 function cachePendingTelr(cartId){
   const payload = { nForm, cartId, ts:Date.now(), reservationMade: sessionStorage.getItem('reservationMade')==='1' };
@@ -1020,11 +1106,8 @@ async function startTelrCheckout(){
   }
 }
 
-
-
 /* -----------------------------
  *  Terms modal & confirm flow
- *  (BOOK FIRST if Telr selected)
  * ----------------------------- */
 const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
 const termsAccept = document.getElementById('termsAccept');
@@ -1235,22 +1318,21 @@ function ensureMapReady(){
 }
 $('#area').on('change', () => { setTimeout(setBoundries, 0); });
 
-
-// Minimal status page init: no checks, no spinner
+// Minimal status page init
 document.addEventListener('DOMContentLoaded', () => {
   const isStatus = (location.hash || '').replace('#','').toLowerCase() === 'status';
   if (!isStatus) return;
-
   ['page1','page2','page3','page4','page5','page6','page7'].forEach(id=>{
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
-
   const statusPage = document.getElementById('statusPage');
   if (statusPage) statusPage.style.display = 'flex';
 });
 
-
+/* -----------------------------
+ *  Simple GAS table demo (kept)
+ * ----------------------------- */
 (async function(){
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbzDljzUgjf_WjU9vIKx-q2i4TCOxK8TOpkTH04KnHMgqTi9oOhKoPAcSc2fhGqpmtiX/exec';
   const PARAMS  = new URLSearchParams({
@@ -1259,13 +1341,14 @@ document.addEventListener('DOMContentLoaded', () => {
     offset:'0',
     limit:'500',
   });
+  // Only run if a table exists on page (not present by default)
+  if (!document.getElementById('tableBody')) return;
 
   const cacheKey = 'sheetCache';
-  const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
+  const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}'); // {version, data}
 
   const renderChunked = (headers, rows) => {
     const table = document.getElementById('tableBody');
-    if (!table) return;
     const frag = document.createDocumentFragment();
     let i = 0;
     function pump(){
@@ -1301,78 +1384,57 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const json = await res.json();
       if (!json.ok) throw new Error('API error');
-
       if (!background || json.version !== cache.version){
-        if (!background){
-        } else {
+        if (background){
           const tbody = document.getElementById('tableBody');
-          if (tbody){ while (tbody.firstChild) tbody.removeChild(tbody.firstChild); }
+          while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
         }
         renderChunked(json.headers, json.rows);
         localStorage.setItem(cacheKey, JSON.stringify({ version: json.version, data: json }));
       }
-    }catch(e){
-      console.warn('Fetch failed', e);
-    }
+    }catch(e){ console.warn('Fetch failed', e); }
   }
 })();
 
-  
 </script>
 
-<!-- i18n -->
+<!-- === i18n Toggle Script (added) === -->
 <script>
 (function(){
   const I18N = {
     ar:{_lang:'ar',_dir:'rtl',
       overlay_loading:'جاري التحميل…',
-      // Page 1
-      p1_h3:'✨ واكس يحمي سيارتك<br>🧼 فوط نظيفة & لمعان مضمون<br>🛞 إسفنجة للكفرات<br><br>... نهتم بكل التفاصيل',
-      p1_hashtag:'#غسيل_بدون_طوابير',
+      hero_text:'✨ واكس يحمي سيارتك<br>🧼 فوط نظيفة & لمعان مضمون<br>🛞 إسفنجة للكفرات<br><br>... نهتم بكل التفاصيل',
+      hero_hash:'#غسيل_بدون_طوابير',
       start_booking:'احجز موعدك', cta_whatsapp:'استفسار واتساب',
-      // Stepper
       step_1:'ابدأ', step_2:'المنطقة والخدمة', step_3:'الموعد', step_4:'الموقع', step_5:'المعلومات', step_6:'التأكيد',
-      // Page 2
       p2_title:'وين تحب نجيك ؟<br>اختيار المنطقة', area_label:'المنطقة', service_label:'الخدمة', next:'التالي', prev:'السابق',
-      // Page 4
       p4_title:'متى تحب نجيك ؟<br>اختيار الموعد', date_label:'التاريخ',
-      // Page 5
       p5_map_title:'الموقع على خريطة قوقل', p5_hint:'📍 اضغط على الخريطة لوضع المؤشر — ويمكنك سحب المؤشر لتعديل المكان',
       p5_hint_small:'📍 انقر لإسقاط المؤشر أو اضغط على اظهار موقعي', my_location:'اظهار موقعي',
-      // Page 6
       p6_contact_title:'معلومات الاتصال', name_label:'الإسم', name_ph:'اكتب اسمك الكامل', mobile_label:'رقم الجوال',
       car_title:'معلومات المركبة', brand_label:'ماركة السيارة', brand_ph:'اختر ماركة السيارة',
       carname_ph:'اسم السيارة (GT-R, كامري، إلنترا)', plateno_ph:'🔢 رقم اللوحة (مثال: 1234)',
       pay_title:'طريقة الدفع', page6_next:'التالي', page6_prev:'السابق', page6_processing:'جاري بدء عملية الدفع…',
-      // Terms
       terms_title:'الشروط والأحكام – مغسلة سيارات متنقلة', terms_accept:'أوافق على الشروط والأحكام', terms_cancel:'إلغاء', terms_confirm:'تأكيد ومتابعة',
-      // Thanks / Status
       thanks_h1:'شكراً لكم', thanks_h2:'تم حجز الموعد، وراح نأكده لكم على الواتساب', thanks_h3:'متحمسين نجيكم!!', rebook:'🔁 حجز جديد',
       status_title:'حالة الدفع', status_text:'تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم', back_home:'العودة'
     },
     en:{_lang:'en',_dir:'ltr',
       overlay_loading:'Loading…',
-      // Page 1
-      p1_h3:'✨ Wax that protects your car<br>🧼 Clean towels & guaranteed shine<br>🛞 Tire sponge<br><br>... we care about every detail',
-      p1_hashtag:'#No_Queue_Wash',
+      hero_text:'✨ Wax that protects your car<br>🧼 Fresh towels & guaranteed shine<br>🛞 Tire sponge for the details<br><br>... We care about every detail',
+      hero_hash:'#NoQueueCarWash',
       start_booking:'Book now', cta_whatsapp:'WhatsApp Enquiry',
-      // Stepper
       step_1:'Start', step_2:'Area & Service', step_3:'Appointment', step_4:'Location', step_5:'Info', step_6:'Confirm',
-      // Page 2
       p2_title:'Where should we come to you?<br>Select area', area_label:'Area', service_label:'Service', next:'Next', prev:'Back',
-      // Page 4
       p4_title:'When should we visit?<br>Select appointment', date_label:'Date',
-      // Page 5
       p5_map_title:'Location on Google Maps', p5_hint:'📍 Click the map to drop a pin — you can drag it to adjust',
       p5_hint_small:'📍 Click to drop a pin or tap Show my location', my_location:'Show my location',
-      // Page 6
       p6_contact_title:'Contact info', name_label:'Full name', name_ph:'Type your full name', mobile_label:'Mobile number',
       car_title:'Vehicle info', brand_label:'Car brand', brand_ph:'Choose brand',
       carname_ph:'Model (GT-R, Camry, Elantra)', plateno_ph:'🔢 Plate number (e.g., 1234)',
       pay_title:'Payment method', page6_next:'Next', page6_prev:'Back', page6_processing:'Starting payment…',
-      // Terms
       terms_title:'Terms & Conditions – Mobile Car Wash', terms_accept:'I accept the terms and conditions', terms_cancel:'Cancel', terms_confirm:'Confirm & continue',
-      // Thanks / Status
       thanks_h1:'Thank you!', thanks_h2:'Your booking is placed; we will confirm via WhatsApp', thanks_h3:'Can’t wait to see you!', rebook:'🔁 New booking',
       status_title:'Payment status', status_text:'Your booking is placed. We will send the payment status via WhatsApp and email.', back_home:'Back'
     }
@@ -1380,11 +1442,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const BIND = [
     ['#globalOverlayMsg','textContent','overlay_loading'],
-    // Page 1 hero + CTA
-    ['#page1 .section-card h3','innerHTML','p1_h3'],
-    ['#page1 .section-card p span','textContent','p1_hashtag'],
     ['#page1-button','textContent','start_booking'],
-    ['#page1 .btn-ghost','textContent','cta_whatsapp'],
+    ['#waEnquiryBtn','textContent','cta_whatsapp'],
+    ['#heroText','innerHTML','hero_text'],
+    ['#heroHashtag','textContent','hero_hash'],
 
     // Stepper
     ['.stepper .step-dot:nth-child(1) small','textContent','step_1'],
@@ -1460,7 +1521,6 @@ document.addEventListener('DOMContentLoaded', () => {
       else el[prop] = val;
     });
 
-    // Select2 placeholders/dir (if initialized)
     const isRTL = pack._dir === 'rtl';
     try{
       const area = $('#area'); const service = $('#service'); const brand = $('#carBrand');
@@ -1487,16 +1547,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Refresh service description to match current language for promo services
-    try{
-      const svcId = document.getElementById('service')?.value || '';
-      if (svcId){
-        const promo = getServicePromoText(String(svcId), pack._lang);
-        if (promo) {
-          updateServiceDescriptionUI(promo);
-        }
-      }
-    }catch(_){}
+    // Re-apply promo text to current selection in the chosen locale
+    const currentServiceId = document.getElementById('service')?.value || '';
+    if (currentServiceId){
+      const promo = getServicePromoText(String(currentServiceId), pack._lang);
+      if (promo) updateServiceDescriptionUI(promo);
+    }
   }
 
   function initLanguage(){
@@ -1516,7 +1572,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 </script>
 
-<!-- Google Maps (best practice: loading=async) -->
+<!-- Google Maps -->
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&libraries=geometry&loading=async"></script>
 </body>
 </html>
