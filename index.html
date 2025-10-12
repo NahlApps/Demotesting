@@ -215,7 +215,8 @@
 
               <label for="service">الخدمة</label>
               <div style="position:relative;">
-                <select id="service" onchange="getOffer()" required></select>
+                <!-- removed inline onchange to avoid double handlers -->
+                <select id="service" required></select>
                 <div id="page3-2-spinner" style="position:absolute; top:0; left:50%; transform:translateX(-50%); display:none;">
                   <div class="spinner-border" role="status" style="width:1.2rem; height:1.2rem; margin-top:14%;"></div>
                 </div>
@@ -530,6 +531,25 @@ const servicesById = new Map(); const categoriesById = new Map();
 let serviceDescText = '';
 let countryCodeInput = null;
 
+/* ---------- NEW: latest-only guard for service description ---------- */
+let serviceDescReqSeq = 0; // increment on each new request; only last may update
+
+async function safeUpdateServiceDescFor(serviceId, locale){
+  const req = ++serviceDescReqSeq;
+  const lang = (locale || nForm.locale || getUILang()) === 'en' ? 'en' : 'ar';
+
+  // Fast path (promo rules)
+  const promo = getServicePromoText(String(serviceId), lang);
+  if (promo){
+    if (req === serviceDescReqSeq) updateServiceDescriptionUI(promo);
+    return;
+  }
+
+  // Slow path (GAS)
+  const txt = await fetchServiceDescription(String(serviceId));
+  if (req === serviceDescReqSeq) updateServiceDescriptionUI(txt || '');
+}
+
 /* ----------------------------- Overlay ----------------------------- */
 const overlayEl   = document.getElementById('globalOverlay');
 const overlayMsgEl= document.getElementById('globalOverlayMsg');
@@ -783,8 +803,6 @@ function paintServicesFromBG(locationId){
     if ($service.data('select2')) {
       $service.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
     }
-    // Re-apply last known description after Select2/UI re-init (prevents disappearing)
-    if (serviceDescText) updateServiceDescriptionUI(serviceDescText);
   }catch(_){}
 
   const firstSvcId = ids[0] || '';
@@ -793,12 +811,11 @@ function paintServicesFromBG(locationId){
     setServiceCatHiddenAndState(catId);
     nForm.service = String(firstSvcId);
 
-    let desc = getServicePromoText(String(firstSvcId), nForm.locale || "ar");
-    if (!desc) fetchServiceDescription(firstSvcId).then(updateServiceDescriptionUI);
-    else updateServiceDescriptionUI(desc);
+    // Invalidate any stale requests and update description for the first option
+    serviceDescReqSeq++;
+    safeUpdateServiceDescFor(String(firstSvcId), nForm.locale || getUILang());
   } else {
-    // Do NOT clear here to avoid flicker/disappear
-    // updateServiceDescriptionUI('');
+    updateServiceDescriptionUI('');
   }
 }
 
@@ -859,18 +876,6 @@ function setServiceCatHiddenAndState(cid){
 }
 
 /* ---------- Service promo rules (frontend) ---------- */
-
-function getOffer(){
-  const id = String(document.getElementById('service').value || '');
-  const locale = nForm.locale || getUILang();
-  const promo = getServicePromoText(id, locale);
-  if (promo) {
-    updateServiceDescriptionUI(promo);
-  } else {
-    fetchServiceDescription(id).then(updateServiceDescriptionUI);
-  }
-}
-  
 function getServicePromoText(serviceId, locale){
   const id = String(serviceId);
   const lang = (locale === 'en') ? 'en' : 'ar';
@@ -932,7 +937,8 @@ function add_dropdown_list(show_list, value_list, element_id){
   show_list.forEach((name, i)=>{
     const opt = document.createElement("option"); opt.text=name; opt.value=value_list[i]; if(i===0) opt.selected=true; parent.appendChild(opt);
   });
-  parent.dispatchEvent(new Event('change'));
+  // prevent firing change when there are no options (which cleared desc)
+  if (show_list.length > 0) parent.dispatchEvent(new Event('change'));
 }
 
 /* ----------------------------- Appointments ----------------------------- */
@@ -954,13 +960,12 @@ async function fetchAppointmentsForSelectedDate(){
   const datesSet=[day1,day2,day3];
 
   document.getElementById('time-date-header').hidden = false;
-for (let i = 1; i <= 3; i++) {
-  const d = datesSet[i-1];
-  // show AR / EN together
-  document.getElementById(`day${i}`).innerHTML = formatDayNameBoth(d);
-  document.getElementById(`day${i}date`).textContent = d.toFormat('yyyy-MM-dd');
-  document.getElementById(`dayHeader${i}`).hidden = false;
-}
+  for (let i = 1; i <= 3; i++) {
+    const d = datesSet[i-1];
+    document.getElementById(`day${i}`).innerHTML = formatDayNameBoth(d);
+    document.getElementById(`day${i}date`).textContent = d.toFormat('yyyy-MM-dd');
+    document.getElementById(`dayHeader${i}`).hidden = false;
+  }
 
   ['dayHeader1','dayHeader2','dayHeader3'].forEach((id, i) => {
     const el = document.getElementById(id);
@@ -993,18 +998,20 @@ for (let i = 1; i <= 3; i++) {
   } finally { if (dateEl) dateEl.disabled=false; }
 }
 if (dateEl){ dateEl.onchange = ()=>{ const hasArea=!!document.getElementById("area")?.value; const hasService=!!document.getElementById("service")?.value; if (!hasArea || !hasService) return; fetchAppointmentsForSelectedDate(); }; }
+
+/* ---------- ONLY service change handler (guarded) ---------- */
 $('#service').on('change', async ()=>{
   nForm.service = String(document.getElementById('service').value || '');
   const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
   setServiceCatHiddenAndState(catId);
+
   const svcId = document.getElementById('service').value || '';
+  safeUpdateServiceDescFor(String(svcId), nForm.locale || getUILang());
 
-  const promo = getServicePromoText(String(svcId), nForm.locale || 'ar');
-  if (promo) updateServiceDescriptionUI(promo);
-  else updateServiceDescriptionUI(await fetchServiceDescription(String(svcId)));
-
-  const p4=document.getElementById('page4'); if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
+  const p4=document.getElementById('page4'); 
+  if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
 });
+
 function timesSetter(index){
   const c = document.getElementById("time-container");
   c.innerHTML = "";
@@ -1393,9 +1400,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (statusPage) statusPage.style.display = 'flex';
 });
 
-/* ----------------------------- (Optional) GAS Table Demo ----------------------------- */
-// (kept from your original; no-op unless you include a table body with id="tableBody")
-
 /* ----------------------------- i18n (AR/EN) ----------------------------- */
 (function(){
   const I18N = {
@@ -1542,11 +1546,10 @@ document.addEventListener('DOMContentLoaded', () => {
       else { te.style.display='none'; ta.style.display='block'; }
     }
 
-    // Re-apply promo for current service in the chosen locale
+    // Re-apply description in the chosen locale (guarded)
     const currentServiceId = document.getElementById('service')?.value || '';
     if (currentServiceId){
-      const promo = getServicePromoText(String(currentServiceId), pack._lang);
-      if (promo) updateServiceDescriptionUI(promo);
+      safeUpdateServiceDescFor(String(currentServiceId), pack._lang);
     }
 
     // Repaint areas/services labels in new locale + ensure polygons
@@ -1577,7 +1580,6 @@ function formatDayNameBoth(dtISO) {
   const dt = (dtISO.isLuxonDateTime ? dtISO : luxon.DateTime.fromISO(dtISO));
   const dayAR = dt.setLocale('ar').toFormat('EEEE');
   const dayEN = dt.setLocale('en').toFormat('EEEE');
-  // Use <bdi> so directions don’t clash
   return `<bdi lang="ar" dir="rtl">${dayAR}</bdi> <span style="opacity:.65">/</span> <bdi lang="en" dir="ltr">${dayEN}</bdi>`;
 }
 
