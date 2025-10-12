@@ -783,6 +783,8 @@ function paintServicesFromBG(locationId){
     if ($service.data('select2')) {
       $service.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
     }
+    // Re-apply last known description after Select2/UI re-init (prevents disappearing)
+    if (serviceDescText) updateServiceDescriptionUI(serviceDescText);
   }catch(_){}
 
   const firstSvcId = ids[0] || '';
@@ -791,10 +793,12 @@ function paintServicesFromBG(locationId){
     setServiceCatHiddenAndState(catId);
     nForm.service = String(firstSvcId);
 
-    // Apply promo/desc immediately on initial paint
-    getOffer();
+    let desc = getServicePromoText(String(firstSvcId), nForm.locale || "ar");
+    if (!desc) fetchServiceDescription(firstSvcId).then(updateServiceDescriptionUI);
+    else updateServiceDescriptionUI(desc);
   } else {
-    updateServiceDescriptionUI('');
+    // Do NOT clear here to avoid flicker/disappear
+    // updateServiceDescriptionUI('');
   }
 }
 
@@ -855,21 +859,16 @@ function setServiceCatHiddenAndState(cid){
 }
 
 /* ---------- Service promo rules (frontend) ---------- */
-function getOffer(){
-  const id = String(document.getElementById('service')?.value || '');
-  const locale = nForm.locale || getUILang() || 'ar';
-  const promo = getServicePromoText(id, locale);
 
-  // Always reflect in UI + nForm.locationDescription
+function getOffer(){
+  const id = String(document.getElementById('service').value || '');
+  const locale = nForm.locale || getUILang();
+  const promo = getServicePromoText(id, locale);
   if (promo) {
     updateServiceDescriptionUI(promo);
   } else {
     fetchServiceDescription(id).then(updateServiceDescriptionUI);
   }
-
-  // Keep category in sync as well
-  const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-  setServiceCatHiddenAndState(catId);
 }
   
 function getServicePromoText(serviceId, locale){
@@ -909,7 +908,7 @@ function updateServiceDescriptionUI(text){
   ensureServiceDescElement();
   serviceDescText = text || '';
   const el = document.getElementById('serviceDescText'); if (el) el.textContent = serviceDescText ? `ℹ️ ${serviceDescText}` : '';
-  updateLocationDescription(); // <- keeps locationDescription including the offer
+  updateLocationDescription();
 }
 
 /* ---------- Area/Service events ---------- */
@@ -998,9 +997,11 @@ $('#service').on('change', async ()=>{
   nForm.service = String(document.getElementById('service').value || '');
   const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
   setServiceCatHiddenAndState(catId);
+  const svcId = document.getElementById('service').value || '';
 
-  // Ensure promo & locationDescription update on any change
-  getOffer();
+  const promo = getServicePromoText(String(svcId), nForm.locale || 'ar');
+  if (promo) updateServiceDescriptionUI(promo);
+  else updateServiceDescriptionUI(await fetchServiceDescription(String(svcId)));
 
   const p4=document.getElementById('page4'); if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
 });
@@ -1392,6 +1393,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (statusPage) statusPage.style.display = 'flex';
 });
 
+/* ----------------------------- (Optional) GAS Table Demo ----------------------------- */
+// (kept from your original; no-op unless you include a table body with id="tableBody")
+
 /* ----------------------------- i18n (AR/EN) ----------------------------- */
 (function(){
   const I18N = {
@@ -1541,14 +1545,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Re-apply promo for current service in the chosen locale
     const currentServiceId = document.getElementById('service')?.value || '';
     if (currentServiceId){
-      getOffer(); // <— updates #serviceDescText and locationDescription
+      const promo = getServicePromoText(String(currentServiceId), pack._lang);
+      if (promo) updateServiceDescriptionUI(promo);
     }
 
     // Repaint areas/services labels in new locale + ensure polygons
     try{
       if (window._bg?.locations) { paintAreasFromBG(); }
       const lid = document.getElementById('area')?.value;
-      if (lid) { paintServicesFromBG(String(lid)); setBoundries(); }
+      if (lid) { paintServicesFromBG(String(lid)); setTimeout(setBoundries, 0); }
     }catch(_){}
     // Update confirmTerms enable state after language switch
     updateConfirmEnabled();
