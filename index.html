@@ -39,6 +39,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <!-- IMPORTANT: use only the bundle (includes modal) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- country codes -->
@@ -122,7 +123,7 @@
     @media (max-width:600px){.time-container{grid-template-columns:repeat(2,1fr)}}
     .time-button{background:#fff;border:1px solid var(--panel-border);border-radius:12px;padding:1rem .8rem;font-weight:800;color:var(--ink-900);cursor:pointer;transition:background .15s,border-color .15s}
     .time-button:hover,.time-button:focus{border-color:var(--brand-600);background:var(--brand-50)}
-    .time-button.selected{border-color:var(--success);background:var(--success-bg)}
+    .time-button.is-selected{border-color:var(--brand-700);background:var(--brand-100)}
     .radio-label{display:block}
     .radio-buttons{width:148px;max-width:100%;height:auto;padding:12px;border-radius:16px;background:
       linear-gradient(180deg,#ffffff 0%, #F6FDFF 60%, var(--brand-50) 100%),
@@ -150,7 +151,7 @@
     .social-fab i{font-size:22px;line-height:1}
     #globalOverlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;flex-direction:column}
     #globalOverlay.is-visible{display:flex}
-    #serviceDescText{ color: var(--error)!important; font-size:1.15rem; font-weight:800; }
+    #serviceDescText{color: var(--error) !important;font-size: 1.05rem;font-weight: 800;}
     #langSwitcher .btn{ border-radius:10px; padding:.35rem .6rem }
     #langSwitcher .btn:focus { outline:2px solid rgba(255,255,255,.7); outline-offset:2px }
   </style>
@@ -211,15 +212,15 @@
               </div>
 
               <label for="service">الخدمة</label>
-              <div style="position:relative;">
+              <div style="position:relative; margin-bottom:12px;">
                 <select id="service" required></select>
                 <div id="page3-2-spinner" style="position:absolute; top:0; left:50%; transform:translateX(-50%); display:none;">
                   <div class="spinner-border" role="status" style="width:1.2rem; height:1.2rem; margin-top:14%;"></div>
                 </div>
               </div>
 
-              <!-- NEW: Number of Car -->
-              <label for="carsCount" style="margin-top:12px;">عدد السيارات</label>
+              <!-- NEW: Number of Cars -->
+              <label for="carsCount">عدد السيارات</label>
               <select id="carsCount" required>
                 <option value="1" selected>1</option>
                 <option value="2">2</option>
@@ -227,7 +228,7 @@
                 <option value="4">4</option>
                 <option value="5">5</option>
               </select>
-              <small id="carsCountHelp" style="display:block; margin-top:6px; color:#245a65;">يمكن حجز حتى 5 سيارات في تسلسل زمني متتابع.</small>
+
             </form>
           </div>
           <div class="sticky-actions">
@@ -236,7 +237,7 @@
         </div>
       </div>
 
-      <!-- Page 3 (hidden) -->
+      <!-- Page 3 (hidden routing) -->
       <div id="page3" class="page" style="display:none;">
         <div class="form-block">
           <div class="section-card">
@@ -449,6 +450,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
         </div>
         <div class="modal-body" style="text-align:right;">
+          <!-- Arabic Terms -->
           <div id="termsBody-ar">
             <ol style="padding-right:1rem;">
               <li><strong>الخدمات المقدمة</strong><ul><li>تقدم المغسلة خدمات غسيل وتنظيف السيارات وفق الباقات المعروضة على الموقع أو حسب الاتفاق المسبق.</li></ul></li>
@@ -467,6 +469,7 @@
             </div>
           </div>
 
+          <!-- English Terms -->
           <div id="termsBody-en" style="display:none; text-align:left;">
             <ol style="padding-left:1rem;">
               <li><strong>Services</strong><ul><li>We provide car wash & detailing services according to the listed packages or prior agreement.</li></ul></li>
@@ -496,7 +499,8 @@
 <script>
 /* ===========================================================
  * Sponge & Soap — Booking App (index.html)
- * AR default, AR/EN i18n, carsCount + sequential times + multi-send
+ * Adds carsCount and sequential times selection + multi-send
+ * Fixes: Bootstrap modal init & Google Maps init order
  * =========================================================== */
 
 /* ---------- HARD ARABIC DEFAULT ---------- */
@@ -507,7 +511,7 @@
       localStorage.setItem('ui_locale','en');
       document.documentElement.lang='en'; document.documentElement.dir='ltr';
     } else {
-      localStorage.setItem('ui_locale','ar'); // force AR
+      localStorage.setItem('ui_locale','ar'); // force AR unless ?lang=en
       document.documentElement.lang='ar'; document.documentElement.dir='rtl';
     }
   } catch(_) {}
@@ -519,15 +523,14 @@ const NAHL_BASE = 'https://nahl-platform.vercel.app';
 const baseForm = `${NAHL_BASE}/api/app/AM/general/${APP_ID}/form`;
 const RESERVE_URL_PRIMARY  = `${baseForm}/reserveAppointment`;
 const RESERVE_URL_FALLBACK = `${baseForm.replace(/\/form\/?$/, '')}/reserveAppointment`;
-const GAS_BASE_URL = '/api/gas-proxy';
+const GAS_BASE_URL = '/api/gas-proxy'; // replace with your deployed GAS proxy
 
 /* ----------------------------- State ----------------------------- */
 const nForm = {
   date:'', time:'', location:'', service:'', serviceCount:'1',
   serviceCat:'', customerM:'', customerN:'', paymentMethod:'',
   urlLocation:'', locationDescription:'', locale:(localStorage.getItem('ui_locale')==='en'?'en':'ar'),
-  carsCount: 1,
-  selectedTimes: []
+  carsCount: 1
 };
 const ALLOWED_PM = new Set(['cash','telr-online','stc-manual']);
 const DateTime = luxon.DateTime;
@@ -536,7 +539,25 @@ let services = []; let serviceCategories = [];
 const servicesById = new Map(); const categoriesById = new Map();
 let serviceDescText = '';
 let countryCodeInput = null;
+
+/* --- Selection for sequential times --- */
+let selectedTimes = []; // [{date:'yyyy-MM-dd', time24:'HH:mm', label:'hh:mm a', dayIdx:0, slotIdx:0}, ...]
+let currentDayIndex = 0;
+
+/* ---------- NEW: latest-only guard for service description ---------- */
 let serviceDescReqSeq = 0;
+async function safeUpdateServiceDescFor(serviceId, locale){
+  const req = ++serviceDescReqSeq;
+  const lang = (locale || nForm.locale || getUILang()) === 'en' ? 'en' : 'ar';
+
+  const promo = getServicePromoText(String(serviceId), lang);
+  if (promo){
+    if (req === serviceDescReqSeq) updateServiceDescriptionUI(promo);
+    return;
+  }
+  const txt = await fetchServiceDescription(String(serviceId));
+  if (req === serviceDescReqSeq) updateServiceDescriptionUI(txt || '');
+}
 
 /* ----------------------------- Overlay ----------------------------- */
 const overlayEl   = document.getElementById('globalOverlay');
@@ -548,7 +569,6 @@ function hideOverlay(){ overlayEl.classList.remove('is-visible'); document.docum
 function handleSubmit(e){ e.preventDefault(); }
 function lockButton(btn, label = "جاري المعالجة…"){ if(!btn) return; btn.dataset._orig=btn.textContent; btn.textContent=label; btn.disabled=true; btn.setAttribute("aria-busy","true"); }
 function unlockButton(btn){ if(!btn) return; btn.textContent=btn.dataset._orig||btn.textContent; btn.disabled=false; btn.removeAttribute("aria-busy"); }
-function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
 function initPhoneInputOnce(){
   if (countryCodeInput) return countryCodeInput;
   const el = document.querySelector('#mobile');
@@ -574,6 +594,15 @@ function checkNumberValidity() {
   }
   number.setCustomValidity(""); return true;
 }
+function maskMobileForLog(m){ const s=String(m||'').replace(/\D/g,''); if(s.length<=6) return s? s.slice(0,3)+'***':''; return s.slice(0,3)+'***'+s.slice(-2); }
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    document.getElementById("name").value = localStorage.getItem("name") || "";
+    const savedM = localStorage.getItem("mobile");
+    if (savedM){ const iti=initPhoneInputOnce(); if (iti) iti.setNumber("+"+savedM); }
+  }catch(_){}
+});
 
 /* ----------------------------- Date ----------------------------- */
 const dateEl = document.getElementById("date");
@@ -582,7 +611,7 @@ if (dateEl){
   dateEl.value = DateTime.now().toFormat('yyyy-MM-dd');
 }
 
-/* ----------------------------- Payload helpers ----------------------------- */
+/* ----------------------------- Payload ----------------------------- */
 const MAP_URL_RE = /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/;
 
 function buildPayloadFromForm(f){
@@ -592,14 +621,15 @@ function buildPayloadFromForm(f){
     time: /^([01]\d|2[0-3]):[0-5]\d$/.test(f.time||'') ? f.time : '',
     location: toStr(f.location),
     service:  toStr(f.service),
-    serviceCount: '1', // one car per request
+    serviceCount: String(f.serviceCount || '1'),
     serviceCat: toStr(f.serviceCat),
     customerM: String((f.customerM||'').replace(/\D/g,'')),
     customerN: (f.customerN||'').trim(),
     paymentMethod: String((f.paymentMethod||'').toLowerCase()),
     urlLocation: (f.urlLocation||''),
     locationDescription: (f.locationDescription||''),
-    locale: (f.locale==='en'?'en':'ar')
+    locale: (f.locale==='en'?'en':'ar'),
+    carsCount: Number(f.carsCount||1)
   };
 }
 function validatePayloadShape(p){
@@ -608,19 +638,20 @@ function validatePayloadShape(p){
   if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(p.time)) errs.push('صيغة الوقت غير صحيحة (HH:mm)');
   if(!p.location) errs.push('المنطقة مطلوبة');
   if(!p.service) errs.push('الخدمة مطلوبة');
+  if(!/^[1-9]\d*$/.test(p.serviceCount)) errs.push('عدد الخدمات يجب أن يكون رقمًا صحيحًا موجبًا');
   if(!p.serviceCat) errs.push('فئة الخدمة مطلوبة');
   if(!/^\d{8,15}$/.test(p.customerM)) errs.push('رقم الجوال يجب أن يكون بصيغة دولية بدون +');
   if(!p.customerN) errs.push('الاسم مطلوب');
   if(!ALLOWED_PM.has(p.paymentMethod)) errs.push('طريقة الدفع غير معتمدة');
   if(!MAP_URL_RE.test(p.urlLocation||'')) errs.push('رابط الموقع غير صحيح');
+  if(!(p.carsCount>=1 && p.carsCount<=5)) errs.push('عدد السيارات يجب أن يكون بين 1 و 5');
   if(!/^(ar|en)$/.test(p.locale)) errs.push('اللغة غير صحيحة');
   return { ok: errs.length===0, errors: errs };
 }
 function syncNFormFromUI(){
   const areaEl = document.getElementById('area'); if(areaEl?.value) nForm.location = String(areaEl.value);
   const svcEl  = document.getElementById('service'); if(svcEl?.value) nForm.service = String(svcEl.value);
-  const svcCntEl = document.getElementById('serviceCount'); nForm.serviceCount = String(svcCntEl?.value || '1');
-  const carsEl = document.getElementById('carsCount'); nForm.carsCount = Math.min(5, Math.max(1, Number(carsEl?.value || 1)));
+  const svcCntEl = document.getElementById('serviceCount'); nForm.serviceCount = String(svcCntEl?.value || nForm.serviceCount || '1');
   let currentCat = document.getElementById('serviceCat')?.value || nForm.serviceCat || '';
   if (!currentCat) currentCat = deriveCategoryIdForSelectedService() || (categoriesById.size===1 ? Array.from(categoriesById.keys())[0] : '');
   if(currentCat) nForm.serviceCat = String(currentCat);
@@ -630,6 +661,7 @@ function syncNFormFromUI(){
   try{ const iti = initPhoneInputOnce(); const e164 = iti? iti.getNumber():''; nForm.customerM = (e164 || '').replace(/\D/g,''); }catch(_){}
   const pm = document.querySelector('input[name="payingMethod"]:checked'); if(pm?.value){ const tokenMap={Cash:'cash','Telr-Online':'telr-online','STC-Manual':'stc-manual'}; nForm.paymentMethod = tokenMap[pm.value] || String(pm.value).toLowerCase(); }
   nForm.locale = (localStorage.getItem('ui_locale')==='en'?'en':'ar');
+  const carsCntEl = document.getElementById('carsCount'); nForm.carsCount = Math.min(5, Math.max(1, Number(carsCntEl?.value||1)));
 }
 
 /* ----------------------------- Networking ----------------------------- */
@@ -657,6 +689,27 @@ async function postReservation(payload){
     return r2;
   }
   return r;
+}
+function callContent2(routText, callback, abortable=false, retries=3){
+  return new Promise((resolve,reject)=>{
+    let signal = '';
+    if (abortable) {
+      if(controllers.length>0){ controllers.forEach(c=>c[0].abort()); controllers=[]; }
+      const controller = new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
+    }
+    setTimeout(()=>{
+      fetch(baseForm + `${routText}`, { method:'GET', redirect:'follow', ...(abortable && { signal }) })
+        .then(async (response)=>{
+          if(!response.ok){ if(retries>0) return resolve(callContent2(routText, callback, abortable, retries-1)); else throw new Error('Network response was not ok'); }
+          const json = await response.json(); callback(json); resolve(json);
+        })
+        .catch(err=>{
+          if(String(err.message).includes('aborted')) return;
+          if(retries>0) setTimeout(()=>resolve(callContent2(routText, callback, abortable, retries-1)), 900);
+          else reject(err);
+        });
+    },300);
+  });
 }
 
 /* ----------------------------- SWR Cache ----------------------------- */
@@ -694,14 +747,13 @@ async function fetchJSONTimeout(url, {timeout=7000, retries=2} = {}){
 }
 window._bg = { locations: null, services: new Map(), ready: false };
 
-/* ----------------------------- Locale helpers ----------------------------- */
+/* ----------------------------- Painters ----------------------------- */
 function getUILang(){ try { return (localStorage.getItem('ui_locale') === 'en') ? 'en' : 'ar'; } catch(_) { return 'ar'; } }
 function pickLocale(item, arKey, enKey){
   const ar = item?.[arKey]; const en = item?.[enKey];
   return (getUILang()==='en') ? (en ?? ar ?? '') : (ar ?? en ?? '');
 }
 
-/* ----------------------------- Areas & Services painting ----------------------------- */
 function paintAreasFromBG(){
   const areaSel = $('#area');
   const locs = window._bg.locations || [];
@@ -709,6 +761,7 @@ function paintAreasFromBG(){
   areaSel.empty().select2({ data, width: "100%", dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
   if (data.length) areaSel.val(data[0].id).trigger('change.select2');
 }
+
 async function prefetchServicesFor(locationId){
   const ck = CACHE_KEYS.servicesByLoc(locationId);
   const cached = readCache(ck);
@@ -725,10 +778,12 @@ async function prefetchServicesFor(locationId){
     }
   }catch(_){}
 }
+
 function paintServicesFromBG(locationId){
   const svcWrap = window._bg.services.get(locationId) || {};
   services = svcWrap.services || [];
   serviceCategories = svcWrap.servicesCat || [];
+
   servicesById.clear(); categoriesById.clear();
   services.forEach(s=>{
     const sid = String(s.TS_service_id ?? s.service_id ?? s.id);
@@ -738,16 +793,20 @@ function paintServicesFromBG(locationId){
     const cid = String(c.TS_service_category_id ?? c.category_id ?? c.id);
     categoriesById.set(cid, c);
   });
+
   const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
   const names = sorted.map(s => pickLocale(s, 'TS_service_arabic_name', 'TS_service_english_name'));
   const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+
   add_dropdown_list(names, ids, "service");
+
   try{
     const $service = $('#service');
     if ($service.data('select2')) {
       $service.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
     }
   }catch(_){}
+
   const firstSvcId = ids[0] || '';
   if (firstSvcId){
     const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
@@ -759,10 +818,13 @@ function paintServicesFromBG(locationId){
     updateServiceDescriptionUI('');
   }
 }
+
+/* ---------- Prefetch on load ---------- */
 $('.js-example-basic-single').select2({ data:[], width:"100%" });
 document.addEventListener('DOMContentLoaded', async () => {
   const cachedLoc = readCache(CACHE_KEYS.locations);
   if (cachedLoc) window._bg.locations = cachedLoc;
+
   (async () => {
     try{
       const json = await fetchJSONTimeout(baseForm + '/locations', { timeout: 6000, retries: 1 });
@@ -780,62 +842,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   })();
 });
 
-/* ----------------------------- Promo/Desc helpers ----------------------------- */
-function getServicePromoText(serviceId, locale){
-  const id = String(serviceId);
-  const lang = (locale === 'en') ? 'en' : 'ar';
-  if (id === '187' || id === '189'){
-    return (lang === 'en')
-      ? 'Opening Offer - Wash for 29/39 SAR/عرض الافتتاح - غسيل بـ 29/39 ريال'
-      : 'Opening Offer - Wash for 29/39 SAR/عرض الافتتاح - غسيل بـ 29/39 ريال';
-  }
-  return '';
-}
-async function fetchServiceDescription(serviceId){
-  try{
-    const res = await fetch(`${GAS_BASE_URL}?action=getServiceDescription&serviceId=${encodeURIComponent(serviceId)}`);
-    const data = await res.json();
-    if (data && data.ok) return String(data.description || '').trim();
-  }catch(_){}
-  return '';
-}
-function ensureServiceDescElement(){
-  let holder = document.getElementById('serviceDescHolder'); if (holder) return holder;
-  const selectWrap = document.getElementById('service').parentElement;
-  holder = document.createElement('div'); holder.id='serviceDescHolder'; holder.style.marginTop='8px';
-  holder.innerHTML = `<small id="serviceDescText" style="display:block;color:#245a65;"></small>`;
-  selectWrap.appendChild(holder); return holder;
-}
-function updateServiceDescriptionUI(text){
-  ensureServiceDescElement();
-  serviceDescText = text || '';
-  const el = document.getElementById('serviceDescText'); if (el) el.textContent = serviceDescText ? `ℹ️ ${serviceDescText}` : '';
-  updateLocationDescription();
-}
-async function safeUpdateServiceDescFor(serviceId, locale){
-  const req = ++serviceDescReqSeq;
-  const lang = (locale || nForm.locale || getUILang()) === 'en' ? 'en' : 'ar';
-  const promo = getServicePromoText(String(serviceId), lang);
-  if (promo){
-    if (req === serviceDescReqSeq) updateServiceDescriptionUI(promo);
-    return;
-  }
-  const txt = await fetchServiceDescription(String(serviceId));
-  if (req === serviceDescReqSeq) updateServiceDescriptionUI(txt || '');
-}
-
-/* ----------------------------- Service→Category helpers (FIX) ----------------------------- */
+/* ---------- Category helpers ---------- */
 function extractCatIdFromServiceObj(svc){
-  if (!svc) return '';
   const directId =
-    svc.TS_service_category_id ?? svc.TS_service_cat_id ?? svc.TS_service_category ??
-    svc.service_category_id ?? svc.category_id ?? svc.categoryId ??
-    svc.TS_category_id ?? svc.TS_cat_id ?? null;
+    svc.TS_service_category_id ?? svc.TS_service_cat_id ?? svc.TS_service_category ?? svc.service_category_id ??
+    svc.category_id ?? svc.categoryId ?? svc.TS_category_id ?? svc.TS_cat_id ?? null;
   if (directId != null && String(directId).trim() !== '') return String(directId);
+
   const nameCand = String(
-    svc.TS_service_category_arabic_name ?? svc.service_category_ar_name ??
-    svc.category_name_ar ?? svc.category_name ?? svc.category ?? ''
+    svc.TS_service_category_arabic_name ?? svc.service_category_ar_name ?? svc.category_name_ar ??
+    svc.category_name ?? svc.category ?? ''
   ).trim();
+
   if (nameCand) {
     for (const [cid, cat] of categoriesById.entries()){
       const nm = String(cat.TS_service_category_arabic_name ?? cat.service_category_ar_name ?? cat.name_ar ?? cat.name ?? '').trim();
@@ -857,7 +875,39 @@ function setServiceCatHiddenAndState(cid){
   if (cid) nForm.serviceCat = String(cid);
 }
 
-/* ----------------------------- Events: Area/Service ----------------------------- */
+/* ---------- Service promo rules (frontend) ---------- */
+function getServicePromoText(serviceId, locale){
+  const id = String(serviceId);
+  const lang = (locale === 'en') ? 'en' : 'ar';
+  if (id === '187'){ return 'Opening Offer - Wash for 29 SAR/عرض الافتتاح - غسيل بـ 29 ريال'; }
+  if (id === '189'){ return 'Opening Offer - Wash for 39 SAR/عرض الافتتاح - غسيل بـ 39 ريال'; }
+  return '';
+}
+
+/* ---------- Service description via GAS (fallback) ---------- */
+async function fetchServiceDescription(serviceId){
+  try{
+    const res = await fetch(`${GAS_BASE_URL}?action=getServiceDescription&serviceId=${encodeURIComponent(serviceId)}`);
+    const data = await res.json();
+    if (data && data.ok) return String(data.description || '').trim();
+  }catch(_){}
+  return '';
+}
+function ensureServiceDescElement(){
+  let holder = document.getElementById('serviceDescHolder'); if (holder) return holder;
+  const selectWrap = document.getElementById('service').parentElement;
+  holder = document.createElement('div'); holder.id='serviceDescHolder'; holder.style.marginTop='8px';
+  holder.innerHTML = `<small id="serviceDescText" style="display:block;color:#245a65;"></small>`;
+  selectWrap.appendChild(holder); return holder;
+}
+function updateServiceDescriptionUI(text){
+  ensureServiceDescElement();
+  serviceDescText = text || '';
+  const el = document.getElementById('serviceDescText'); if (el) el.textContent = serviceDescText ? `ℹ️ ${serviceDescText}` : '';
+  updateLocationDescription();
+}
+
+/* ---------- Area/Service/CarsCount events ---------- */
 $("#area").on("change", ()=>{
   const lid = String(document.getElementById("area").value || "");
   if (lid && window._bg.services.has(lid)){
@@ -880,46 +930,25 @@ function add_dropdown_list(show_list, value_list, element_id){
   });
   if (show_list.length > 0) parent.dispatchEvent(new Event('change'));
 }
+$('#service').on('change', async ()=>{
+  nForm.service = String(document.getElementById('service').value || '');
+  const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+  setServiceCatHiddenAndState(catId);
+  const svcId = document.getElementById('service').value || '';
+  safeUpdateServiceDescFor(String(svcId), nForm.locale || getUILang());
+  const p4=document.getElementById('page4'); 
+  if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
+});
+$('#carsCount').on('change', ()=>{
+  const el = document.getElementById('carsCount');
+  nForm.carsCount = Math.min(5, Math.max(1, Number(el?.value || 1)));
+  // reset selection if any
+  clearTimeSelections();
+});
 
-/* ----------------------------- Appointments & Sequential selection ----------------------------- */
-let appointments=[[],[],[]], ActualTimes=[[],[],[]], _currentDayIndex=0;
+/* ----------------------------- Appointments ----------------------------- */
+let appointments=[[],[],[]], ActualTimes=[[],[],[]];
 
-function clearSelectedTimesUI(){
-  nForm.selectedTimes = [];
-  document.querySelectorAll('.time-button.selected').forEach(b=>b.classList.remove('selected'));
-}
-function showFailP4(msg){
-  const box = document.getElementById('fail-alert-3');
-  if (!box) return;
-  box.style.display = 'block';
-  box.firstElementChild.textContent = msg;
-  setTimeout(()=>{ box.style.display='none'; }, 3500);
-}
-function selectSequentialTimes(dayIndex, startIndex){
-  const count = Math.min(5, Math.max(1, Number(document.getElementById('carsCount')?.value || nForm.carsCount || 1)));
-  const list = ActualTimes[dayIndex] || [];
-  if (startIndex + count > list.length){
-    showFailP4('لا توجد فتحات كافية متتالية لهذا العدد. اختر وقتًا أبكر أو قلّل العدد.');
-    return false;
-  }
-  clearSelectedTimesUI();
-  nForm.selectedTimes = [];
-  for(let k=0;k<count;k++){
-    const idx = startIndex + k;
-    const btn = document.querySelector(`.time-button[data-day="${dayIndex}"][data-idx="${idx}"]`);
-    if (btn) btn.classList.add('selected');
-    const t24 = luxon.DateTime.fromFormat(list[idx], "hh:mm a").toFormat("HH:mm");
-    nForm.selectedTimes.push(t24);
-  }
-  const dayDateText = document.getElementById(`day${dayIndex+1}date`)?.innerText || dateEl.value;
-  nForm.date = dayDateText;
-  nForm.time = nForm.selectedTimes[0] || '';
-  // Immediately go to map after selection as per your earlier flow:
-  document.getElementById('page4').style.display='none';
-  document.getElementById('page5').style.display='flex';
-  setTimeout(ensureMapReady, 0);
-  return true;
-}
 async function fetchAppointmentsForSelectedDate(){
   const tc = document.getElementById('time-container');
   const areaVal = document.getElementById("area")?.value || "";
@@ -942,13 +971,16 @@ async function fetchAppointmentsForSelectedDate(){
     document.getElementById(`day${i}date`).textContent = d.toFormat('yyyy-MM-dd');
     document.getElementById(`dayHeader${i}`).hidden = false;
   }
+
   ['dayHeader1','dayHeader2','dayHeader3'].forEach((id, i) => {
     const el = document.getElementById(id);
     if (el && !el.dataset.bound) {
       el.dataset.bound = '1';
-      el.onclick = () => {
-        document.querySelectorAll('.time-date-header .choosed').forEach(d=>d.classList.remove('choosed'));
-        el.classList.add('choosed'); _currentDayIndex = i; timesSetter(i);
+      el.onclick = () => { 
+        document.querySelectorAll('.time-date-header .choosed').forEach(d=>d.classList.remove('choosed')); 
+        el.classList.add('choosed'); 
+        currentDayIndex = i;
+        timesSetter(i); 
       };
     }
   });
@@ -971,38 +1003,83 @@ async function fetchAppointmentsForSelectedDate(){
         else if(rec[i]["TS_appointment_date"]===d2){ appointments[1].push(rec[i]['TS_appointment_time']); ActualTimes[1].push(tempActualTimes[i]); }
         else if(rec[i]["TS_appointment_date"]===d3){ appointments[2].push(rec[i]['TS_appointment_time']); ActualTimes[2].push(tempActualTimes[i]); }
       }
-      _currentDayIndex = 0; timesSetter(0);
+      currentDayIndex = 0;
+      timesSetter(0);
     }, true);
   } finally { if (dateEl) dateEl.disabled=false; }
 }
-function timesSetter(dayIdx){
+
+function timesSetter(index){
   const c = document.getElementById("time-container");
   c.innerHTML = "";
-  clearSelectedTimesUI();
-  const list = appointments[dayIdx] || [];
-  const listAMPM = ActualTimes[dayIdx] || [];
-  if(list.length===0){
+  clearTimeSelections();
+
+  if(appointments[index].length===0){
     c.innerHTML = `<div style="grid-column:1/-1; justify-self:center; color:#0b2a33;">لا توجد مواعيد متاحة</div>`;
     return;
   }
-  for(let y=0;y<list.length;y++){
+
+  // Build buttons
+  for(let y=0;y<appointments[index].length;y++){
     const btn = document.createElement('button');
     btn.className = 'time-button';
-    btn.setAttribute('dir','ltr');
-    btn.dataset.day = String(dayIdx);
-    btn.dataset.idx = String(y);
-    btn.textContent = list[y];
-    btn.addEventListener('click', ()=> selectSequentialTimes(dayIdx, y));
+    btn.dir = 'ltr';
+    btn.textContent = appointments[index][y];
+    btn.addEventListener('click', ()=> selectSequential(index, y));
     c.appendChild(btn);
   }
 }
+
+function clearTimeSelections(){
+  selectedTimes = [];
+  document.querySelectorAll('.time-button').forEach(b=>b.classList.remove('is-selected'));
+}
+
+function selectSequential(dayIdx, startSlotIdx){
+  const count = Math.min(5, Math.max(1, Number(document.getElementById('carsCount')?.value || 1)));
+  const total = appointments[dayIdx].length;
+  if (startSlotIdx + count > total){
+    showInlineAlert('fail-alert-3', 'لا يوجد عدد كافٍ من المواعيد المتتالية لهذا الاختيار', 'اختر وقتًا أبكر أو قلّل عدد السيارات.');
+    return;
+  }
+  // Make sure all selected are contiguous and available (we assume appointments list already removed unavailable)
+  clearTimeSelections();
+  const dayDate = document.getElementById('day'+(dayIdx+1)+'date').innerText;
+  for (let i=0;i<count;i++){
+    const slotIdx = startSlotIdx + i;
+    const label = ActualTimes[dayIdx][slotIdx]; // e.g., '01:30 PM'
+    const parsed = luxon.DateTime.fromFormat(label, "hh:mm a");
+    const time24 = parsed.toFormat("HH:mm");
+    selectedTimes.push({ date: dayDate, time24, label, dayIdx, slotIdx });
+  }
+  // Mark buttons
+  const c = document.getElementById("time-container");
+  for (let i=0;i<count;i++){
+    const btn = c.children[startSlotIdx+i];
+    if (btn) btn.classList.add('is-selected');
+  }
+  hideInlineAlert('fail-alert-3');
+  // Move to map step
+  nForm.date = dayDate;
+  nForm.time = selectedTimes[0]?.time24 || '';
+  document.getElementById('page4').style.display='none';
+  document.getElementById('page5').style.display='flex';
+  setTimeout(ensureMapReady, 0);
+}
+
+function showInlineAlert(id, title, sub){
+  const el = document.getElementById(id); if(!el) return;
+  el.style.display='block'; el.children[0].textContent = title || ''; el.children[1].textContent = sub || '';
+}
+function hideInlineAlert(id){ const el = document.getElementById(id); if(!el) return; el.style.display='none'; }
 
 /* ----------------------------- Navigation ----------------------------- */
 document.getElementById('page1-button').onclick = ()=>{
   document.getElementById('page1').style.display='none';
   document.getElementById('page2').style.display='flex';
-  if (window._bg?.locations?.length){
-    paintAreasFromBG(); setTimeout(setBoundries, 0);
+  if (window._bg.locations && window._bg.locations.length){
+    paintAreasFromBG();
+    setTimeout(setBoundries, 0);
   } else {
     $('.js-example-basic-single').select2({ data:[], width:"100%" });
   }
@@ -1010,37 +1087,33 @@ document.getElementById('page1-button').onclick = ()=>{
 document.getElementById('page2-button').onclick = ()=>{
   const area = document.getElementById("area");
   if(!area.value){ document.getElementById('page2-form').reportValidity(); return; }
-  syncNFormFromUI();
+  nForm.location = area.value;
+  nForm.carsCount = Math.min(5, Math.max(1, Number(document.getElementById('carsCount')?.value || 1)));
   document.getElementById('page2').style.display='none';
   document.getElementById('page3').style.display='flex';
-  setTimeout(()=>{ document.getElementById('page3').style.display='none'; document.getElementById('page4').style.display='flex'; fetchAppointmentsForSelectedDate(); }, 450);
+  setTimeout(()=>{ document.getElementById('page3').style.display='none'; document.getElementById('page4').style.display='flex'; fetchAppointmentsForSelectedDate(); }, 350);
 };
 document.getElementById('page4-return').onclick = ()=>{
   document.getElementById('page4').style.display='none';
   document.getElementById('page2').style.display='flex';
 };
-/* reacts to changes */
-document.getElementById('carsCount').addEventListener('change', ()=>{ syncNFormFromUI(); if (document.getElementById('time-container')) clearSelectedTimesUI(); });
-if (dateEl){ dateEl.onchange = ()=>{ const hasArea=!!document.getElementById("area")?.value; const hasService=!!document.getElementById("service")?.value; if (!hasArea || !hasService) return; clearSelectedTimesUI(); fetchAppointmentsForSelectedDate(); }; }
-$('#service').on('change', async ()=>{
-  nForm.service = String(document.getElementById('service').value || '');
-  const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-  setServiceCatHiddenAndState(catId);
-  const svcId = document.getElementById('service').value || '';
-  safeUpdateServiceDescFor(String(svcId), nForm.locale || getUILang());
-  clearSelectedTimesUI();
-  const p4=document.getElementById('page4'); 
-  if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
-});
-
-/* ----------------------------- Car/plate helpers ----------------------------- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  try{
-    document.getElementById("name").value = localStorage.getItem("name") || "";
-    const savedM = localStorage.getItem("mobile");
-    if (savedM){ const iti=initPhoneInputOnce(); if (iti) iti.setNumber("+"+savedM); }
-  }catch(_){}
-});
+document.getElementById('page5-button').onclick = ()=>{
+  if(!window.position){
+    if (window.map) placeOrMovePin(window.map.getCenter());
+    if(!window.position){
+      const warn = document.getElementById('fail-alert-5a');
+      warn.style.display='block'; warn.firstElementChild.textContent = 'الرجاء تحديد موقع الخدمة على الخريطة';
+      return;
+    }
+  }
+  document.getElementById('page5').style.display='none';
+  document.getElementById('page6').style.display='flex';
+  setTimeout(initPhoneInputOnce, 0);
+};
+document.getElementById('page5-return').onclick = ()=>{
+  document.getElementById('page5').style.display='none';
+  document.getElementById('page4').style.display='flex';
+};
 document.getElementById('plateNumber').addEventListener('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); this.setCustomValidity(''); updateLocationDescription(); });
 function updateLocationDescription(){
   const carBrand = document.getElementById("carBrand").value || "";
@@ -1057,48 +1130,40 @@ function updateLocationDescription(){
   $('#carBrand').select2({ placeholder: "اختر ماركة السيارة", allowClear:true, width:"100%" });
 })();
 
-/* ----------------------------- Reservation: multi-send (one per time) ----------------------------- */
-async function createReservationSingleTime(timeHHmm){
-  const base = { ...nForm, time: timeHHmm };
-  const payload = buildPayloadFromForm(base);
+/* ----------------------------- Reservation & Payment ----------------------------- */
+async function createReservationNow(payloadOverride={}){
+  syncNFormFromUI();
+  const payload = buildPayloadFromForm({ ...nForm, ...payloadOverride });
+
   const v = validatePayloadShape(payload);
-  if(!v.ok){ throw new Error('validation_error: ' + v.errors.join(', ')); }
-  const res = await postReservation(payload);
-  if(res.ok && res.data?.success){ return res.data; }
-  const serverMsg = res?.data?.msgAR || res?.data?.message || res?.raw || 'تعذر إنشاء الحجز';
-  const err = new Error(serverMsg); err._server = res; throw err;
-}
-async function createReservationsForAllSelectedTimes(){
-  if (!nForm.selectedTimes?.length) throw new Error('no_times_selected');
-  for (let i=0; i<nForm.selectedTimes.length; i++){
-    const t = nForm.selectedTimes[i];
-    showOverlay(`جاري حجز السيارة رقم ${i+1} من ${nForm.selectedTimes.length}…`);
-    await createReservationSingleTime(t);
-    await sleep(450);
+  if(!v.ok){
+    alert('الرجاء إدخال البيانات بالشكل الصحيح:\n• ' + v.errors.join('\n• '));
+    return { ok:false, reason:'client_validation', payload };
   }
-  hideOverlay();
-  return true;
+  const res = await postReservation(payload);
+  const serverMsg = res?.data?.msgAR || res?.data?.message || res?.raw || '';
+  if(res.ok && res.data?.success){
+    try { sessionStorage.setItem('reservationMade','1'); } catch(_){}
+    return { ok:true, data:res.data };
+  } else {
+    alert(serverMsg || 'تعذر إنشاء الحجز');
+    return { ok:false, res };
+  }
 }
 
-/* ----------------------------- Telr checkout ----------------------------- */
-let __paymentInFlight = false;
-async function startTelrCheckout(){
-  if (__paymentInFlight) return false;
-  const chosenId = document.querySelector('input[name="payingMethod"]:checked')?.id || '';
-  if (chosenId !== 'payTelrMada') return false;
-
-  const nameEl = document.getElementById('name');
-  if(!nameEl.value.trim()){ nameEl.setCustomValidity('يُرجى ملئ هذا الحقل'); document.getElementById('page6-form').reportValidity(); return false; }
-  if(!checkNumberValidity()){ document.getElementById('page6-form').reportValidity(); return false; }
-
+function cachePendingTelr(cartId){
+  const payload = { nForm, cartId, ts:Date.now(), reservationMade: sessionStorage.getItem('reservationMade')==='1' };
+  sessionStorage.setItem('pendingBooking', JSON.stringify(payload));
+}
+function getSelectedServiceIdOrThrow(){
   const serviceId = document.getElementById('service')?.value;
-  const customerN = (document.getElementById('name')?.value || '').trim();
-  const iti = initPhoneInputOnce(); const e164 = iti ? iti.getNumber() : ''; const customerM = (e164 || "").replace(/\D/g,'');
-  try { localStorage.setItem('name', customerN); localStorage.setItem('mobile', customerM); } catch(_){}
+  if(!serviceId) throw new Error('service_not_selected');
+  return String(serviceId);
+}
+let __paymentInFlight = false;
 
+async function startTelrCheckoutSingle(serviceId, customerN, customerM){
   const p6s = document.getElementById('page6-spinner'); if(p6s) p6s.style.display='flex';
-  __paymentInFlight = true;
-
   try{
     const res = await fetch(`${GAS_BASE_URL}?action=createTelrByService`, {
       method:'POST', headers:{ 'Content-Type':'application/json' },
@@ -1107,76 +1172,94 @@ async function startTelrCheckout(){
     const data = await res.json();
     if(!data.ok || !data.paymentUrl){
       alert('تعذر بدء عملية الدفع. حاول لاحقاً.');
-      if(p6s) p6s.style.display='none'; __paymentInFlight=false; return false;
+      if(p6s) p6s.style.display='none';
+      return false;
     }
-    location.href = data.paymentUrl;
+    cachePendingTelr(data.cartId);
+    location.href = data.paymentUrl; // redirect
     return true;
   }catch(e){
     alert('تعذر بدء عملية الدفع. حاول لاحقاً.');
-    if(p6s) p6s.style.display='none'; __paymentInFlight=false; return false;
+    if(p6s) p6s.style.display='none';
+    return false;
   }
 }
 
-/* ----------------------------- Terms modal (SAFE INIT) ----------------------------- */
+/* ----------------------------- Terms modal (safe init) ----------------------------- */
 let termsModal = null;
-(function ensureTermsModal(){
-  function ready() {
-    const el = document.getElementById('termsModal');
-    if (!el) return;
-    if (!window.bootstrap || !bootstrap.Modal) return setTimeout(ready, 100);
-    if (!termsModal) { termsModal = new bootstrap.Modal(el, { backdrop: 'static', keyboard: false }); }
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready); else ready();
-})();
+function initTermsModalSafe(){
+  const el = document.getElementById('termsModal');
+  if (!el) return;
+  if (!window.bootstrap?.Modal) return;
+  if (!termsModal) termsModal = new bootstrap.Modal(el, { backdrop:'static', keyboard:false });
+}
 const termsAcceptAR = document.getElementById('termsAccept');
 const termsAcceptEN = document.getElementById('termsAcceptEN');
 const confirmTerms = document.getElementById('confirmTerms');
 function updateConfirmEnabled(){
   const lang = getUILang();
-  confirmTerms.disabled = (lang==='en') ? !termsAcceptEN?.checked : !termsAcceptAR?.checked;
+  if (lang==='en'){ confirmTerms.disabled = !termsAcceptEN.checked; }
+  else{ confirmTerms.disabled = !termsAcceptAR.checked; }
 }
 termsAcceptAR?.addEventListener('change', updateConfirmEnabled);
 termsAcceptEN?.addEventListener('change', updateConfirmEnabled);
 
-let __confirmInFlight = false;
 document.getElementById('page6-button').addEventListener('click', ()=>{
   const nameOk = !!document.getElementById('name').value.trim();
   const phoneOk = checkNumberValidity();
   const plateOk = !!document.getElementById('plateNumber').value.trim();
   const paymentChosen = !!document.querySelector('input[name="payingMethod"]:checked');
   if(!nameOk || !phoneOk || !plateOk || !paymentChosen){ document.getElementById('page6-form').reportValidity(); return; }
-  if (termsAcceptAR) termsAcceptAR.checked=false;
-  if (termsAcceptEN) termsAcceptEN.checked=false;
-  updateConfirmEnabled();
+  termsAcceptAR.checked=false; termsAcceptEN.checked=false; updateConfirmEnabled();
+  initTermsModalSafe();
   termsModal?.show();
 });
 confirmTerms.addEventListener('click', async ()=>{
-  if (__confirmInFlight) return;
-  __confirmInFlight = true;
-  termsModal?.hide();
+  if (__paymentInFlight) return;
+  __paymentInFlight = true;
+  initTermsModalSafe(); termsModal?.hide();
   lockButton(confirmTerms, getUILang()==='en' ? "Processing…" : "جاري المتابعة…");
   showOverlay(getUILang()==='en' ? "Processing…" : "جاري المتابعة…");
+
   try{
     syncNFormFromUI();
-    if (!nForm.selectedTimes?.length){
-      hideOverlay(); unlockButton(confirmTerms); __confirmInFlight=false;
-      alert('يرجى اختيار وقت البدء ليتم حجز المتتابع حسب عدد السيارات.');
-      return;
-    }
-    await createReservationsForAllSelectedTimes();
     const chosenId = document.querySelector('input[name="payingMethod"]:checked')?.id || '';
+
+    const nameEl = document.getElementById('name');
+    const customerN = (nameEl?.value || '').trim();
+    const iti = initPhoneInputOnce(); const e164 = iti ? iti.getNumber() : ''; const customerM = (e164 || "").replace(/\D/g,'');
+
+    // One reservation per selected time
+    if (!selectedTimes.length){
+      alert(getUILang()==='en' ? 'Please select a time first.' : 'يرجى اختيار موعد أولاً.');
+      unlockButton(confirmTerms); __paymentInFlight=false; hideOverlay(); return;
+    }
+
+    // Loop reservations (carsCount) — each with its own time
+    for (const t of selectedTimes){
+      const payloadOverride = { date: t.date, time: t.time24 };
+      const booked = await createReservationNow(payloadOverride);
+      if (!booked.ok){
+        unlockButton(confirmTerms); __paymentInFlight=false; hideOverlay();
+        return;
+      }
+    }
+
     if (chosenId === 'payTelrMada'){
-      const started = await startTelrCheckout();
-      unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay();
-      if (!started) return;
+      const serviceId = getSelectedServiceIdOrThrow();
+      // Start a single Telr checkout (cart can reflect multiple items via backend logic)
+      const started = await startTelrCheckoutSingle(serviceId, customerN, customerM);
+      if (!started) { unlockButton(confirmTerms); __paymentInFlight=false; hideOverlay(); }
       return;
     }
-    unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay();
+
+    // Cash / STC-Manual: show success page
+    unlockButton(confirmTerms); __paymentInFlight=false; hideOverlay();
     document.getElementById('page6').style.display='none';
     document.getElementById('page7').style.display='flex';
   }catch(e){
-    unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay();
-    alert(getUILang()==='en' ? String(e) : ('تعذر إتمام الإجراء: ' + String(e)));
+    unlockButton(confirmTerms); __paymentInFlight=false; hideOverlay();
+    alert(getUILang()==='en' ? 'Could not complete the action. Try again.' : 'تعذر إتمام الإجراء، حاول مرة أخرى.');
   }
 });
 document.getElementById('page6-return').addEventListener('click', ()=>{
@@ -1185,6 +1268,12 @@ document.getElementById('page6-return').addEventListener('click', ()=>{
   setTimeout(ensureMapReady,0);
 });
 document.getElementById("rebook")?.addEventListener("click", ()=> location.href = location.origin + location.pathname );
+document.querySelectorAll('input[name="payingMethod"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    const tokenMap={ 'Cash':'cash','STC-Manual':'stc-manual','Telr-Online':'telr-online' };
+    nForm.paymentMethod = tokenMap[r.value] || String(r.value).toLowerCase();
+  });
+});
 
 /* ----------------------------- Progress Stepper ----------------------------- */
 (function progressHeartbeat(){
@@ -1205,7 +1294,7 @@ document.getElementById("rebook")?.addEventListener("click", ()=> location.href 
   tick(); setInterval(tick, 350);
 })();
 
-/* ----------------------------- Google Maps (GLOBAL init) ----------------------------- */
+/* ----------------------------- Google Maps ----------------------------- */
 window.prePosition     = "https://www.google.com/maps/search/?api=1&query=";
 window.defaultLocation = { lat: 26.34165524787632, lng: 50.11524831545726 };
 window.position        = "";
@@ -1214,7 +1303,8 @@ window.marker          = null;
 window.infoWindow      = null;
 window.polygon         = null;
 window.serviceBounds   = null;
-function updatePosition(lat,lng){ window.position = `${window.prePosition}${lat},${lng}`; nForm.urlLocation = window.position; }
+
+function updatePosition(lat,lng){ window.position = `${window.prePosition}${lat},${lng}`; }
 function insideService(latLng){
   if (!window.polygon || !google.maps.geometry || !google.maps.geometry.poly) return true;
   const pt = (latLng instanceof google.maps.LatLng) ? latLng : new google.maps.LatLng(latLng.lat, latLng.lng);
@@ -1234,6 +1324,12 @@ function myMap(){
   window.addEventListener("resize", ()=>{ if (!window.map) return; google.maps.event.trigger(window.map,"resize"); });
   setTimeout(()=>{ if (typeof setBoundries==='function') setBoundries(); }, 0);
 }
+function initMap(){ // keeps google callback happy
+  if (typeof window.myMap === 'function') window.myMap();
+  else setTimeout(()=>{ if (typeof window.myMap === 'function') window.myMap(); }, 50);
+}
+window.myMap = myMap; window.initMap = initMap;
+
 function placeOrMovePin(latLng){
   if (!window.map) return;
   if (!insideService(latLng)) {
@@ -1250,29 +1346,24 @@ function placeOrMovePin(latLng){
         if (window.infoWindow) { window.infoWindow.setContent(getUILang()==='en'?"⚠️ Outside service area — move the pin inside the allowed zone":"⚠️ خارج نطاق الخدمة — حرّك المؤشر داخل المنطقة المسموحة"); window.infoWindow.open(window.map, window.marker); }
         return;
       }
-      updatePosition(p.lat(), p.lng());
+      updatePosition(p.lat(), p.lng()); nForm.urlLocation = window.position;
     });
   } else { window.marker.setPosition(latLng); }
   window.map.panTo(latLng); window.map.setZoom(17);
-  updatePosition(latLng.lat(), latLng.lng());
+  updatePosition(latLng.lat(), latLng.lng()); nForm.urlLocation = window.position;
   if (window.infoWindow) { window.infoWindow.setContent(getUILang()==='en'?"✅ Location set here (you can drag the pin)":"✅ تم تحديد موقعك هنا (يمكنك سحب المؤشر للتعديل)"); window.infoWindow.open(window.map, window.marker); }
 }
-function ensureMapReady(){
-  const el = document.getElementById('googleMap'); if (!el || !window.map) return;
-  google.maps.event.trigger(window.map, 'resize');
-  setTimeout(()=>{ if (window.marker){ window.map.setCenter(window.marker.getPosition()); window.map.setZoom(17); }
-                   else if (window.serviceBounds){ window.map.fitBounds(window.serviceBounds); }
-                   else { window.map.setCenter(window.defaultLocation); window.map.setZoom(12); } }, 40);
-}
-window.initMap = function initMap(){ myMap(); };
 
 /* ---------- Boundaries (AR/EN names supported) ---------- */
 function setBoundries(){
   if (!window.map) return;
+
   const selectedText = ($('#area option:selected').text() || '').trim();
+
   const isAziziyah   = ["العزيزية - الخبر","Aziziyah - Khobar","Al Aziziyah - Khobar","Aziziyah"].some(n => selectedText.toLowerCase().includes(n.toLowerCase()));
   const isRakah      = ["الراكة والاحياء المحيطة","Rakah & Surrounding Districts","Rakah"].some(n => selectedText.toLowerCase().includes(n.toLowerCase()));
   const isDhahran    = ["الظهران","Dhahran"].some(n => selectedText.toLowerCase().includes(n.toLowerCase()));
+
   let coords = null;
   if (isAziziyah) {
     coords = [
@@ -1307,10 +1398,12 @@ function setBoundries(){
       { lat:26.29799900302895,  lng:50.16468008169681  }
     ];
   }
+
   if (!coords) {
     if (window.polygon) { window.polygon.setMap(null); window.polygon = null; }
     window.serviceBounds = null; window.map.setCenter(window.defaultLocation); window.map.setZoom(12); return;
   }
+
   const path = coords.map(c => new google.maps.LatLng(c.lat, c.lng));
   if (coords.length && (coords[0].lat !== coords[coords.length-1].lat || coords[0].lng !== coords[coords.length-1].lng)) path.push(new google.maps.LatLng(coords[0].lat, coords[0].lng));
   if (window.polygon) window.polygon.setMap(null);
@@ -1318,31 +1411,43 @@ function setBoundries(){
   window.polygon.setMap(window.map);
   const b = new google.maps.LatLngBounds(); path.forEach(p => b.extend(p)); window.serviceBounds = b; window.map.fitBounds(b);
   if (window.marker) { window.marker.setMap(null); window.marker = null; }
-  window.position = ""; nForm.urlLocation = "";
+  window.position = "";
 }
+const page5Spinner = document.getElementById('page5-spinner');
+function showGeoSpinner(show, msg="جاري تحديد موقعك…"){ if(!page5Spinner) return; page5Spinner.style.display = show ? 'flex':'none'; page5Spinner.querySelector('span').textContent = msg; }
+document.getElementById('show-my-location')?.addEventListener('click', ()=>{
+  ensureMapReady();
+  if(!navigator.geolocation){
+    if(window.infoWindow){ window.infoWindow.setPosition(window.map.getCenter()); window.infoWindow.setContent(getUILang()==='en'?"⚠️ Geolocation not supported":"⚠️ جهازك لا يدعم تحديد الموقع."); window.infoWindow.open(window.map); }
+    return;
+  }
+  showGeoSpinner(true, getUILang()==='en'?'Getting your location…':'جاري تحديد موقعك…');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ showGeoSpinner(false); const userPos = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude); placeOrMovePin(userPos); },
+    ()=>{ showGeoSpinner(false); if(window.infoWindow){ window.infoWindow.setPosition(window.map.getCenter()); window.infoWindow.setContent(getUILang()==='en'?"⚠️ Couldn’t get your location.":"⚠️ تعذر الحصول على موقعك."); window.infoWindow.open(window.map); } },
+    { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
+  );
+});
+function ensureMapReady(){
+  const el = document.getElementById('googleMap'); if (!el || !window.map) return;
+  google.maps.event.trigger(window.map, 'resize');
+  setTimeout(()=>{ if (window.marker){ window.map.setCenter(window.marker.getPosition()); window.map.setZoom(17); }
+                   else if (window.serviceBounds){ window.map.fitBounds(window.serviceBounds); }
+                   else { window.map.setCenter(window.defaultLocation); window.map.setZoom(12); } }, 40);
+}
+$('#area').on('change', () => { setTimeout(setBoundries, 0); });
 
-/* ----------------------------- Content fetcher (appointments) ----------------------------- */
-function callContent2(routText, callback, abortable=false, retries=3){
-  return new Promise((resolve,reject)=>{
-    let signal = '';
-    if (abortable) {
-      if(controllers.length>0){ controllers.forEach(c=>c[0].abort()); controllers=[]; }
-      const controller = new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
-    }
-    setTimeout(()=>{
-      fetch(baseForm + `${routText}`, { method:'GET', redirect:'follow', ...(abortable && { signal }) })
-        .then(async (response)=>{
-          if(!response.ok){ if(retries>0) return resolve(callContent2(routText, callback, abortable, retries-1)); else throw new Error('Network response was not ok'); }
-          const json = await response.json(); callback(json); resolve(json);
-        })
-        .catch(err=>{
-          if(String(err.message).includes('aborted')) return;
-          if(retries>0) setTimeout(()=>resolve(callContent2(routText, callback, abortable, retries-1)), 900);
-          else reject(err);
-        });
-    },300);
+/* ----------------------------- Status Page ----------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  const isStatus = (location.hash || '').replace('#','').toLowerCase() === 'status';
+  if (!isStatus) return;
+  ['page1','page2','page3','page4','page5','page6','page7'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
   });
-}
+  const statusPage = document.getElementById('statusPage');
+  if (statusPage) statusPage.style.display = 'flex';
+});
 
 /* ----------------------------- i18n (AR/EN) ----------------------------- */
 (function(){
@@ -1384,6 +1489,7 @@ function callContent2(routText, callback, abortable=false, retries=3){
       status_title:'Payment status', status_text:'Your booking is placed. We will send the payment status via WhatsApp and email.', back_home:'Back'
     }
   };
+
   const BIND = [
     ['#globalOverlayMsg','textContent','overlay_loading'],
     ['#page1-button','textContent','start_booking'],
@@ -1435,9 +1541,13 @@ function callContent2(routText, callback, abortable=false, retries=3){
     ['#statusText1','textContent','status_text'],
     ['#backHome','textContent','back_home'],
   ];
+
   function applyI18N(lang){
     const pack = I18N[lang] || I18N.ar;
-    document.documentElement.lang = pack._lang; document.documentElement.dir  = pack._dir;
+
+    document.documentElement.lang = pack._lang;
+    document.documentElement.dir  = pack._dir;
+
     BIND.forEach(([sel, prop, key])=>{
       const el = document.querySelector(sel);
       if (!el) return;
@@ -1447,9 +1557,13 @@ function callContent2(routText, callback, abortable=false, retries=3){
       else if (prop === 'data-i18n-placeholder') el.dataset.i18nPlaceholder = val;
       else el[prop] = val;
     });
+
     const isRTL = pack._dir === 'rtl';
     try{
-      const area = $('#area'); const service = $('#service'); const brand = $('#carBrand');
+      const area = $('#area');
+      const service = $('#service');
+      const brand = $('#carBrand');
+
       if (area.data('select2'))   area.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
       if (service.data('select2')) service.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
       if (brand.data('select2')) {
@@ -1457,6 +1571,7 @@ function callContent2(routText, callback, abortable=false, retries=3){
         brand.select2({ placeholder: brandPh, allowClear:true, width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
       }
     }catch(_){}
+
     try { localStorage.setItem('ui_locale', pack._lang); } catch(_){}
     if (window.nForm) window.nForm.locale = pack._lang;
 
@@ -1464,10 +1579,10 @@ function callContent2(routText, callback, abortable=false, retries=3){
     const enBtn = document.getElementById('toEN');
     if (arBtn && enBtn){
       if (pack._lang === 'ar'){
-        arBtn.classList.add('btn-light'); arBtn.classList.remove('btn-outline-light');
+        arBtn.classList.add('btn-light');        arBtn.classList.remove('btn-outline-light');
         enBtn.classList.add('btn-outline-light'); enBtn.classList.remove('btn-light');
       } else {
-        enBtn.classList.add('btn-light'); enBtn.classList.remove('btn-outline-light');
+        enBtn.classList.add('btn-light');        enBtn.classList.remove('btn-outline-light');
         arBtn.classList.add('btn-outline-light'); arBtn.classList.remove('btn-light');
       }
     }
@@ -1482,23 +1597,23 @@ function callContent2(routText, callback, abortable=false, retries=3){
     try{
       if (window._bg?.locations) { paintAreasFromBG(); }
       const lid = document.getElementById('area')?.value;
-      if (lid) { paintServicesFromBG(String(lid)); setTimeout(setBoundries, 0); }
+      if (lid) { paintServicesFromBG(String(lid)); setBoundries(); }
     }catch(_){}
     updateConfirmEnabled();
   }
+
   function initLanguage(){
     const urlLang = new URLSearchParams(location.search).get('lang');
     const lang = (urlLang==='en' ? 'en' : 'ar');
     applyI18N(lang);
-    const arBtn = document.getElementById('toAR');
-    const enBtn = document.getElementById('toEN');
-    if (arBtn) arBtn.onclick = ()=> applyI18N('ar');
-    if (enBtn) enBtn.onclick = ()=> applyI18N('en');
+    document.getElementById('toAR')?.addEventListener('click', ()=> applyI18N('ar'));
+    document.getElementById('toEN')?.addEventListener('click', ()=> applyI18N('en'));
   }
+
   document.addEventListener('DOMContentLoaded', initLanguage);
 })();
 
-/* Day name (AR + EN) */
+// === Day name (AR + EN) ===
 function formatDayNameBoth(dtISO) {
   const dt = (dtISO.isLuxonDateTime ? dtISO : luxon.DateTime.fromISO(dtISO));
   const dayAR = dt.setLocale('ar').toFormat('EEEE');
@@ -1507,7 +1622,11 @@ function formatDayNameBoth(dtISO) {
 }
 </script>
 
-<!-- Google Maps (keep AFTER your app script so window.initMap exists) -->
+<!-- Google Maps: define initMap globally earlier, then load script -->
+<script>
+  // Already defined in main script; this ensures presence even if script order changes
+  window.initMap = window.initMap || function(){ if (typeof window.myMap === 'function') window.myMap(); };
+</script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&libraries=geometry&loading=async"></script>
 </body>
 </html>
