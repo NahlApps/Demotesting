@@ -1,245 +1,194 @@
 <!DOCTYPE html>
-<html lang="ja" dir="ltr" data-theme="tokyo-neon">
+<html lang="ar" dir="rtl" data-theme="tokyo-neon">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Tiger77 – 東京スタイル予約</title>
+  <title>Tiger77 — حجز غسيل سيارات (أسلوب طوكيو)</title>
 
-  <!-- JP fonts -->
+  <!-- Arabic + JP vibe -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Antique+B1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
 
+  <!-- ====== TOKYO NEON THEME (RTL + Arabic) ====== -->
   <style>
-  /* =========================================================
-     TOKYO STYLE THEMES for Tiger77 (toggle with data-theme)
-     data-theme="tokyo-neon" | "ginza-zen"
-     ========================================================= */
-
-  /* ---------- Base (shared tokens) ---------- */
   :root{
+    --primary-900:#071222;
+    --primary-800:#0A1F3F;
+    --primary-700:#0E2A55;
+    --primary-600:#0B7CFF;
+    --primary-500:#36A2FF;
+    --primary-300:#7CC0FF;
+
+    --accent-600:#E60012;
+
+    --ink-100:#F1F6FF;
+    --ink-200:#D9E4FA;
+    --ink-300:#B7C6E5;
+
+    --surface-900:#0A0F1A;
+    --surface-card:rgba(10,15,26,.86);
+    --border-700:#1E2B40;
+    --border-600:#24344F;
+
+    --shadow-xs:0 2px 6px rgba(0,0,0,.12);
+    --shadow-sm:0 8px 24px rgba(0,0,0,.18);
+    --shadow-md:0 16px 36px rgba(0,0,0,.22);
     --radius-md:14px; --radius-pill:999px;
-    --shadow-xs:0 2px 6px rgba(0,0,0,.08);
-    --shadow-sm:0 8px 24px rgba(0,0,0,.12);
-    --shadow-md:0 16px 36px rgba(0,0,0,.16);
     --ease:cubic-bezier(.22,.61,.36,1);
     --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
+
+    --grid: repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px);
   }
 
-  /* ---------- Shibuya Neon (default) ---------- */
-  :root,
-  :root[data-theme="tokyo-neon"]{
-    --p-900:#001535;      /* deep navy */
-    --p-800:#022E6A;      /* header tint */
-    --p-700:#0B7CFF;      /* primary CTA (electric blue) */
-    --p-600:#36A2FF;      /* focus ring */
-    --p-500:#7CC0FF;
-
-    --p-900-58: rgba(0,21,53,.58);
-    --p-900-34: rgba(0,21,53,.34);
-    --p-800-65: rgba(2,46,106,.65);
-    --p-800-45: rgba(2,46,106,.45);
-    --p-600-22: rgba(54,162,255,.22);
-    --p-600-14: rgba(54,162,255,.14);
-
-    --gold-600:#E61B23;   /* “Tiger Red” */
-
-    --ink-900:#E8EEF7;    /* light text on dark */
-    --ink-700:#C9D6EA;
-    --surface-000:#0A0F1A;
-    --surface-100:#0E1422;
-    --border-300:#2A3A55;
-    --lavender-050:#0F1A2C;
-
-    --neon-blue:rgba(11,124,255,.75);
-    --neon-red:rgba(230,27,35,.85);
-
-    --page-bg:
-      radial-gradient(1200px 600px at 70% -10%, rgba(11,124,255,.18), transparent 60%),
-      radial-gradient(900px 500px at 10% 120%, rgba(230,27,35,.10), transparent 55%),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px),
-      #070C17;
-  }
-
-  /* ---------- Ginza Zen (light) ---------- */
-  :root[data-theme="ginza-zen"]{
-    --p-900:#0F172A;
-    --p-800:#1E293B;
-    --p-700:#1D4ED8;
-    --p-600:#2563EB;
-    --p-500:#60A5FA;
-
-    --p-900-58: rgba(29,78,216,.08);
-    --p-900-34: rgba(29,78,216,.05);
-    --p-800-65: rgba(30,41,59,.80);
-    --p-800-45: rgba(30,41,59,.56);
-    --p-600-22: rgba(37,99,235,.18);
-    --p-600-14: rgba(37,99,235,.10);
-
-    --gold-600:#E60012;
-    --ink-900:#0F172A;
-    --ink-700:#334155;
-    --surface-000:#FFFFFF;
-    --surface-100:#F7F8FA;
-    --border-300:#E5E7EB;
-    --lavender-050:#F3F7FF;
-
-    --page-bg: linear-gradient(180deg, #FFFFFF, #F7FAFF);
-  }
-
-  /* ---------- Global ---------- */
   html,body{height:100%}
   body{
     margin:0;
-    font-family:"Noto Sans JP", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-    color:var(--ink-900);
-    background: var(--page-bg) fixed;
+    font-family:"Cairo","Noto Sans JP",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink-100);
+    background:
+      radial-gradient(1100px 520px at 70% -10%, rgba(11,124,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 10% 120%, rgba(230,0,18,.12), transparent 55%),
+      var(--grid),
+      var(--primary-900);
     min-height:100dvh; display:flex; flex-direction:column;
   }
-  h1,h2,.display{
-    font-family:"Shippori Antique B1","Noto Sans JP",sans-serif;
-    letter-spacing:.2px;
-  }
 
-  /* ---------- Header ---------- */
+  h1,h2{ font-weight:900; letter-spacing:.2px; margin:0; }
+  p, label, .muted{ color:var(--ink-300) }
+
+  /* Header */
   header{
-    position:fixed; inset:0 0 auto 0; z-index:999;
-    background: linear-gradient(0deg, var(--p-800-65), var(--p-800-65));
-    backdrop-filter: blur(6px);
-    border-bottom:1px solid rgba(255,255,255,.18);
+    position:fixed; inset:0 0 auto 0; z-index:50;
+    background:linear-gradient(180deg,var(--primary-700),var(--primary-800));
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(255,255,255,.12);
   }
-  .header-inner{ max-width:1120px; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between; }
-  .brand{
-    display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:12px;
-    background: color-mix(in oklab, white 10%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in oklab, white 12%, transparent);
-  }
-  .brand img{ height:64px; width:auto; object-fit:contain;
-    filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 10px 18px rgba(0,0,0,.25));
-  }
-
+  .header-inner{ max-width:1120px; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between }
+  .brand{ display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:12px; background:rgba(255,255,255,.06); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12) }
+  .brand img{ height:64px; filter:drop-shadow(0 10px 18px rgba(0,0,0,.28)) }
   .header-right{flex:1; display:flex; flex-direction:column; gap:6px}
-  .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
-  .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.28); border-radius:999px; overflow:hidden}
-  .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--p-700), var(--p-600)); transition:width var(--dur-md) var(--ease)}
-  .mini-progress .step{font-weight:800; font-size:1rem; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.25)}
-  .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
-  .chip{
-    display:inline-flex; align-items:center; gap:6px; max-width:100%;
-    padding:6px 10px; border:1px solid rgba(255,255,255,.55);
-    border-radius:999px; color:#fff; font-size:.85rem; background:rgba(255,255,255,.14);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .chip.current{ background:rgba(255,255,255,.24); border-color:rgba(255,255,255,.85); box-shadow:0 0 0 2px rgba(255,255,255,.18) inset; }
 
-  /* ---------- Layout ---------- */
-  main{flex:1 0 auto; display:flex; justify-content:center; padding:calc(72px + 16px) 12px 80px;}
+  .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
+  .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.18); border-radius:999px; overflow:hidden}
+  .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--primary-600),var(--primary-500)); transition:width var(--dur-md) var(--ease)}
+  .mini-progress .step{font-weight:800; font-size:1rem}
+
+  .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+  .chip{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid rgba(255,255,255,.42); border-radius:999px; color:#fff; background:rgba(255,255,255,.12); font-size:.85rem}
+  .chip.current{background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.82)}
+
+  /* Layout */
+  main{flex:1 0 auto; display:flex; justify-content:center; padding:calc(72px + 16px) 12px 88px}
   #app{width:100%; max-width:1120px}
   .stage{position:relative; min-height:520px; padding:8px 0 20px}
-  .page{
-    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
-    padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;
-  }
+  .page{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px; padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none}
   .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
-  .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
-  @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
-  @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
-  .page h1{font-size:1.5rem; font-weight:900; margin:0; text-align:center}
+  .page.exit{ animation:pageOut var(--dur-sm) var(--ease) both }
+  @keyframes pageIn{from{opacity:0; transform:translateY(12px) scale(.992)}to{opacity:1; transform:translateY(0) scale(1)}}
+  @keyframes pageOut{from{opacity:1; transform:translateY(0) scale(1)}to{opacity:0; transform:translateY(14px) scale(.985)}}
+  .page h1{font-size:1.5rem}
 
   .card{
-    background: color-mix(in oklab, var(--surface-000) 92%, transparent);
-    color: var(--ink-900);
-    border:1px solid color-mix(in oklab, var(--border-300) 70%, transparent);
-    border-radius:var(--radius-md); box-shadow:var(--shadow-md);
+    background:var(--surface-card);
+    border:1px solid var(--border-700);
+    color:var(--ink-100);
+    border-radius:var(--radius-md);
+    box-shadow:var(--shadow-md);
     padding:24px; width:100%; max-width:920px; backdrop-filter:blur(4px);
   }
 
-  /* ---------- Form ---------- */
-  .grid{ display:grid; gap:14px }
-  .grid.cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)) }
-  @media (max-width:680px){ .grid.cols-2{ grid-template-columns:1fr } }
+  /* Form */
+  .grid{display:grid; gap:14px}
+  .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media (max-width:720px){ .grid.cols-2{grid-template-columns:1fr} }
+  label{ font-weight:800; display:block; margin:2px 0 6px; color:var(--ink-200) }
 
-  label{ font-weight:700; display:block; margin:4px 0 6px; }
   .form-control, select{
-    width:100%; background:#fff; color:var(--ink-900);
-    border:1px solid var(--border-300); border-radius:14px; min-height:48px;
-    padding:12px 14px; font-size:16px; outline:none;
-    transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
+    width:100%; background:#0f1622; color:#e9f2ff;
+    border:1px solid var(--border-600); border-radius:14px;
+    min-height:48px; padding:12px 14px; font-size:16px; outline:none;
+    transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
   }
-  .form-control:focus, select:focus{ box-shadow:0 0 0 4px var(--p-600-22); border-color:var(--p-600); }
+  .form-control::placeholder{ color:#7f8daa }
+  .form-control:focus, select:focus{
+    background:#0c1420; border-color:var(--primary-500);
+    box-shadow:0 0 0 4px rgba(54,162,255,.22);
+  }
 
-  /* ---------- Time Options ---------- */
+  /* Service cards */
+  .svc-grid{ display:grid; gap:14px; margin-top:8px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+  @media (max-width:980px){ .svc-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width:560px){ .svc-grid{ grid-template-columns:1fr; } }
+
+  .svc-card{
+    background:#0f1622; border:1px solid var(--border-600);
+    border-radius:14px; padding:12px; display:flex; gap:12px; align-items:center;
+    cursor:pointer; outline:none; box-shadow:var(--shadow-xs);
+    transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs), border-color var(--dur-xs);
+    min-height:108px; position:relative;
+  }
+  .svc-card:hover{ transform:translateY(-2px); background:#0c1420; box-shadow:var(--shadow-sm); border-color:#314665 }
+  .svc-card[aria-checked="true"]{ outline:3px solid var(--primary-600); outline-offset:2px; box-shadow:0 0 0 3px rgba(11,124,255,.18) inset }
+  .svc-card[aria-disabled="true"]{ opacity:.48; pointer-events:none }
+
+  .svc-thumb{ width:84px;height:84px;border-radius:12px;overflow:hidden;background:#121a28;border:1px solid #1f2a3d; display:flex;align-items:center;justify-content:center; font-size:36px }
+  .svc-title{ font-weight:900; margin:0 0 4px }
+  .svc-desc{ color:#a6b5d4; margin:0 0 8px; font-size:.94rem }
+  .svc-cat{ background:var(--accent-600); color:#fff; border:0; padding:2px 8px; border-radius:999px; font-size:.75rem; margin-inline-start:auto }
+  .price{ background:var(--primary-600); color:#fff; font-weight:800; font-size:.8rem; padding:4px 8px; border-radius:999px }
+
+  /* Time options */
   .time-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px}
   @media (max-width:560px){ .time-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
   .time-option{
-    background:#fff; color:var(--ink-900); font-weight:800;
-    border:1px solid var(--border-300); border-radius:14px;
+    background:#0f1622; color:#e9f2ff; font-weight:900;
+    border:1px solid var(--border-600); border-radius:14px;
     padding:14px 10px; min-height:56px; box-shadow:var(--shadow-xs);
     transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), outline-color var(--dur-xs) var(--ease);
     display:flex; align-items:center; justify-content:center; cursor:pointer;
   }
-  .time-option:hover{ transform:translateY(-2px); background:var(--lavender-050); box-shadow:var(--shadow-sm); }
+  .time-option:hover{ transform:translateY(-2px); background:#0c1420; box-shadow:var(--shadow-sm) }
   .time-option[aria-pressed="true"]{
-    outline:3px solid var(--p-700); outline-offset:2px;
-    background:linear-gradient(0deg, var(--lavender-050), #fff);
-    box-shadow:0 0 12px var(--neon-blue), inset 0 0 0 3px color-mix(in oklab, var(--p-700) 22%, transparent);
+    outline:3px solid var(--primary-600); outline-offset:2px;
+    background:linear-gradient(0deg, rgba(11,124,255,.06), #0f1622);
+    box-shadow:0 0 12px rgba(11,124,255,.35), inset 0 0 0 3px rgba(11,124,255,.15);
   }
 
-  /* ---------- Service Cards ---------- */
-  .svc-grid{ display:grid; gap:14px; margin-top:8px; grid-template-columns:repeat(3,minmax(0,1fr)); }
-  @media (max-width:920px){ .svc-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  @media (max-width:560px){ .svc-grid{ grid-template-columns:1fr; } }
-  .svc-card{ background:#fff; border:1px solid var(--border-300); border-radius:14px; padding:12px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; outline:none; box-shadow:var(--shadow-xs); transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs); min-height:110px; position:relative; }
-  .svc-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--lavender-050) }
-  .svc-card[aria-checked="true"]{ outline:3px solid var(--p-700); outline-offset:2px; }
-  .svc-thumb{ width:84px;height:84px;border-radius:12px;overflow:hidden;background:#f4f4f4;border:1px solid #eee; display:flex;align-items:center;justify-content:center; font-size:36px}
-  .svc-title{ font-weight:900; margin:0 0 4px; }
-  .svc-cat{ background:var(--gold-600); color:#fff; border:0; padding:2px 8px; border-radius:999px; font-size:.75rem; margin-inline-start:auto; }
-
-  /* ---------- Footer ---------- */
+  /* Footer/CTA */
   footer.sticky-nav{
     position:fixed; left:0; right:0; bottom:0; z-index:40;
-    background:var(--p-800-45);
-    backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);
+    background: linear-gradient(180deg, rgba(10,31,63,.92), rgba(7,18,34,.92));
+    backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.10);
   }
-  .footer-inner{ max-width:1120px; margin:0 auto; padding:12px; display:flex; gap:12px; }
+  .footer-inner{ max-width:1120px; margin:0 auto; padding:12px; display:flex; gap:12px }
   .btn{
-    border:1px solid var(--border-300); border-radius:14px; padding:14px 16px; min-height:52px; font-weight:900; font-size:1rem; cursor:pointer;
-    background:#fff; color:#1f2937; transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs), color var(--dur-xs), border-color var(--dur-xs);
-    flex:1;
+    border:1px solid var(--border-600); border-radius:14px; padding:14px 16px; min-height:52px;
+    font-weight:900; font-size:1rem; cursor:pointer; flex:1;
+    background:#0f1622; color:#e9f2ff;
+    transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs), color var(--dur-xs), border-color var(--dur-xs);
   }
-  .btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+  .btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow-sm); background:#0c1420; border-color:#314665 }
   .btn[disabled]{ opacity:.55; pointer-events:none }
-  .btn.primary{ background:var(--p-700); color:#fff; border-color:var(--p-700); text-shadow:0 1px 0 rgba(0,0,0,.18); box-shadow:0 8px 26px rgba(11,124,255,.35); }
-  .btn.primary:hover{ background:var(--p-600); border-color:var(--p-600); box-shadow:0 10px 30px rgba(11,124,255,.45); }
-  .btn.ghost{ background:transparent; color:#fff; border-color:rgba(255,255,255,.45) }
 
-  /* ---------- Light theme header tweaks ---------- */
-  :root[data-theme="ginza-zen"] header{ background: rgba(255,255,255,.94); border-bottom:1px solid var(--border-300); }
-  :root[data-theme="ginza-zen"] .chip{ color: var(--p-800); background: #fff; border-color: var(--border-300); }
-  :root[data-theme="ginza-zen"] .mini-progress .bar{ background:#E6ECF5 }
-  :root[data-theme="ginza-zen"] .mini-progress .bar>span{ background:linear-gradient(90deg, var(--p-700), var(--p-500)) }
-  :root[data-theme="ginza-zen"] .brand{ background:#fff; box-shadow:inset 0 0 0 1px var(--border-300) }
-
-  /* ---------- Utility ---------- */
-  .muted{ color:var(--ink-700) }
-  .row{display:flex; gap:10px; flex-wrap:wrap}
-  .row > *{ flex:1 }
-  .total{font-weight:900; font-size:1.125rem}
-  .theme-toggle{
-    border:1px solid rgba(255,255,255,.55);
-    background:rgba(255,255,255,.14);
-    color:#fff; padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:700;
+  .btn.primary{
+    background:linear-gradient(180deg, var(--primary-600), #167cf8);
+    color:#fff; border-color:transparent;
+    text-shadow:0 1px 0 rgba(0,0,0,.18);
+    box-shadow:0 12px 30px rgba(11,124,255,.35), inset 0 -6px 10px rgba(0,0,0,.12);
   }
-  :root[data-theme="ginza-zen"] .theme-toggle{ color:var(--p-800); background:#fff; border-color:var(--border-300) }
+  .btn.primary:hover{ filter:saturate(1.08) brightness(1.02) }
+  .btn.ghost{ background:transparent; color:var(--ink-200); border-color:rgba(255,255,255,.35) }
 
-  @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+  /* Toast */
+  #toast{ position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:2000;display:none;padding:10px 14px;border-radius:12px;background:var(--primary-600);color:#fff;font-weight:800;box-shadow:var(--shadow-sm) }
+
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
   </style>
 </head>
 
 <body>
-  <!-- Toast (simple) -->
-  <div id="toast" style="position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:2000;display:none;padding:10px 14px;border-radius:10px;background:#0B7CFF;color:#fff;font-weight:700;"></div>
+  <div id="toast"></div>
 
   <header>
     <div class="header-inner">
@@ -249,63 +198,64 @@
       <div class="header-right">
         <div class="mini-progress" aria-hidden="true">
           <div class="bar"><span id="miniBar" style="width:0%"></span></div>
-          <div class="step" id="miniStep">ようこそ</div>
+          <div class="step" id="miniStep">الترحيب</div>
         </div>
         <div id="chips" class="summary-chips" aria-live="polite"></div>
       </div>
-      <button id="toggleTheme" class="theme-toggle" type="button">NEON / ZEN</button>
+      <button id="toggleTheme" class="btn ghost" style="flex:0 0 auto;min-height:40px;padding:8px 12px">NEON / ZEN</button>
     </div>
   </header>
 
   <main>
     <div id="app">
       <div class="stage">
-        <!-- 1 Welcome -->
-        <section id="page1" class="page active" aria-label="ようこそ">
-          <h1>🚗 Tiger77 出張洗車 – 東京</h1>
+        <!-- 1) Welcome -->
+        <section id="page1" class="page active" aria-label="الترحيب">
+          <h1>🚗 Tiger77 — غسيل سيارات متنقل بأسلوب طوكيو</h1>
           <div class="card">
-            <p class="muted">ご自宅・職場までお伺いします。次へ進んで、エリアとサービスをお選びください。</p>
+            <p class="muted">نجيك لين باب بيتك أو دوامك. اضغط التالي لاختيار المنطقة والخدمة.</p>
           </div>
         </section>
 
-        <!-- 2 Service -->
-        <section id="page2" class="page" aria-label="サービスを選択">
-          <h1>どこで、何を洗いますか？</h1>
+        <!-- 2) Service -->
+        <section id="page2" class="page" aria-label="اختيار الخدمة">
+          <h1>وين، ووش تبغى نغسل؟</h1>
           <div class="card">
             <div class="grid cols-2">
               <div>
-                <label for="area">エリア</label>
+                <label for="area">المنطقة</label>
                 <select id="area">
-                  <option value="">選択してください</option>
+                  <option value="">اختر المنطقة</option>
                 </select>
               </div>
               <div>
-                <label for="cars">台数</label>
+                <label for="cars">عدد السيارات</label>
                 <select id="cars">
-                  <option value="1">1台</option>
-                  <option value="2">2台</option>
-                  <option value="3">3台</option>
+                  <option value="1">١</option>
+                  <option value="2">٢</option>
+                  <option value="3">٣</option>
+                  <option value="4">٤</option>
                 </select>
               </div>
             </div>
 
-            <label style="margin-top:14px">サービス</label>
+            <label style="display:block;margin-top:14px">الخدمة</label>
             <div id="svcGrid" class="svc-grid" role="radiogroup"></div>
           </div>
         </section>
 
-        <!-- 3 Time -->
-        <section id="page3" class="page" aria-label="日時を選択">
-          <h1>ご希望の日時</h1>
+        <!-- 3) Time -->
+        <section id="page3" class="page" aria-label="اختيار الموعد">
+          <h1>متى يناسبك؟</h1>
           <div class="card">
             <div class="grid cols-2">
               <div>
-                <label for="date">日付</label>
+                <label for="date">التاريخ</label>
                 <input id="date" type="date" class="form-control"/>
               </div>
               <div>
-                <label class="muted">必要枠</label>
-                <div id="timeNeed" class="form-control" style="display:flex;align-items:center;justify-content:center;font-weight:900;">0/1</div>
+                <label class="muted">عدد الأوقات المطلوبة</label>
+                <div id="needBox" class="form-control" style="display:flex;align-items:center;justify-content:center;font-weight:900;">0/1</div>
               </div>
             </div>
             <div style="height:12px"></div>
@@ -313,109 +263,94 @@
           </div>
         </section>
 
-        <!-- 4 Contact -->
-        <section id="page4" class="page" aria-label="お客様情報">
-          <h1>お客様情報</h1>
+        <!-- 4) Contact -->
+        <section id="page4" class="page" aria-label="معلومات العميل">
+          <h1>معلومات الاتصال</h1>
           <div class="card">
             <div class="grid cols-2">
               <div>
-                <label for="name">お名前</label>
-                <input id="name" type="text" class="form-control" placeholder="山田 太郎"/>
+                <label for="name">الاسم</label>
+                <input id="name" type="text" class="form-control" placeholder="الاسم الكامل"/>
               </div>
               <div>
-                <label for="kana">フリガナ</label>
-                <input id="kana" type="text" class="form-control" placeholder="ヤマダ タロウ"/>
+                <label for="phone">الجوال</label>
+                <input id="phone" type="tel" class="form-control" placeholder="05XXXXXXXX"/>
               </div>
               <div>
-                <label for="phone">携帯電話</label>
-                <input id="phone" type="tel" class="form-control" placeholder="08012345678"/>
+                <label for="addr">العنوان</label>
+                <input id="addr" type="text" class="form-control" placeholder="الحي - الشارع - رقم المنزل"/>
               </div>
               <div>
-                <label for="zip">〒 郵便番号</label>
-                <input id="zip" type="text" class="form-control" placeholder="1000001"/>
-              </div>
-              <div>
-                <label for="addr">住所</label>
-                <input id="addr" type="text" class="form-control" placeholder="東京都千代田区千代田1-1"/>
-              </div>
-              <div>
-                <label for="note">備考（任意）</label>
-                <input id="note" type="text" class="form-control" placeholder="車種、色など"/>
+                <label for="note">ملاحظات (اختياري)</label>
+                <input id="note" type="text" class="form-control" placeholder="نوع السيارة، لونها…"/>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 5 Payment -->
-        <section id="page5" class="page" aria-label="お支払い方法">
-          <h1>お支払い方法</h1>
+        <!-- 5) Payment -->
+        <section id="page5" class="page" aria-label="الدفع">
+          <h1>طريقة الدفع</h1>
           <div class="card">
-            <div class="grid cols-2">
+            <div class="svc-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
               <label class="svc-card" role="radio" aria-checked="false" tabindex="0">
-                <input type="radio" name="pay" value="PayPay" hidden>
-                <div class="svc-thumb">💴</div>
-                <div style="flex:1">
-                  <div class="row" style="align-items:center">
-                    <h3 class="svc-title" style="margin:0">PayPay</h3>
-                    <span class="svc-cat">おすすめ</span>
-                  </div>
-                  <p class="muted" style="margin:.25rem 0 0">QR決済</p>
-                </div>
-              </label>
-
-              <label class="svc-card" role="radio" aria-checked="false" tabindex="0">
-                <input type="radio" name="pay" value="クレジットカード" hidden>
+                <input type="radio" name="pay" value="مدى / بطاقة" hidden>
                 <div class="svc-thumb">💳</div>
                 <div style="flex:1">
-                  <h3 class="svc-title" style="margin:0">クレジットカード（JCB / VISA / Master）</h3>
-                  <p class="muted" style="margin:.25rem 0 0">タッチ決済可</p>
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <h3 class="svc-title">مدى / بطاقة ائتمانية</h3>
+                    <span class="svc-cat">سريع</span>
+                  </div>
+                  <p class="svc-desc">ندعم فيزا وماستر</p>
                 </div>
               </label>
 
               <label class="svc-card" role="radio" aria-checked="false" tabindex="0">
-                <input type="radio" name="pay" value="現金" hidden>
+                <input type="radio" name="pay" value="نقداً" hidden>
                 <div class="svc-thumb">🪙</div>
                 <div style="flex:1">
-                  <h3 class="svc-title" style="margin:0">現金</h3>
-                  <p class="muted" style="margin:.25rem 0 0">当日お支払い</p>
+                  <h3 class="svc-title">نقداً</h3>
+                  <p class="svc-desc">الدفع عند الانتهاء</p>
                 </div>
               </label>
             </div>
           </div>
         </section>
 
-        <!-- 6 Map (placeholder) -->
-        <section id="page6" class="page" aria-label="位置確認">
-          <h1>作業場所</h1>
+        <!-- 6) Location hint (placeholder) -->
+        <section id="page6" class="page" aria-label="الموقع">
+          <h1>الموقع على الخريطة</h1>
           <div class="card">
-            <p class="muted">地図（任意）— 実装時は Google Maps を <code>language=ja&region=JP</code> で読み込みます。</p>
-            <div style="height:380px;border-radius:14px;background:linear-gradient(135deg,#101827,#0b1222);border:1px solid var(--border-300);display:flex;align-items:center;justify-content:center;color:#9aa7bd;">MAP PLACEHOLDER</div>
+            <p class="muted">خريطة (اختياري) — عند الدمج مع Google Maps استخدم <code>language=ar&region=SA</code>.</p>
+            <div style="height:360px;border-radius:14px;background:linear-gradient(135deg,#101827,#0b1222);border:1px solid var(--border-700);display:flex;align-items:center;justify-content:center;color:#9aa7bd;">MAP PLACEHOLDER</div>
           </div>
         </section>
 
-        <!-- 7 Review -->
-        <section id="page7" class="page" aria-label="確認">
-          <h1>内容の確認</h1>
+        <!-- 7) Review -->
+        <section id="page7" class="page" aria-label="مراجعة">
+          <h1>راجع طلبك</h1>
           <div class="card">
-            <div class="row"><div>エリア</div><div id="rv-area" style="text-align:right;font-weight:900">—</div></div>
-            <div class="row"><div>サービス</div><div id="rv-service" style="text-align:right;font-weight:900">—</div></div>
-            <div class="row"><div>台数</div><div id="rv-cars" style="text-align:right;font-weight:900">—</div></div>
-            <div class="row"><div>日付</div><div id="rv-date" style="text-align:right;font-weight:900">—</div></div>
-            <div class="row"><div>時間</div><div id="rv-times" style="text-align:right;font-weight:900">—</div></div>
-            <div class="row"><div>お名前</div><div id="rv-name" style="text-align:right;font-weight:900">—</div></div>
-            <div class="row"><div>電話</div><div id="rv-phone" style="text-align:right;font-weight:900">—</div></div>
-            <div class="row"><div>支払い</div><div id="rv-pay" style="text-align:right;font-weight:900">—</div></div>
-            <hr style="border:none;border-top:1px solid var(--border-300);margin:12px 0">
-            <div class="row"><div>合計</div><div id="rv-total" class="total" style="text-align:right">—</div></div>
+            <div class="grid">
+              <div style="display:flex;justify-content:space-between"><span>المنطقة</span><strong id="rv-area">—</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>الخدمة</span><strong id="rv-service">—</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>عدد السيارات</span><strong id="rv-cars">—</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>التاريخ</span><strong id="rv-date">—</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>الأوقات</span><strong id="rv-times">—</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>الاسم</span><strong id="rv-name">—</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>الجوال</span><strong id="rv-phone">—</strong></div>
+              <div style="display:flex;justify-content:space-between"><span>الدفع</span><strong id="rv-pay">—</strong></div>
+              <hr style="border:none;border-top:1px solid var(--border-700)">
+              <div style="display:flex;justify-content:space-between"><span>الإجمالي</span><strong id="rv-total">—</strong></div>
+            </div>
           </div>
         </section>
 
-        <!-- 8 Done -->
-        <section id="page8" class="page" aria-label="完了">
-          <h1>ご予約ありがとうございます 🎉</h1>
+        <!-- 8) Done -->
+        <section id="page8" class="page" aria-label="تم">
+          <h1>شكراً لك! 🎉</h1>
           <div class="card">
-            <p class="muted">担当スタッフより確認のご連絡を差し上げます。</p>
-            <button class="btn primary" onclick="location.reload()">もう一度予約する</button>
+            <p class="muted">تم استلام الطلب. سنتواصل معك للتأكيد.</p>
+            <button class="btn primary" onclick="location.reload()">حجز جديد</button>
           </div>
         </section>
       </div>
@@ -424,35 +359,35 @@
 
   <footer class="sticky-nav">
     <div class="footer-inner">
-      <button id="prevBtn" class="btn ghost" disabled>戻る</button>
-      <button id="nextBtn" class="btn primary">次へ</button>
+      <button id="prevBtn" class="btn ghost" disabled>السابق</button>
+      <button id="nextBtn" class="btn primary">التالي</button>
     </div>
   </footer>
 
   <script>
-  /* ---------- Simple demo data & helpers ---------- */
-  const AREAS = ["千代田区","中央区","港区","新宿区","渋谷区","品川区","目黒区","世田谷区"];
+  // ---------- Demo Data ----------
+  const AREAS = ["الجبيل","الدمام","الخبر","الظهران","القطيف"];
   const SERVICES = [
-    {id:"basic", name:"ベーシック洗車", cat:"外装", price:3500, desc:"外装手洗い＋簡易撥水"},
-    {id:"pro", name:"プロ洗車", cat:"外装・内装", price:5500, desc:"外装手洗い＋内装バキューム"},
-    {id:"vip", name:"VIPディテール", cat:"外装・内装", price:9900, desc:"泡洗浄＋内装コーティング"}
+    {id:"basic", name:"الباقة الأساسية", cat:"خارجي", price:35, desc:"غسيل خارجي + لمسة سريعة"},
+    {id:"pro",   name:"الباقة المتوسطة", cat:"خارجي + داخلي", price:55, desc:"خارجي يدوي + تنظيف داخلي"},
+    {id:"vip",   name:"VIP", cat:"خارجي + داخلي", price:99, desc:"رغوة النانو + تلميع عميق"}
   ];
-  const formatJPY = n => new Intl.NumberFormat("ja-JP",{style:"currency",currency:"JPY"}).format(n);
+  const formatSAR = n => new Intl.NumberFormat("ar-SA",{style:"currency",currency:"SAR"}).format(n);
 
-  const ordered = ["page1","page2","page3","page4","page5","page6","page7","page8"];
-  const labels  = ["ようこそ","サービス","日時","情報","支払い","場所","確認","完了"];
-  const state = { area:"", service:null, cars:1, date:"", times:[], name:"", phone:"", pay:"", total:0 };
+  const steps = ["page1","page2","page3","page4","page5","page6","page7","page8"];
+  const labels= ["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","مراجعة","تم"];
+  const state  = { area:"", service:null, cars:1, date:"", times:[], name:"", phone:"", pay:"", total:0 };
 
-  const $ = sel => document.querySelector(sel);
+  const $ = s => document.querySelector(s);
 
-  /* ---------- Theme toggle ---------- */
-  $("#toggleTheme").addEventListener("click", ()=>{
-    const root = document.documentElement;
-    root.dataset.theme = root.dataset.theme === "ginza-zen" ? "tokyo-neon" : "ginza-zen";
-    toast(root.dataset.theme === "ginza-zen" ? "Ginza Zen に切替" : "Shibuya Neon に切替");
+  // Theme toggle (optional light)
+  document.getElementById("toggleTheme").addEventListener("click", ()=>{
+    const r=document.documentElement;
+    r.dataset.theme = r.dataset.theme==="ginza-zen" ? "tokyo-neon" : "ginza-zen";
+    toast(r.dataset.theme==="ginza-zen" ? "تم اختيار نمط Zen" : "تم اختيار نمط Neon");
   });
 
-  /* ---------- Init selects & services ---------- */
+  // Init
   (function init(){
     const area = $("#area");
     AREAS.forEach(a => area.append(new Option(a,a)));
@@ -469,21 +404,20 @@
         <input type="radio" name="svc" value="${s.id}" hidden>
         <div class="svc-thumb">🧼</div>
         <div style="flex:1">
-          <div class="row" style="align-items:center">
+          <div style="display:flex;gap:8px;align-items:center">
             <h3 class="svc-title">${s.name}</h3>
             <span class="svc-cat">${s.cat}</span>
           </div>
-          <p class="muted" style="margin:.25rem 0 6px">${s.desc}</p>
-          <strong>${formatJPY(s.price)}</strong>
+          <p class="svc-desc">${s.desc}</p>
+          <span class="price">${formatSAR(s.price)}</span>
         </div>`;
       card.addEventListener("click", ()=> chooseService(s.id, card));
       card.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); chooseService(s.id, card); }});
       grid.append(card);
     });
 
-    // date default = today (JP)
-    const d = new Date();
-    $("#date").value = d.toISOString().slice(0,10);
+    // date default
+    const d = new Date(); $("#date").value = d.toISOString().slice(0,10);
     $("#date").addEventListener("change", paintTimes);
     paintTimes();
     paintNeed();
@@ -499,7 +433,7 @@
 
   function paintTimes(){
     const times = $("#times"); times.innerHTML = "";
-    const slots = ["09:00","10:00","11:00","13:00","14:00","15:00","16:00","17:00","18:00"];
+    const slots = ["06:00","07:00","08:00","09:00","10:00","11:00","13:00","15:00","17:00","19:00"];
     slots.forEach(t=>{
       const b=document.createElement("button");
       b.type="button"; b.className="time-option"; b.textContent=t; b.setAttribute("aria-pressed","false");
@@ -508,7 +442,7 @@
         const idx = state.times.indexOf(t);
         if(idx>=0){ state.times.splice(idx,1); }
         else{
-          if(state.times.length>=need){ toast(`必要枠は ${need} 件です`); return; }
+          if(state.times.length>=need){ toast(`لا يمكنك اختيار أكثر من ${need} وقت`); return; }
           state.times.push(t);
         }
         paintNeed();
@@ -520,103 +454,97 @@
     state.date = $("#date").value;
   }
 
-  function paintNeed(){
-    $("#timeNeed").textContent = `${state.times.length}/${state.cars}`;
-  }
+  function paintNeed(){ $("#needBox").textContent = `${state.times.length}/${state.cars}`; }
 
-  /* ---------- Navigation ---------- */
+  // Nav
   $("#prevBtn").addEventListener("click", ()=> go(-1));
   $("#nextBtn").addEventListener("click", onNext);
 
   function onNext(){
     const i = getIndex();
-    const id = ordered[i];
+    const id = steps[i];
 
     if(id==="page1"){ go(1); return; }
     if(id==="page2"){
       const area = $("#area").value;
-      if(!area || !state.service){ toast("エリアとサービスを選択してください"); return; }
+      if(!area || !state.service){ toast("اختر المنطقة والخدمة"); return; }
       state.area = area; go(1); return;
     }
     if(id==="page3"){
-      if(state.times.length !== state.cars){ toast(`時間枠を ${state.cars} 件選択してください`); return; }
+      if(state.times.length !== state.cars){ toast(`اختر ${state.cars} وقت`); return; }
       state.date = $("#date").value; go(1); return;
     }
     if(id==="page4"){
       const name=$("#name").value.trim(), phone=$("#phone").value.trim();
-      if(!name || !phone){ toast("お名前と携帯電話を入力してください"); return; }
+      if(!name || !phone){ toast("أدخل الاسم ورقم الجوال"); return; }
       state.name = name; state.phone = phone; go(1); return;
     }
     if(id==="page5"){
       const sel = document.querySelector('input[name="pay"]:checked');
-      if(!sel){ toast("支払い方法を選択してください"); return; }
+      if(!sel){ toast("اختر طريقة الدفع"); return; }
       state.pay = sel.value; go(1); return;
     }
     if(id==="page6"){ go(1); return; }
-    if(id==="page7"){ toast("予約を送信しました"); go(1); return; }
+    if(id==="page7"){ toast("تم إرسال الطلب"); go(1); return; }
   }
 
   function go(step){
     const i = getIndex();
-    const next = Math.max(0, Math.min(ordered.length-1, i+step));
+    const next = Math.max(0, Math.min(steps.length-1, i+step));
     showPage(next);
   }
 
   function getIndex(){
     const id = document.querySelector(".page.active")?.id;
-    return Math.max(0, ordered.indexOf(id));
+    return Math.max(0, steps.indexOf(id));
   }
 
   function showPage(idx){
     const cur = document.querySelector(".page.active");
-    const next = document.getElementById(ordered[idx]);
-    if(cur===next) return;
-    if(cur){ cur.classList.remove("active"); cur.classList.add("exit"); setTimeout(()=>cur.classList.remove("exit"), 240); }
+    const next = document.getElementById(steps[idx]);
+    if(cur){ cur.classList.remove("active"); cur.classList.add("exit"); setTimeout(()=>cur.classList.remove("exit"), 220); }
     if(next){ next.classList.add("active"); }
 
-    // footer buttons
-    $("#prevBtn").disabled = idx===0 || idx===ordered.length-1;
-    $("#nextBtn").textContent = (ordered[idx]==="page7") ? "予約を確定" : (ordered[idx]==="page8" ? "完了" : "次へ");
-    $("#nextBtn").disabled = ordered[idx]==="page8";
+    $("#prevBtn").disabled = idx===0 || idx===steps.length-1;
+    $("#nextBtn").textContent = (steps[idx]==="page7") ? "تأكيد الحجز" : (steps[idx]==="page8" ? "تم" : "التالي");
+    $("#nextBtn").disabled = steps[idx]==="page8";
 
-    // progress + chips
-    const pct = ((idx+1)/ordered.length)*100;
+    const pct = ((idx+1)/steps.length)*100;
     $("#miniBar").style.width = pct+"%";
     $("#miniStep").textContent = labels[idx];
 
-    if(ordered[idx]==="page7"){ renderReview(); }
+    if(steps[idx]==="page7"){ renderReview(); }
     syncChips();
-    scrollTo(0,0);
+    scrollTo({top:0,behavior:"smooth"});
   }
 
   function renderReview(){
-    $("#rv-area").textContent = state.area || "—";
-    $("#rv-service").textContent = state.service ? state.service.name : "—";
-    $("#rv-cars").textContent = state.cars + "台";
-    $("#rv-date").textContent = state.date || "—";
-    $("#rv-times").textContent = state.times.length ? state.times.join("・") : "—";
-    $("#rv-name").textContent = state.name || "—";
-    $("#rv-phone").textContent = state.phone || "—";
-    $("#rv-pay").textContent = state.pay || "—";
+    $("#rv-area").textContent   = state.area || "—";
+    $("#rv-service").textContent= state.service? state.service.name : "—";
+    $("#rv-cars").textContent   = state.cars;
+    $("#rv-date").textContent   = state.date || "—";
+    $("#rv-times").textContent  = state.times.length ? state.times.join(" ، ") : "—";
+    $("#rv-name").textContent   = state.name || "—";
+    $("#rv-phone").textContent  = state.phone || "—";
+    $("#rv-pay").textContent    = state.pay || "—";
     const total = (state.service?state.service.price:0) * state.cars;
-    state.total = total;
-    $("#rv-total").textContent = formatJPY(total);
+    state.total = total; $("#rv-total").textContent = formatSAR(total);
   }
 
   function syncChips(){
     const wrap = $("#chips"); wrap.innerHTML = "";
     const chips = [
-      state.area && ["📍", "エリア", state.area],
-      state.service && ["🧼", "サービス", state.service.name],
-      state.cars && ["🚗", "台数", state.cars + "台"],
-      state.date && state.times.length && ["🕒", "日時", `${state.date}・${state.times.join("・")}`],
-      state.pay && ["💳", "支払い", state.pay]
+      state.area && ["📍","المنطقة",state.area],
+      state.service && ["🧼","الخدمة",state.service.name],
+      state.cars && ["🚗","السيارات",state.cars],
+      state.date && state.times.length && ["🕒","الموعد",`${state.date} • ${state.times.join("، ")}`],
+      state.pay && ["💳","الدفع",state.pay]
     ].filter(Boolean);
-    const group = getIndex();
+
     chips.forEach((c,idx)=>{
-      const el = document.createElement("div");
-      el.className = "chip" + (idx===chips.length-1 ? " current": "");
-      el.innerHTML = `<span>${c[0]}</span><span>${c[1]}:</span><strong>&nbsp;${c[2]}</strong>`;
+      const el=document.createElement("div");
+      el.className="chip"+(idx===chips.length-1?" current":"");
+      el.innerHTML=`<span>${c[0]}</span><span>${c[1]}:</span><strong>&nbsp;${c[2]}</strong>`;
       wrap.append(el);
     });
   }
@@ -624,15 +552,17 @@
   function toast(msg){
     const t = $("#toast");
     t.textContent = msg; t.style.display="block";
-    setTimeout(()=>{ t.style.opacity="0"; setTimeout(()=>{ t.style.display="none"; t.style.opacity="1"; }, 220); }, 1800);
+    setTimeout(()=>{ t.style.opacity="0"; setTimeout(()=>{ t.style.display="none"; t.style.opacity="1"; }, 220); }, 1600);
   }
 
-  // keyboard support for payment cards
-  document.querySelectorAll('#page5 .svc-card').forEach(card=>{
-    const input = card.querySelector('input[name="pay"]');
-    const choose = ()=>{ document.querySelectorAll('#page5 .svc-card').forEach(c=>c.setAttribute('aria-checked','false')); card.setAttribute('aria-checked','true'); input.checked = true; };
-    card.addEventListener('click', choose);
-    card.addEventListener('keydown', e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); choose(); }});
+  // Payment card keyboard
+  document.addEventListener("click", e=>{
+    const card = e.target.closest('#page5 .svc-card');
+    if(card){
+      document.querySelectorAll('#page5 .svc-card').forEach(c=>c.setAttribute('aria-checked','false'));
+      card.setAttribute('aria-checked','true');
+      card.querySelector('input[name="pay"]').checked = true;
+    }
   });
   </script>
 </body>
