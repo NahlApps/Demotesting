@@ -418,22 +418,22 @@
         <!-- 5) Payment -->
         <section id="page5" class="page" aria-label="طريقة الدفع">
           <h1>طريقة الدفع</h1>
-          <div class="pay-grid" role="radiogroup" aria-label="طريقة الدفع" id="payGroup" aria-describedby="err-pay">
-            <label class="pay-card" role="radio" aria-checked="false" tabindex="0">
+          <div class="pay-grid" role="radiogroup" aria-label="طريقة الدفع" id="payGroup" aria-describedby="err-pay" >
+            <label class="pay-card" role="radio" aria-checked="false" tabindex="0 hidden">
               <input type="radio" name="payingMethod" value="stc pay" class="visually-hidden" />
               <span class="pay-card__content">
                 <img class="pay-card__img" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay" />
                 <span class="pay-card__label">STC Pay</span>
               </span>
             </label>
-            <label class="pay-card" role="radio" aria-checked="false" tabindex="-1">
+            <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" hidden>
               <input type="radio" name="payingMethod" value="cash" class="visually-hidden" />
               <span class="pay-card__content">
                 <span class="pay-card__icon" aria-hidden="true">💵</span>
                 <span class="pay-card__label"><strong>كاش</strong></span>
               </span>
             </label>
-            <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" style="grid-column:1/-1">
+            <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" style="grid-column:1/-1" hidden>
               <input type="radio" name="payingMethod" value="Bank Transfer" class="visually-hidden" />
               <span class="pay-card__content">
                 <span class="pay-card__icon" aria-hidden="true">🏦</span>
