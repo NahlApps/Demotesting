@@ -73,7 +73,7 @@
       /* Background — neon gradient over city */
       --page-bg:
         linear-gradient(180deg, rgba(0,229,255,.10), rgba(255,45,174,.10)),
-        url("https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1600&auto=format&fit=crop") /* Tokyo night */
+        url("https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1600&auto=format&fit=crop")
         center/cover no-repeat fixed;
 
       /* Inputs */
@@ -215,6 +215,36 @@
       background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)) !important; color:#0A0B0F !important;
     }
 
+    /* === EXTRA tuning for Page 2 selects/search === */
+    .select2-container .select2-search__field{
+      color:#E9EDFF !important;
+      background:#0B0F19 !important;
+      border:1px solid rgba(255,255,255,.08) !important;
+      border-radius:10px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder{
+      color: var(--placeholder) !important;
+    }
+    .select2-results__option--highlighted[aria-selected]{
+      background: linear-gradient(90deg, var(--neon-cyan), color-mix(in oklab, var(--neon-magenta) 40%, var(--neon-cyan))) !important;
+      color:#0A0C12 !important;
+    }
+    .select2-results__option[aria-selected="true"]{
+      background: linear-gradient(90deg, var(--neon-magenta), var(--neon-purple)) !important;
+      color:#0A0C12 !important;
+    }
+    .form-control:hover, select:hover, .select2-selection:hover{
+      background: var(--input-bg-hover) !important;
+      border-color: color-mix(in oklab, var(--neon-cyan) 32%, var(--input-border)) !important;
+    }
+    .form-control:focus, select:focus, .select2-container--open .select2-selection{
+      background: var(--input-bg-hover) !important;
+      border-color: var(--neon-cyan) !important;
+      box-shadow:
+        0 0 0 6px color-mix(in oklab, var(--neon-cyan) 18%, transparent),
+        0 0 0 2px color-mix(in oklab, var(--neon-magenta) 28%, transparent) inset !important;
+    }
+
     /* ========= Time picker ========= */
     .time-toolbar{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:8px}
     @media (min-width:768px){ .time-toolbar{grid-template-columns: 1fr; } }
@@ -231,8 +261,10 @@
     .time-option:hover{transform:translateY(-2px); background:rgba(255,255,255,.12); box-shadow:var(--shadow-sm)}
     .time-option[aria-pressed="true"]{
       outline:3px solid var(--neon-cyan); outline-offset:2px;
-      background:linear-gradient(0deg, rgba(0,229,255,.15), rgba(255,45,174,.15));
-      box-shadow:0 0 0 3px rgba(255,45,174,.18);
+      background:
+        linear-gradient(0deg, rgba(0,229,255,.14), rgba(255,45,174,.12)),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      box-shadow:0 0 0 3px rgba(255,45,174,.18), 0 12px 28px rgba(0,0,0,.4);
     }
 
     /* ========= Loading overlay ========= */
@@ -321,7 +353,10 @@
     }
     .svc-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); background:rgba(255,255,255,.12) }
     .svc-card.selected, .svc-card[aria-checked="true"]{
-      outline:3px solid var(--neon-magenta); outline-offset:2px; box-shadow:0 0 0 3px rgba(0,229,255,.18);
+      outline: 3px solid var(--neon-magenta);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px rgba(0,229,255,.18), 0 16px 48px rgba(0,0,0,.45);
+      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.08));
     }
     .svc-thumb{ width:88px;height:88px;flex:0 0 88px;border-radius:12px;overflow:hidden;background:#0F1424;border:1px solid rgba(255,255,255,.12); display:flex;align-items:center;justify-content:center; }
     .svc-thumb img{ width:100%;height:100%;object-fit:cover;display:block }
@@ -346,6 +381,22 @@
       background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta))!important; color:#0B0D13!important; border-color:transparent!important; box-shadow:0 0 0 3px rgba(0,229,255,.18);
     }
     #addonsChips .btn[aria-pressed="true"]::before{ content:"✓"; font-weight:900; margin-inline-start:6px; }
+
+    /* ========= Review (Page 7) polish ========= */
+    #page7 .card .border-bottom{ border-color: rgba(255,255,255,.12) !important; }
+    #page7 .card .border-top{ border-color: rgba(255,255,255,.12) !important; }
+    #page7 .card .fw-bold{ color:#FFF; }
+    #rv-total{
+      font-weight: 900; letter-spacing:.3px;
+      text-shadow: 0 0 10px rgba(0,229,255,.35), 0 0 6px rgba(255,45,174,.25);
+    }
+    #page7 .btn-outline-secondary{ border-color: rgba(255,255,255,.22); color:#E9EDFF; }
+    #page7 .btn-outline-secondary:hover{ border-color: var(--neon-cyan); background: rgba(255,255,255,.10); }
+    #confirmOrder{
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+      border: none; color:#0B0D13; font-weight:900;
+    }
+    #confirmOrder:hover{ filter: saturate(1.06) brightness(1.02); }
   </style>
 </head>
 
@@ -459,7 +510,7 @@
 
         <!-- 3) Time -->
         <section id="page3" class="page" aria-label="اختيار الموعد">
-          <h1>🕰️ متى تحب نجيك؟ • ご希望の時間は？</h1>
+          <h1>🕰️ متى تحب نجيك؟ • ご希望の時間は؟</h1>
           <div class="card position-relative" id="timeCard">
             <div class="row g-3">
               <div class="col-12 col-md-5">
@@ -468,7 +519,7 @@
                 <div class="field-error" id="err-date">يرجى اختيار تاريخ صحيح</div>
               </div>
               <div class="col-12 col-md-7 d-flex align-items-end justify-content-end">
-                <div class="text-muted" id="timeCountHint" style="font-weight:800">0/1 وقت محدد</div>
+                <div class="text-muted" id="timeCountHint" aria-live="polite" style="font-weight:800">0/1 وقت محدد</div>
               </div>
             </div>
 
@@ -690,7 +741,7 @@
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- ==== IMPORTANT: JS below is functionally identical to your original (no workflow change) ==== -->
+  <!-- ==== IMPORTANT: JS below keeps original workflow ==== -->
   <script>
   /* ---------- Logo fallback ---------- */
   function handleLogoError(img){
@@ -818,7 +869,14 @@
     const el=document.getElementById('timeCountHint');
     if(el) el.textContent = `${got}/${need} وقت محدد`;
   }
-  function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
+  /* keep neon overlays when background changes */
+  function setPageBackground(id){
+    const img = PAGE_BACKGROUNDS[id] || PAGE_BACKGROUNDS.page1;
+    document.body.style.background =
+      `radial-gradient(1200px 600px at 80% -10%, rgba(255,45,174,.25), transparent 60%),
+       radial-gradient(900px 500px at -10% 110%, rgba(0,229,255,.20), transparent 55%),
+       url("${img}") center/cover no-repeat fixed`;
+  }
 
   function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
   function syncProgress(i){
@@ -829,10 +887,11 @@
     const next=document.getElementById('footer-next');
     const wait=document.getElementById('footer-wait');
     const onThanks=(orderedPages[i]==='page8');
+    const onReview=(orderedPages[i]==='page7');
     prev.classList.toggle('hidden', i===0 || onThanks);
     next.classList.toggle('hidden', onThanks);
     wait.classList.remove('show');
-    next.textContent = (i===0) ? 'تخطي العرض' : (orderedPages[i]==='page7' ? 'تأكيد الطلب' : 'التالي');
+    next.textContent = i===0 ? '次へ • التالي' : (onReview ? '✅ 確定 • تأكيد' : '次へ • التالي');
   }
 
   function renderSummary(currentId){
@@ -863,6 +922,7 @@
     chips.filter(c=>c.v && c.g<=currGroup).forEach(c=>{
       const el=document.createElement('div');
       el.className='chip'+(c.g===currGroup?' current':'');
+
       el.innerHTML=`<i class="fa-solid ${c.i}"></i><span class="title">${c.t}:</span><span class="value">${c.v}</span>`;
       wrap.appendChild(el);
     });
@@ -1274,439 +1334,4 @@
       chipsWrap.appendChild(chip);
     });
     const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    document.getElementById('addonsNoThanks').onclick = ()=>{ selectedAddons = []; bsModal.hide(); renderSummary('page2'); updateNextAvailability(); };
-    document.getElementById('addonsConfirm').onclick = ()=>{
-      selectedAddons = [...chipsWrap.querySelectorAll('.btn[aria-pressed="true"]')].map(el=>el.dataset.value);
-      bsModal.hide(); renderSummary('page2'); updateNextAvailability();
-    };
-    bsModal.show();
-  }
-  window.addEventListener('service:selected', (ev) => { const { id } = ev.detail || {}; openAddonsModalFor(id); });
-
-  /* ---------- NAHL category name → ID --------- */
-  const NAHL_CAT_MAP = new Map();
-  function updateServiceCatIdFromName(){
-    const areaId = $('#area').val();
-    const catName = ($('#serviceCat').val() || '').trim();
-    const map = NAHL_CAT_MAP.get(String(areaId));
-    const id = map?.get(catName);
-    nForm.serviceCat = id ? String(id) : '';
-  }
-
-  function composeLocationDescription(){
-    const parts = [];
-    const brand = $('#carBrand').val() || '';
-    const car   = $('#carName').val() || '';
-    const plate = $('#plateNumber').val() || '';
-    const base = [brand, car, plate].filter(Boolean).join(', ');
-    if (base) parts.push(base);
-    if (selectedAddons.length) parts.push('إضافات: ' + selectedAddons.join('، '));
-    const final = parts.join(' | ');
-    $('#locationDescription').val(final);
-    nForm.locationDescription = final;
-  }
-
-  /* ---------- Initialize ---------- */
-  $(function () {
-    installResizeObservers();
-
-    Object.values(PAGE_BACKGROUNDS).forEach(src => { const i = new Image(); i.src = src; });
-
-    // Select2
-    $('#area').select2({ width: '100%', placeholder: 'اختر المنطقة', dir: 'rtl' });
-    $('#serviceCat').select2({ width: '100%', placeholder: 'فئة الخدمة', dir: 'rtl' });
-    $('#service').select2({ width: '100%', placeholder: 'باقتك المختارة', dir: 'rtl', minimumResultsForSearch: Infinity });
-    $('#carBrand').select2({ width: '100%', placeholder: 'ماركة المركبة', dir: 'rtl' });
-    $('#numCars').select2({ width: '100%', placeholder: 'عدد السيارات', dir: 'rtl', minimumResultsForSearch: Infinity });
-    $('#area, #serviceCat, #service, #carBrand, #numCars').on('select2:open', () => { $('.select2-search__field').attr('dir', 'rtl'); });
-
-    $('#numCars').on('change', function(){
-      const v = parseInt(this.value||'1',10);
-      const clamped = Math.min(Math.max(v||1,1),5);
-      nForm.serviceCount = String(clamped);
-      $('#serviceCount').val(String(clamped));
-      if (selectedTimes.length > clamped) { selectedTimes = selectedTimes.slice(0, clamped); renderSelectedDateTimes(lastSelectedDateISO); }
-      updateTimeCountHint(); renderSummary('page2'); updateNextAvailability();
-    });
-
-    itiPhone = window.intlTelInput(document.querySelector('#mobile'), {
-      initialCountry: 'sa', onlyCountries: ['sa','ae','bh','kw','om','qa'],
-      separateDialCode: true, placeholderNumberType: 'MOBILE',
-      utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
-    });
-    $('#mobile').on('blur', () => { if (itiPhone && itiPhone.isValidNumber()) { nForm.customerM = itiPhone.getNumber().replace(/^\+/, ''); $('#err-mobile').hide(); } else { $('#err-mobile').show(); } });
-
-    $('#name').on('input', function () { nForm.customerN = this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
-    $('#mobile').on('input', function () { renderSummary('page4'); updateNextAvailability(); });
-    $('#carName').on('input', function () { updateNextAvailability(); composeLocationDescription(); });
-    $('#plateNumber').on('input', function () { updatePlateHint(); renderSummary('page4'); updateNextAvailability(); composeLocationDescription(); });
-
-    const today = DateTime.now().toFormat('yyyy-LL-dd');
-    $('#date').val(today).attr('min', today);
-    $('#date').on('change', () => { fetchTimesForSelectedDate(); renderSummary('page3'); });
-    $('#timeFilter').on('change', function () { currentTimeFilter = this.value; renderSelectedDateTimes(lastSelectedDateISO); });
-
-    // Load locations (NAHL)
-    setLoadingServices(true);
-    callContent2(`/locations`, res => {
-      const list = res?.data || [];
-      const ds = list.map(l => ({ id: l.id, text: l.TS_location_arabic_name }));
-      $('#area').empty().select2({ data: ds, width: '100%', placeholder: 'اختر المنطقة', dir: 'rtl' });
-      if (ds.length) $('#area').val(ds[0].id).trigger('change');
-      else { showToast('error', 'لا توجد مناطق متاحة حالياً'); }
-      renderSummary('page2');
-    });
-
-    // Auto-retry services from GAS with spinner
-    (async () => {
-      setLoadingServices(true);
-      const MAX = 3; let attempt=0; let success=false; let lastErr=null;
-      while(attempt<MAX && !success){
-        try{
-          const rows = await fetchAllServicesFromGAS();
-          servicesSheetCache = rows;
-          const uniq = [...new Set(rows.map(r => String(r.TS_category_arabic_name || '').trim()).filter(Boolean))];
-          categoriesFromSheet = uniq;
-          const catOptions = uniq.map(name => ({ id: name, text: name }));
-          $('#serviceCat').empty().select2({ data: catOptions, width: '100%', placeholder: 'فئة الخدمة', dir: 'rtl' });
-          if (catOptions.length) $('#serviceCat').val(catOptions[0].id).trigger('change');
-          else {
-            $('#serviceCat').val(null).trigger('change');
-            $('#service').val(null).trigger('change.select2');
-            document.getElementById('serviceCards').innerHTML = '';
-            document.getElementById('svcEmpty').style.display = 'block';
-          }
-          success=true;
-        }catch(e){ lastErr=e; attempt++; if(attempt<MAX) await new Promise(r=>setTimeout(r, 600*attempt)); }
-      }
-      setLoadingServices(false);
-      if(!success){
-        console.error('Failed to fetch services from GAS', lastErr);
-        document.getElementById('svcError').style.display='block';
-        document.getElementById('svcRetry')?.addEventListener('click', ()=>location.reload());
-      }
-      renderSummary('page2'); updateNextAvailability();
-    })();
-
-    // When location changes: fetch service-cat map (name→id)
-    $('#area').on('change', function () {
-      const areaId = this.value;
-      nForm.location = areaId;
-      callContent2(`/services?location=${encodeURIComponent(areaId)}`, (res) => {
-        const catsArr = res?.data?.servicesCat || res?.data?.categories || [];
-        const map = new Map();
-        catsArr.forEach(c => { const name = String(c.TS_category_arabic_name || '').trim(); const id = c.TS_category_id; if (name) map.set(name, id); });
-        NAHL_CAT_MAP.set(String(areaId), map);
-        updateServiceCatIdFromName();
-      }, true);
-      renderSummary('page2'); updateNextAvailability();
-    });
-
-    $('#serviceCat').on('change', function () {
-      renderServiceCardsByCategory_FromSheet(this.value);
-      updateServiceCatIdFromName();
-      renderSummary('page2'); updateNextAvailability();
-    });
-
-    $('#service').on('change', function () {
-      nForm.service = this.value || '';
-      const wrap = document.getElementById('serviceCards');
-      if (wrap && this.value) {
-        updateRovingTabindex(this.value);
-        const sel = [...wrap.children].find(el=>el.dataset?.serviceId===String(this.value));
-        sel && sel.scrollIntoView({ block: 'nearest' });
-      }
-      renderSummary('page2'); updateNextAvailability();
-      composeLocationDescription();
-    });
-
-    // Car brands
-    const brands=['Changan','Hyundai','Kia','Toyota','Nissan','Chevrolet','GMC','Mercedes-Benz','BMW','Audi','Lexus','Land Rover (Range Rover)','Porsche','Genesis','Cadillac','Infiniti','Ford','Honda','Mazda','Mitsubishi','Other'].map(b=>({id:b,text:b}));
-    $('#carBrand').empty().select2({ data: brands, width: '100%', placeholder: 'اختر ماركة المركبة', dir: 'rtl' });
-
-    // Footer nav
-    document.getElementById('footer-next').addEventListener('click', gotoNext);
-    document.getElementById('footer-prev').addEventListener('click', () => { const i = getActiveIndex(); showPage(Math.max(i - 1, 0)); });
-
-    // Payment selection
-    const payCards = [...document.getElementById('payGroup').querySelectorAll('.pay-card')];
-    payCards.forEach((card) => {
-      const input = card.querySelector('input');
-      const choose = () => {
-        payCards.forEach(c => { c.setAttribute('aria-checked', 'false'); c.setAttribute('tabindex', '-1'); c.querySelector('input').checked = false; });
-        card.setAttribute('aria-checked', 'true'); card.setAttribute('tabindex', '0'); input.checked = true;
-        nForm.paymentMethod = input.value; renderSummary('page5'); updateNextAvailability();
-        showPage(5); // go to Map next via footer
-      };
-      card.addEventListener('click', choose);
-      card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); } });
-    });
-
-    // Confirm button on Review page triggers submit
-    document.getElementById('confirmOrder').addEventListener('click', submitAllAppointments);
-
-    // Rebook
-    $('#rebook').on('click', () => location.href = '/');
-
-    // Initial UI
-    setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
-    nForm.serviceCount = '1'; updateTimeCountHint();
-  });
-
-  function updateNextAvailability(){
-    const i=getActiveIndex(); const nextBtn=document.getElementById('footer-next'); let enable=true;
-    if(i===0){ enable=true; }
-    else if(i===1){ enable=!!($('#area').val()&&$('#service').val()&&$('#numCars').val()); }
-    else if(i===2){
-      const need = getCarsCount();
-      enable = selectedTimes.length === need;
-    }
-    else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
-    else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
-    else if(i===5){ enable=!!positionUrl; } // Map
-    else if(i===6){ enable=true; } // Review
-    nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
-  }
-
-  async function gotoNext(){
-    const i = getActiveIndex(); const id = orderedPages[i];
-    if (id === 'page1') { stopWelcomeDeck(); showPage(1); return; }
-
-    if (id === 'page2') {
-      const areaOk = !!$('#area').val(), catOk = !!$('#serviceCat').val(), svcOk = !!$('#service').val();
-      const carsOk = !!$('#numCars').val();
-      $('#err-area').toggle(!areaOk); $('#err-serviceCat').toggle(!catOk); $('#err-service').toggle(!svcOk); $('#err-numCars').toggle(!carsOk);
-      if (!areaOk || !catOk || !svcOk || !carsOk) { showToast('error', 'يرجى إكمال اختيار المنطقة/التصنيف/الخدمة/عدد السيارات'); return; }
-      nForm.serviceCount = String(getCarsCount());
-      document.getElementById('date').dispatchEvent(new Event('change'));
-      showPage(2); return;
-    }
-
-    if (id === 'page3') {
-      const need = getCarsCount();
-      if (selectedTimes.length !== need) { showToast('error', `الرجاء اختيار ${need} وقت`); return; }
-      nForm.date = lastSelectedISO;
-      showPage(3); return;
-    }
-
-    if (id === 'page4') {
-      const nameOk = ($('#name').val() || '').trim().length > 0;
-      const phoneOk = itiPhone && itiPhone.isValidNumber();
-      $('#err-name').toggle(!nameOk); $('#err-mobile').toggle(!phoneOk);
-      if (!nameOk || !phoneOk) { showToast('error', 'يرجى التحقق من الاسم ورقم الجوال'); return; }
-      nForm.customerN = $('#name').val().trim();
-      nForm.customerM = itiPhone.getNumber().replace(/^\+/, '');
-      const carBits = [$('#carBrand').val() || '', $('#carName').val() || '', $('#plateNumber').val() || ''].filter(Boolean);
-      const extraBits = (window.additionalServicesSelected || []).map(x => x.label);
-      const combined = [...carBits, ...(extraBits.length ? ['خدمات إضافية: ' + extraBits.join('، ')] : [])].join(', ');
-      nForm.locationDescription = combined;
-      showPage(4); return;
-    }
-
-    if (id === 'page5') {
-      if (!nForm.paymentMethod) { $('#err-pay').show(); showToast('error', 'اختر طريقة الدفع'); return; }
-      $('#err-pay').hide(); showPage(5); return; // -> Map
-    }
-
-    if (id === 'page6') {
-      if (!positionUrl) { $('#err-map').show(); showToast('error', 'الرجاء تحديد الموقع'); return; }
-      $('#err-map').hide(); nForm.urlLocation = positionUrl;
-      showPage(6); return; // -> Review
-    }
-
-    if (id === 'page7') {
-      await submitAllAppointments();
-      return;
-    }
-
-    showPage(Math.min(i + 1, orderedPages.length - 1));
-  }
-
-  function populateReview(){
-    const area = $('#area').find(':selected').text() || '—';
-    const srv  = $('#service').find(':selected').text() || '—';
-    const cars = String(getCarsCount());
-    const dateTxt = nForm.date ? luxon.DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '—';
-    const timesTxt = selectedTimes.length ? selectedTimes.join('، ') : '—';
-    const name = ($('#name').val()||'').trim() || '—';
-    const mobile = (window.itiPhone && itiPhone.isValidNumber()) ? itiPhone.getNumber() : ($('#mobile').val()||'—');
-    const carBits = [$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
-    const addons = (selectedAddons && selectedAddons.length) ? selectedAddons.join('، ') : '—';
-    const pay = (nForm.paymentMethod||'').toUpperCase() || '—';
-
-    $('#rv-area').text(area);
-    $('#rv-service').text(srv);
-    $('#rv-cars').text(cars);
-    $('#rv-date').text(dateTxt);
-    $('#rv-times').text(timesTxt);
-    $('#rv-name').text(name);
-    $('#rv-mobile').text(mobile);
-    $('#rv-car').text(carBits || '—');
-    $('#rv-addons').text(addons);
-    $('#rv-pay').text(pay);
-
-    const totalObj = computeOrderTotal();
-    $('#rv-total').text(totalObj.formatted);
-
-    document.querySelectorAll('#page7 [data-edit-step]').forEach(btn=>{
-      btn.onclick = (e)=>{ const step = Number(e.currentTarget.getAttribute('data-edit-step')); const idx = Math.max(0, Math.min(step-1, orderedPages.length-1)); showPage(idx); };
-    });
-  }
-
-  /* ---------- Google Map + Places (Jubail polygon) ---------- */
-  let map, marker, autocomplete, jubailPoly, jubailBounds;
-  const SA_BOUNDS = { north: 26.582151149881536, south: 26.479187374350676, west: 49.94492876846446, east: 50.05681139737682 };
-  const JUBAIL_ALLOWED_PATH = [
-    {lat:26.484054540578327, lng:50.00261281025426},
-    {lat:26.535514751994445, lng:49.95514844270524},
-    {lat:26.5592374337014943, lng:49.95322907308383},
-    {lat:26.565616456914945, lng:49.99587130060291},
-    {lat:26.54367784463272, lng:50.0058700609464},
-    {lat:26.532828784787508, lng:50.01205719488301},
-    {lat:26.53393587871155, lng:50.03173228080144},
-    {lat:26.509023682480127, lng:50.036434502593266},
-    {lat:26.50802708220727, lng:50.01614070328118}
-  ];
-  function initMap(){
-    jubailPoly = new google.maps.Polygon({ paths: JUBAIL_ALLOWED_PATH, strokeColor:'#6B3FA6', strokeOpacity:.9, strokeWeight:2, fillColor:'#6B3FA6', fillOpacity:.18, clickable:false });
-    jubailBounds = new google.maps.LatLngBounds(); JUBAIL_ALLOWED_PATH.forEach(p => jubailBounds.extend(new google.maps.LatLng(p.lat, p.lng)));
-    const def = jubailBounds.getCenter();
-    map=new google.maps.Map(document.getElementById('googleMap'),{ center:def, zoom:12, disableDoubleClickZoom:true, mapTypeControl:false, fullscreenControl:true, restriction:{latLngBounds: SA_BOUNDS, strictBounds:false} });
-    jubailPoly.setMap(map); map.fitBounds(jubailBounds);
-    marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع داخل الجبيل'});
-
-    const pointInJubail = (latLng) => google.maps.geometry.poly.containsLocation(latLng, jubailPoly);
-    function snapToPolygon(latLng){
-      const path = jubailPoly.getPath(); let bestPoint = null; let bestDist = Infinity;
-      function toPoint(ll){ return {x: ll.lng(), y: ll.lat()}; }
-      function fromPoint(pt){ return new google.maps.LatLng(pt.y, pt.x); }
-      function dist2(a,b){ const dx=a.x-b.x, dy=a.y-b.y; return dx*dx+dy*dy; }
-      function clamp01(t){ return Math.max(0, Math.min(1, t)); }
-      const p = toPoint(latLng);
-      for(let i=0;i<path.getLength();i++){
-        const aLL = path.getAt(i); const bLL = path.getAt((i+1)%path.getLength());
-        const a = toPoint(aLL), b = toPoint(bLL); const ab = {x: b.x - a.x, y: b.y - a.y};
-        const ap = {x: p.x - a.x, y: p.y - a.y}; const abLen2 = ab.x*ab.x + ab.y*ab.y || 1e-12;
-        const t = clamp01((ap.x*ab.x + ap.y*ab.y) / abLen2); const proj = { x: a.x + t*ab.x, y: a.y + t*ab.y };
-        const d2 = dist2(p, proj); if(d2 < bestDist){ bestDist = d2; bestPoint = proj; }
-      }
-      return fromPoint(bestPoint || p);
-    }
-    function setPos(latLng, pan=false, allowSnap=true){
-      if(!latLng) return;
-      if(!pointInJubail(latLng)){
-        if(allowSnap){ latLng = snapToPolygon(latLng); showToast('error','الموقع خارج نطاق الجبيل — تم تقريب العلامة لأقرب نقطة داخل الحدود.'); }
-        else{ showToast('error','الموقع خارج نطاق الجبيل — يرجى اختيار نقطة داخل الحدود.'); return; }
-      }
-      marker.setPosition(latLng); if(pan){ map.panTo(latLng); } map.setZoom(Math.max(15, map.getZoom()));
-      positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
-      const hint=document.getElementById('mapHint');
-      if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`;
-      renderSummary('page6'); updateNextAvailability();
-    }
-    marker.addListener('dragend',({latLng})=>setPos(latLng,false,true));
-    map.addListener('click',({latLng})=>setPos(latLng,true,true));
-    const input=document.getElementById('mapSearch');
-    const opts={ fields:['geometry','name'], componentRestrictions:{country:'sa'}, strictBounds:false };
-    autocomplete=new google.maps.places.Autocomplete(input, opts);
-    autocomplete.bindTo('bounds', map);
-    autocomplete.addListener('place_changed', ()=>{ const place=autocomplete.getPlace(); if(!place?.geometry) return; setPos(place.geometry.location,true,true); });
-    document.getElementById('show-my-location')?.addEventListener('click',()=>{
-      if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
-      navigator.geolocation.getCurrentPosition(
-        pos=>{ const ll = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude); setPos(ll,true,true); if(!google.maps.geometry.poly.containsLocation(ll, jubailPoly)){ map.fitBounds(jubailBounds); } },
-        _=>{ showToast('error','تعذر تحديد موقعك'); },
-        { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
-      );
-    });
-  }
-  window.initMap=initMap;
-
-  /* ---------- Submit (from Review page) ---------- */
-  async function submitAllAppointments(){
-    const cleanBase = sanitizeNahlPayload(nForm);
-    const missing = [];
-    if (!cleanBase.date) missing.push('التاريخ');
-    if (!selectedTimes.length) missing.push('الأوقات');
-    if (!cleanBase.location) missing.push('المنطقة');
-    if (!cleanBase.service) missing.push('الخدمة');
-    if (!cleanBase.customerN) missing.push('الاسم');
-    if (!cleanBase.customerM) missing.push('الجوال');
-    if (!cleanBase.paymentMethod) missing.push('طريقة الدفع');
-    if (!positionUrl) missing.push('الموقع على الخريطة');
-    if (missing.length) { showToast('error', 'الحقول الناقصة: ' + missing.join('، ')); return; }
-
-    if (isSubmitting) return;
-    isSubmitting = true;
-
-    const $next=document.getElementById('footer-next');
-    const $prev=document.getElementById('footer-prev');
-    const $wait=document.getElementById('footer-wait');
-    $next.style.display='none'; $prev.style.display='none'; $wait.classList.add('show');
-
-    const successes = []; const failures  = [];
-    for (let idx=0; idx<selectedTimes.length; idx++){
-      const t = selectedTimes[idx];
-      const payload = { ...cleanBase, time: t, urlLocation: positionUrl };
-      try {
-        const r = await postReservationOriginal(payload);
-        if (r.ok && r.data?.success) successes.push({ time: t, res: r });
-        else {
-          const msg = r?.data?.msgAR || r?.data?.message || (r.status===404?'المسار غير موجود':'فشل الحجز');
-          failures.push({ time: t, msg });
-        }
-      } catch(e){ failures.push({ time: t, msg: String(e) }); }
-      await new Promise(res=>setTimeout(res, 200));
-    }
-
-    if (failures.length === 0) {
-      showToast('success', 'تم إنشاء الحجوزات لجميع السيارات');
-      document.getElementById('ts-area').textContent = $('#area').find(':selected').text() || '—';
-      document.getElementById('ts-service').textContent = $('#service').find(':selected').text() || '—';
-      document.getElementById('ts-cars').textContent = String(getCarsCount());
-      const dateTxt = cleanBase.date ? DateTime.fromISO(cleanBase.date).toFormat('d LLL yyyy') : '';
-      const timesTxt = selectedTimes.join('، ');
-      document.getElementById('ts-dt').textContent = `${dateTxt} • ${timesTxt}`;
-      document.getElementById('ts-pay').textContent = (cleanBase.paymentMethod || '').toUpperCase() || '—';
-      const waMsg = encodeURIComponent(
-        `تم إرسال طلب حجز:\nالخدمة: ${$('#service').find(':selected').text()}\nالتاريخ: ${dateTxt}\nالمواعيد: ${timesTxt}\nعدد السيارات: ${getCarsCount()}\nالرابط: ${location.href}`
-      );
-      document.getElementById('ts-whatsapp').href = `https://wa.me/?text=${waMsg}`;
-      showPage(7); // -> Thanks
-    } else {
-      let msg = `تعذر إنشاء بعض الحجوزات:\n`;
-      failures.forEach(f => { msg += `• ${f.time}: ${f.msg}\n`; });
-      showToast('error', msg.trim());
-      isSubmitting = false; $wait.classList.remove('show'); $next.style.display=''; $prev.style.display='';
-    }
-  }
-
-  (function observeStepChange(){
-    const obs = new MutationObserver(()=>{ const i=getActiveIndex(); syncProgress(i); });
-    obs.observe(document.querySelector('.stage'), { subtree:true, attributes:true, attributeFilter:['class'] });
-  })();
-
-  window.addEventListener('pagehide', () => {
-    try { if (Array.isArray(controllers)) controllers.forEach(([c]) => { try { c.abort(); } catch(_){} }); } catch(_) {}
-  });
-
-  (function ensureMapInitSafety(){
-    if (window.__mapInitPatched) return;
-    window.__mapInitPatched = true;
-    const maybeInit = () => {
-      try{
-        if (typeof google !== 'undefined' && google.maps && document.getElementById('googleMap') && typeof window.initMap === 'function') {
-          if (!window.__mapAlreadyInited) { window.__mapAlreadyInited = true; window.initMap(); }
-        }
-      }catch(_){}
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => { maybeInit(); setTimeout(maybeInit, 500); });
-    } else { maybeInit(); setTimeout(maybeInit, 500); }
-  })();
-  </script>
-
-  <!-- Google Maps (with geometry lib) -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places,geometry&language=ar&region=SA" async defer></script>
-</body>
-</html>
+    document.getElementById('addonsNoThanks').onclick = ()=>{ selected
