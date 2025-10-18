@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="tokyo">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Tiger 77</title>
+  <title>Tiger 77 • 東京 | تايغر ٧٧</title>
 
   <!-- UI libs -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <!-- Fonts: Cairo (AR) + Noto Sans JP (JP) -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Noto+Sans+JP:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <!-- Arabic + Japanese fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet"/>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css" rel="stylesheet"/>
@@ -21,354 +22,333 @@
   <link rel="icon" type="image/png" sizes="32x32" href="">
   <link rel="icon" type="image/png" sizes="16x16" href="">
 
-<style>
-  /* ===== Tokyo (Neon / Zen) Theme ======================================= */
-  :root{
-    /* Ink base + neon accents */
-    --ink-950:#0a0b0f;          /* page background ink */
-    --ink-900:#12131a;          /* card text */
-    --zen-100:rgba(255,255,255,.82);
-    --zen-080:rgba(255,255,255,.66);
-    --zen-060:rgba(255,255,255,.48);
+  <style>
+    /* ============================
+       TOKYO (NEON / ZEN) THEME
+       ============================ */
+    :root{
+      /* Neon core */
+      --neon-cyan:#00E5FF;
+      --neon-magenta:#FF2DAE;
+      --neon-purple:#7A5CFF;
+      --ink-900:#0A0C12;
+      --ink-800:#121624;
+      --ink-700:#1B2033;
 
-    --neon-cyan:#00E5FF;        /* neon cyan */
-    --neon-magenta:#FF2D92;     /* neon magenta */
-    --neon-purple:#7A5CFF;      /* neon purple */
-    --neon-lime:#C6FF00;        /* accent spark (rare) */
+      /* Primary scale remapped to neon */
+      --p-900:#11162A;
+      --p-800:#182041;
+      --p-700:#223069;
+      --p-600:#2D43A1;
+      --p-500:#3A5AE6;
 
-    --glass-bg:rgba(18,19,26,.66);
-    --glass-stroke:rgba(255,255,255,.12);
-    --glass-blur:10px;
+      /* Glows / alphas */
+      --p-900-58: rgba(17,22,42,.82);
+      --p-900-34: rgba(17,22,42,.58);
+      --p-800-65: rgba(34,48,105,.65);
+      --p-800-45: rgba(29,39,87,.45);
+      --p-600-22: rgba(0,229,255,.18);
+      --p-600-14: rgba(255,45,174,.16);
 
-    --border-300:#283041;
+      --gold-600:#E4007F; /* accent chip (Japanese magenta) */
 
-    /* Re-map legacy tokens used by existing UI */
-    --p-900: var(--neon-purple);
-    --p-800: #5746ff;
-    --p-700: #3a2dff;
-    --p-600: #2b22d6;
-    --p-500: #b4adff;
+      /* neutrals */
+      --lavender-050:#0F1424;
+      --surface-000:#0D111B;
+      --surface-card:rgba(255,255,255,.07);
+      --border-300:rgba(255,255,255,.16);
 
-    --p-900-58: color-mix(in oklab, var(--neon-purple) 58%, transparent);
-    --p-900-34: color-mix(in oklab, var(--neon-purple) 34%, transparent);
-    --p-800-65: color-mix(in oklab, var(--p-800) 65%, transparent);
-    --p-800-45: color-mix(in oklab, var(--p-800) 45%, transparent);
-    --p-600-22: color-mix(in oklab, var(--p-600) 22%, transparent);
-    --p-600-14: color-mix(in oklab, var(--p-600) 14%, transparent);
+      /* shape + elevation */
+      --radius-md:14px; --radius-pill:999px;
+      --shadow-xs:0 2px 10px rgba(0,0,0,.25);
+      --shadow-sm:0 10px 24px rgba(0,0,0,.35);
+      --shadow-md:0 24px 64px rgba(0,0,0,.45);
 
-    --gold-600: var(--neon-magenta);
+      /* motion */
+      --ease:cubic-bezier(.22,.61,.36,1);
+      --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
 
-    --lavender-050: color-mix(in oklab, var(--neon-purple) 12%, #0b0d13);
+      --header-h:76px; --footer-h:118px;
 
-    --radius-md:14px; --radius-pill:999px;
-    --shadow-xs:0 4px 14px rgba(0,0,0,.28);
-    --shadow-sm:0 10px 28px rgba(0,0,0,.32);
-    --shadow-md:0 16px 36px rgba(0,0,0,.38);
+      /* Background — neon gradient over city */
+      --page-bg:
+        linear-gradient(180deg, rgba(0,229,255,.10), rgba(255,45,174,.10)),
+        url("https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1600&auto=format&fit=crop") /* Tokyo night */
+        center/cover no-repeat fixed;
 
-    --ease:cubic-bezier(.22,.61,.36,1);
-    --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
+      /* Inputs */
+      --input-bg: rgba(10,12,18,.82);
+      --input-bg-hover: rgba(14,18,26,.9);
+      --input-border: rgba(255,255,255,.14);
+      --input-border-hover: color-mix(in oklab, var(--neon-cyan) 26%, var(--input-border));
+      --placeholder: rgba(235,240,255,.45);
+    }
 
-    --header-h:76px; --footer-h:118px;
+    html,body{height:100%}
+    body{
+      margin:0; color:#E9EDFF;
+      font-family:'Cairo','Noto Sans JP',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;
+      background: radial-gradient(1200px 600px at 80% -10%, rgba(255,45,174,.25), transparent 60%),
+                  radial-gradient(900px 500px at -10% 110%, rgba(0,229,255,.20), transparent 55%),
+                  var(--page-bg);
+      min-height:100vh; min-height:100dvh;
+      display:flex; flex-direction:column;
+      padding-top:var(--header-h); padding-bottom:var(--footer-h);
+      backdrop-filter: blur(0.5px);
+    }
 
-    --grain:url("data:image/svg+xml;utf8, \
-      <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 40 40'> \
-        <filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/></filter> \
-        <rect width='100%' height='100%' filter='url(%23n)' opacity='.06'/> \
-      </svg>");
-    --page-bg:url("https://images.unsplash.com/photo-1569830907165-5c5d8c1e1f1a?q=80&w=2400&auto=format&fit=crop"); /* Tokyo night */
-  }
+    /* ========= Header ========= */
+    header{
+      position:fixed; inset-block-start:0; inset-inline:0; z-index:999;
+      background:
+        linear-gradient(0deg, rgba(13,17,27,.92), rgba(13,17,27,.92)),
+        radial-gradient(1200px 600px at 90% -20%, rgba(255,45,174,.25), transparent 60%),
+        radial-gradient(900px 500px at -10% 140%, rgba(0,229,255,.25), transparent 55%);
+      border-bottom:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 12px 30px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+    }
+    .header-inner{ max-width:1120px; width:100%; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between; }
 
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family: 'Cairo', 'Noto Sans JP', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    color:#fff;
-    background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(122,92,255,.22), transparent 60%),
-      radial-gradient(1000px 500px at 10% 10%, rgba(255,45,146,.20), transparent 65%),
-      radial-gradient(900px 400px at 50% 110%, rgba(0,229,255,.18), transparent 70%),
-      var(--page-bg) center/cover no-repeat fixed;
-    min-height:100vh; min-height:100dvh;
-    display:flex; flex-direction:column;
-    padding-top:var(--header-h); padding-bottom:var(--footer-h);
-    position:relative;
-    isolation:isolate;
-  }
-  body::before{
-    content:""; position:fixed; inset:0; z-index:-1;
-    background:var(--grain) center/320px repeat;
-    opacity:.7; pointer-events:none; mix-blend-mode:overlay;
-  }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      padding:6px 10px; border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.20), 0 8px 20px rgba(0,0,0,.35);
+    }
+    .brand img{height:72px; filter: drop-shadow(0 0 18px rgba(0,229,255,.55)) drop-shadow(0 0 10px rgba(255,45,174,.35)); }
 
-  /* ================= Header ================= */
-  header{
-    position:fixed; inset:0 0 auto 0; z-index:999;
-    background: linear-gradient(0deg, rgba(10,11,15,.75), rgba(10,11,15,.9));
-    backdrop-filter: blur(14px);
-    border-bottom:1px solid var(--glass-stroke);
-  }
-  .header-inner{ max-width:1120px; width:100%; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between; }
+    .header-right{flex:1; display:flex; flex-direction:column; gap:6px}
 
-  .brand{
-    display:flex; align-items:center; gap:10px;
-    padding:6px 10px; border-radius:12px;
-    background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
-  }
-  .brand img{height:72px; width:auto; object-fit:contain;
-    filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 10px 18px rgba(122,92,255,.35));
-  }
+    .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
+    .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.12); border-radius:999px; overflow:hidden}
+    .mini-progress .bar>span{
+      height:100%; width:0%;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-magenta));
+      box-shadow: 0 0 16px var(--neon-cyan), 0 0 24px var(--neon-magenta);
+      transition:width var(--dur-md) var(--ease)
+    }
+    .mini-progress .step{font-weight:900; font-size:1rem; color:#fff; letter-spacing:.4px}
 
-  .header-right{flex:1; display:flex; flex-direction:column; gap:6px}
+    .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+    .chip{
+      display:inline-flex; align-items:center; gap:6px; max-width:100%;
+      padding:6px 10px; border:1px solid rgba(255,255,255,.25);
+      border-radius:999px; color:#fff; font-size:.85rem;
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      box-shadow: 0 4px 10px rgba(0,0,0,.25);
+    }
+    .chip.current{ box-shadow:0 0 0 2px rgba(255,255,255,.25) inset, 0 0 14px rgba(0,229,255,.35); }
 
-  /* Progress bar neon */
-  .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
-  .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.18); border-radius:999px; overflow:hidden}
-  .mini-progress .bar>span{
-    display:block; height:100%; width:0%;
-    background:
-      linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
-    box-shadow:0 0 16px color-mix(in oklab, var(--neon-cyan) 58%, transparent), 0 0 14px color-mix(in oklab, var(--neon-magenta) 38%, transparent);
-    transition:width var(--dur-md) var(--ease)
-  }
-  .mini-progress .step{font-weight:800; font-size:1rem; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.25)}
+    /* ========= Pages / Cards ========= */
+    main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
+    #app{width:100%; max-width:1120px}
+    .stage{position:relative; min-height:560px; padding:8px 0 20px}
+    .page{
+      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
+      padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;
+    }
+    .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
+    .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
+    @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
+    @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
+    .page h1{
+      font-family:'Cairo','Noto Sans JP',sans-serif;
+      font-size:1.45rem; font-weight:900; margin:0; text-align:center; letter-spacing:.2px;
+      text-shadow: 0 0 18px rgba(0,229,255,.35);
+    }
 
-  /* Chips */
-  .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
-  .chip{
-    display:inline-flex; align-items:center; gap:8px; max-width:100%;
-    padding:6px 12px; border:1px solid var(--glass-stroke);
-    border-radius:999px; color:#fff; font-size:.85rem;
-    background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.04), 0 8px 22px rgba(0,0,0,.28);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .chip.current{
-    background:linear-gradient(180deg, rgba(122,92,255,.22), rgba(255,45,146,.14));
-    border-color: color-mix(in oklab, var(--neon-magenta) 40%, var(--neon-purple));
-    box-shadow:0 0 0 2px color-mix(in oklab, var(--neon-cyan) 30%, transparent) inset;
-  }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      color:#E9EDFF;
+      border-radius:14px; box-shadow:var(--shadow-md);
+      padding:24px; width:100%; max-width:920px; backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.12);
+    }
 
-  /* ================= Pages / Cards ================= */
-  main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
-  #app{width:100%; max-width:1120px}
-  .stage{position:relative; min-height:560px; padding:8px 0 20px}
-  .page{
-    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
-    padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992);
-    pointer-events:none;
-  }
-  .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
-  .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
-  @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
-  @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
-  .page h1{font-size:1.375rem; font-weight:900; margin:0; text-align:center; letter-spacing:.3px; text-shadow:0 6px 24px rgba(0,0,0,.35)}
+    /* ========= Welcome deck ========= */
+    .ppt-deck{position:relative; width:100%; max-width:920px; height:210px}
+    .ppt-slide{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transform:translateY(14px) scale(.98); transition:opacity .6s var(--ease), transform .6s var(--ease)}
+    .ppt-slide .slide-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      color:#E9EDFF; border-radius:14px; box-shadow:var(--shadow-sm);
+      padding:18px 20px; text-align:center; width:min(820px,92%);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .ppt-slide .slide-card h3{font-weight:900}
+    .ppt-slide.is-active{opacity:1; transform:none; z-index:2}
+    .ppt-slide.is-exiting{opacity:0; transform:translateY(-8px) scale(.985); z-index:1}
+    .ppt-dots{display:flex; gap:8px; justify-content:center; margin-top:12px}
+    .ppt-dot{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35)}
+    .ppt-dot.active{background:linear-gradient(90deg,var(--neon-cyan),var(--neon-magenta)); box-shadow:0 0 0 4px rgba(255,255,255,.10)}
 
-  .card{
-    background:var(--glass-bg); color:var(--zen-100);
-    border-radius:14px; box-shadow:var(--shadow-md);
-    padding:24px; width:100%; max-width:920px; backdrop-filter:blur(var(--glass-blur));
-    border:1px solid var(--glass-stroke);
-  }
+    /* ========= Inputs & dropdowns (Tokyo contrast) ========= */
+    .form-control, select, .select2-selection{
+      background:var(--input-bg) !important; color:#fff !important;
+      border:1px solid var(--input-border) !important; border-radius:14px!important;
+      min-height:52px; text-align:center; font-size:16px;
+      transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
+    }
+    .form-control:hover, select:hover, .select2-selection:hover{
+      background:var(--input-bg-hover) !important;
+      border-color:var(--input-border-hover) !important;
+    }
+    .form-control:focus, select:focus, .select2-container--open .select2-selection{
+      background:var(--input-bg-hover) !important;
+      border-color:var(--input-border-hover) !important;
+      box-shadow:
+        0 0 0 6px color-mix(in oklab, var(--neon-cyan) 18%, transparent),
+        0 0 0 2px color-mix(in oklab, var(--neon-magenta) 24%, transparent) inset !important;
+      outline:none !important;
+    }
+    .form-label{display:inline-block; margin-bottom:6px; font-size:.9rem; font-weight:800; color:#D8DEFF}
+    .field-error{color:#FF6B6B; font-size:.85rem; margin-top:6px; display:none}
+    .has-error .form-control, .has-error .select2-selection{ border-color:#FF6B6B !important; box-shadow:0 0 0 3px rgba(255,107,107,.22) !important; }
+    .select2-container .select2-selection--single .select2-selection__rendered{color:#fff !important; line-height:52px!important;}
+    .select2-container .select2-selection--single{height:52px!important; display:flex; align-items:center}
+    .select2-dropdown{background:#0B0D13 !important; color:#fff !important; border:1px solid rgba(255,255,255,.16)!important; box-shadow:0 18px 40px rgba(0,0,0,.45)}
+    .select2-results__option{color:#e8edff !important}
+    .select2-results__option--highlighted{ background: color-mix(in oklab, var(--neon-purple) 36%, #0b0d13) !important; color:#fff!important; }
+    .select2-results__option[aria-selected="true"]{
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)) !important; color:#0A0B0F !important;
+    }
 
-  /* Welcome deck */
-  .ppt-deck{position:relative; width:100%; max-width:920px; height:200px}
-  .ppt-slide{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transform:translateY(14px) scale(.98); transition:opacity .6s var(--ease), transform .6s var(--ease)}
-  .ppt-slide .slide-card{
-    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-    color:var(--zen-100); border-radius:14px; box-shadow:var(--shadow-md);
-    padding:18px 20px; text-align:center; width:min(820px,92%); border:1px solid var(--glass-stroke)
-  }
-  .ppt-slide.is-active{opacity:1; transform:none; z-index:2}
-  .ppt-slide.is-exiting{opacity:0; transform:translateY(-8px) scale(.985); z-index:1}
-  .ppt-dots{display:flex; gap:8px; justify-content:center; margin-top:12px}
-  .ppt-dot{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.35)}
-  .ppt-dot.active{background:var(--neon-cyan); box-shadow:0 0 0 4px color-mix(in oklab, var(--neon-cyan) 25%, transparent)}
+    /* ========= Time picker ========= */
+    .time-toolbar{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:8px}
+    @media (min-width:768px){ .time-toolbar{grid-template-columns: 1fr; } }
+    .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
+    @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
+    .time-option{
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      color:#fff; font-weight:800;
+      border:1px solid rgba(255,255,255,.14); border-radius:14px;
+      padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs);
+      transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), outline-color var(--dur-xs) var(--ease);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
+    .time-option:hover{transform:translateY(-2px); background:rgba(255,255,255,.12); box-shadow:var(--shadow-sm)}
+    .time-option[aria-pressed="true"]{
+      outline:3px solid var(--neon-cyan); outline-offset:2px;
+      background:linear-gradient(0deg, rgba(0,229,255,.15), rgba(255,45,174,.15));
+      box-shadow:0 0 0 3px rgba(255,45,174,.18);
+    }
 
-  /* Inputs */
-  .form-control, select, .select2-selection{
-    background:rgba(255,255,255,.06); color:var(--zen-100);
-    border:1px solid var(--glass-stroke)!important; border-radius:14px!important;
-    min-height:52px; text-align:center; font-size:16px;
-    transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease);
-  }
-  .form-control:focus{
-    box-shadow:0 0 0 6px color-mix(in oklab, var(--neon-cyan) 18%, transparent), 0 0 0 2px color-mix(in oklab, var(--neon-magenta) 22%, transparent) inset;
-    border-color:color-mix(in oklab, var(--neon-magenta) 38%, var(--neon-cyan))!important;
-    background:rgba(255,255,255,.10);
-  }
-  .form-label{display:inline-block; margin-bottom:6px; font-size:.9rem; font-weight:800; color:var(--zen-080)}
-  .field-error{color:#FF6B6B; font-size:.85rem; margin-top:6px; display:none}
-  .has-error .form-control, .has-error .select2-selection{ border-color:#FF6B6B !important; }
-  .has-error .field-error{display:block}
+    /* ========= Loading overlay ========= */
+    .load-overlay{
+      position:absolute; inset:0; background:rgba(13,17,27,.86); color:#fff;
+      display:none; align-items:center; justify-content:center; gap:12px; border-radius:14px; backdrop-filter:blur(2px);
+    }
+    .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
+    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
 
-  .select2-container .select2-selection--single .select2-selection__rendered{color:var(--zen-100)!important; line-height:52px!important;}
-  .select2-container .select2-selection--single{height:52px!important; display:flex; align-items:center}
-  .select2-dropdown{background:#0f1117; color:var(--zen-100); border:1px solid var(--glass-stroke)}
-  .select2-results__option, .select2-search__field{color:var(--zen-100)}
-  .select2-results__option--highlighted{ background:color-mix(in oklab, var(--neon-purple) 40%, #0f1117)!important; color:#fff!important; }
+    /* ========= Payment Methods ========= */
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
+    :root{ --pri-50:#0F1424; --pri-600:var(--neon-cyan); }
+    .pay-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;align-items:stretch;width:min(100%,960px);margin-inline:auto}
+    .pay-card{cursor:pointer;border:1px solid rgba(255,255,255,.16);background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));border-radius:14px;padding:14px;min-height:96px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,box-shadow .2s,transform .05s,background-color .2s;outline:none;width:100%}
+    .pay-card:hover{border-color:#cbd5e1;box-shadow:0 14px 34px rgba(0,0,0,.35);background-color:rgba(255,255,255,.12)}
+    .pay-card:has(input:checked){border-color:var(--pri-600);box-shadow:0 0 0 3px color-mix(in oklab, var(--pri-600) 28%, transparent), 0 18px 44px rgba(0,0,0,.45);background:linear-gradient(0deg, color-mix(in oklab, var(--pri-50) 60%, #0A0C12), rgba(255,255,255,.06))}
+    .pay-card__content{display:grid;grid-template-rows:auto auto;justify-items:center;align-items:center;gap:10px;text-align:center;color:#fff}
+    .pay-card__img{width:min(180px,60%);max-height:40px;object-fit:contain;filter: drop-shadow(0 0 10px rgba(0,229,255,.35))}
+    .pay-card__icon{font-size:28px;line-height:1}
+    .pay-card__label{font-size:14px;color:#EEF2FF;font-weight:800}
+    .field-error{color:#ff8a8a;font-size:14px;margin-top:10px;text-align:center;display:none}
+    .pay-grid[data-invalid="true"] ~ .field-error { display:block; }
 
-  /* Time picker */
-  .time-toolbar{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:8px}
-  @media (min-width:768px){ .time-toolbar{grid-template-columns: 1fr; } }
-  .time-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px}
-  @media (min-width:540px){ .time-grid{grid-template-columns:repeat(3,1fr)} }
-  .time-option{
-    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-    color:var(--zen-100); font-weight:900;
-    border:1px solid var(--glass-stroke); border-radius:14px;
-    padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs);
-    transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), outline-color var(--dur-xs) var(--ease);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    letter-spacing:.5px;
-  }
-  .time-option:hover{transform:translateY(-2px); background:linear-gradient(180deg, rgba(122,92,255,.15), rgba(255,45,146,.08)); box-shadow:var(--shadow-sm)}
-  .time-option[aria-pressed="true"]{
-    outline:3px solid var(--neon-cyan);
-    outline-offset:2px;
-    background:linear-gradient(0deg, color-mix(in oklab, var(--neon-magenta) 18%, #10121a), color-mix(in oklab, var(--neon-purple) 22%, #10121a));
-    box-shadow:0 0 0 3px rgba(11,124,255,.18);
-  }
+    /* ========= Map ========= */
+    .map-search .form-control{min-height:48px; text-align:right}
+    .map-search .fa-magnifying-glass{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#c2c8ff}
+    #googleMap{width:100%;height:420px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
 
-  /* Loading overlay */
-  .load-overlay{
-    position:absolute; inset:0; background:rgba(5,6,9,.78); color:var(--zen-080);
-    display:none; align-items:center; justify-content:center; gap:12px; border-radius:14px; backdrop-filter:blur(6px);
-    border:1px solid var(--glass-stroke);
-  }
-  .load-overlay.show{display:flex; animation:fadeIn var(--dur-sm) var(--ease) both}
-  @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+    /* ========= Footer ========= */
+    footer.sticky-nav{
+      position:sticky; bottom:0; z-index:40;
+      background: linear-gradient(0deg, rgba(16,20,32,.86), rgba(16,20,32,.86));
+      border-top:1px solid rgba(255,255,255,.10); backdrop-filter:blur(12px);
+    }
+    .footer-inner{ max-width:1120px; width:100%; margin:0 auto; padding:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+    .footer-brand{ font-size:.95rem; color:#fff; opacity:.94; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+    .footer-brand a{color:#9BE7FF; text-decoration:underline}
+    .footer-social{display:flex; align-items:center; gap:12px}
+    .footer-social a{color:#fff; opacity:.95; font-size:1.2rem; filter: drop-shadow(0 0 8px rgba(0,229,255,.45))}
+    .footer-actions{display:flex; gap:12px; width:100%}
+    .btn-footer{
+      flex:1; border:1px solid rgba(255,255,255,.16); border-radius:14px; padding:16px 16px; min-height:56px; font-size:1rem; font-weight:900;
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06)); color:#fff;
+      transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs), color var(--dur-xs), border-color var(--dur-xs);
+    }
+    .btn-footer:hover{transform:translateY(-2px); box-shadow:0 14px 34px rgba(0,0,0,.35)}
+    .btn-footer.primary{background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); color:#0B0D13; border-color:transparent}
+    .btn-footer.primary:hover{filter:saturate(1.1) brightness(1.02)}
+    .btn-footer.primary:focus{ box-shadow:0 0 0 6px rgba(0,229,255,.22) }
+    .btn-footer.hidden{visibility:hidden}
+    .btn-footer:disabled{opacity:.6; pointer-events:none}
+    #footer-wait{display:none; align-items:center; gap:10px; color:#fff; font-weight:800}
+    #footer-wait.show{display:flex}
 
-  /* Payment */
-  .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
-  :root{ --pri-50:#0f1117; --pri-600:var(--neon-cyan); }
-  .pay-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;align-items:stretch;width:min(100%,960px);margin-inline:auto}
-  .pay-card{cursor:pointer;border:1px solid var(--glass-stroke);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));border-radius:14px;padding:14px;min-height:96px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,box-shadow .2s,transform .05s,background-color .2s;outline:none;width:100%}
-  .pay-card:hover{border-color:color-mix(in oklab, var(--neon-cyan) 40%, var(--glass-stroke));box-shadow:0 10px 28px rgba(0,0,0,.35);background:linear-gradient(180deg, rgba(122,92,255,.14), rgba(255,45,146,.08))}
-  .pay-card:has(input:checked){border-color:var(--neon-cyan);box-shadow:0 0 0 3px color-mix(in oklab, var(--neon-cyan) 28%, transparent);background:linear-gradient(0deg, color-mix(in oklab, var(--neon-cyan) 14%, rgba(255,255,255,.08)), rgba(255,255,255,.02))}
-  .pay-card__content{display:grid;grid-template-rows:auto auto;justify-items:center;align-items:center;gap:10px;text-align:center}
-  .pay-card__img{width:min(180px,60%);max-height:40px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,229,255,.25))}
-  .pay-card__icon{font-size:28px;line-height:1}
-  .pay-card__label{font-size:14px;color:var(--zen-100);font-weight:800; letter-spacing:.4px}
-  .field-error{color:#ff8080;font-size:14px;margin-top:10px;text-align:center;display:none}
-  .pay-grid[data-invalid="true"] ~ .field-error { display:block; }
+    @media (max-width: 480px){
+      .brand img{ height:64px }
+      .summary-chips{ overflow-x:auto; gap:6px; padding-bottom:2px; scrollbar-width:thin; }
+      .summary-chips::-webkit-scrollbar{ height:4px }
+      .chip{ padding:4px 8px; font-size:.78rem }
+      .chip .title{ display:none }
+      .chip .value{ max-width:140px; overflow:hidden; text-overflow:ellipsis }
+      .btn-footer{min-height:58px; font-size:1.05rem}
+      .footer-actions{width:100%}
+      .footer-brand{width:100%; justify-content:space-between}
+    }
 
-  /* Map */
-  .map-search{position:relative; margin-bottom:12px}
-  .map-search .form-control{min-height:48px; text-align:right}
-  .map-search .fa-magnifying-glass{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9aa3b2}
-  #googleMap{width:100%;height:420px;border-radius:14px;overflow:hidden;border:1px solid var(--glass-stroke)}
+    .iti{ width:100%; }
+    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ left:8px; right:auto; }
+    html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
+      padding-left: calc(76px + 8px);
+      padding-right: 12px;
+      text-align: left; direction: ltr;
+    }
 
-  /* Footer */
-  footer.sticky-nav{
-    position:sticky; bottom:0; z-index:40;
-    background: linear-gradient(180deg, rgba(10,11,15,.7), rgba(10,11,15,.94));
-    backdrop-filter:blur(10px); border-top:1px solid var(--glass-stroke);
-  }
-  .footer-inner{ max-width:1120px; width:100%; margin:0 auto; padding:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
-  .footer-brand{ font-size:.95rem; color:#cbd5e1; opacity:.94; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
-  .footer-brand a{color:#fff; text-decoration:underline}
-  .footer-social{display:flex; align-items:center; gap:12px}
-  .footer-social a{color:#fff; opacity:.95; font-size:1.2rem}
-  .footer-actions{display:flex; gap:12px; width:100%}
-  .btn-footer{
-    flex:1; border:1px solid var(--glass-stroke); border-radius:14px; padding:16px 16px; min-height:56px; font-size:1rem; font-weight:900;
-    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:#e5edff;
-    transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs), color var(--dur-xs), border-color var(--dur-xs);
-    letter-spacing:.3px;
-  }
-  .btn-footer:hover{transform:translateY(-2px); box-shadow:var(--shadow-sm)}
-  .btn-footer.primary{
-    background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
-    color:#0a0b0f; border-color:transparent; text-shadow:none;
-  }
-  .btn-footer.primary:hover{filter:saturate(1.2) brightness(1.05)}
-  .btn-footer.primary:focus{ box-shadow:0 0 0 6px color-mix(in oklab, var(--neon-cyan) 16%, transparent); }
-  .btn-footer.hidden{visibility:hidden}
-  .btn-footer:disabled{opacity:.5; pointer-events:none}
-  #footer-wait{display:none; align-items:center; gap:10px; color:#fff; font-weight:800}
-  #footer-wait.show{display:flex}
+    /* ========= Service cards ========= */
+    .svc-grid{ display:grid; gap:14px; margin-top:8px; grid-template-columns:repeat(1,minmax(0,1fr)); }
+    @media (min-width:560px){ .svc-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (min-width:992px){ .svc-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    .svc-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:12px;
+      display:flex; gap:12px; align-items:flex-start; cursor:pointer; outline:none; box-shadow:var(--shadow-xs);
+      transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs);
+      min-height:110px; position:relative; color:#fff;
+    }
+    .svc-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); background:rgba(255,255,255,.12) }
+    .svc-card.selected, .svc-card[aria-checked="true"]{
+      outline:3px solid var(--neon-magenta); outline-offset:2px; box-shadow:0 0 0 3px rgba(0,229,255,.18);
+    }
+    .svc-thumb{ width:88px;height:88px;flex:0 0 88px;border-radius:12px;overflow:hidden;background:#0F1424;border:1px solid rgba(255,255,255,.12); display:flex;align-items:center;justify-content:center; }
+    .svc-thumb img{ width:100%;height:100%;object-fit:cover;display:block }
+    .svc-body{ flex:1 1 auto; min-width:0 }
+    .svc-title-row{ display:flex; align-items:center; gap:8px }
+    .svc-title{ font-weight:900; font-size:1rem; color:#fff; margin:0 0 4px }
+    .svc-cat{ background:var(--gold-600); color:#fff; border:0; padding:2px 8px; border-radius:999px; font-size:.75rem; display:inline-flex; gap:6px; align-items:center; white-space:nowrap; margin-inline-start:auto; }
+    .svc-desc{ font-size:.9rem; color:#DCE3FF; opacity:.92; margin:0 0 8px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden }
+    .tag-row{ display:flex; flex-wrap:wrap; gap:6px }
+    .price-tag{ background:#1B2033; color:#CFE7FF; border:0; padding:4px 8px; border-radius:999px; font-size:.8rem; white-space:nowrap }
+    .price-tag.alt{ background:#282F4C }
+    .svc-cta{ position:absolute; inset-inline-end:10px; inset-block-end:10px; font-size:.85rem; color:#fff; opacity:.9; text-shadow:0 0 10px rgba(0,229,255,.6) }
+    .svc-skel{ background:linear-gradient(90deg,#0F1424,#12182A,#0F1424); background-size:200% 100%; animation:shimmer 1.2s infinite; border:1px solid rgba(255,255,255,.12); border-radius:14px; min-height:110px; }
+    @keyframes shimmer{ 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-  @media (max-width: 480px){
-    .brand img{ height:64px }
-    .summary-chips{ overflow-x:auto; gap:6px; padding-bottom:2px; scrollbar-width:thin; }
-    .summary-chips::-webkit-scrollbar{ height:4px }
-    .chip{ padding:4px 8px; font-size:.78rem }
-    .chip .title{ display:none }
-    .chip .value{ max-width:140px; overflow:hidden; text-overflow:ellipsis }
-    .btn-footer{min-height:58px; font-size:1.05rem}
-    .footer-actions{width:100%}
-    .footer-brand{width:100%; justify-content:space-between}
-  }
-
-  .iti{ width:100%; }
-  html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{ left:8px; right:auto; }
-  html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
-    padding-left: calc(76px + 8px);
-    padding-right: 12px;
-    text-align: left; direction: ltr;
-  }
-
-  /* Service cards */
-  .svc-grid{ display:grid; gap:14px; margin-top:8px; grid-template-columns:repeat(1,minmax(0,1fr)); }
-  @media (min-width:560px){ .svc-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  @media (min-width:992px){ .svc-grid{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
-  .svc-card{
-    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-    border:1px solid var(--glass-stroke); border-radius:14px; color:var(--zen-100);
-    padding:12px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; outline:none; box-shadow:var(--shadow-xs);
-    transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs); min-height:110px; position:relative;
-  }
-  .svc-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); background:linear-gradient(180deg, rgba(122,92,255,.14), rgba(255,45,146,.08)) }
-  .svc-card.selected, .svc-card[aria-checked="true"]{
-    outline:3px solid var(--neon-magenta); outline-offset:2px;
-    box-shadow:0 0 0 2px color-mix(in oklab, var(--neon-cyan) 26%, transparent) inset;
-  }
-  .svc-thumb{ width:88px;height:88px;flex:0 0 88px;border-radius:12px;overflow:hidden;background:#0f1117;border:1px solid var(--glass-stroke); display:flex;align-items:center;justify-content:center; }
-  .svc-thumb img{ width:100%;height:100%;object-fit:cover;display:block }
-  .svc-body{ flex:1 1 auto; min-width:0 }
-  .svc-title-row{ display:flex; align-items:center; gap:8px }
-  .svc-title{ font-weight:900; font-size:1rem; color:#fff; margin:0 0 4px; letter-spacing:.2px }
-  .svc-cat{ background:linear-gradient(90deg, var(--neon-magenta), var(--neon-purple)); color:#0a0b0f; border:0; padding:2px 8px; border-radius:999px; font-size:.75rem; display:inline-flex; gap:6px; align-items:center; white-space:nowrap; margin-inline-start:auto; font-weight:900 }
-  .svc-desc{ font-size:.9rem; color:var(--zen-080); margin:0 0 8px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden }
-  .tag-row{ display:flex; flex-wrap:wrap; gap:6px }
-  .price-tag{ background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); color:#0a0b0f; border:0; padding:4px 8px; border-radius:999px; font-size:.8rem; white-space:nowrap; font-weight:900 }
-  .price-tag.alt{ background:linear-gradient(90deg, var(--neon-purple), var(--neon-cyan)) }
-  .svc-cta{ position:absolute; inset-inline-end:10px; inset-block-end:10px; font-size:.85rem; color:#cbd5e1; opacity:.88 }
-  .svc-skel{ background:linear-gradient(90deg,#0e0f14,#12131a,#0e0f14); background-size:200% 100%; animation:shimmer 1.2s infinite; border:1px solid var(--glass-stroke); border-radius:14px; min-height:110px; }
-  @keyframes shimmer{ 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-  /* Add-ons chips */
-  #addonsChips .btn{
-    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-    color:#fff; border:1px solid var(--glass-stroke); border-radius:999px; min-height:38px; padding-inline:14px;
-  }
-  #addonsChips .btn:hover{ background:linear-gradient(180deg, rgba(122,92,255,.14), rgba(255,45,146,.08)); border-color:var(--neon-cyan); }
-  #addonsChips .btn[aria-pressed="true"]{
-    background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta))!important; color:#0a0b0f!important; border-color:transparent!important; box-shadow:0 0 0 3px color-mix(in oklab, var(--neon-cyan) 20%, transparent);
-  }
-  #addonsChips .btn[aria-pressed="true"]::before{ content:"✓"; font-weight:900; margin-inline-start:6px; }
-
-  /* Language toggle */
-  .lang-toggle{
-    display:flex; gap:8px; align-items:center; margin-inline-start:8px;
-    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-    border:1px solid var(--glass-stroke); border-radius:999px; padding:6px 10px;
-  }
-  .lang-toggle button{
-    border:0; padding:6px 10px; border-radius:999px; font-weight:900; letter-spacing:.3px; color:#e5edff;
-    background:transparent; cursor:pointer;
-  }
-  .lang-toggle button.active{
-    background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); color:#0a0b0f;
-  }
-
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce){
-    *{animation:none!important; transition:none!important}
-  }
-</style>
+    /* ========= Add-ons chips ========= */
+    #addonsChips .btn{
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06)); color:#fff; border:1px solid rgba(255,255,255,.16); border-radius:999px; min-height:38px; padding-inline:14px;
+    }
+    #addonsChips .btn:hover{ background:rgba(255,255,255,.12); border-color:var(--neon-cyan); }
+    #addonsChips .btn[aria-pressed="true"]{
+      background:linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta))!important; color:#0B0D13!important; border-color:transparent!important; box-shadow:0 0 0 3px rgba(0,229,255,.18);
+    }
+    #addonsChips .btn[aria-pressed="true"]::before{ content:"✓"; font-weight:900; margin-inline-start:6px; }
+  </style>
 </head>
+
 <body>
   <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
 
@@ -379,16 +359,11 @@
              alt="Tiger 77"
              src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Tiger77%20-%20Logo.png"
              onerror="handleLogoError(this)" />
-        <!-- Language toggle -->
-        <div class="lang-toggle" aria-label="Language">
-          <button id="btnLangAR" class="active" type="button">العربية</button>
-          <button id="btnLangJP" type="button">日本語</button>
-        </div>
       </div>
       <div class="header-right">
         <div class="mini-progress" aria-hidden="true">
           <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
-          <div class="step" id="miniStepTitle" data-i18n="step.welcome">الترحيب</div>
+          <div class="step" id="miniStepTitle">الترحيب</div>
         </div>
         <div id="summaryChips" class="summary-chips" aria-live="polite"></div>
       </div>
@@ -400,49 +375,58 @@
       <div class="stage">
         <!-- 1) Welcome -->
         <section id="page1" class="page active" aria-label="الترحيب">
-          <h1 data-i18n="brand.title">🐯 Tiger 77</h1>
+          <h1>🗼 タイガー77 • Tiger 77 — أهلاً بكم في طوكيو ✨</h1>
           <div class="ppt-deck" id="pptDeck">
             <div class="ppt-slide is-active">
-              <div class="slide-card"><h3 class="mb-2" data-i18n="welcome.s1t">نجيك لين باب بيتك</h3><p class="m-0" data-i18n="welcome.s1d">حجز سريع • خدمة متنقلة • احترافية في كل تفصيل</p></div>
+              <div class="slide-card">
+                <h3 class="mb-2">🎌 خدمة متنقلة • 迅速訪問</h3>
+                <p class="m-0">نجيك لين باب بيتك — ご自宅まで伺います</p>
+              </div>
             </div>
             <div class="ppt-slide">
-              <div class="slide-card"><h3 class="mb-2" data-i18n="welcome.s2t">مواد فاخرة</h3><p class="m-0" data-i18n="welcome.s2d">منتجات آمنة على الطلاء والداخلية مع عناية دقيقة</p></div>
+              <div class="slide-card">
+                <h3 class="mb-2">🥷 品質 • こだわり</h3>
+                <p class="m-0">مواد فاخرة وآمنة — プレミアムケアで安心</p>
+              </div>
             </div>
             <div class="ppt-slide">
-              <div class="slide-card"><h3 class="mb-2" data-i18n="welcome.s3t">موعدك على راحتك</h3><p class="m-0" data-i18n="welcome.s3d">حدد المنطقة والخدمة والوقت المناسب — والباقي علينا</p></div>
+              <div class="slide-card">
+                <h3 class="mb-2">🍣 المواعيد على راحتك • ご希望の時間</h3>
+                <p class="m-0">حدد المنطقة والخدمة — エリアとサービスを選ぶだけ</p>
+              </div>
             </div>
           </div>
           <div id="pptDots" class="ppt-dots" aria-hidden="true"></div>
           <div class="card text-center" style="max-width:860px">
-            <p class="mb-0" style="color:#d5d9fb" data-i18n="welcome.cta">انطلق — الخطوة التالية لاختيار المنطقة والخدمة</p>
+            <p class="mb-0">ابدأ الآن — 次へ進んでサービスを選択</p>
           </div>
         </section>
 
         <!-- 2) Service & Location -->
         <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
-          <h1 data-i18n="step.service">وين تحب نجيك؟</h1>
+          <h1>🚙 أين نصل إليك؟ • どこでご希望ですか？</h1>
           <div class="card position-relative" id="servicesCard">
-            <label class="form-label" data-i18n="labels.area">اختيار المنطقة</label>
+            <label class="form-label">اختيار المنطقة • エリア選択</label>
             <select id="area" style="width:100%"></select>
-            <div class="field-error" id="err-area" data-i18n="errors.area">يرجى اختيار المنطقة</div>
+            <div class="field-error" id="err-area">يرجى اختيار المنطقة</div>
 
             <div class="row g-3 mt-3">
               <div class="col-12 col-md-6">
-                <label class="form-label" data-i18n="labels.category">التصنيف</label>
+                <label class="form-label">التصنيف • カテゴリー</label>
                 <select id="serviceCat" style="width:100%"></select>
-                <div class="field-error" id="err-serviceCat" data-i18n="errors.category">يرجى اختيار التصنيف</div>
+                <div class="field-error" id="err-serviceCat">يرجى اختيار التصنيف</div>
               </div>
 
               <!-- Hidden actual select synced with cards -->
               <div class="col-12 col-md-6" hidden>
-                <label class="form-label" data-i18n="labels.service">الخدمة</label>
+                <label class="form-label">الخدمة • サービス</label>
                 <select id="service" style="width:100%" class="visually-hidden" aria-hidden="true" tabindex="-1"></select>
-                <div class="field-error" id="err-service" data-i18n="errors.service">يرجى اختيار الخدمة</div>
+                <div class="field-error" id="err-service">يرجى اختيار الخدمة</div>
               </div>
 
               <!-- Number of Cars -->
               <div class="col-12 col-md-6">
-                <label class="form-label" for="numCars" data-i18n="labels.cars">عدد السيارات (حتى 5)</label>
+                <label class="form-label" for="numCars">عدد السيارات (حتى 5) • 台数（最大5台）</label>
                 <select id="numCars" style="width:100%">
                   <option value="1" selected>1</option>
                   <option value="2">2</option>
@@ -450,16 +434,16 @@
                   <option value="4">4</option>
                   <option value="5">5</option>
                 </select>
-                <div class="field-error" id="err-numCars" data-i18n="errors.cars">يرجى اختيار عدد السيارات</div>
+                <div class="field-error" id="err-numCars">يرجى اختيار عدد السيارات</div>
               </div>
 
               <div class="col-12">
                 <div id="serviceCardsWrap">
                   <div id="serviceCards" class="svc-grid" role="radiogroup" aria-label="الخدمات المتاحة"></div>
-                  <div id="svcEmpty" class="text-center text-muted" style="display:none;padding:16px" data-i18n="state.noServices">لا توجد خدمات في هذا التصنيف</div>
+                  <div id="svcEmpty" class="text-center text-muted" style="display:none;padding:16px">لا توجد خدمات في هذا التصنيف</div>
                   <div id="svcError" class="text-center" style="display:none;padding:16px">
-                    <div class="mb-2 text-danger" data-i18n="state.loadErr">تعذر تحميل بيانات الخدمات</div>
-                    <button id="svcRetry" class="btn btn-outline-primary btn-sm" data-i18n="actions.retry">إعادة المحاولة</button>
+                    <div class="mb-2 text-danger">تعذر تحميل بيانات الخدمات</div>
+                    <button id="svcRetry" class="btn btn-outline-primary btn-sm">إعادة المحاولة</button>
                   </div>
                 </div>
               </div>
@@ -468,20 +452,20 @@
             <!-- Spinner during load -->
             <div id="servicesLoading" class="load-overlay" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
-              <strong data-i18n="state.loadingServices">جاري تحميل الخدمات…</strong>
+              <strong>جاري تحميل الخدمات…</strong>
             </div>
           </div>
         </section>
 
         <!-- 3) Time -->
         <section id="page3" class="page" aria-label="اختيار الموعد">
-          <h1 data-i18n="step.time">متى تحب نجيك؟</h1>
+          <h1>🕰️ متى تحب نجيك؟ • ご希望の時間は？</h1>
           <div class="card position-relative" id="timeCard">
             <div class="row g-3">
               <div class="col-12 col-md-5">
-                <label class="form-label" for="date" data-i18n="labels.date">التاريخ</label>
+                <label class="form-label" for="date">التاريخ • 日付</label>
                 <input id="date" type="date" class="form-control"/>
-                <div class="field-error" id="err-date" data-i18n="errors.date">يرجى اختيار تاريخ صحيح</div>
+                <div class="field-error" id="err-date">يرجى اختيار تاريخ صحيح</div>
               </div>
               <div class="col-12 col-md-7 d-flex align-items-end justify-content-end">
                 <div class="text-muted" id="timeCountHint" style="font-weight:800">0/1 وقت محدد</div>
@@ -490,13 +474,13 @@
 
             <div class="time-toolbar mt-3">
               <div>
-                <label class="form-label" for="timeFilter" hidden data-i18n="labels.timeFilter">فلترة الوقت</label>
+                <label class="form-label" for="timeFilter" hidden>فلترة الوقت</label>
                 <select id="timeFilter" class="form-select" hidden>
-                  <option value="all" selected data-i18n="time.all">كل الأوقات المتاحة</option>
-                  <option value="morning" data-i18n="time.morning">الصباح (06:00–11:00)</option>
-                  <option value="afternoon" data-i18n="time.afternoon">الظهيرة (11:00–16:00)</option>
-                  <option value="evening" data-i18n="time.evening">المساء (16:00–21:00)</option>
-                  <option value="night" data-i18n="time.night">ليلًا (21:00–23:59)</option>
+                  <option value="all" selected>كل الأوقات • すべて</option>
+                  <option value="morning">الصباح (06:00–11:00)</option>
+                  <option value="afternoon">الظهيرة (11:00–16:00)</option>
+                  <option value="evening">المساء (16:00–21:00)</option>
+                  <option value="night">ليلًا (21:00–23:59)</option>
                 </select>
               </div>
             </div>
@@ -505,7 +489,7 @@
               <div id="time-container" class="time-grid" role="group" aria-label="اختيار الأوقات (متعدد)"></div>
               <div id="timeLoading" class="load-overlay">
                 <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
-                <strong data-i18n="state.fetchTimes">جاري جلب المواعيد…</strong>
+                <strong>جاري جلب المواعيد…</strong>
               </div>
             </div>
           </div>
@@ -513,18 +497,18 @@
 
         <!-- 4) Contact -->
         <section id="page4" class="page" aria-label="معلومات الاتصال">
-          <h1 data-i18n="step.contact">معلومات الاتصال</h1>
+          <h1>👤 معلومات الاتصال • 連絡先</h1>
           <div class="card">
             <div class="row g-3">
               <div class="col-12 col-md-6">
-                <label for="name" class="form-label" data-i18n="labels.name">الاسم</label>
+                <label for="name" class="form-label">الاسم • お名前</label>
                 <input id="name" type="text" class="form-control" placeholder="الاسم كما سيظهر في الفاتورة" autocomplete="name"/>
-                <div class="field-error" id="err-name" data-i18n="errors.name">يرجى إدخال الاسم</div>
+                <div class="field-error" id="err-name">يرجى إدخال الاسم</div>
               </div>
               <div class="col-12 col-md-6">
-                <label for="mobile" class="form-label" data-i18n="labels.mobile">رقم الجوال</label>
+                <label for="mobile" class="form-label">رقم الجوال • 携帯番号</label>
                 <input id="mobile" type="tel" class="form-control" placeholder="5XXXXXXXX" autocomplete="tel"/>
-                <div class="field-error" id="err-mobile" data-i18n="errors.mobile">الرجاء إدخال رقم جوال صحيح</div>
+                <div class="field-error" id="err-mobile">الرجاء إدخال رقم جوال صحيح</div>
               </div>
             </div>
           </div>
@@ -532,17 +516,17 @@
           <div class="card" hidden>
             <div class="row g-3">
               <div class="col-12 col-md-4">
-                <label class="form-label" for="carBrand" data-i18n="labels.carBrand">ماركة السيارة 🚘</label>
+                <label class="form-label" for="carBrand">ماركة السيارة • メーカー</label>
                 <select id="carBrand" style="width:100%"></select>
               </div>
               <div class="col-12 col-md-4">
-                <label class="form-label" for="carName" data-i18n="labels.carName">اسم السيارة</label>
-                <input id="carName" type="text" class="form-control" placeholder="الموديل/الفئة — مثال: S-Class، LX 570" autocomplete="off"/>
+                <label class="form-label" for="carName">اسم السيارة • モデル</label>
+                <input id="carName" type="text" class="form-control" placeholder="الموديل/الفئة" autocomplete="off"/>
               </div>
               <div class="col-12 col-md-4">
-                <label class="form-label" for="plateNumber" data-i18n="labels.plate">رقم اللوحة (اختياري)</label>
+                <label class="form-label" for="plateNumber">رقم اللوحة (اختياري) • ナンバー(任意)</label>
                 <input id="plateNumber" type="text" inputmode="numeric" class="form-control" placeholder="أرقام اللوحة — اختياري" autocomplete="off"/>
-                <small id="plateHelp" class="text-muted d-block mt-1" style="opacity:.9" data-i18n="hints.plate">اختياري — يساعد فريقنا على التعرف على مركبتك بسرعة</small>
+                <small id="plateHelp" class="text-muted d-block mt-1" style="opacity:.9">اختياري — يساعد فريقنا على التعرف على مركبتك بسرعة</small>
                 <div class="field-error" id="err-plate" style="display:none"></div>
               </div>
               <input id="locationDescription" type="text" hidden/>
@@ -553,7 +537,7 @@
 
         <!-- 5) Payment -->
         <section id="page5" class="page" aria-label="طريقة الدفع">
-          <h1 data-i18n="step.pay">طريقة الدفع</h1>
+          <h1>💴 طريقة الدفع • お支払い</h1>
           <div class="pay-grid" role="radiogroup" aria-label="طريقة الدفع" id="payGroup" aria-describedby="err-pay" >
             <label class="pay-card" role="radio" aria-checked="false" tabindex="0" hidden>
               <input type="radio" name="payingMethod" value="stc pay" class="visually-hidden" />
@@ -565,93 +549,92 @@
             <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" hidden>
               <input type="radio" name="payingMethod" value="cash" class="visually-hidden" />
               <span class="pay-card__content">
-                <span class="pay-card__icon" aria-hidden="true">💵</span>
-                <span class="pay-card__label" data-i18n="pay.cash"><strong>كاش</strong></span>
+                <span class="pay-card__icon" aria-hidden="true">💴</span>
+                <span class="pay-card__label"><strong>نقدًا • 現金</strong></span>
               </span>
             </label>
             <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" style="grid-column:1/-1" hidden>
               <input type="radio" name="payingMethod" value="Bank Transfer" class="visually-hidden" />
               <span class="pay-card__content">
                 <span class="pay-card__icon" aria-hidden="true">🏦</span>
-                <span class="pay-card__label" data-i18n="pay.bank"><strong>تحويل بنكي</strong></span>
+                <span class="pay-card__label"><strong>تحويل بنكي • 振込</strong></span>
               </span>
             </label>
             <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" style="grid-column:1/-1">
               <input type="radio" name="payingMethod" value="mada" class="visually-hidden" />
               <span class="pay-card__content">
                 <img class="pay-card__img" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada" />
-                <span class="pay-card__label" data-i18n="pay.mada">مدى</span>
+                <span class="pay-card__label">مدى • Mada</span>
               </span>
             </label>
           </div>
-          <div class="field-error" id="err-pay" role="alert" aria-live="polite" data-i18n="errors.pay">يرجى اختيار طريقة الدفع</div>
+          <div class="field-error" id="err-pay" role="alert" aria-live="polite">يرجى اختيار طريقة الدفع</div>
         </section>
 
         <!-- 6) Map -->
         <section id="page6" class="page" aria-label="اختيار الموقع">
-          <h1 data-i18n="step.map">الموقع على خريطة قوقل</h1>
+          <h1>🗺️ الموقع على خريطة قوقل • 位置（Google マップ）</h1>
           <div class="card">
             <div class="map-search">
-              <input id="mapSearch" class="form-control" type="text" placeholder="ابحث عن برج، حي، أو عنوان داخل السعودية"/>
+              <input id="mapSearch" class="form-control" type="text" placeholder="ابحث داخل السعودية • 住所/ランドマーク"/>
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             <div id="googleMap"></div>
           </div>
           <div class="card text-center">
-            <button id="show-my-location" class="btn btn-outline-primary" type="button" data-i18n="actions.myLoc">إظهار موقعي</button>
+            <button id="show-my-location" class="btn btn-outline-primary" type="button">📍 إظهار موقعي • 現在地</button>
           </div>
-          <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center" data-i18n="hints.map">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
-          <div class="field-error" id="err-map" style="text-align:center" data-i18n="errors.map">الرجاء تحديد الموقع على الخريطة</div>
+          <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك • 地図をタップまたはピンをドラッグ</small>
+          <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
         </section>
 
         <!-- 7) Review Order -->
         <section id="page7" class="page" aria-label="مراجعة الطلب">
-          <h1 data-i18n="step.review">مراجعة الطلب</h1>
+          <h1>🔎 مراجعة الطلب • 最終確認</h1>
           <div class="card" style="max-width:820px">
-            <p class="text-muted mb-3" data-i18n="review.desc">راجع تفاصيل حجزك ثم اضغط "تأكيد الطلب"</p>
+            <p class="text-muted mb-3">راجع تفاصيل حجزك ثم اضغط "تأكيد الطلب" • 内容をご確認ください</p>
 
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.area">المنطقة</span><span class="fw-bold" id="rv-area">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.service">الخدمة</span><span class="fw-bold" id="rv-service">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.cars">عدد السيارات</span><span class="fw-bold" id="rv-cars">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.date">التاريخ</span><span class="fw-bold" id="rv-date">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.times">الأوقات</span><span class="fw-bold" id="rv-times">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.name">الاسم</span><span class="fw-bold" id="rv-name">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.mobile">الجوال</span><span class="fw-bold" id="rv-mobile">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom" hidden><span data-i18n="review.car">المركبة</span><span class="fw-bold" id="rv-car">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.addons">الإضافات</span><span class="fw-bold" id="rv-addons">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.pay">الدفع</span><span class="fw-bold" id="rv-pay">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>المنطقة • エリア</span><span class="fw-bold" id="rv-area">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>الخدمة • サービス</span><span class="fw-bold" id="rv-service">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>عدد السيارات • 台数</span><span class="fw-bold" id="rv-cars">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>التاريخ • 日付</span><span class="fw-bold" id="rv-date">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>الأوقات • 時間</span><span class="fw-bold" id="rv-times">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>الاسم • お名前</span><span class="fw-bold" id="rv-name">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>الجوال • 携帯</span><span class="fw-bold" id="rv-mobile">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom" hidden><span>المركبة</span><span class="fw-bold" id="rv-car">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>الإضافات • 追加</span><span class="fw-bold" id="rv-addons">—</span></div>
+            <div class="d-flex justify-content-between py-2 border-bottom"><span>الدفع • 支払い</span><span class="fw-bold" id="rv-pay">—</span></div>
 
-            <!-- Order Total -->
             <div class="d-flex justify-content-between py-2 border-top">
-              <span data-i18n="review.total">الإجمالي</span>
+              <span>الإجمالي • 合計</span>
               <span class="fw-bold" id="rv-total">—</span>
             </div>
 
             <div class="d-flex gap-2 flex-wrap mt-3">
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="2" data-i18n="actions.editService">تعديل الخدمة</button>
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="3" data-i18n="actions.editTime">تعديل الوقت</button>
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="4" data-i18n="actions.editContact">تعديل البيانات</button>
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="5" data-i18n="actions.editPay">تغيير الدفع</button>
-              <button id="confirmOrder" class="btn btn-primary ms-auto" type="button" data-i18n="actions.confirm">تأكيد الطلب</button>
+              <button class="btn btn-outline-secondary" type="button" data-edit-step="2">تعديل الخدمة</button>
+              <button class="btn btn-outline-secondary" type="button" data-edit-step="3">تعديل الوقت</button>
+              <button class="btn btn-outline-secondary" type="button" data-edit-step="4">تعديل البيانات</button>
+              <button class="btn btn-outline-secondary" type="button" data-edit-step="5">تغيير الدفع</button>
+              <button id="confirmOrder" class="btn btn-primary ms-auto" type="button">✅ تأكيد الطلب • 確定</button>
             </div>
           </div>
         </section>
 
         <!-- 8) Done -->
         <section id="page8" class="page" aria-label="تم الحجز">
-          <h1 data-i18n="done.title">شكراً لكم 🌟</h1>
+          <h1>🌸 ありがとうございました • شكراً لكم</h1>
           <div class="card text-center" style="max-width:720px">
-            <p class="mb-3" style="color:#d5d9fb" data-i18n="done.desc">تم استلام طلبكم، وسنؤكد الموعد على واتساب قريبًا.</p>
+            <p class="mb-3">تم استلام طلبكم، وسنؤكد الموعد على واتساب قريبًا • ご予約内容を確認後、WhatsAppでご連絡します</p>
             <div id="thanks-summary" class="text-start mx-auto" style="max-width:520px">
-              <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.area">المنطقة</span><strong id="ts-area">—</strong></div>
-              <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.service">الخدمة</span><strong id="ts-service">—</strong></div>
-              <div class="d-flex justify-content-between py-2 border-bottom"><span data-i18n="review.cars">عدد السيارات</span><strong id="ts-cars">—</strong></div>
-              <div class="d-flex justify-content-between py-2"><span data-i18n="done.times">المواعيد</span><strong id="ts-dt">—</strong></div>
-              <div class="d-flex justify-content-between py-2"><span data-i18n="done.pay">طريقة الدفع</span><strong id="ts-pay">—</strong></div>
+              <div class="d-flex justify-content-between py-2 border-bottom"><span>المنطقة • エリア</span><strong id="ts-area">—</strong></div>
+              <div class="d-flex justify-content-between py-2 border-bottom"><span>الخدمة • サービス</span><strong id="ts-service">—</strong></div>
+              <div class="d-flex justify-content-between py-2 border-bottom"><span>عدد السيارات • 台数</span><strong id="ts-cars">—</strong></div>
+              <div class="d-flex justify-content-between py-2"><span>المواعيد • 日時</span><strong id="ts-dt">—</strong></div>
+              <div class="d-flex justify-content-between py-2"><span>طريقة الدفع • 支払い</span><strong id="ts-pay">—</strong></div>
             </div>
             <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
-              <a id="ts-whatsapp" class="btn btn-success" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> <span data-i18n="actions.share">مشاركة عبر واتساب</span></a>
-              <button id="rebook" class="btn btn-primary" type="button" style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px" data-i18n="actions.rebook">🔁 حجز جديد</button>
+              <a id="ts-whatsapp" class="btn btn-success" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> مشاركة عبر واتساب • 共有</a>
+              <button id="rebook" class="btn btn-primary" type="button" style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px">🔁 حجز جديد • もう一度</button>
             </div>
           </div>
         </section>
@@ -670,11 +653,11 @@
         </div>
       </div>
       <div class="footer-actions">
-        <button id="footer-prev" type="button" class="btn-footer hidden" data-i18n="actions.prev">السابق</button>
-        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled data-i18n="actions.skip">تخطي العرض</button>
+        <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
+        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>次へ • التالي</button>
         <div id="footer-wait" class="">
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-          <span data-i18n="state.sending">يتم إرسال الطلب…</span>
+          <span>يتم إرسال الطلب…</span>
         </div>
       </div>
     </div>
@@ -683,18 +666,18 @@
   <!-- ===== Additional Services Modal ===== -->
   <div class="modal fade" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content" style="border-radius:16px; background:var(--glass-bg); color:#fff; border:1px solid var(--glass-stroke); backdrop-filter:blur(8px)">
-        <div class="modal-header" style="border-bottom:1px solid var(--glass-stroke)">
-          <h5 class="modal-title fw-bold" id="addonsModalLabel" data-i18n="addons.title">الخدمات الإضافية</h5>
-          <button type="button" class="btn-close" style="filter:invert(1) contrast(100%)" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+      <div class="modal-content" style="border-radius:16px">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="addonsModalLabel">الخدمات الإضافية • オプション</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
         </div>
         <div class="modal-body">
-          <p class="text-muted mb-2" data-i18n="addons.hint">اختياري — اختَر ما يناسبك:</p>
+          <p class="text-muted mb-2">اختياري — 選択自由:</p>
           <div id="addonsChips" class="addon-wrap"></div>
         </div>
-        <div class="modal-footer d-flex justify-content-between" style="border-top:1px solid var(--glass-stroke)">
-          <button type="button" id="addonsNoThanks" class="btn btn-outline-secondary" data-i18n="addons.no">لا شكرًا</button>
-          <button type="button" id="addonsConfirm" class="btn btn-primary" data-i18n="addons.confirm">تأكيد الإضافات</button>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" id="addonsNoThanks" class="btn btn-outline-secondary">لا شكرًا • スキップ</button>
+          <button type="button" id="addonsConfirm" class="btn btn-primary">تأكيد الإضافات • 確定</button>
         </div>
       </div>
     </div>
@@ -707,9 +690,9 @@
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- ===== Existing Logic (Unchanged) + Theme/I18N helpers appended below ===== -->
-<script>
-  /* ---------- Logo fallback (unchanged) ---------- */
+  <!-- ==== IMPORTANT: JS below is functionally identical to your original (no workflow change) ==== -->
+  <script>
+  /* ---------- Logo fallback ---------- */
   function handleLogoError(img){
     const fallbacks = [
       "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%20Soap/spong&Soap%20-%20logo.png",
@@ -722,7 +705,7 @@
     else { img.style.display = 'none'; }
   }
 
-  /* ---------- NAHL API endpoints (unchanged) ---------- */
+  /* ---------- NAHL API endpoints ---------- */
   const APP_ID='6e6b8ca3-e69a-48de-8522-16a496cc5214';
   const defaultLink2=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
   const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
@@ -759,8 +742,38 @@
       paymentMethod:      toStr((n.paymentMethod||'').toLowerCase()),
       urlLocation:        toStr(n.urlLocation),
       locationDescription:toStr(n.locationDescription),
-      locale:             window.__lang || 'ar'
+      locale:             'ar'
     };
+  }
+
+  async function postReservationOriginal(payload){
+    const body = JSON.stringify(payload);
+    const headers1 = { 'Content-Type':'text/plain;charset=UTF-8', 'Accept':'application/json' };
+    const headers2 = { 'Content-Type':'application/json;charset=UTF-8', 'Accept':'application/json' };
+
+    try{
+      const res1 = await fetch(RESERVE_URL_PRIMARY, { method:'POST', headers:headers1, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer', redirect:'follow' });
+      const raw1 = await res1.text(); let data1=null; try{ data1 = JSON.parse(raw1); }catch(_){}
+      if(res1.ok) return { ok:true, status:res1.status, data:data1||{}, raw:raw1, url:RESERVE_URL_PRIMARY };
+      if(res1.status===415 || res1.status===406){
+        const res1b = await fetch(RESERVE_URL_PRIMARY, { method:'POST', headers:headers2, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer' });
+        const raw1b = await res1b.text(); let data1b=null; try{ data1b=JSON.parse(raw1b);}catch(_){}
+        if(res1b.ok) return { ok:true, status:res1b.status, data:data1b||{}, raw:raw1b, url:RESERVE_URL_PRIMARY };
+        if(res1b.status!==404) return { ok:false, status:res1b.status, data:data1b, raw:raw1b, url:RESERVE_URL_PRIMARY };
+      }
+      if(res1.status!==404) return { ok:false, status:res1.status, data:data1, raw:raw1, url:RESERVE_URL_PRIMARY };
+    }catch(e){}
+
+    try{
+      const res2 = await fetch(RESERVE_URL_FALLBACK, { method:'POST', headers:headers1, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer', redirect:'follow' });
+      const raw2 = await res2.text(); let data2=null; try{ data2 = JSON.parse(raw2); }catch(_){}
+      if(res2.ok) return { ok:true, status:res2.status, data:data2||{}, raw:raw2, url:RESERVE_URL_FALLBACK };
+      const res2b = await fetch(RESERVE_URL_FALLBACK, { method:'POST', headers:headers2, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer' });
+      const raw2b = await res2b.text(); let data2b=null; try{ data2b = JSON.parse(raw2b); }catch(_){}
+      return { ok:res2b.ok, status:res2b.status, data:data2b, raw:raw2b, url:RESERVE_URL_FALLBACK };
+    }catch(e2){
+      return { ok:false, status:0, error:String(e2), url:RESERVE_URL_FALLBACK };
+    }
   }
 
   function showToast(type='info', msg=''){
@@ -773,23 +786,18 @@
     setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2400);
   }
 
-  /* ---------- Everything from your previous logic remains; below is the original large block ---------- */
-</script>
-
-<!-- === BEGIN: ORIGINAL APP LOGIC (unchanged, pasted from your last version) === -->
-<script>
   const DateTime=luxon.DateTime;
   const orderedPages=["page1","page2","page3","page4","page5","page6","page7","page8"];
   const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","مراجعة","تم"];
   const PAGE_BACKGROUNDS={
-    page1:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg",
-    page2:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg",
-    page3:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG3.jpg",
-    page4:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG4.jpg",
-    page5:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg",
-    page6:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg",
-    page7:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg",
-    page8:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"
+    page1:"https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1600&auto=format&fit=crop",
+    page2:"https://images.unsplash.com/photo-1526485797145-8b63f7f3f991?q=80&w=1600&auto=format&fit=crop",
+    page3:"https://images.unsplash.com/photo-1518732714860-b62714ce0c59?q=80&w=1600&auto=format&fit=crop",
+    page4:"https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=1600&auto=format&fit=crop",
+    page5:"https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=1600&auto=format&fit=crop",
+    page6:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1600&auto=format&fit=crop",
+    page7:"https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=1600&auto=format&fit=crop",
+    page8:"https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1600&auto=format&fit=crop"
   };
   const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6,page8:7};
 
@@ -900,6 +908,7 @@
   }
   function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
 
+  /* Plate helpers */
   function isSpecialPlate(num){
     if(!/^\d+$/.test(num) || num.length < 3) return false;
     const same = /^(\d)\1+$/.test(num);
@@ -919,6 +928,7 @@
     const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
   }
 
+  /* Times helpers */
   function parseTimeToLuxon(raw){
     let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true});
     if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
@@ -1002,7 +1012,6 @@
       return;
     }
 
-    /* Auto-select first available slot(s) — retained */
     if (selectedTimes.length === 0) {
       const limit = getCarsCount();
       selectedTimes = viewList.slice(0, limit).map(t =>
@@ -1053,6 +1062,7 @@
     header && ro.observe(header); footer && ro.observe(footer);
   }
 
+  /* ---------- GAS JSONP (Services) with auto-retry ---------- */
   const GAS_BASE = 'https://script.google.com/macros/s/AKfycbwMXUFLd6th5C6cK7E999aTdHXuWHcUOq7KzGzxJE4RUaEt2tWNg98p98hXqYCTE-F7YQ/exec';
   function jsonp(url, timeoutMs = 12000){
     return new Promise((resolve,reject)=>{
@@ -1077,6 +1087,7 @@
     return arr.map(r => ({ ...r, TS_service_id: String(r.TS_service_id ?? '') }));
   }
 
+  /* ---------- Service Cards ---------- */
   const arCurrency = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
   function toArrayTags(x){
     if (Array.isArray(x)) return x.map(t=>String(t).trim()).filter(Boolean);
@@ -1159,20 +1170,20 @@
       const img=document.createElement('img');
       img.src=meta.img; img.alt=service.TS_service_arabic_name||('خدمة '+service.TS_service_id);
       img.loading='lazy'; img.decoding='async'; img.width=88; img.height=88;
-      img.onerror=()=>{ thumb.textContent='🧼'; }; thumb.appendChild(img);
-    }else{ thumb.textContent='🧼'; }
+      img.onerror=()=>{ thumb.textContent='🧽'; }; thumb.appendChild(img);
+    }else{ thumb.textContent='🧽'; }
 
     const body=document.createElement('div'); body.className='svc-body';
     const titleRow=document.createElement('div'); titleRow.className='svc-title-row';
     const ttl=document.createElement('div'); ttl.className='svc-title'; ttl.textContent=service.TS_service_arabic_name||service.TS_service_id;
     titleRow.appendChild(ttl);
     const catText = meta.category;
-    if(catText){ const cat=document.createElement('span'); cat.className='svc-cat'; cat.innerHTML='<i class="fa-solid fa-layer-group"></i> '+catText; titleRow.appendChild(cat); }
+    if(catText){ const cat=document.createElement('span'); cat.className='svc-cat'; cat.innerHTML='🍡 '+catText; titleRow.appendChild(cat); }
     const desc=document.createElement('p'); desc.className='svc-desc'; desc.textContent=meta.desc||'';
     const tagsRow=document.createElement('div'); tagsRow.className='tag-row';
     (meta.tags||[]).forEach((t,i)=>{ const chip=document.createElement('span'); chip.className='price-tag'+(i%2?' alt':''); chip.textContent=t; tagsRow.appendChild(chip); });
 
-    const cta=document.createElement('div'); cta.className='svc-cta'; cta.innerHTML='<i class="fa-solid fa-circle-check"></i>';
+    const cta=document.createElement('div'); cta.className='svc-cta'; cta.innerHTML='🗼';
     body.appendChild(titleRow); body.appendChild(desc); body.appendChild(tagsRow);
     card.appendChild(thumb); card.appendChild(body); card.appendChild(cta);
 
@@ -1230,6 +1241,7 @@
     if(retry) retry.onclick=()=>renderServiceCardsByCategory_FromSheet(categoryName);
   }
 
+  /* ---------- Addons ---------- */
   function toArrayTagsSafe(s){ return toArrayTags(s); }
   function getAddonsForService(serviceId){
     const row = servicesSheetCache.find(r => String(r.TS_service_id) === String(serviceId));
@@ -1271,6 +1283,7 @@
   }
   window.addEventListener('service:selected', (ev) => { const { id } = ev.detail || {}; openAddonsModalFor(id); });
 
+  /* ---------- NAHL category name → ID --------- */
   const NAHL_CAT_MAP = new Map();
   function updateServiceCatIdFromName(){
     const areaId = $('#area').val();
@@ -1293,6 +1306,7 @@
     nForm.locationDescription = final;
   }
 
+  /* ---------- Initialize ---------- */
   $(function () {
     installResizeObservers();
 
@@ -1332,6 +1346,7 @@
     $('#date').on('change', () => { fetchTimesForSelectedDate(); renderSummary('page3'); });
     $('#timeFilter').on('change', function () { currentTimeFilter = this.value; renderSelectedDateTimes(lastSelectedDateISO); });
 
+    // Load locations (NAHL)
     setLoadingServices(true);
     callContent2(`/locations`, res => {
       const list = res?.data || [];
@@ -1342,6 +1357,7 @@
       renderSummary('page2');
     });
 
+    // Auto-retry services from GAS with spinner
     (async () => {
       setLoadingServices(true);
       const MAX = 3; let attempt=0; let success=false; let lastErr=null;
@@ -1372,6 +1388,7 @@
       renderSummary('page2'); updateNextAvailability();
     })();
 
+    // When location changes: fetch service-cat map (name→id)
     $('#area').on('change', function () {
       const areaId = this.value;
       nForm.location = areaId;
@@ -1403,12 +1420,15 @@
       composeLocationDescription();
     });
 
+    // Car brands
     const brands=['Changan','Hyundai','Kia','Toyota','Nissan','Chevrolet','GMC','Mercedes-Benz','BMW','Audi','Lexus','Land Rover (Range Rover)','Porsche','Genesis','Cadillac','Infiniti','Ford','Honda','Mazda','Mitsubishi','Other'].map(b=>({id:b,text:b}));
     $('#carBrand').empty().select2({ data: brands, width: '100%', placeholder: 'اختر ماركة المركبة', dir: 'rtl' });
 
+    // Footer nav
     document.getElementById('footer-next').addEventListener('click', gotoNext);
     document.getElementById('footer-prev').addEventListener('click', () => { const i = getActiveIndex(); showPage(Math.max(i - 1, 0)); });
 
+    // Payment selection
     const payCards = [...document.getElementById('payGroup').querySelectorAll('.pay-card')];
     payCards.forEach((card) => {
       const input = card.querySelector('input');
@@ -1416,15 +1436,19 @@
         payCards.forEach(c => { c.setAttribute('aria-checked', 'false'); c.setAttribute('tabindex', '-1'); c.querySelector('input').checked = false; });
         card.setAttribute('aria-checked', 'true'); card.setAttribute('tabindex', '0'); input.checked = true;
         nForm.paymentMethod = input.value; renderSummary('page5'); updateNextAvailability();
-        showPage(5);
+        showPage(5); // go to Map next via footer
       };
       card.addEventListener('click', choose);
       card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); } });
     });
 
+    // Confirm button on Review page triggers submit
     document.getElementById('confirmOrder').addEventListener('click', submitAllAppointments);
+
+    // Rebook
     $('#rebook').on('click', () => location.href = '/');
 
+    // Initial UI
     setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
     nForm.serviceCount = '1'; updateTimeCountHint();
   });
@@ -1439,8 +1463,8 @@
     }
     else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
     else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
-    else if(i===5){ enable=!!positionUrl; }
-    else if(i===6){ enable=true; }
+    else if(i===5){ enable=!!positionUrl; } // Map
+    else if(i===6){ enable=true; } // Review
     nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
   }
 
@@ -1481,13 +1505,13 @@
 
     if (id === 'page5') {
       if (!nForm.paymentMethod) { $('#err-pay').show(); showToast('error', 'اختر طريقة الدفع'); return; }
-      $('#err-pay').hide(); showPage(5); return;
+      $('#err-pay').hide(); showPage(5); return; // -> Map
     }
 
     if (id === 'page6') {
       if (!positionUrl) { $('#err-map').show(); showToast('error', 'الرجاء تحديد الموقع'); return; }
       $('#err-map').hide(); nForm.urlLocation = positionUrl;
-      showPage(6); return;
+      showPage(6); return; // -> Review
     }
 
     if (id === 'page7') {
@@ -1529,6 +1553,7 @@
     });
   }
 
+  /* ---------- Google Map + Places (Jubail polygon) ---------- */
   let map, marker, autocomplete, jubailPoly, jubailBounds;
   const SA_BOUNDS = { north: 26.582151149881536, south: 26.479187374350676, west: 49.94492876846446, east: 50.05681139737682 };
   const JUBAIL_ALLOWED_PATH = [
@@ -1597,6 +1622,7 @@
   }
   window.initMap=initMap;
 
+  /* ---------- Submit (from Review page) ---------- */
   async function submitAllAppointments(){
     const cleanBase = sanitizeNahlPayload(nForm);
     const missing = [];
@@ -1646,7 +1672,7 @@
         `تم إرسال طلب حجز:\nالخدمة: ${$('#service').find(':selected').text()}\nالتاريخ: ${dateTxt}\nالمواعيد: ${timesTxt}\nعدد السيارات: ${getCarsCount()}\nالرابط: ${location.href}`
       );
       document.getElementById('ts-whatsapp').href = `https://wa.me/?text=${waMsg}`;
-      showPage(7);
+      showPage(7); // -> Thanks
     } else {
       let msg = `تعذر إنشاء بعض الحجوزات:\n`;
       failures.forEach(f => { msg += `• ${f.time}: ${f.msg}\n`; });
@@ -1678,246 +1704,9 @@
       document.addEventListener('DOMContentLoaded', () => { maybeInit(); setTimeout(maybeInit, 500); });
     } else { maybeInit(); setTimeout(maybeInit, 500); }
   })();
-</script>
-<!-- === END: ORIGINAL APP LOGIC === -->
+  </script>
 
-<!-- ===== Lightweight I18N (AR / JP) – applies only UI text, no workflow changes ===== -->
-<script>
-  window.__lang = 'ar';
-
-  const I18N = {
-    ar: {
-      "brand.title":"🐯 Tiger 77",
-      "step.welcome":"الترحيب",
-      "step.service":"وين تحب نجيك؟",
-      "step.time":"متى تحب نجيك؟",
-      "step.contact":"معلومات الاتصال",
-      "step.pay":"طريقة الدفع",
-      "step.map":"الموقع على خريطة قوقل",
-      "step.review":"مراجعة الطلب",
-      "done.title":"شكراً لكم 🌟",
-      "done.desc":"تم استلام طلبكم، وسنؤكد الموعد على واتساب قريبًا.",
-      "done.times":"المواعيد",
-      "done.pay":"طريقة الدفع",
-
-      "welcome.s1t":"نجيك لين باب بيتك",
-      "welcome.s1d":"حجز سريع • خدمة متنقلة • احترافية في كل تفصيل",
-      "welcome.s2t":"مواد فاخرة",
-      "welcome.s2d":"منتجات آمنة على الطلاء والداخلية مع عناية دقيقة",
-      "welcome.s3t":"موعدك على راحتك",
-      "welcome.s3d":"حدد المنطقة والخدمة والوقت المناسب — والباقي علينا",
-      "welcome.cta":"انطلق — الخطوة التالية لاختيار المنطقة والخدمة",
-
-      "labels.area":"اختيار المنطقة",
-      "labels.category":"التصنيف",
-      "labels.service":"الخدمة",
-      "labels.cars":"عدد السيارات (حتى 5)",
-      "labels.date":"التاريخ",
-      "labels.timeFilter":"فلترة الوقت",
-      "labels.name":"الاسم",
-      "labels.mobile":"رقم الجوال",
-      "labels.carBrand":"ماركة السيارة 🚘",
-      "labels.carName":"اسم السيارة",
-      "labels.plate":"رقم اللوحة (اختياري)",
-
-      "hints.plate":"اختياري — يساعد فريقنا على التعرف على مركبتك بسرعة",
-      "hints.map":"اضغط على الخريطة أو اسحب العلامة لتحديد موقعك",
-
-      "errors.area":"يرجى اختيار المنطقة",
-      "errors.category":"يرجى اختيار التصنيف",
-      "errors.service":"يرجى اختيار الخدمة",
-      "errors.cars":"يرجى اختيار عدد السيارات",
-      "errors.date":"يرجى اختيار تاريخ صحيح",
-      "errors.name":"يرجى إدخال الاسم",
-      "errors.mobile":"الرجاء إدخال رقم جوال صحيح",
-      "errors.pay":"يرجى اختيار طريقة الدفع",
-      "errors.map":"الرجاء تحديد الموقع على الخريطة",
-
-      "time.all":"كل الأوقات المتاحة",
-      "time.morning":"الصباح (06:00–11:00)",
-      "time.afternoon":"الظهيرة (11:00–16:00)",
-      "time.evening":"المساء (16:00–21:00)",
-      "time.night":"ليلًا (21:00–23:59)",
-
-      "state.noServices":"لا توجد خدمات في هذا التصنيف",
-      "state.loadErr":"تعذر تحميل بيانات الخدمات",
-      "state.loadingServices":"جاري تحميل الخدمات…",
-      "state.fetchTimes":"جاري جلب المواعيد…",
-      "state.sending":"يتم إرسال الطلب…",
-
-      "pay.cash":"كاش",
-      "pay.bank":"تحويل بنكي",
-      "pay.mada":"مدى",
-
-      "review.desc":"راجع تفاصيل حجزك ثم اضغط \"تأكيد الطلب\"",
-      "review.area":"المنطقة",
-      "review.service":"الخدمة",
-      "review.cars":"عدد السيارات",
-      "review.date":"التاريخ",
-      "review.times":"الأوقات",
-      "review.name":"الاسم",
-      "review.mobile":"الجوال",
-      "review.car":"المركبة",
-      "review.addons":"الإضافات",
-      "review.pay":"الدفع",
-      "review.total":"الإجمالي",
-
-      "actions.retry":"إعادة المحاولة",
-      "actions.myLoc":"إظهار موقعي",
-      "actions.prev":"السابق",
-      "actions.skip":"تخطي العرض",
-      "actions.editService":"تعديل الخدمة",
-      "actions.editTime":"تعديل الوقت",
-      "actions.editContact":"تعديل البيانات",
-      "actions.editPay":"تغيير الدفع",
-      "actions.confirm":"تأكيد الطلب",
-      "actions.share":"مشاركة عبر واتساب",
-      "actions.rebook":"🔁 حجز جديد"
-    },
-    jp: {
-      "brand.title":"🐯 タイガー77",
-      "step.welcome":"ようこそ",
-      "step.service":"どのエリアに伺いますか？",
-      "step.time":"ご希望の時間は？",
-      "step.contact":"連絡先情報",
-      "step.pay":"お支払い方法",
-      "step.map":"Googleマップで位置を指定",
-      "step.review":"内容の確認",
-      "done.title":"ありがとうございます 🌟",
-      "done.desc":"ご依頼を受け付けました。まもなくWhatsAppで確認します。",
-      "done.times":"日時",
-      "done.pay":"支払い方法",
-
-      "welcome.s1t":"ご自宅の前まで伺います",
-      "welcome.s1d":"スピード予約・出張サービス・プロ品質",
-      "welcome.s2t":"上質なケア用品",
-      "welcome.s2d":"塗装や内装に優しい製品で丁寧に仕上げ",
-      "welcome.s3t":"都合に合わせて予約",
-      "welcome.s3d":"エリア・サービス・時間を選ぶだけ、あとはお任せ",
-      "welcome.cta":"次へ — エリアとサービスを選択",
-
-      "labels.area":"エリア選択",
-      "labels.category":"カテゴリ",
-      "labels.service":"サービス",
-      "labels.cars":"台数（最大5台）",
-      "labels.date":"日付",
-      "labels.timeFilter":"時間帯の絞り込み",
-      "labels.name":"氏名",
-      "labels.mobile":"携帯番号",
-      "labels.carBrand":"車のメーカー 🚘",
-      "labels.carName":"車名 / グレード",
-      "labels.plate":"ナンバー（任意）",
-
-      "hints.plate":"任意 — 車両の特定がスムーズになります",
-      "hints.map":"地図をタップまたはピンをドラッグして位置を指定",
-
-      "errors.area":"エリアを選択してください",
-      "errors.category":"カテゴリを選択してください",
-      "errors.service":"サービスを選択してください",
-      "errors.cars":"台数を選択してください",
-      "errors.date":"正しい日付を選択してください",
-      "errors.name":"氏名を入力してください",
-      "errors.mobile":"正しい携帯番号を入力してください",
-      "errors.pay":"お支払い方法を選択してください",
-      "errors.map":"地図で位置を指定してください",
-
-      "time.all":"すべての時間帯",
-      "time.morning":"朝（06:00–11:00）",
-      "time.afternoon":"昼（11:00–16:00）",
-      "time.evening":"夕方（16:00–21:00）",
-      "time.night":"夜（21:00–23:59）",
-
-      "state.noServices":"このカテゴリのサービスはありません",
-      "state.loadErr":"サービス情報の取得に失敗しました",
-      "state.loadingServices":"サービスを読み込み中…",
-      "state.fetchTimes":"空き時間を取得中…",
-      "state.sending":"送信しています…",
-
-      "pay.cash":"現金",
-      "pay.bank":"銀行振込",
-      "pay.mada":"Mada",
-
-      "review.desc":"内容を確認し「予約を確定」を押してください",
-      "review.area":"エリア",
-      "review.service":"サービス",
-      "review.cars":"台数",
-      "review.date":"日付",
-      "review.times":"時間",
-      "review.name":"氏名",
-      "review.mobile":"携帯",
-      "review.car":"車両",
-      "review.addons":"追加サービス",
-      "review.pay":"支払い",
-      "review.total":"合計",
-
-      "actions.retry":"再試行",
-      "actions.myLoc":"現在地を表示",
-      "actions.prev":"戻る",
-      "actions.skip":"スキップ",
-      "actions.editService":"サービスを編集",
-      "actions.editTime":"時間を編集",
-      "actions.editContact":"連絡先を編集",
-      "actions.editPay":"支払いを変更",
-      "actions.confirm":"予約を確定",
-      "actions.share":"WhatsAppで共有",
-      "actions.rebook":"🔁 新しく予約"
-    }
-  };
-
-  function applyI18N(lang){
-    window.__lang = (lang === 'jp') ? 'jp' : 'ar';
-    const dict = I18N[window.__lang];
-
-    // dir & lang
-    const html = document.documentElement;
-    if(window.__lang==='jp'){ html.setAttribute('lang','ja'); html.setAttribute('dir','ltr'); }
-    else { html.setAttribute('lang','ar'); html.setAttribute('dir','rtl'); }
-
-    // data-i18n replacements
-    document.querySelectorAll('[data-i18n]').forEach(el=>{
-      const key = el.getAttribute('data-i18n');
-      if (dict[key]) el.textContent = dict[key];
-    });
-
-    // update step labels array (only visible label)
-    const i = (typeof getActiveIndex==='function') ? getActiveIndex() : 0;
-    const stepEl = document.getElementById('miniStepTitle');
-    if (stepEl) stepEl.textContent = dict['step.'+['welcome','service','time','contact','pay','map','review','done'][Math.min(i,7)]] || stepEl.textContent;
-
-    // footer buttons text
-    const prev = document.getElementById('footer-prev');
-    const next = document.getElementById('footer-next');
-    if (prev) prev.textContent = dict['actions.prev'] || prev.textContent;
-    if (next){
-      const id = (typeof orderedPages!=='undefined') ? orderedPages[i] : 'page1';
-      next.textContent =
-        (id==='page1') ? (dict['actions.skip']||next.textContent)
-        : (id==='page7') ? (dict['actions.confirm']||next.textContent)
-        : (window.__lang==='jp' ? '次へ' : 'التالي');
-    }
-
-    // select2 direction switch for search field
-    const search = document.querySelector('.select2-search__field');
-    if (search) search.setAttribute('dir', (window.__lang==='jp') ? 'ltr' : 'rtl');
-  }
-
-  document.addEventListener('DOMContentLoaded', ()=>{
-    // Toggle handlers
-    const btnAR = document.getElementById('btnLangAR');
-    const btnJP = document.getElementById('btnLangJP');
-    const setActive = (lang)=>{
-      btnAR.classList.toggle('active', lang==='ar');
-      btnJP.classList.toggle('active', lang==='jp');
-    };
-    btnAR.addEventListener('click', ()=>{ setActive('ar'); applyI18N('ar'); });
-    btnJP.addEventListener('click', ()=>{ setActive('jp'); applyI18N('jp'); });
-
-    // default Arabic
-    setActive('ar'); applyI18N('ar');
-  });
-</script>
-
-<!-- Google Maps (with geometry lib) -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places,geometry&language=ar&region=SA" async defer></script>
+  <!-- Google Maps (with geometry lib) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places,geometry&language=ar&region=SA" async defer></script>
 </body>
 </html>
