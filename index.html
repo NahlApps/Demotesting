@@ -1,1596 +1,639 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ja" dir="ltr" data-theme="tokyo-neon">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Tiger 77</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Tiger77 – 東京スタイル予約</title>
 
-  <!-- UI libs -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css" rel="stylesheet"/>
-<meta property="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Tiger77%20-%20Logo.png">
-<meta property="twitter:image:src" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Tiger77%20-%20Logo.png">
-<link rel="shortcut icon" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Tiger77%20-%20Logo.png" type="image/x-icon">
-<link rel="icon" type="image/png" sizes="32x32" href="">
-<link rel="icon" type="image/png" sizes="16x16" href="">
   <!-- JP fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Antique+B1&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Antique+B1&display=swap" rel="stylesheet">
 
+  <style>
+  /* =========================================================
+     TOKYO STYLE THEMES for Tiger77 (toggle with data-theme)
+     data-theme="tokyo-neon" | "ginza-zen"
+     ========================================================= */
 
-<style>
-/* =========================================================
-   TOKYO STYLE THEMES for Tiger77 (toggle with data-theme)
-   data-theme="tokyo-neon" | "ginza-zen"
-   ========================================================= */
+  /* ---------- Base (shared tokens) ---------- */
+  :root{
+    --radius-md:14px; --radius-pill:999px;
+    --shadow-xs:0 2px 6px rgba(0,0,0,.08);
+    --shadow-sm:0 8px 24px rgba(0,0,0,.12);
+    --shadow-md:0 16px 36px rgba(0,0,0,.16);
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
+  }
 
-/* ---------- Base (shared tokens / do not edit often) ---------- */
-:root{
-  --radius-md:14px; --radius-pill:999px;
-  --shadow-xs:0 2px 6px rgba(0,0,0,.08);
-  --shadow-sm:0 8px 24px rgba(0,0,0,.12);
-  --shadow-md:0 16px 36px rgba(0,0,0,.16);
-  --ease:cubic-bezier(.22,.61,.36,1);
-  --dur-xs:160ms; --dur-sm:220ms; --dur-md:460ms;
-}
+  /* ---------- Shibuya Neon (default) ---------- */
+  :root,
+  :root[data-theme="tokyo-neon"]{
+    --p-900:#001535;      /* deep navy */
+    --p-800:#022E6A;      /* header tint */
+    --p-700:#0B7CFF;      /* primary CTA (electric blue) */
+    --p-600:#36A2FF;      /* focus ring */
+    --p-500:#7CC0FF;
 
-/* ---------- Shibuya Neon (default) ---------- */
-:root,
-:root[data-theme="tokyo-neon"]{
-  /* Brand → Tiger77 blue + vermilion */
-  --p-900:#001535;      /* deep navy */
-  --p-800:#022E6A;      /* header tint */
-  --p-700:#0B7CFF;      /* primary CTA (electric blue) */
-  --p-600:#36A2FF;      /* focus ring */
-  --p-500:#7CC0FF;
+    --p-900-58: rgba(0,21,53,.58);
+    --p-900-34: rgba(0,21,53,.34);
+    --p-800-65: rgba(2,46,106,.65);
+    --p-800-45: rgba(2,46,106,.45);
+    --p-600-22: rgba(54,162,255,.22);
+    --p-600-14: rgba(54,162,255,.14);
 
-  --p-900-58: rgba(0,21,53,.58);
-  --p-900-34: rgba(0,21,53,.34);
-  --p-800-65: rgba(2,46,106,.65);
-  --p-800-45: rgba(2,46,106,.45);
-  --p-600-22: rgba(54,162,255,.22);
-  --p-600-14: rgba(54,162,255,.14);
+    --gold-600:#E61B23;   /* “Tiger Red” */
 
-  --gold-600:#E61B23;   /* “Tiger Red” (Japanese vermilion) */
+    --ink-900:#E8EEF7;    /* light text on dark */
+    --ink-700:#C9D6EA;
+    --surface-000:#0A0F1A;
+    --surface-100:#0E1422;
+    --border-300:#2A3A55;
+    --lavender-050:#0F1A2C;
 
-  --ink-900:#E8EEF7;    /* light text on dark */
-  --ink-700:#C9D6EA;
-  --surface-000:#0A0F1A;
-  --surface-100:#0E1422;
-  --border-300:#2A3A55;
-  --lavender-050:#0F1A2C; /* cool surface tint */
+    --neon-blue:rgba(11,124,255,.75);
+    --neon-red:rgba(230,27,35,.85);
 
-  /* Neon helpers */
-  --neon-blue:rgba(11,124,255,.75);
-  --neon-red:rgba(230,27,35,.85);
+    --page-bg:
+      radial-gradient(1200px 600px at 70% -10%, rgba(11,124,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 10% 120%, rgba(230,27,35,.10), transparent 55%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px),
+      #070C17;
+  }
 
-  /* Hero / page bg = dark + faint grid */
-  --page-bg:
-    radial-gradient(1200px 600px at 70% -10%, rgba(11,124,255,.18), transparent 60%),
-    radial-gradient(900px 500px at 10% 120%, rgba(230,27,35,.10), transparent 55%),
-    repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px),
-    #070C17;
-}
+  /* ---------- Ginza Zen (light) ---------- */
+  :root[data-theme="ginza-zen"]{
+    --p-900:#0F172A;
+    --p-800:#1E293B;
+    --p-700:#1D4ED8;
+    --p-600:#2563EB;
+    --p-500:#60A5FA;
 
-/* ---------- Ginza Zen (light / premium) ---------- */
-:root[data-theme="ginza-zen"]{
-  --p-900:#0F172A;     /* text on light */
-  --p-800:#1E293B;
-  --p-700:#1D4ED8;     /* calm indigo CTA */
-  --p-600:#2563EB;
-  --p-500:#60A5FA;
+    --p-900-58: rgba(29,78,216,.08);
+    --p-900-34: rgba(29,78,216,.05);
+    --p-800-65: rgba(30,41,59,.80);
+    --p-800-45: rgba(30,41,59,.56);
+    --p-600-22: rgba(37,99,235,.18);
+    --p-600-14: rgba(37,99,235,.10);
 
-  --p-900-58: rgba(29,78,216,.08);
-  --p-900-34: rgba(29,78,216,.05);
-  --p-800-65: rgba(30,41,59,.80);
-  --p-800-45: rgba(30,41,59,.56);
-  --p-600-22: rgba(37,99,235,.18);
-  --p-600-14: rgba(37,99,235,.10);
+    --gold-600:#E60012;
+    --ink-900:#0F172A;
+    --ink-700:#334155;
+    --surface-000:#FFFFFF;
+    --surface-100:#F7F8FA;
+    --border-300:#E5E7EB;
+    --lavender-050:#F3F7FF;
 
-  --gold-600:#E60012;   /* Japanese vermilion */
-  --ink-900:#0F172A;    /* dark text */
-  --ink-700:#334155;
-  --surface-000:#FFFFFF;
-  --surface-100:#F7F8FA;
-  --border-300:#E5E7EB;
-  --lavender-050:#F3F7FF;
+    --page-bg: linear-gradient(180deg, #FFFFFF, #F7FAFF);
+  }
 
-  --page-bg:
-    linear-gradient(180deg, #FFFFFF, #F7FAFF);
-}
+  /* ---------- Global ---------- */
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:"Noto Sans JP", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    color:var(--ink-900);
+    background: var(--page-bg) fixed;
+    min-height:100dvh; display:flex; flex-direction:column;
+  }
+  h1,h2,.display{
+    font-family:"Shippori Antique B1","Noto Sans JP",sans-serif;
+    letter-spacing:.2px;
+  }
 
-/* ---------- Global (uses tokens above) ---------- */
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:"Noto Sans JP", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
-  color:var(--ink-900);
-  background: var(--page-bg) fixed;
-  min-height:100dvh; display:flex; flex-direction:column;
-}
+  /* ---------- Header ---------- */
+  header{
+    position:fixed; inset:0 0 auto 0; z-index:999;
+    background: linear-gradient(0deg, var(--p-800-65), var(--p-800-65));
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid rgba(255,255,255,.18);
+  }
+  .header-inner{ max-width:1120px; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between; }
+  .brand{
+    display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:12px;
+    background: color-mix(in oklab, white 10%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, white 12%, transparent);
+  }
+  .brand img{ height:64px; width:auto; object-fit:contain;
+    filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 10px 18px rgba(0,0,0,.25));
+  }
 
-/* Display font for big headings (Tokyo vibe) */
-h1,h2,.display{
-  font-family:"Shippori Antique B1","Noto Sans JP",sans-serif;
-  letter-spacing:.2px;
-}
+  .header-right{flex:1; display:flex; flex-direction:column; gap:6px}
+  .mini-progress{display:flex; align-items:center; gap:10px; width:100%}
+  .mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.28); border-radius:999px; overflow:hidden}
+  .mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--p-700), var(--p-600)); transition:width var(--dur-md) var(--ease)}
+  .mini-progress .step{font-weight:800; font-size:1rem; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.25)}
+  .summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; max-width:100%;
+    padding:6px 10px; border:1px solid rgba(255,255,255,.55);
+    border-radius:999px; color:#fff; font-size:.85rem; background:rgba(255,255,255,.14);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .chip.current{ background:rgba(255,255,255,.24); border-color:rgba(255,255,255,.85); box-shadow:0 0 0 2px rgba(255,255,255,.18) inset; }
 
-/* ================= Header ================= */
-header{
-  position:fixed; inset:0 0 auto 0; z-index:999;
-  background: linear-gradient(0deg, var(--p-800-65), var(--p-800-65));
-  backdrop-filter: blur(6px);
-  border-bottom:1px solid rgba(255,255,255,.18);
-}
-.header-inner{ max-width:1120px; margin:0 auto; padding:10px 12px; display:flex; align-items:center; gap:12px; justify-content:space-between; }
-.brand{
-  display:flex; align-items:center; gap:10px; padding:6px 10px; border-radius:12px;
-  background: color-mix(in oklab, white 10%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, white 12%, transparent);
-}
-.brand img{ height:72px; width:auto; object-fit:contain;
-  filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 10px 18px rgba(0,0,0,.25));
-}
+  /* ---------- Layout ---------- */
+  main{flex:1 0 auto; display:flex; justify-content:center; padding:calc(72px + 16px) 12px 80px;}
+  #app{width:100%; max-width:1120px}
+  .stage{position:relative; min-height:520px; padding:8px 0 20px}
+  .page{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; gap:20px;
+    padding:24px 12px 28px; overflow:auto; opacity:0; transform:translateY(12px) scale(.992); pointer-events:none;
+  }
+  .page.active{ pointer-events:auto; animation:pageIn var(--dur-md) var(--ease) both }
+  .page.exit  { animation:pageOut var(--dur-sm) var(--ease) both }
+  @keyframes pageIn{ from{opacity:0; transform:translateY(12px) scale(.992)} to{opacity:1; transform:translateY(0) scale(1)} }
+  @keyframes pageOut{ from{opacity:1; transform:translateY(0) scale(1)} to{opacity:0; transform:translateY(14px) scale(.985)} }
+  .page h1{font-size:1.5rem; font-weight:900; margin:0; text-align:center}
 
-/* Progress & header chips */
-.mini-progress{display:flex; align-items:center; gap:10px; width:100%}
-.mini-progress .bar{flex:1; height:8px; background:rgba(255,255,255,.28); border-radius:999px; overflow:hidden}
-.mini-progress .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--p-700), var(--p-600)); transition:width var(--dur-md) var(--ease)}
-.mini-progress .step{font-weight:800; font-size:1rem; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.25)}
-.summary-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
-.chip{
-  display:inline-flex; align-items:center; gap:6px; max-width:100%;
-  padding:6px 10px; border:1px solid rgba(255,255,255,.55);
-  border-radius:999px; color:#fff; font-size:.85rem; background:rgba(255,255,255,.14);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.chip.current{ background:rgba(255,255,255,.24); border-color:rgba(255,255,255,.85); box-shadow:0 0 0 2px rgba(255,255,255,.18) inset; }
+  .card{
+    background: color-mix(in oklab, var(--surface-000) 92%, transparent);
+    color: var(--ink-900);
+    border:1px solid color-mix(in oklab, var(--border-300) 70%, transparent);
+    border-radius:var(--radius-md); box-shadow:var(--shadow-md);
+    padding:24px; width:100%; max-width:920px; backdrop-filter:blur(4px);
+  }
 
-/* ================= Cards & Content ================= */
-main{flex:1 0 auto; display:flex; justify-content:center; padding:calc(76px + 16px) 12px 0;}
-#app{width:100%; max-width:1120px}
-.card{
-  background: color-mix(in oklab, var(--surface-000) 92%, transparent);
-  color: var(--ink-900);
-  border:1px solid color-mix(in oklab, var(--border-300) 70%, transparent);
-  border-radius:var(--radius-md); box-shadow:var(--shadow-md);
-  padding:24px; width:100%; max-width:920px; backdrop-filter:blur(4px);
-}
+  /* ---------- Form ---------- */
+  .grid{ display:grid; gap:14px }
+  .grid.cols-2{ grid-template-columns:repeat(2,minmax(0,1fr)) }
+  @media (max-width:680px){ .grid.cols-2{ grid-template-columns:1fr } }
 
-/* ================= Inputs ================= */
-.form-control, select, .select2-selection{
-  background:#fff; color:var(--ink-900); border:1px solid var(--border-300)!important; border-radius:14px!important;
-  min-height:52px; text-align:center; font-size:16px;
-  transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
-}
-.form-control:focus{ box-shadow:0 0 0 4px var(--p-600-22); border-color:var(--p-600)!important; }
-.form-label{ display:inline-block; margin-bottom:6px; font-weight:800; color: color-mix(in oklab, var(--ink-900) 86%, black 14%); }
+  label{ font-weight:700; display:block; margin:4px 0 6px; }
+  .form-control, select{
+    width:100%; background:#fff; color:var(--ink-900);
+    border:1px solid var(--border-300); border-radius:14px; min-height:48px;
+    padding:12px 14px; font-size:16px; outline:none;
+    transition:border-color var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
+  }
+  .form-control:focus, select:focus{ box-shadow:0 0 0 4px var(--p-600-22); border-color:var(--p-600); }
 
-/* ================= Time options (with neon selection) ================= */
-.time-option{
-  background:#fff; color:var(--ink-900); font-weight:800;
-  border:1px solid var(--border-300); border-radius:14px;
-  padding:14px 10px; min-height:64px; box-shadow:var(--shadow-xs);
-  transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), outline-color var(--dur-xs) var(--ease);
-  display:flex; align-items:center; justify-content:center;
-}
-.time-option:hover{ transform:translateY(-2px); background:var(--lavender-050); box-shadow:var(--shadow-sm); }
-.time-option[aria-pressed="true"]{
-  outline:3px solid var(--p-700); outline-offset:2px;
-  background:linear-gradient(0deg, var(--lavender-050), #fff);
-  box-shadow:0 0 12px var(--neon-blue), inset 0 0 0 3px color-mix(in oklab, var(--p-700) 22%, transparent);
-}
+  /* ---------- Time Options ---------- */
+  .time-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px}
+  @media (max-width:560px){ .time-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  .time-option{
+    background:#fff; color:var(--ink-900); font-weight:800;
+    border:1px solid var(--border-300); border-radius:14px;
+    padding:14px 10px; min-height:56px; box-shadow:var(--shadow-xs);
+    transition:transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), background var(--dur-xs) var(--ease), outline-color var(--dur-xs) var(--ease);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .time-option:hover{ transform:translateY(-2px); background:var(--lavender-050); box-shadow:var(--shadow-sm); }
+  .time-option[aria-pressed="true"]{
+    outline:3px solid var(--p-700); outline-offset:2px;
+    background:linear-gradient(0deg, var(--lavender-050), #fff);
+    box-shadow:0 0 12px var(--neon-blue), inset 0 0 0 3px color-mix(in oklab, var(--p-700) 22%, transparent);
+  }
 
-/* ================= Service cards ================= */
-.svc-card{ background:#fff; border:1px solid var(--border-300); border-radius:14px; padding:12px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; outline:none; box-shadow:var(--shadow-xs); transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs); min-height:110px; position:relative; }
-.svc-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--lavender-050) }
-.svc-card[aria-checked="true"]{ outline:3px solid var(--p-700); outline-offset:2px; }
-.svc-cat{ background:var(--gold-600); color:#fff; border:0; padding:2px 8px; border-radius:999px; font-size:.75rem; margin-inline-start:auto; }
+  /* ---------- Service Cards ---------- */
+  .svc-grid{ display:grid; gap:14px; margin-top:8px; grid-template-columns:repeat(3,minmax(0,1fr)); }
+  @media (max-width:920px){ .svc-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width:560px){ .svc-grid{ grid-template-columns:1fr; } }
+  .svc-card{ background:#fff; border:1px solid var(--border-300); border-radius:14px; padding:12px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; outline:none; box-shadow:var(--shadow-xs); transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs); min-height:110px; position:relative; }
+  .svc-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-sm); background:var(--lavender-050) }
+  .svc-card[aria-checked="true"]{ outline:3px solid var(--p-700); outline-offset:2px; }
+  .svc-thumb{ width:84px;height:84px;border-radius:12px;overflow:hidden;background:#f4f4f4;border:1px solid #eee; display:flex;align-items:center;justify-content:center; font-size:36px}
+  .svc-title{ font-weight:900; margin:0 0 4px; }
+  .svc-cat{ background:var(--gold-600); color:#fff; border:0; padding:2px 8px; border-radius:999px; font-size:.75rem; margin-inline-start:auto; }
 
-/* ================= Buttons / Footer ================= */
-.btn-footer{
-  border:1px solid var(--border-300); border-radius:14px; padding:16px; min-height:56px; font-weight:800;
-  background:#fff; color: color-mix(in oklab, var(--p-900) 90%, black 10%);
-  transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs), color var(--dur-xs), border-color var(--dur-xs);
-}
-.btn-footer.primary{ background:var(--p-700); color:#fff; border-color:var(--p-700);
-  text-shadow:0 1px 0 rgba(0,0,0,.18);
-  box-shadow:0 8px 26px rgba(11,124,255,.35);
-}
-.btn-footer.primary:hover{ background:var(--p-600); border-color:var(--p-600); transform:translateY(-1px); box-shadow:0 10px 30px rgba(11,124,255,.45); }
-.btn-footer.primary:focus{ box-shadow:0 0 0 4px var(--p-600-22), 0 10px 30px rgba(11,124,255,.45); }
+  /* ---------- Footer ---------- */
+  footer.sticky-nav{
+    position:fixed; left:0; right:0; bottom:0; z-index:40;
+    background:var(--p-800-45);
+    backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);
+  }
+  .footer-inner{ max-width:1120px; margin:0 auto; padding:12px; display:flex; gap:12px; }
+  .btn{
+    border:1px solid var(--border-300); border-radius:14px; padding:14px 16px; min-height:52px; font-weight:900; font-size:1rem; cursor:pointer;
+    background:#fff; color:#1f2937; transition:transform var(--dur-xs), box-shadow var(--dur-xs), background var(--dur-xs), color var(--dur-xs), border-color var(--dur-xs);
+    flex:1;
+  }
+  .btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow-sm); }
+  .btn[disabled]{ opacity:.55; pointer-events:none }
+  .btn.primary{ background:var(--p-700); color:#fff; border-color:var(--p-700); text-shadow:0 1px 0 rgba(0,0,0,.18); box-shadow:0 8px 26px rgba(11,124,255,.35); }
+  .btn.primary:hover{ background:var(--p-600); border-color:var(--p-600); box-shadow:0 10px 30px rgba(11,124,255,.45); }
+  .btn.ghost{ background:transparent; color:#fff; border-color:rgba(255,255,255,.45) }
 
-/* ================= Payment cards ================= */
-.pay-card{cursor:pointer;border:1px solid var(--border-300);background:#fff;border-radius:14px;padding:14px;min-height:96px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,box-shadow .2s,transform .05s,background-color .2s;outline:none;width:100%}
-.pay-card:hover{border-color:color-mix(in oklab, var(--p-700) 30%, var(--border-300));box-shadow:0 2px 10px rgba(0,0,0,.06);background-color:#fafafa}
-.pay-card:has(input:checked){border-color:var(--p-700);box-shadow:0 0 0 3px color-mix(in oklab, var(--p-700) 28%, transparent), 0 0 22px var(--neon-blue);background:linear-gradient(0deg, color-mix(in oklab, var(--p-500) 10%, #fff), #fff)}
+  /* ---------- Light theme header tweaks ---------- */
+  :root[data-theme="ginza-zen"] header{ background: rgba(255,255,255,.94); border-bottom:1px solid var(--border-300); }
+  :root[data-theme="ginza-zen"] .chip{ color: var(--p-800); background: #fff; border-color: var(--border-300); }
+  :root[data-theme="ginza-zen"] .mini-progress .bar{ background:#E6ECF5 }
+  :root[data-theme="ginza-zen"] .mini-progress .bar>span{ background:linear-gradient(90deg, var(--p-700), var(--p-500)) }
+  :root[data-theme="ginza-zen"] .brand{ background:#fff; box-shadow:inset 0 0 0 1px var(--border-300) }
 
-/* ================= Footer bar ================= */
-footer.sticky-nav{
-  position:sticky; bottom:0; z-index:40;
-  background:var(--p-800-45);
-  backdrop-filter:blur(10px); border-top:1px solid rgba(255,255,255,.15);
-}
+  /* ---------- Utility ---------- */
+  .muted{ color:var(--ink-700) }
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  .row > *{ flex:1 }
+  .total{font-weight:900; font-size:1.125rem}
+  .theme-toggle{
+    border:1px solid rgba(255,255,255,.55);
+    background:rgba(255,255,255,.14);
+    color:#fff; padding:8px 12px; border-radius:999px; cursor:pointer; font-weight:700;
+  }
+  :root[data-theme="ginza-zen"] .theme-toggle{ color:var(--p-800); background:#fff; border-color:var(--border-300) }
 
-/* ================= Theme: light adjustments ================= */
-:root[data-theme="ginza-zen"] header{
-  background: rgba(255,255,255,.94);
-  border-bottom:1px solid var(--border-300);
-}
-:root[data-theme="ginza-zen"] .chip{ color: var(--p-800); background: #fff; border-color: var(--border-300); }
-:root[data-theme="ginza-zen"] .mini-progress .bar{ background:#E6ECF5 }
-:root[data-theme="ginza-zen"] .mini-progress .bar>span{ background:linear-gradient(90deg, var(--p-700), var(--p-500)) }
-:root[data-theme="ginza-zen"] .btn-footer.primary{ box-shadow:none }
-
-/* ================= Reduced motion ================= */
-@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
-</style>
-
-
-
-
-  
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+  </style>
 </head>
-<body>
-  <div id="toastWrap" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1050;display:flex;flex-direction:column;gap:8px"></div>
 
-  <header id="siteHeader">
+<body>
+  <!-- Toast (simple) -->
+  <div id="toast" style="position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:2000;display:none;padding:10px 14px;border-radius:10px;background:#0B7CFF;color:#fff;font-weight:700;"></div>
+
+  <header>
     <div class="header-inner">
       <div class="brand">
-        <img id="brandLogo"
-             alt="Tiger 77"
-             src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Tiger77%20-%20Logo.png"
-             onerror="handleLogoError(this)" />
+        <img alt="Tiger77" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Tiger77%20-%20Logo.png"/>
       </div>
       <div class="header-right">
         <div class="mini-progress" aria-hidden="true">
-          <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
-          <div class="step" id="miniStepTitle">الترحيب</div>
+          <div class="bar"><span id="miniBar" style="width:0%"></span></div>
+          <div class="step" id="miniStep">ようこそ</div>
         </div>
-        <div id="summaryChips" class="summary-chips" aria-live="polite"></div>
+        <div id="chips" class="summary-chips" aria-live="polite"></div>
       </div>
+      <button id="toggleTheme" class="theme-toggle" type="button">NEON / ZEN</button>
     </div>
   </header>
 
   <main>
     <div id="app">
       <div class="stage">
-        <!-- 1) Welcome -->
-        <section id="page1" class="page active" aria-label="الترحيب">
-          <h1>🐯 Tiger 77</h1>
-          <div class="ppt-deck" id="pptDeck">
-            <div class="ppt-slide is-active">
-              <div class="slide-card"><h3 class="mb-2">نجيك لين باب بيتك</h3><p class="m-0">حجز سريع • خدمة متنقلة • احترافية في كل تفصيل</p></div>
-            </div>
-            <div class="ppt-slide">
-              <div class="slide-card"><h3 class="mb-2">مواد فاخرة</h3><p class="m-0">منتجات آمنة على الطلاء والداخلية مع عناية دقيقة</p></div>
-            </div>
-            <div class="ppt-slide">
-              <div class="slide-card"><h3 class="mb-2">موعدك على راحتك</h3><p class="m-0">حدد المنطقة والخدمة والوقت المناسب — والباقي علينا</p></div>
-            </div>
-          </div>
-          <div id="pptDots" class="ppt-dots" aria-hidden="true"></div>
-          <div class="card text-center" style="max-width:860px">
-            <p class="mb-0" style="color:#224652">انطلق — الخطوة التالية لاختيار المنطقة والخدمة</p>
+        <!-- 1 Welcome -->
+        <section id="page1" class="page active" aria-label="ようこそ">
+          <h1>🚗 Tiger77 出張洗車 – 東京</h1>
+          <div class="card">
+            <p class="muted">ご自宅・職場までお伺いします。次へ進んで、エリアとサービスをお選びください。</p>
           </div>
         </section>
 
-        <!-- 2) Service & Location -->
-        <section id="page2" class="page" aria-label="اختيار المنطقة والخدمة">
-          <h1>وين تحب نجيك؟</h1>
-          <div class="card position-relative" id="servicesCard">
-            <label class="form-label">اختيار المنطقة</label>
-            <select id="area" style="width:100%"></select>
-            <div class="field-error" id="err-area">يرجى اختيار المنطقة</div>
-
-            <div class="row g-3 mt-3">
-              <div class="col-12 col-md-6">
-                <label class="form-label">التصنيف</label>
-                <select id="serviceCat" style="width:100%"></select>
-                <div class="field-error" id="err-serviceCat">يرجى اختيار التصنيف</div>
-              </div>
-
-              <!-- Hidden actual select synced with cards -->
-              <div class="col-12 col-md-6" hidden>
-                <label class="form-label">الخدمة</label>
-                <select id="service" style="width:100%" class="visually-hidden" aria-hidden="true" tabindex="-1"></select>
-                <div class="field-error" id="err-service">يرجى اختيار الخدمة</div>
-              </div>
-
-              <!-- Number of Cars -->
-              <div class="col-12 col-md-6">
-                <label class="form-label" for="numCars">عدد السيارات (حتى 5)</label>
-                <select id="numCars" style="width:100%">
-                  <option value="1" selected>1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </select>
-                <div class="field-error" id="err-numCars">يرجى اختيار عدد السيارات</div>
-              </div>
-
-              <div class="col-12">
-                <div id="serviceCardsWrap">
-                  <div id="serviceCards" class="svc-grid" role="radiogroup" aria-label="الخدمات المتاحة"></div>
-                  <div id="svcEmpty" class="text-center text-muted" style="display:none;padding:16px">لا توجد خدمات في هذا التصنيف</div>
-                  <div id="svcError" class="text-center" style="display:none;padding:16px">
-                    <div class="mb-2 text-danger">تعذر تحميل بيانات الخدمات</div>
-                    <button id="svcRetry" class="btn btn-outline-primary btn-sm">إعادة المحاولة</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Spinner during load -->
-            <div id="servicesLoading" class="load-overlay" aria-hidden="true">
-              <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
-              <strong>جاري تحميل الخدمات…</strong>
-            </div>
-          </div>
-        </section>
-
-        <!-- 3) Time -->
-        <section id="page3" class="page" aria-label="اختيار الموعد">
-          <h1>متى تحب نجيك؟</h1>
-          <div class="card position-relative" id="timeCard">
-            <div class="row g-3">
-              <div class="col-12 col-md-5">
-                <label class="form-label" for="date">التاريخ</label>
-                <input id="date" type="date" class="form-control"/>
-                <div class="field-error" id="err-date">يرجى اختيار تاريخ صحيح</div>
-              </div>
-              <div class="col-12 col-md-7 d-flex align-items-end justify-content-end">
-                <div class="text-muted" id="timeCountHint" style="font-weight:800">0/1 وقت محدد</div>
-              </div>
-            </div>
-
-            <div class="time-toolbar mt-3">
+        <!-- 2 Service -->
+        <section id="page2" class="page" aria-label="サービスを選択">
+          <h1>どこで、何を洗いますか？</h1>
+          <div class="card">
+            <div class="grid cols-2">
               <div>
-                <label class="form-label" for="timeFilter" hidden>فلترة الوقت</label>
-                <select id="timeFilter" class="form-select" hidden>
-                  <option value="all" selected>كل الأوقات المتاحة</option>
-                  <option value="morning">الصباح (06:00–11:00)</option>
-                  <option value="afternoon">الظهيرة (11:00–16:00)</option>
-                  <option value="evening">المساء (16:00–21:00)</option>
-                  <option value="night">ليلًا (21:00–23:59)</option>
+                <label for="area">エリア</label>
+                <select id="area">
+                  <option value="">選択してください</option>
+                </select>
+              </div>
+              <div>
+                <label for="cars">台数</label>
+                <select id="cars">
+                  <option value="1">1台</option>
+                  <option value="2">2台</option>
+                  <option value="3">3台</option>
                 </select>
               </div>
             </div>
 
-            <div class="position-relative mt-3">
-              <div id="time-container" class="time-grid" role="group" aria-label="اختيار الأوقات (متعدد)"></div>
-              <div id="timeLoading" class="load-overlay">
-                <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
-                <strong>جاري جلب المواعيد…</strong>
-              </div>
-            </div>
+            <label style="margin-top:14px">サービス</label>
+            <div id="svcGrid" class="svc-grid" role="radiogroup"></div>
           </div>
         </section>
 
-        <!-- 4) Contact -->
-        <section id="page4" class="page" aria-label="معلومات الاتصال">
-          <h1>معلومات الاتصال</h1>
+        <!-- 3 Time -->
+        <section id="page3" class="page" aria-label="日時を選択">
+          <h1>ご希望の日時</h1>
           <div class="card">
-            <div class="row g-3">
-              <div class="col-12 col-md-6">
-                <label for="name" class="form-label">الاسم</label>
-                <input id="name" type="text" class="form-control" placeholder="الاسم كما سيظهر في الفاتورة" autocomplete="name"/>
-                <div class="field-error" id="err-name">يرجى إدخال الاسم</div>
+            <div class="grid cols-2">
+              <div>
+                <label for="date">日付</label>
+                <input id="date" type="date" class="form-control"/>
               </div>
-              <div class="col-12 col-md-6">
-                <label for="mobile" class="form-label">رقم الجوال</label>
-                <input id="mobile" type="tel" class="form-control" placeholder="5XXXXXXXX" autocomplete="tel"/>
-                <div class="field-error" id="err-mobile">الرجاء إدخال رقم جوال صحيح</div>
+              <div>
+                <label class="muted">必要枠</label>
+                <div id="timeNeed" class="form-control" style="display:flex;align-items:center;justify-content:center;font-weight:900;">0/1</div>
               </div>
             </div>
-          </div>
-
-          <div class="card" hidden>
-            <div class="row g-3">
-              <div class="col-12 col-md-4">
-                <label class="form-label" for="carBrand">ماركة السيارة 🚘</label>
-                <select id="carBrand" style="width:100%"></select>
-              </div>
-              <div class="col-12 col-md-4">
-                <label class="form-label" for="carName">اسم السيارة</label>
-                <input id="carName" type="text" class="form-control" placeholder="الموديل/الفئة — مثال: S-Class، LX 570" autocomplete="off"/>
-              </div>
-              <div class="col-12 col-md-4">
-                <label class="form-label" for="plateNumber">رقم اللوحة (اختياري)</label>
-                <input id="plateNumber" type="text" inputmode="numeric" class="form-control" placeholder="أرقام اللوحة — اختياري" autocomplete="off"/>
-                <small id="plateHelp" class="text-muted d-block mt-1" style="opacity:.9">اختياري — يساعد فريقنا على التعرف على مركبتك بسرعة</small>
-                <div class="field-error" id="err-plate" style="display:none"></div>
-              </div>
-              <input id="locationDescription" type="text" hidden/>
-              <input id="serviceCount" type="hidden" value="1"/>
-            </div>
+            <div style="height:12px"></div>
+            <div id="times" class="time-grid"></div>
           </div>
         </section>
 
-        <!-- 5) Payment -->
-        <section id="page5" class="page" aria-label="طريقة الدفع">
-          <h1>طريقة الدفع</h1>
-          <div class="pay-grid" role="radiogroup" aria-label="طريقة الدفع" id="payGroup" aria-describedby="err-pay" >
-            <label class="pay-card" role="radio" aria-checked="false" tabindex="0" hidden>
-              <input type="radio" name="payingMethod" value="stc pay" class="visually-hidden" />
-              <span class="pay-card__content">
-                <img class="pay-card__img" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/STC%20PAY%20LOGO.png" alt="STC Pay" />
-                <span class="pay-card__label">STC Pay</span>
-              </span>
-            </label>
-            <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" hidden>
-              <input type="radio" name="payingMethod" value="cash" class="visually-hidden" />
-              <span class="pay-card__content">
-                <span class="pay-card__icon" aria-hidden="true">💵</span>
-                <span class="pay-card__label"><strong>كاش</strong></span>
-              </span>
-            </label>
-            <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" style="grid-column:1/-1" hidden>
-              <input type="radio" name="payingMethod" value="Bank Transfer" class="visually-hidden" />
-              <span class="pay-card__content">
-                <span class="pay-card__icon" aria-hidden="true">🏦</span>
-                <span class="pay-card__label"><strong>تحويل بنكي</strong></span>
-              </span>
-            </label>
-            <label class="pay-card" role="radio" aria-checked="false" tabindex="-1" style="grid-column:1/-1">
-              <input type="radio" name="payingMethod" value="mada" class="visually-hidden" />
-              <span class="pay-card__content">
-                <img class="pay-card__img" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/MADA%20LOGO.png" alt="Mada" />
-                <span class="pay-card__label">مدى</span>
-              </span>
-            </label>
-          </div>
-          <div class="field-error" id="err-pay" role="alert" aria-live="polite">يرجى اختيار طريقة الدفع</div>
-        </section>
-
-        <!-- 6) Map -->
-        <section id="page6" class="page" aria-label="اختيار الموقع">
-          <h1>الموقع على خريطة قوقل</h1>
+        <!-- 4 Contact -->
+        <section id="page4" class="page" aria-label="お客様情報">
+          <h1>お客様情報</h1>
           <div class="card">
-            <div class="map-search">
-              <input id="mapSearch" class="form-control" type="text" placeholder="ابحث عن برج، حي، أو عنوان داخل السعودية"/>
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            <div id="googleMap"></div>
-          </div>
-          <div class="card text-center">
-            <button id="show-my-location" class="btn btn-outline-primary" type="button">إظهار موقعي</button>
-          </div>
-          <small id="mapHint" class="text-muted d-block mt-2" style="text-align:center">اضغط على الخريطة أو اسحب العلامة لتحديد موقعك</small>
-          <div class="field-error" id="err-map" style="text-align:center">الرجاء تحديد الموقع على الخريطة</div>
-        </section>
-
-        <!-- 7) Review Order -->
-        <section id="page7" class="page" aria-label="مراجعة الطلب">
-          <h1>مراجعة الطلب</h1>
-          <div class="card" style="max-width:820px">
-            <p class="text-muted mb-3">راجع تفاصيل حجزك ثم اضغط "تأكيد الطلب"</p>
-
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>المنطقة</span><span class="fw-bold" id="rv-area">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>الخدمة</span><span class="fw-bold" id="rv-service">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>عدد السيارات</span><span class="fw-bold" id="rv-cars">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>التاريخ</span><span class="fw-bold" id="rv-date">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>الأوقات</span><span class="fw-bold" id="rv-times">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>الاسم</span><span class="fw-bold" id="rv-name">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>الجوال</span><span class="fw-bold" id="rv-mobile">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom" hidden><span>المركبة</span><span class="fw-bold" id="rv-car">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>الإضافات</span><span class="fw-bold" id="rv-addons">—</span></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span>الدفع</span><span class="fw-bold" id="rv-pay">—</span></div>
-
-            <!-- NEW: Order Total -->
-            <div class="d-flex justify-content-between py-2 border-top">
-              <span>الإجمالي</span>
-              <span class="fw-bold" id="rv-total">—</span>
-            </div>
-
-            <div class="d-flex gap-2 flex-wrap mt-3">
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="2">تعديل الخدمة</button>
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="3">تعديل الوقت</button>
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="4">تعديل البيانات</button>
-              <button class="btn btn-outline-secondary" type="button" data-edit-step="5">تغيير الدفع</button>
-              <button id="confirmOrder" class="btn btn-primary ms-auto" type="button">تأكيد الطلب</button>
+            <div class="grid cols-2">
+              <div>
+                <label for="name">お名前</label>
+                <input id="name" type="text" class="form-control" placeholder="山田 太郎"/>
+              </div>
+              <div>
+                <label for="kana">フリガナ</label>
+                <input id="kana" type="text" class="form-control" placeholder="ヤマダ タロウ"/>
+              </div>
+              <div>
+                <label for="phone">携帯電話</label>
+                <input id="phone" type="tel" class="form-control" placeholder="08012345678"/>
+              </div>
+              <div>
+                <label for="zip">〒 郵便番号</label>
+                <input id="zip" type="text" class="form-control" placeholder="1000001"/>
+              </div>
+              <div>
+                <label for="addr">住所</label>
+                <input id="addr" type="text" class="form-control" placeholder="東京都千代田区千代田1-1"/>
+              </div>
+              <div>
+                <label for="note">備考（任意）</label>
+                <input id="note" type="text" class="form-control" placeholder="車種、色など"/>
+              </div>
             </div>
           </div>
         </section>
 
-        <!-- 8) Done -->
-        <section id="page8" class="page" aria-label="تم الحجز">
-          <h1>شكراً لكم 🌟</h1>
-          <div class="card text-center" style="max-width:720px">
-            <p class="mb-3" style="color:#224652">تم استلام طلبكم، وسنؤكد الموعد على واتساب قريبًا.</p>
-            <div id="thanks-summary" class="text-start mx-auto" style="max-width:520px">
-              <div class="d-flex justify-content-between py-2 border-bottom"><span>المنطقة</span><strong id="ts-area">—</strong></div>
-              <div class="d-flex justify-content-between py-2 border-bottom"><span>الخدمة</span><strong id="ts-service">—</strong></div>
-              <div class="d-flex justify-content-between py-2 border-bottom"><span>عدد السيارات</span><strong id="ts-cars">—</strong></div>
-              <div class="d-flex justify-content-between py-2"><span>المواعيد</span><strong id="ts-dt">—</strong></div>
-              <div class="d-flex justify-content-between py-2"><span>طريقة الدفع</span><strong id="ts-pay">—</strong></div>
+        <!-- 5 Payment -->
+        <section id="page5" class="page" aria-label="お支払い方法">
+          <h1>お支払い方法</h1>
+          <div class="card">
+            <div class="grid cols-2">
+              <label class="svc-card" role="radio" aria-checked="false" tabindex="0">
+                <input type="radio" name="pay" value="PayPay" hidden>
+                <div class="svc-thumb">💴</div>
+                <div style="flex:1">
+                  <div class="row" style="align-items:center">
+                    <h3 class="svc-title" style="margin:0">PayPay</h3>
+                    <span class="svc-cat">おすすめ</span>
+                  </div>
+                  <p class="muted" style="margin:.25rem 0 0">QR決済</p>
+                </div>
+              </label>
+
+              <label class="svc-card" role="radio" aria-checked="false" tabindex="0">
+                <input type="radio" name="pay" value="クレジットカード" hidden>
+                <div class="svc-thumb">💳</div>
+                <div style="flex:1">
+                  <h3 class="svc-title" style="margin:0">クレジットカード（JCB / VISA / Master）</h3>
+                  <p class="muted" style="margin:.25rem 0 0">タッチ決済可</p>
+                </div>
+              </label>
+
+              <label class="svc-card" role="radio" aria-checked="false" tabindex="0">
+                <input type="radio" name="pay" value="現金" hidden>
+                <div class="svc-thumb">🪙</div>
+                <div style="flex:1">
+                  <h3 class="svc-title" style="margin:0">現金</h3>
+                  <p class="muted" style="margin:.25rem 0 0">当日お支払い</p>
+                </div>
+              </label>
             </div>
-            <div class="d-flex gap-2 justify-content-center mt-3 flex-wrap">
-              <a id="ts-whatsapp" class="btn btn-success" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> مشاركة عبر واتساب</a>
-              <button id="rebook" class="btn btn-primary" type="button" style="min-height:52px;font-weight:800;border-radius:12px;padding:12px 18px">🔁 حجز جديد</button>
-            </div>
+          </div>
+        </section>
+
+        <!-- 6 Map (placeholder) -->
+        <section id="page6" class="page" aria-label="位置確認">
+          <h1>作業場所</h1>
+          <div class="card">
+            <p class="muted">地図（任意）— 実装時は Google Maps を <code>language=ja&region=JP</code> で読み込みます。</p>
+            <div style="height:380px;border-radius:14px;background:linear-gradient(135deg,#101827,#0b1222);border:1px solid var(--border-300);display:flex;align-items:center;justify-content:center;color:#9aa7bd;">MAP PLACEHOLDER</div>
+          </div>
+        </section>
+
+        <!-- 7 Review -->
+        <section id="page7" class="page" aria-label="確認">
+          <h1>内容の確認</h1>
+          <div class="card">
+            <div class="row"><div>エリア</div><div id="rv-area" style="text-align:right;font-weight:900">—</div></div>
+            <div class="row"><div>サービス</div><div id="rv-service" style="text-align:right;font-weight:900">—</div></div>
+            <div class="row"><div>台数</div><div id="rv-cars" style="text-align:right;font-weight:900">—</div></div>
+            <div class="row"><div>日付</div><div id="rv-date" style="text-align:right;font-weight:900">—</div></div>
+            <div class="row"><div>時間</div><div id="rv-times" style="text-align:right;font-weight:900">—</div></div>
+            <div class="row"><div>お名前</div><div id="rv-name" style="text-align:right;font-weight:900">—</div></div>
+            <div class="row"><div>電話</div><div id="rv-phone" style="text-align:right;font-weight:900">—</div></div>
+            <div class="row"><div>支払い</div><div id="rv-pay" style="text-align:right;font-weight:900">—</div></div>
+            <hr style="border:none;border-top:1px solid var(--border-300);margin:12px 0">
+            <div class="row"><div>合計</div><div id="rv-total" class="total" style="text-align:right">—</div></div>
+          </div>
+        </section>
+
+        <!-- 8 Done -->
+        <section id="page8" class="page" aria-label="完了">
+          <h1>ご予約ありがとうございます 🎉</h1>
+          <div class="card">
+            <p class="muted">担当スタッフより確認のご連絡を差し上げます。</p>
+            <button class="btn primary" onclick="location.reload()">もう一度予約する</button>
           </div>
         </section>
       </div>
     </div>
   </main>
 
-  <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
+  <footer class="sticky-nav">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a></span>
-        <div class="footer-social">
-          <a href="https://wa.me/966509027172" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-          <a href="https://www.instagram.com/nahl.app?igsh=ZmljaXNncGtudjJ2" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="https://www.tiktok.com/@nahl.app?_t=ZS-8zgmzEQTSQW&_r=1" target="_blank" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        </div>
-      </div>
-      <div class="footer-actions">
-        <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
-        <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>تخطي العرض</button>
-        <div id="footer-wait" class="">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-          <span>يتم إرسال الطلب…</span>
-        </div>
-      </div>
+      <button id="prevBtn" class="btn ghost" disabled>戻る</button>
+      <button id="nextBtn" class="btn primary">次へ</button>
     </div>
   </footer>
 
-  <!-- ===== Additional Services Modal ===== -->
-  <div class="modal fade" id="addonsModal" tabindex="-1" aria-labelledby="addonsModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content" style="border-radius:16px">
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold" id="addonsModalLabel">الخدمات الإضافية</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-        </div>
-        <div class="modal-body">
-          <p class="text-muted mb-2">اختياري — اختَر ما يناسبك:</p>
-          <div id="addonsChips" class="addon-wrap"></div>
-        </div>
-        <div class="modal-footer d-flex justify-content-between">
-          <button type="button" id="addonsNoThanks" class="btn btn-outline-secondary">لا شكرًا</button>
-          <button type="button" id="addonsConfirm" class="btn btn-primary">تأكيد الإضافات</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <script>
+  /* ---------- Simple demo data & helpers ---------- */
+  const AREAS = ["千代田区","中央区","港区","新宿区","渋谷区","品川区","目黒区","世田谷区"];
+  const SERVICES = [
+    {id:"basic", name:"ベーシック洗車", cat:"外装", price:3500, desc:"外装手洗い＋簡易撥水"},
+    {id:"pro", name:"プロ洗車", cat:"外装・内装", price:5500, desc:"外装手洗い＋内装バキューム"},
+    {id:"vip", name:"VIPディテール", cat:"外装・内装", price:9900, desc:"泡洗浄＋内装コーティング"}
+  ];
+  const formatJPY = n => new Intl.NumberFormat("ja-JP",{style:"currency",currency:"JPY"}).format(n);
 
-  <!-- libs -->
-  <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  const ordered = ["page1","page2","page3","page4","page5","page6","page7","page8"];
+  const labels  = ["ようこそ","サービス","日時","情報","支払い","場所","確認","完了"];
+  const state = { area:"", service:null, cars:1, date:"", times:[], name:"", phone:"", pay:"", total:0 };
 
-<script>
-  /* ---------- Logo fallback ---------- */
-  function handleLogoError(img){
-    const fallbacks = [
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%20Soap/spong&Soap%20-%20logo.png",
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png",
-      "https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/logo.png",
-      "https://dummyimage.com/180x54/027A93/ffffff.png&text=Sponge+%26+Soap"
-    ];
-    const i = Number(img.dataset.fidx||0);
-    if (i < fallbacks.length){ img.dataset.fidx = String(i+1); img.src = fallbacks[i]; }
-    else { img.style.display = 'none'; }
-  }
+  const $ = sel => document.querySelector(sel);
 
-  /* ---------- NAHL API endpoints ---------- */
-  const APP_ID='6e6b8ca3-e69a-48de-8522-16a496cc5214';
-  const defaultLink2=`https://nahl-platform.vercel.app/api/app/AM/general/${APP_ID}/form`;
-  const RESERVE_URL_PRIMARY  =`${defaultLink2}/reserveAppointment`;
-  const RESERVE_URL_FALLBACK =`${defaultLink2.replace(/\/form\/?$/,'')}/reserveAppointment`;
+  /* ---------- Theme toggle ---------- */
+  $("#toggleTheme").addEventListener("click", ()=>{
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === "ginza-zen" ? "tokyo-neon" : "ginza-zen";
+    toast(root.dataset.theme === "ginza-zen" ? "Ginza Zen に切替" : "Shibuya Neon に切替");
+  });
 
-  let controllers=[];
-  async function callContent2(path, cb, abortable=false, retries=3){
-    let signal='';
-    if(abortable){
-      controllers.forEach(([c])=>c.abort()); controllers=[];
-      const controller=new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
-    }
-    try{
-      await new Promise(r=>setTimeout(r, 120));
-      const res=await fetch(defaultLink2+path,{method:'GET',redirect:'follow',...(abortable&&{signal}),cache:'no-store'});
-      if(!res.ok){ if(retries>0) return callContent2(path,cb,abortable,retries-1); throw new Error('Network');}
-      cb(await res.json());
-    }catch(e){
-      if(!String(e).includes('AbortError') && retries>0) setTimeout(()=>callContent2(path,cb,abortable,retries-1),500);
-    }
-  }
+  /* ---------- Init selects & services ---------- */
+  (function init(){
+    const area = $("#area");
+    AREAS.forEach(a => area.append(new Option(a,a)));
+    $("#cars").addEventListener("change", e => { state.cars = +e.target.value; paintNeed(); });
 
-  function sanitizeNahlPayload(n){
-    const toStr = v => (v == null ? '' : String(v).trim());
-    return {
-      date:               toStr(n.date),
-      time:               toStr(n.time),
-      location:           toStr(n.location),
-      service:            toStr(n.service),
-      serviceCount:       toStr(n.serviceCount || '1'),
-      serviceCat:         toStr(n.serviceCat),
-      customerM:          toStr(n.customerM),
-      customerN:          toStr(n.customerN),
-      paymentMethod:      toStr((n.paymentMethod||'').toLowerCase()),
-      urlLocation:        toStr(n.urlLocation),
-      locationDescription:toStr(n.locationDescription),
-      locale:             'ar'
-    };
-  }
-
-  async function postReservationOriginal(payload){
-    const body = JSON.stringify(payload);
-    const headers1 = { 'Content-Type':'text/plain;charset=UTF-8', 'Accept':'application/json' };
-    const headers2 = { 'Content-Type':'application/json;charset=UTF-8', 'Accept':'application/json' };
-
-    try{
-      const res1 = await fetch(RESERVE_URL_PRIMARY, { method:'POST', headers:headers1, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer', redirect:'follow' });
-      const raw1 = await res1.text(); let data1=null; try{ data1 = JSON.parse(raw1); }catch(_){}
-      if(res1.ok) return { ok:true, status:res1.status, data:data1||{}, raw:raw1, url:RESERVE_URL_PRIMARY };
-      if(res1.status===415 || res1.status===406){
-        const res1b = await fetch(RESERVE_URL_PRIMARY, { method:'POST', headers:headers2, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer' });
-        const raw1b = await res1b.text(); let data1b=null; try{ data1b=JSON.parse(raw1b);}catch(_){}
-        if(res1b.ok) return { ok:true, status:res1b.status, data:data1b||{}, raw:raw1b, url:RESERVE_URL_PRIMARY };
-        if(res1b.status!==404) return { ok:false, status:res1b.status, data:data1b, raw:raw1b, url:RESERVE_URL_PRIMARY };
-      }
-      if(res1.status!==404) return { ok:false, status:res1.status, data:data1, raw:raw1, url:RESERVE_URL_PRIMARY };
-    }catch(e){}
-
-    try{
-      const res2 = await fetch(RESERVE_URL_FALLBACK, { method:'POST', headers:headers1, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer', redirect:'follow' });
-      const raw2 = await res2.text(); let data2=null; try{ data2 = JSON.parse(raw2); }catch(_){}
-      if(res2.ok) return { ok:true, status:res2.status, data:data2||{}, raw:raw2, url:RESERVE_URL_FALLBACK };
-      const res2b = await fetch(RESERVE_URL_FALLBACK, { method:'POST', headers:headers2, body, mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer' });
-      const raw2b = await res2b.text(); let data2b=null; try{ data2b = JSON.parse(raw2b); }catch(_){}
-      return { ok:res2b.ok, status:res2b.status, data:data2b, raw:raw2b, url:RESERVE_URL_FALLBACK };
-    }catch(e2){
-      return { ok:false, status:0, error:String(e2), url:RESERVE_URL_FALLBACK };
-    }
-  }
-
-  function showToast(type='info', msg=''){
-    const wrap=document.getElementById('toastWrap');
-    const div=document.createElement('div');
-    div.style.minWidth='260px'; div.style.color='#fff'; div.style.padding='10px 14px';
-    div.style.borderRadius='10px'; div.style.boxShadow='var(--shadow-md)';
-    div.style.background = type==='error' ? '#dc2626' : type==='success' ? '#16a34a' : '#0284c7';
-    div.textContent=msg; wrap.appendChild(div);
-    setTimeout(()=>{ div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(), 180); }, 2400);
-  }
-
-  const DateTime=luxon.DateTime;
-  const orderedPages=["page1","page2","page3","page4","page5","page6","page7","page8"];
-  const STEPS_LABELS=["الترحيب","الخدمة","الوقت","البيانات","الدفع","الموقع","مراجعة","تم"];
-  const PAGE_BACKGROUNDS={
-    page1:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG1.jpg",
-    page2:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG2.jpg",
-    page3:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG3.jpg",
-    page4:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG4.jpg",
-    page5:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg",
-    page6:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG6.jpg",
-    page7:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG5.jpg",
-    page8:"https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/NahlDemoBG7.jpg"
-  };
-  const STEP_GROUP_INDEX={page1:0,page2:1,page3:2,page4:3,page5:4,page6:5,page7:6,page8:7};
-
-  let selectedTime=null;
-  let selectedTimes=[];
-  let servicesSheetCache=[], categoriesFromSheet=[];
-  let itiPhone=null, positionUrl="";
-  let lastSelectedISO="";
-  let isSubmitting=false;
-  let currentTimeFilter='all';
-  let selectedAddons = [];
-  const nForm={date:'',time:'',location:'',service:'',serviceCount:'1',serviceCat:'',customerM:'',customerN:'',paymentMethod:'',urlLocation:'',locationDescription:'', locale:'ar'};
-
-  function getCarsCount(){ const n=parseInt(nForm.serviceCount||'1',10); return Math.min(Math.max(n||1,1),5); }
-  function updateTimeCountHint(){
-    const need = getCarsCount();
-    const got  = selectedTimes.length;
-    const el=document.getElementById('timeCountHint');
-    if(el) el.textContent = `${got}/${need} وقت محدد`;
-  }
-  function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
-
-  function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
-  function syncProgress(i){
-    const pct=((i+1)/orderedPages.length)*100;
-    document.getElementById('miniBarFill').style.width=pct+'%';
-    document.getElementById('miniStepTitle').textContent=STEPS_LABELS[Math.min(i,STEPS_LABELS.length-1)];
-    const prev=document.getElementById('footer-prev');
-    const next=document.getElementById('footer-next');
-    const wait=document.getElementById('footer-wait');
-    const onThanks=(orderedPages[i]==='page8');
-    prev.classList.toggle('hidden', i===0 || onThanks);
-    next.classList.toggle('hidden', onThanks);
-    wait.classList.remove('show');
-    next.textContent = (i===0) ? 'تخطي العرض' : (orderedPages[i]==='page7' ? 'تأكيد الطلب' : 'التالي');
-  }
-
-  function renderSummary(currentId){
-    const wrap=document.getElementById('summaryChips'); if(!wrap) return;
-    const activeId=currentId || (document.querySelector('.page.active')?.id) || 'page1';
-    const currGroup=STEP_GROUP_INDEX[activeId] ?? 0;
-
-    wrap.style.display = currGroup === 0 ? 'none' : 'flex';
-    if(currGroup===0){ wrap.innerHTML=''; return; }
-
-    const areaTxt=$('#area').find(':selected').text()||'';
-    const srvTxt=$('#service').find(':selected').text()||'';
-    const dt=nForm.date ? DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '';
-    const tmChip = selectedTimes.length ? (selectedTimes.length===1 ? selectedTimes[0] : `${selectedTimes.length} مواعيد`) : (nForm.time||'');
-    const pay=(nForm.paymentMethod||''); const locOk=!!positionUrl;
-
-    const chips=[
-      {i:'fa-location-dot',t:'المنطقة',v:areaTxt,g:1},
-      {i:'fa-screwdriver-wrench',t:'الخدمة',v:srvTxt,g:1},
-      {i:'fa-car',t:'السيارات',v:String(getCarsCount()),g:1},
-      {i:'fa-puzzle-piece',t:'الإضافات',v:(selectedAddons.length?selectedAddons.join('، '):''),g:1},
-      {i:'fa-clock',t:'الموعد',v:(dt && tmChip)?`${dt} • ${tmChip}`:'',g:2},
-      {i:'fa-credit-card',t:'الدفع',v:(pay?pay.toUpperCase():''),g:4},
-      {i:'fa-map-pin',t:'الموقع',v:(locOk?'تم التحديد':''),g:5},
-    ];
-
-    wrap.innerHTML='';
-    chips.filter(c=>c.v && c.g<=currGroup).forEach(c=>{
-      const el=document.createElement('div');
-      el.className='chip'+(c.g===currGroup?' current':'');
-      el.innerHTML=`<i class="fa-solid ${c.i}"></i><span class="title">${c.t}:</span><span class="value">${c.v}</span>`;
-      wrap.appendChild(el);
+    const grid = $("#svcGrid");
+    SERVICES.forEach(s=>{
+      const card = document.createElement("label");
+      card.className = "svc-card";
+      card.setAttribute("role","radio");
+      card.setAttribute("aria-checked","false");
+      card.tabIndex = 0;
+      card.innerHTML = `
+        <input type="radio" name="svc" value="${s.id}" hidden>
+        <div class="svc-thumb">🧼</div>
+        <div style="flex:1">
+          <div class="row" style="align-items:center">
+            <h3 class="svc-title">${s.name}</h3>
+            <span class="svc-cat">${s.cat}</span>
+          </div>
+          <p class="muted" style="margin:.25rem 0 6px">${s.desc}</p>
+          <strong>${formatJPY(s.price)}</strong>
+        </div>`;
+      card.addEventListener("click", ()=> chooseService(s.id, card));
+      card.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); chooseService(s.id, card); }});
+      grid.append(card);
     });
+
+    // date default = today (JP)
+    const d = new Date();
+    $("#date").value = d.toISOString().slice(0,10);
+    $("#date").addEventListener("change", paintTimes);
+    paintTimes();
+    paintNeed();
+    syncChips();
+  })();
+
+  function chooseService(id, el){
+    document.querySelectorAll('#svcGrid .svc-card').forEach(c=>c.setAttribute('aria-checked','false'));
+    el.setAttribute('aria-checked','true');
+    state.service = SERVICES.find(x=>x.id===id);
+    syncChips();
+  }
+
+  function paintTimes(){
+    const times = $("#times"); times.innerHTML = "";
+    const slots = ["09:00","10:00","11:00","13:00","14:00","15:00","16:00","17:00","18:00"];
+    slots.forEach(t=>{
+      const b=document.createElement("button");
+      b.type="button"; b.className="time-option"; b.textContent=t; b.setAttribute("aria-pressed","false");
+      b.addEventListener("click",()=>{
+        const need = state.cars;
+        const idx = state.times.indexOf(t);
+        if(idx>=0){ state.times.splice(idx,1); }
+        else{
+          if(state.times.length>=need){ toast(`必要枠は ${need} 件です`); return; }
+          state.times.push(t);
+        }
+        paintNeed();
+        b.setAttribute("aria-pressed", state.times.includes(t) ? "true" : "false");
+        syncChips();
+      });
+      times.append(b);
+    });
+    state.date = $("#date").value;
+  }
+
+  function paintNeed(){
+    $("#timeNeed").textContent = `${state.times.length}/${state.cars}`;
+  }
+
+  /* ---------- Navigation ---------- */
+  $("#prevBtn").addEventListener("click", ()=> go(-1));
+  $("#nextBtn").addEventListener("click", onNext);
+
+  function onNext(){
+    const i = getIndex();
+    const id = ordered[i];
+
+    if(id==="page1"){ go(1); return; }
+    if(id==="page2"){
+      const area = $("#area").value;
+      if(!area || !state.service){ toast("エリアとサービスを選択してください"); return; }
+      state.area = area; go(1); return;
+    }
+    if(id==="page3"){
+      if(state.times.length !== state.cars){ toast(`時間枠を ${state.cars} 件選択してください`); return; }
+      state.date = $("#date").value; go(1); return;
+    }
+    if(id==="page4"){
+      const name=$("#name").value.trim(), phone=$("#phone").value.trim();
+      if(!name || !phone){ toast("お名前と携帯電話を入力してください"); return; }
+      state.name = name; state.phone = phone; go(1); return;
+    }
+    if(id==="page5"){
+      const sel = document.querySelector('input[name="pay"]:checked');
+      if(!sel){ toast("支払い方法を選択してください"); return; }
+      state.pay = sel.value; go(1); return;
+    }
+    if(id==="page6"){ go(1); return; }
+    if(id==="page7"){ toast("予約を送信しました"); go(1); return; }
+  }
+
+  function go(step){
+    const i = getIndex();
+    const next = Math.max(0, Math.min(ordered.length-1, i+step));
+    showPage(next);
+  }
+
+  function getIndex(){
+    const id = document.querySelector(".page.active")?.id;
+    return Math.max(0, ordered.indexOf(id));
   }
 
   function showPage(idx){
-    const cur=document.querySelector('.page.active');
-    const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
-    if(cur && cur.id==='page1') stopWelcomeDeck();
-    if(cur){ cur.classList.remove('active'); cur.classList.add('exit'); }
-    next.style.display='flex';
-    requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 240); });
+    const cur = document.querySelector(".page.active");
+    const next = document.getElementById(ordered[idx]);
+    if(cur===next) return;
+    if(cur){ cur.classList.remove("active"); cur.classList.add("exit"); setTimeout(()=>cur.classList.remove("exit"), 240); }
+    if(next){ next.classList.add("active"); }
 
-    if(next.id==='page7') populateReview(); // entering Review
-    syncProgress(idx);
-    setPageBackground(next.id);
-    renderSummary(next.id);
-    updateNextAvailability();
-    if(next.id==='page1') startWelcomeDeck();
+    // footer buttons
+    $("#prevBtn").disabled = idx===0 || idx===ordered.length-1;
+    $("#nextBtn").textContent = (ordered[idx]==="page7") ? "予約を確定" : (ordered[idx]==="page8" ? "完了" : "次へ");
+    $("#nextBtn").disabled = ordered[idx]==="page8";
+
+    // progress + chips
+    const pct = ((idx+1)/ordered.length)*100;
+    $("#miniBar").style.width = pct+"%";
+    $("#miniStep").textContent = labels[idx];
+
+    if(ordered[idx]==="page7"){ renderReview(); }
+    syncChips();
+    scrollTo(0,0);
   }
 
-  function setLoadingTimes(on){ document.getElementById('timeLoading').classList.toggle('show', !!on); }
-  function setLoadingServices(on){ document.getElementById('servicesLoading').classList.toggle('show', !!on); }
-
-  /* Welcome slideshow */
-  let deckTimers=[]; let deckIndex=0; let deckRunning=false;
-  const SLIDE_MS=2600; const GAP_MS=220;
-  function startWelcomeDeck(){
-    const deck=document.getElementById('pptDeck'); if(!deck) return;
-    const slides=[...deck.querySelectorAll('.ppt-slide')];
-    const dotsWrap=document.getElementById('pptDots');
-    dotsWrap.innerHTML=slides.map((_,i)=>`<span class="ppt-dot${i===0?' active':''}"></span>`).join('');
-    const dots=[...dotsWrap.children];
-
-    const setActive=(i,ex=-1)=>{
-      slides.forEach((s,idx)=>{ s.classList.remove('is-active','is-exiting'); if(idx===i){s.classList.add('is-active'); s.style.zIndex=2;} else if(idx===ex){s.classList.add('is-exiting'); s.style.zIndex=1;} else{s.style.zIndex=0;} });
-      dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
-    };
-    deckRunning=true; deckIndex=0; setActive(0,-1);
-    const advance=()=>{ if(!deckRunning) return; const prev=deckIndex; deckIndex++; if(deckIndex>=slides.length){ stopWelcomeDeck(); showPage(1); return; } setActive(deckIndex,prev); schedule(); };
-    const schedule=()=>{ deckTimers.push(setTimeout(advance, SLIDE_MS+GAP_MS)); };
-    schedule();
-  }
-  function stopWelcomeDeck(){ deckRunning=false; deckTimers.forEach(clearTimeout); deckTimers=[]; }
-
-  /* Plate helpers */
-  function isSpecialPlate(num){
-    if(!/^\d+$/.test(num) || num.length < 3) return false;
-    const same = /^(\d)\1+$/.test(num);
-    const asc  = ('01234567890123456789').includes(num);
-    const desc = ('98765432109876543210').includes(num);
-    const pal  = num === num.split('').reverse().join('');
-    const pairRepeat = (num.length%2===0) && /^(\d{2})\1+$/.test(num);
-    return same || asc || desc || pal || pairRepeat;
-  }
-  function updatePlateHint(){
-    const raw = ($('#plateNumber').val()||'');
-    const v   = raw.replace(/\D/g,'');
-    $('#plateNumber').val(v);
-    const txt = v ? (isSpecialPlate(v) ? 'رقم مميز 👌 — ممتاز للتوثيق السريع.' : 'اختياري — يساعد فريقنا على التعرف على مركبتك.')
-                  : 'اختياري — يساعد فريقنا على التعرف على مركبتك';
-    $('#plateHelp').text(txt);
-    const pe=document.getElementById('err-plate'); if(pe) pe.style.display='none';
+  function renderReview(){
+    $("#rv-area").textContent = state.area || "—";
+    $("#rv-service").textContent = state.service ? state.service.name : "—";
+    $("#rv-cars").textContent = state.cars + "台";
+    $("#rv-date").textContent = state.date || "—";
+    $("#rv-times").textContent = state.times.length ? state.times.join("・") : "—";
+    $("#rv-name").textContent = state.name || "—";
+    $("#rv-phone").textContent = state.phone || "—";
+    $("#rv-pay").textContent = state.pay || "—";
+    const total = (state.service?state.service.price:0) * state.cars;
+    state.total = total;
+    $("#rv-total").textContent = formatJPY(total);
   }
 
-  /* Times helpers */
-  function parseTimeToLuxon(raw){
-    let t=DateTime.fromISO(String(raw||'').trim(),{setZone:true});
-    if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'HH:mm:ss',{setZone:true});
-    if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm a',{setZone:true});
-    if(!t.isValid) t=DateTime.fromFormat(String(raw||''),'H:mm',{setZone:true});
-    return t.isValid?t:null;
-  }
-  function timeInMins(h, m){ return (h*60)+m }
-  function passesFilter(mins){
-    if(currentTimeFilter==='all') return true;
-    if(currentTimeFilter==='morning')   return mins>=timeInMins(6,0)  && mins<timeInMins(11,0);
-    if(currentTimeFilter==='afternoon') return mins>=timeInMins(11,0) && mins<timeInMins(16,0);
-    if(currentTimeFilter==='evening')   return mins>=timeInMins(16,0) && mins<timeInMins(21,0);
-    if(currentTimeFilter==='night')     return mins>=timeInMins(21,0) && mins<timeInMins(24,0);
-    return true;
-  }
-
-  let dayTimes=[]; let timesLoaded=false; let lastSelectedDateISO='';
-  function fetchTimesForSelectedDate(){
-    const dateEl=document.getElementById('date');
-    const timeContainer=document.getElementById('time-container');
-    const loc=$('#area').val()||''; const srv=$('#service').val()||'';
-    const selectedISO=(dateEl.value||DateTime.now().toFormat('yyyy-LL-dd')).trim();
-    lastSelectedISO=selectedISO; lastSelectedDateISO=selectedISO;
-
-    selectedTime=null; selectedTimes=[]; updateTimeCountHint();
-
-    if(!loc||!srv){
-      timeContainer.innerHTML=`<div style="grid-column:1/-1;justify-self:center" class="text-muted">اختر المنطقة والخدمة لعرض المواعيد</div>`;
-      updateNextAvailability(); return;
-    }
-
-    dateEl.disabled=true; setLoadingTimes(true);
-    timeContainer.innerHTML=`<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"></div>`;
-
-    const now=DateTime.now().setZone('Asia/Riyadh');
-    const isToday=selectedISO===now.toISODate();
-
-    const qs=`/appointments?startDate=${encodeURIComponent(selectedISO)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(srv)}&onlyAvailable=1`;
-    callContent2(qs,(res)=>{
-      const rows=(res?.data?.appointments||[]);
-      const filtered=rows.filter(r=>{
-        const d=DateTime.fromISO(r.TS_appointment_date,{setZone:true}); if(!d.isValid||d.toISODate()!==selectedISO) return false;
-        const t=parseTimeToLuxon(r.TS_appointment_time); if(!t) return false;
-        const f=(typeof r.isAvailable==='boolean')?r.isAvailable:undefined;
-        const s=String(r.TS_status||r.status||r.TS_appointment_status||'').toLowerCase();
-        const b=Number(r.TS_booked ?? r.booked); const c=Number(r.TS_capacity ?? r.capacity);
-        let rem=Number(r.TS_remaining ?? r.remaining);
-        if(!Number.isFinite(rem)&&Number.isFinite(c)&&Number.isFinite(b)) rem=c-b;
-        const open=f===true||['available','open','free','empty','vacant','canceled'].includes(s)||(Number.isFinite(rem)?rem>0:(f!==false&&!s));
-        if(!open) return false;
-        if(isToday){ const slot=now.set({hour:t.hour,minute:t.minute,second:0}); if(slot<now.plus({minutes:5})) return false; }
-        return true;
-      });
-
-      const list=filtered.map(r=>{
-        const t=parseTimeToLuxon(r.TS_appointment_time);
-        const mins = t.hour*60 + t.minute;
-        return {label:t.toLocaleString(DateTime.TIME_SIMPLE), h:t.hour, m:t.minute, mins};
-      });
-
-      const seen=new Set();
-      dayTimes=list.filter(x=>{ if(seen.has(x.mins)) return false; seen.add(x.mins); return true; });
-      timesLoaded=true;
-
-      renderSelectedDateTimes(selectedISO);
-      dateEl.disabled=false; setLoadingTimes(false);
-    }, true);
-  }
-
-  function renderSelectedDateTimes(selectedISO){
-    const timeContainer=document.getElementById('time-container');
-    timeContainer.innerHTML='';
-    if(!timesLoaded){
-      timeContainer.innerHTML=`<div class="spinner-border text-info" role="status" style="grid-column:1/-1;justify-self:center;"></div>`;
-      return;
-    }
-    const viewList = dayTimes.filter(x=>passesFilter(x.mins)).sort((a,b)=> a.mins - b.mins);
-    if(!viewList.length){
-      timeContainer.innerHTML=`<div style="grid-column:1/-1;justify-self:center" class="text-muted">لا توجد مواعيد ضمن الفلتر المحدد</div>`;
-      return;
-    }
-
-    /* Auto-select first available slot(s) so UI is highlighted from first render */
-    if (selectedTimes.length === 0) {
-      const limit = getCarsCount();
-      selectedTimes = viewList.slice(0, limit).map(t =>
-        luxon.DateTime.fromObject({hour:t.h, minute:t.m}).toFormat('HH:mm')
-      );
-      nForm.date = selectedISO;
-      selectedTime = selectedTimes[0] ? { ui: selectedTimes[0], iso: selectedTimes[0] } : null;
-      updateTimeCountHint();
-      renderSummary('page3');
-      updateNextAvailability();
-    }
-
-    const limit = getCarsCount();
-    viewList.forEach(t=>{
-      const btn=document.createElement('button');
-      btn.type='button'; btn.className='time-option'; btn.setAttribute('role','button'); btn.setAttribute('aria-pressed','false'); btn.setAttribute('dir','ltr');
-      btn.textContent=t.label;
-      const hhmm = DateTime.fromObject({hour:t.h,minute:t.m}).toFormat('HH:mm');
-      const reflect = () => { const on = selectedTimes.includes(hhmm); btn.setAttribute('aria-pressed', on ? 'true' : 'false'); };
-      reflect();
-      btn.addEventListener('click',()=>{
-        const idx = selectedTimes.indexOf(hhmm);
-        if (idx >= 0) selectedTimes.splice(idx,1);
-        else{
-          if (selectedTimes.length >= limit) { showToast('error', `لا يمكنك اختيار أكثر من ${limit} وقت`); return; }
-          selectedTimes.push(hhmm);
-        }
-        reflect();
-        nForm.date = selectedISO;
-        selectedTime = selectedTimes[0] ? { ui: hhmm, iso: hhmm } : null;
-        updateTimeCountHint();
-        renderSummary('page3');
-        updateNextAvailability();
-      });
-      timeContainer.appendChild(btn);
+  function syncChips(){
+    const wrap = $("#chips"); wrap.innerHTML = "";
+    const chips = [
+      state.area && ["📍", "エリア", state.area],
+      state.service && ["🧼", "サービス", state.service.name],
+      state.cars && ["🚗", "台数", state.cars + "台"],
+      state.date && state.times.length && ["🕒", "日時", `${state.date}・${state.times.join("・")}`],
+      state.pay && ["💳", "支払い", state.pay]
+    ].filter(Boolean);
+    const group = getIndex();
+    chips.forEach((c,idx)=>{
+      const el = document.createElement("div");
+      el.className = "chip" + (idx===chips.length-1 ? " current": "");
+      el.innerHTML = `<span>${c[0]}</span><span>${c[1]}:</span><strong>&nbsp;${c[2]}</strong>`;
+      wrap.append(el);
     });
   }
 
-  function installResizeObservers(){
-    const header=document.getElementById('siteHeader');
-    const footer=document.getElementById('siteFooter');
-    const ro=new ResizeObserver(entries=>{
-      entries.forEach(entry=>{
-        if(entry.target.id==='siteHeader') document.documentElement.style.setProperty('--header-h', entry.contentRect.height+'px');
-        if(entry.target.id==='siteFooter') document.documentElement.style.setProperty('--footer-h', entry.contentRect.height+'px');
-      });
-    });
-    header && ro.observe(header); footer && ro.observe(footer);
+  function toast(msg){
+    const t = $("#toast");
+    t.textContent = msg; t.style.display="block";
+    setTimeout(()=>{ t.style.opacity="0"; setTimeout(()=>{ t.style.display="none"; t.style.opacity="1"; }, 220); }, 1800);
   }
 
-  /* ---------- GAS JSONP (Services) with auto-retry ---------- */
-  const GAS_BASE = 'https://script.google.com/macros/s/AKfycbwMXUFLd6th5C6cK7E999aTdHXuWHcUOq7KzGzxJE4RUaEt2tWNg98p98hXqYCTE-F7YQ/exec';
-  function jsonp(url, timeoutMs = 12000){
-    return new Promise((resolve,reject)=>{
-      const cb = 'jsonp_cb_' + Math.random().toString(36).slice(2);
-      let s;
-      const timer = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, timeoutMs);
-      function cleanup(){ clearTimeout(timer); try { delete window[cb]; } catch(_) {} if (s && s.parentNode) s.parentNode.removeChild(s); }
-      window[cb] = (data) => { cleanup(); resolve(data); };
-      const sep = url.includes('?') ? '&' : '?';
-      const src = `${url}${sep}callback=${cb}&_=${Date.now()}`;
-      s = document.createElement('script'); s.src = src; s.async = true; s.onerror = () => { cleanup(); reject(new Error('JSONP network error')); };
-      document.head.appendChild(s);
-    });
-  }
-  async function fetchAllServicesFromGAS(){
-    const url = `${GAS_BASE}?action=serviceMetaAll`;
-    const res = await jsonp(url);
-    let arr=[];
-    if (res?.ok && Array.isArray(res.data)) arr = res.data;
-    else if (res?.ok && res.data && typeof res.data === 'object') arr = Object.values(res.data);
-    else throw new Error('Bad GAS payload for serviceMetaAll');
-    return arr.map(r => ({ ...r, TS_service_id: String(r.TS_service_id ?? '') }));
-  }
-
-  /* ---------- Service Cards ---------- */
-  const arCurrency = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
-  function toArrayTags(x){
-    if (Array.isArray(x)) return x.map(t=>String(t).trim()).filter(Boolean);
-    if (x == null) return [];
-    return String(x).split(/[\n,،,|/]+/).map(s=>s.trim()).filter(Boolean);
-  }
-  function getServiceMeta(s){
-    const img  = s.TS_image_url || '';
-    const desc = s.TS_service_description_ar || '';
-    const cat  = s.TS_category_arabic_name || '';
-    const priceNumRaw = (s.TS_price != null && s.TS_price !== '') ? String(s.TS_price) : '';
-    const priceNum    = priceNumRaw ? Number(priceNumRaw.replace(/[^\d.]/g,'')) : NaN;
-    const priceText   = s.TS_price_text || '';
-    let tags = toArrayTags(s.TS_price_tags || '');
-    if (!isNaN(priceNum)) tags.unshift(arCurrency.format(priceNum));
-    else if (priceText)   tags.unshift(String(priceText));
-    return { img, desc, tags, category: cat };
-  }
-  function getServicePrice(serviceId){
-    const row = servicesSheetCache.find(r => String(r.TS_service_id) === String(serviceId));
-    if(!row) return 0;
-    const raw = (row.TS_price != null && row.TS_price !== '') ? String(row.TS_price) : '';
-    const num = raw ? Number(raw.replace(/[^\d.]/g,'')) : NaN;
-    return Number.isFinite(num) ? num : 0;
-  }
-  function getAddonsPrice(addons){
-    let sum = 0;
-    addons.forEach(label=>{
-      const m = String(label).match(/(\d+(?:\.\d+)?)/g);
-      if(m){ m.forEach(x=>{ const v=Number(x); if(Number.isFinite(v)) sum+=v; }); }
-    });
-    return sum;
-  }
-  function computeOrderTotal(){
-    const serviceId = nForm.service || $('#service').val() || '';
-    const main = getServicePrice(serviceId);
-    const addonsSum = getAddonsPrice(selectedAddons);
-    const cars = getCarsCount();
-    const total = (main + addonsSum) * cars;
-    return { main, addonsSum, cars, total, formatted: arCurrency.format(total) };
-  }
-
-  function createSkeletonCards(n=6){
-    const wrap = document.getElementById('serviceCards');
-    if (!wrap) return;
-    wrap.innerHTML='';
-    for (let i=0;i<n;i++){
-      const sk=document.createElement('div');
-      sk.className='svc-skel'; sk.setAttribute('aria-hidden','true');
-      wrap.appendChild(sk);
-    }
-    const empty=document.getElementById('svcEmpty'); const err=document.getElementById('svcError');
-    if (empty) empty.style.display='none'; if (err) err.style.display='none';
-  }
-  function clearSkeletons(){ const wrap=document.getElementById('serviceCards'); if (wrap) wrap.innerHTML=''; }
-  function updateRovingTabindex(selectedId){
-    document.querySelectorAll('#serviceCards .svc-card').forEach(c=>{
-      const sel = c.dataset.serviceId === String(selectedId);
-      c.setAttribute('tabindex', sel ? '0':'-1');
-      c.setAttribute('aria-checked', sel ? 'true':'false');
-      c.classList.toggle('selected', sel);
-    });
-  }
-  function onCardKeydown(e){
-    const cards=[...document.querySelectorAll('#serviceCards .svc-card')];
-    const cur=e.currentTarget; const idx=cards.indexOf(cur);
-    if(idx<0) return;
-    const gridCols=(getComputedStyle(document.querySelector('.svc-grid')).gridTemplateColumns||'').split(' ').length||3;
-    if(e.key==='ArrowRight'||e.key==='ArrowDown'){ e.preventDefault(); (cards[Math.min(cards.length-1, idx+(e.key==='ArrowRight'?1:gridCols))]||cur).focus(); }
-    else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); (cards[Math.max(0, idx-(e.key==='ArrowLeft'?1:gridCols))]||cur).focus(); }
-    else if(e.key===' '||e.key==='Enter'){ e.preventDefault(); chooseServiceCard(cur,{focus:true,announce:true}); }
-  }
-  function buildCardDOM(service, meta){
-    const card=document.createElement('div');
-    card.className='svc-card'; card.setAttribute('role','radio'); card.setAttribute('aria-checked','false'); card.setAttribute('tabindex','-1');
-    card.dataset.serviceId=String(service.TS_service_id);
-
-    const thumb=document.createElement('div'); thumb.className='svc-thumb';
-    if(meta.img){
-      const img=document.createElement('img');
-      img.src=meta.img; img.alt=service.TS_service_arabic_name||('خدمة '+service.TS_service_id);
-      img.loading='lazy'; img.decoding='async'; img.width=88; img.height=88;
-      img.onerror=()=>{ thumb.textContent='🧼'; }; thumb.appendChild(img);
-    }else{ thumb.textContent='🧼'; }
-
-    const body=document.createElement('div'); body.className='svc-body';
-    const titleRow=document.createElement('div'); titleRow.className='svc-title-row';
-    const ttl=document.createElement('div'); ttl.className='svc-title'; ttl.textContent=service.TS_service_arabic_name||service.TS_service_id;
-    titleRow.appendChild(ttl);
-    const catText = meta.category;
-    if(catText){ const cat=document.createElement('span'); cat.className='svc-cat'; cat.innerHTML='<i class="fa-solid fa-layer-group"></i> '+catText; titleRow.appendChild(cat); }
-    const desc=document.createElement('p'); desc.className='svc-desc'; desc.textContent=meta.desc||'';
-    const tagsRow=document.createElement('div'); tagsRow.className='tag-row';
-    (meta.tags||[]).forEach((t,i)=>{ const chip=document.createElement('span'); chip.className='price-tag'+(i%2?' alt':''); chip.textContent=t; tagsRow.appendChild(chip); });
-
-    const cta=document.createElement('div'); cta.className='svc-cta'; cta.innerHTML='<i class="fa-solid fa-circle-check"></i>';
-    body.appendChild(titleRow); body.appendChild(desc); body.appendChild(tagsRow);
-    card.appendChild(thumb); card.appendChild(body); card.appendChild(cta);
-
-    card.addEventListener('click',()=>chooseServiceCard(card,{focus:true,announce:true}));
-    card.addEventListener('keydown',onCardKeydown);
-    return card;
-  }
-  function chooseServiceCard(card,{focus=false,announce=false}={}){
-    const id=card?.dataset?.serviceId; if(!id) return;
-    $('#service').val(id).trigger('change.select2');
-    nForm.service=id; updateRovingTabindex(id);
-    if(focus) card.focus(); renderSummary('page2'); updateNextAvailability();
-    const name=card.querySelector('.svc-title')?.textContent||''; const catText=$('#serviceCat').find(':selected').text()||'';
-    window.dispatchEvent(new CustomEvent('service:selected',{detail:{id,name,category:catText}}));
-    if(announce) showToast('success','تم اختيار: '+name);
-  }
-  function getServiceMetaFor(s){ return getServiceMeta(s); }
-
-  async function renderServiceCardsByCategory_FromSheet(categoryName){
-    const wrap=document.getElementById('serviceCards'); if(!wrap) return;
-    const empty=document.getElementById('svcEmpty'); const err=document.getElementById('svcError'); const retry=document.getElementById('svcRetry');
-    if(empty) empty.style.display='none'; if(err) err.style.display='none';
-    clearSkeletons(); createSkeletonCards(6);
-
-    const list = servicesSheetCache
-      .filter(s => String(s.TS_category_arabic_name||'').trim() === String(categoryName||'').trim())
-      .sort((a,b)=> Number(a.TS_service_id) - Number(b.TS_service_id));
-
-    const $svc=$('#service'); $svc.empty().select2?.({width:'100%',placeholder:'',dir:'rtl'});
-
-    if(!list.length){
-      clearSkeletons(); if(empty) empty.style.display='block';
-      nForm.service=''; selectedAddons=[]; renderSummary('page2'); updateNextAvailability(); return;
-    }
-
-    clearSkeletons();
-    list.forEach(s=>{
-      const id=String(s.TS_service_id);
-      const name=s.TS_service_arabic_name || `خدمة ${id}`;
-      $svc.append(new Option(name, id, false, false));
-      const meta=getServiceMetaFor(s);
-      wrap.appendChild(buildCardDOM(s, meta));
-    });
-
-    const currentSel=$('#service').val();
-    const toSelect = (currentSel && list.some(s=>String(s.TS_service_id)===String(currentSel)))
-      ? String(currentSel)
-      : String(list[0].TS_service_id);
-
-    $('#service').val(toSelect).trigger('change.select2');
-    updateRovingTabindex(toSelect);
-    nForm.service=toSelect; selectedAddons=[];
-    renderSummary('page2'); updateNextAvailability();
-
-    if(retry) retry.onclick=()=>renderServiceCardsByCategory_FromSheet(categoryName);
-  }
-
-  /* ---------- Addons ---------- */
-  function toArrayTagsSafe(s){ return toArrayTags(s); }
-  function getAddonsForService(serviceId){
-    const row = servicesSheetCache.find(r => String(r.TS_service_id) === String(serviceId));
-    const raw = row?.TS_addons || row?.TS_additional_services || row?.TS_additional_services_ar || '';
-    let list = toArrayTagsSafe(raw);
-    if (!list.length){
-      list = ['غسيل بصابون النانو - 10 ريال +'];
-    }
-    const seen = new Set(); const clean = [];
-    list.forEach(s=>{ const t=s.trim(); if(t && !seen.has(t)){ seen.add(t); clean.push(t); } });
-    return clean;
-  }
-  function openAddonsModalFor(serviceId){
-    const modalEl = document.getElementById('addonsModal');
-    const chipsWrap = document.getElementById('addonsChips');
-    chipsWrap.innerHTML = '';
-    const addons = getAddonsForService(serviceId);
-    addons.forEach((label) => {
-      const chip = document.createElement('button');
-      chip.type = 'button'; chip.className = 'btn btn-sm btn-outline-secondary';
-      chip.style.borderRadius = '999px';
-      chip.style.minHeight = '38px';
-      chip.textContent = label; chip.dataset.value = label; chip.setAttribute('aria-pressed','false');
-      chip.addEventListener('click', ()=>{
-        const p=chip.getAttribute('aria-pressed')==='true';
-        chip.setAttribute('aria-pressed', String(!p));
-        if (p) chip.classList.add('btn-outline-secondary');
-        else chip.classList.remove('btn-outline-secondary');
-      });
-      chipsWrap.appendChild(chip);
-    });
-    const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    document.getElementById('addonsNoThanks').onclick = ()=>{ selectedAddons = []; bsModal.hide(); renderSummary('page2'); updateNextAvailability(); };
-    document.getElementById('addonsConfirm').onclick = ()=>{
-      selectedAddons = [...chipsWrap.querySelectorAll('.btn[aria-pressed="true"]')].map(el=>el.dataset.value);
-      bsModal.hide(); renderSummary('page2'); updateNextAvailability();
-    };
-    bsModal.show();
-  }
-  window.addEventListener('service:selected', (ev) => { const { id } = ev.detail || {}; openAddonsModalFor(id); });
-
-  /* ---------- NAHL category name → ID --------- */
-  const NAHL_CAT_MAP = new Map();
-  function updateServiceCatIdFromName(){
-    const areaId = $('#area').val();
-    const catName = ($('#serviceCat').val() || '').trim();
-    const map = NAHL_CAT_MAP.get(String(areaId));
-    const id = map?.get(catName);
-    nForm.serviceCat = id ? String(id) : '';
-  }
-
-  function composeLocationDescription(){
-    const parts = [];
-    const brand = $('#carBrand').val() || '';
-    const car   = $('#carName').val() || '';
-    const plate = $('#plateNumber').val() || '';
-    const base = [brand, car, plate].filter(Boolean).join(', ');
-    if (base) parts.push(base);
-    if (selectedAddons.length) parts.push('إضافات: ' + selectedAddons.join('، '));
-    const final = parts.join(' | ');
-    $('#locationDescription').val(final);
-    nForm.locationDescription = final;
-  }
-
-  /* ---------- Initialize ---------- */
-  $(function () {
-    installResizeObservers();
-
-    Object.values(PAGE_BACKGROUNDS).forEach(src => { const i = new Image(); i.src = src; });
-
-    // Select2
-    $('#area').select2({ width: '100%', placeholder: 'اختر المنطقة', dir: 'rtl' });
-    $('#serviceCat').select2({ width: '100%', placeholder: 'فئة الخدمة', dir: 'rtl' });
-    $('#service').select2({ width: '100%', placeholder: 'باقتك المختارة', dir: 'rtl', minimumResultsForSearch: Infinity });
-    $('#carBrand').select2({ width: '100%', placeholder: 'ماركة المركبة', dir: 'rtl' });
-    $('#numCars').select2({ width: '100%', placeholder: 'عدد السيارات', dir: 'rtl', minimumResultsForSearch: Infinity });
-    $('#area, #serviceCat, #service, #carBrand, #numCars').on('select2:open', () => { $('.select2-search__field').attr('dir', 'rtl'); });
-
-    $('#numCars').on('change', function(){
-      const v = parseInt(this.value||'1',10);
-      const clamped = Math.min(Math.max(v||1,1),5);
-      nForm.serviceCount = String(clamped);
-      $('#serviceCount').val(String(clamped));
-      if (selectedTimes.length > clamped) { selectedTimes = selectedTimes.slice(0, clamped); renderSelectedDateTimes(lastSelectedDateISO); }
-      updateTimeCountHint(); renderSummary('page2'); updateNextAvailability();
-    });
-
-    itiPhone = window.intlTelInput(document.querySelector('#mobile'), {
-      initialCountry: 'sa', onlyCountries: ['sa','ae','bh','kw','om','qa'],
-      separateDialCode: true, placeholderNumberType: 'MOBILE',
-      utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js'
-    });
-    $('#mobile').on('blur', () => { if (itiPhone && itiPhone.isValidNumber()) { nForm.customerM = itiPhone.getNumber().replace(/^\+/, ''); $('#err-mobile').hide(); } else { $('#err-mobile').show(); } });
-
-    $('#name').on('input', function () { nForm.customerN = this.value.trim(); renderSummary('page4'); updateNextAvailability(); });
-    $('#mobile').on('input', function () { renderSummary('page4'); updateNextAvailability(); });
-    $('#carName').on('input', function () { updateNextAvailability(); composeLocationDescription(); });
-    $('#plateNumber').on('input', function () { updatePlateHint(); renderSummary('page4'); updateNextAvailability(); composeLocationDescription(); });
-
-    const today = DateTime.now().toFormat('yyyy-LL-dd');
-    $('#date').val(today).attr('min', today);
-    $('#date').on('change', () => { fetchTimesForSelectedDate(); renderSummary('page3'); });
-    $('#timeFilter').on('change', function () { currentTimeFilter = this.value; renderSelectedDateTimes(lastSelectedDateISO); });
-
-    // Load locations (NAHL)
-    setLoadingServices(true);
-    callContent2(`/locations`, res => {
-      const list = res?.data || [];
-      const ds = list.map(l => ({ id: l.id, text: l.TS_location_arabic_name }));
-      $('#area').empty().select2({ data: ds, width: '100%', placeholder: 'اختر المنطقة', dir: 'rtl' });
-      if (ds.length) $('#area').val(ds[0].id).trigger('change');
-      else { showToast('error', 'لا توجد مناطق متاحة حالياً'); }
-      renderSummary('page2');
-    });
-
-    // Auto-retry services from GAS with spinner
-    (async () => {
-      setLoadingServices(true);
-      const MAX = 3; let attempt=0; let success=false; let lastErr=null;
-      while(attempt<MAX && !success){
-        try{
-          const rows = await fetchAllServicesFromGAS();
-          servicesSheetCache = rows;
-          const uniq = [...new Set(rows.map(r => String(r.TS_category_arabic_name || '').trim()).filter(Boolean))];
-          categoriesFromSheet = uniq;
-          const catOptions = uniq.map(name => ({ id: name, text: name }));
-          $('#serviceCat').empty().select2({ data: catOptions, width: '100%', placeholder: 'فئة الخدمة', dir: 'rtl' });
-          if (catOptions.length) $('#serviceCat').val(catOptions[0].id).trigger('change');
-          else {
-            $('#serviceCat').val(null).trigger('change');
-            $('#service').val(null).trigger('change.select2');
-            document.getElementById('serviceCards').innerHTML = '';
-            document.getElementById('svcEmpty').style.display = 'block';
-          }
-          success=true;
-        }catch(e){ lastErr=e; attempt++; if(attempt<MAX) await new Promise(r=>setTimeout(r, 600*attempt)); }
-      }
-      setLoadingServices(false);
-      if(!success){
-        console.error('Failed to fetch services from GAS', lastErr);
-        document.getElementById('svcError').style.display='block';
-        document.getElementById('svcRetry')?.addEventListener('click', ()=>location.reload());
-      }
-      renderSummary('page2'); updateNextAvailability();
-    })();
-
-    // When location changes: fetch service-cat map (name→id)
-    $('#area').on('change', function () {
-      const areaId = this.value;
-      nForm.location = areaId;
-      callContent2(`/services?location=${encodeURIComponent(areaId)}`, (res) => {
-        const catsArr = res?.data?.servicesCat || res?.data?.categories || [];
-        const map = new Map();
-        catsArr.forEach(c => { const name = String(c.TS_category_arabic_name || '').trim(); const id = c.TS_category_id; if (name) map.set(name, id); });
-        NAHL_CAT_MAP.set(String(areaId), map);
-        updateServiceCatIdFromName();
-      }, true);
-      renderSummary('page2'); updateNextAvailability();
-    });
-
-    $('#serviceCat').on('change', function () {
-      renderServiceCardsByCategory_FromSheet(this.value);
-      updateServiceCatIdFromName();
-      renderSummary('page2'); updateNextAvailability();
-    });
-
-    $('#service').on('change', function () {
-      nForm.service = this.value || '';
-      const wrap = document.getElementById('serviceCards');
-      if (wrap && this.value) {
-        updateRovingTabindex(this.value);
-        const sel = [...wrap.children].find(el=>el.dataset?.serviceId===String(this.value));
-        sel && sel.scrollIntoView({ block: 'nearest' });
-      }
-      renderSummary('page2'); updateNextAvailability();
-      composeLocationDescription();
-    });
-
-    // Car brands
-    const brands=['Changan','Hyundai','Kia','Toyota','Nissan','Chevrolet','GMC','Mercedes-Benz','BMW','Audi','Lexus','Land Rover (Range Rover)','Porsche','Genesis','Cadillac','Infiniti','Ford','Honda','Mazda','Mitsubishi','Other'].map(b=>({id:b,text:b}));
-    $('#carBrand').empty().select2({ data: brands, width: '100%', placeholder: 'اختر ماركة المركبة', dir: 'rtl' });
-
-    // Footer nav
-    document.getElementById('footer-next').addEventListener('click', gotoNext);
-    document.getElementById('footer-prev').addEventListener('click', () => { const i = getActiveIndex(); showPage(Math.max(i - 1, 0)); });
-
-    // Payment selection
-    const payCards = [...document.getElementById('payGroup').querySelectorAll('.pay-card')];
-    payCards.forEach((card) => {
-      const input = card.querySelector('input');
-      const choose = () => {
-        payCards.forEach(c => { c.setAttribute('aria-checked', 'false'); c.setAttribute('tabindex', '-1'); c.querySelector('input').checked = false; });
-        card.setAttribute('aria-checked', 'true'); card.setAttribute('tabindex', '0'); input.checked = true;
-        nForm.paymentMethod = input.value; renderSummary('page5'); updateNextAvailability();
-        showPage(5); // go to Map next via footer
-      };
-      card.addEventListener('click', choose);
-      card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); } });
-    });
-
-    // Confirm button on Review page triggers submit
-    document.getElementById('confirmOrder').addEventListener('click', submitAllAppointments);
-
-    // Rebook
-    $('#rebook').on('click', () => location.href = '/');
-
-    // Initial UI
-    setPageBackground('page1'); renderSummary('page1'); syncProgress(0); startWelcomeDeck();
-    nForm.serviceCount = '1'; updateTimeCountHint();
+  // keyboard support for payment cards
+  document.querySelectorAll('#page5 .svc-card').forEach(card=>{
+    const input = card.querySelector('input[name="pay"]');
+    const choose = ()=>{ document.querySelectorAll('#page5 .svc-card').forEach(c=>c.setAttribute('aria-checked','false')); card.setAttribute('aria-checked','true'); input.checked = true; };
+    card.addEventListener('click', choose);
+    card.addEventListener('keydown', e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); choose(); }});
   });
-
-  function updateNextAvailability(){
-    const i=getActiveIndex(); const nextBtn=document.getElementById('footer-next'); let enable=true;
-    if(i===0){ enable=true; }
-    else if(i===1){ enable=!!($('#area').val()&&$('#service').val()&&$('#numCars').val()); }
-    else if(i===2){
-      const need = getCarsCount();
-      enable = selectedTimes.length === need;
-    }
-    else if(i===3){ const nameOk=($('#name').val()||'').trim().length>0; enable=nameOk && (window.itiPhone ? itiPhone.isValidNumber() : true); }
-    else if(i===4){ enable=!!(document.querySelector('#payGroup input:checked')); }
-    else if(i===5){ enable=!!positionUrl; } // Map
-    else if(i===6){ enable=true; } // Review
-    nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
-  }
-
-  async function gotoNext(){
-    const i = getActiveIndex(); const id = orderedPages[i];
-    if (id === 'page1') { stopWelcomeDeck(); showPage(1); return; }
-
-    if (id === 'page2') {
-      const areaOk = !!$('#area').val(), catOk = !!$('#serviceCat').val(), svcOk = !!$('#service').val();
-      const carsOk = !!$('#numCars').val();
-      $('#err-area').toggle(!areaOk); $('#err-serviceCat').toggle(!catOk); $('#err-service').toggle(!svcOk); $('#err-numCars').toggle(!carsOk);
-      if (!areaOk || !catOk || !svcOk || !carsOk) { showToast('error', 'يرجى إكمال اختيار المنطقة/التصنيف/الخدمة/عدد السيارات'); return; }
-      nForm.serviceCount = String(getCarsCount());
-      document.getElementById('date').dispatchEvent(new Event('change'));
-      showPage(2); return;
-    }
-
-    if (id === 'page3') {
-      const need = getCarsCount();
-      if (selectedTimes.length !== need) { showToast('error', `الرجاء اختيار ${need} وقت`); return; }
-      nForm.date = lastSelectedISO;
-      showPage(3); return;
-    }
-
-    if (id === 'page4') {
-      const nameOk = ($('#name').val() || '').trim().length > 0;
-      const phoneOk = itiPhone && itiPhone.isValidNumber();
-      $('#err-name').toggle(!nameOk); $('#err-mobile').toggle(!phoneOk);
-      if (!nameOk || !phoneOk) { showToast('error', 'يرجى التحقق من الاسم ورقم الجوال'); return; }
-      nForm.customerN = $('#name').val().trim();
-      nForm.customerM = itiPhone.getNumber().replace(/^\+/, '');
-      const carBits = [$('#carBrand').val() || '', $('#carName').val() || '', $('#plateNumber').val() || ''].filter(Boolean);
-      const extraBits = (window.additionalServicesSelected || []).map(x => x.label);
-      const combined = [...carBits, ...(extraBits.length ? ['خدمات إضافية: ' + extraBits.join('، ')] : [])].join(', ');
-      nForm.locationDescription = combined;
-      showPage(4); return;
-    }
-
-    if (id === 'page5') {
-      if (!nForm.paymentMethod) { $('#err-pay').show(); showToast('error', 'اختر طريقة الدفع'); return; }
-      $('#err-pay').hide(); showPage(5); return; // -> Map
-    }
-
-    if (id === 'page6') {
-      if (!positionUrl) { $('#err-map').show(); showToast('error', 'الرجاء تحديد الموقع'); return; }
-      $('#err-map').hide(); nForm.urlLocation = positionUrl;
-      showPage(6); return; // -> Review
-    }
-
-    if (id === 'page7') {
-      await submitAllAppointments();
-      return;
-    }
-
-    showPage(Math.min(i + 1, orderedPages.length - 1));
-  }
-
-  function populateReview(){
-    const area = $('#area').find(':selected').text() || '—';
-    const srv  = $('#service').find(':selected').text() || '—';
-    const cars = String(getCarsCount());
-    const dateTxt = nForm.date ? luxon.DateTime.fromISO(nForm.date).toFormat('d LLL yyyy') : '—';
-    const timesTxt = selectedTimes.length ? selectedTimes.join('، ') : '—';
-    const name = ($('#name').val()||'').trim() || '—';
-    const mobile = (window.itiPhone && itiPhone.isValidNumber()) ? itiPhone.getNumber() : ($('#mobile').val()||'—');
-    const carBits = [$('#carBrand').val()||'', $('#carName').val()||'', $('#plateNumber').val()||''].filter(Boolean).join(', ');
-    const addons = (selectedAddons && selectedAddons.length) ? selectedAddons.join('، ') : '—';
-    const pay = (nForm.paymentMethod||'').toUpperCase() || '—';
-
-    $('#rv-area').text(area);
-    $('#rv-service').text(srv);
-    $('#rv-cars').text(cars);
-    $('#rv-date').text(dateTxt);
-    $('#rv-times').text(timesTxt);
-    $('#rv-name').text(name);
-    $('#rv-mobile').text(mobile);
-    $('#rv-car').text(carBits || '—');
-    $('#rv-addons').text(addons);
-    $('#rv-pay').text(pay);
-
-    const totalObj = computeOrderTotal();
-    $('#rv-total').text(totalObj.formatted);
-
-    document.querySelectorAll('#page7 [data-edit-step]').forEach(btn=>{
-      btn.onclick = (e)=>{ const step = Number(e.currentTarget.getAttribute('data-edit-step')); const idx = Math.max(0, Math.min(step-1, orderedPages.length-1)); showPage(idx); };
-    });
-  }
-
-  /* ---------- Google Map + Places (Jubail polygon) ---------- */
-  let map, marker, autocomplete, jubailPoly, jubailBounds;
-  const SA_BOUNDS = { north: 26.582151149881536, south: 26.479187374350676, west: 49.94492876846446, east: 50.05681139737682 };
-  const JUBAIL_ALLOWED_PATH = [
-    {lat:26.484054540578327, lng:50.00261281025426},//26.484054540578327, 50.00261281025426
-    {lat:26.535514751994445, lng:49.95514844270524},//26.535514751994445, 49.95514844270524
-    {lat:26.5592374337014943, lng:49.95322907308383},//26.559237433701494, 49.95322907308383
-    {lat:26.565616456914945, lng:49.99587130060291},//26.565616456914945, 49.99587130060291
-    {lat:26.54367784463272, lng:50.0058700609464},//26.54367784463272, 50.0058700609464
-    {lat:26.532828784787508, lng:50.01205719488301},//26.532828784787508, 50.01205719488301
-    {lat:26.53393587871155, lng:50.03173228080144},//26.53393587871155, 50.03173228080144
-    {lat:26.509023682480127, lng:50.036434502593266},//26.509023682480127, 50.036434502593266
-    {lat:26.50802708220727, lng:50.01614070328118}//26.508027082207278, 50.01614070328118
-
-  ];
-  function initMap(){
-    jubailPoly = new google.maps.Polygon({ paths: JUBAIL_ALLOWED_PATH, strokeColor:'#6B3FA6', strokeOpacity:.9, strokeWeight:2, fillColor:'#6B3FA6', fillOpacity:.18, clickable:false });
-    jubailBounds = new google.maps.LatLngBounds(); JUBAIL_ALLOWED_PATH.forEach(p => jubailBounds.extend(new google.maps.LatLng(p.lat, p.lng)));
-    const def = jubailBounds.getCenter();
-    map=new google.maps.Map(document.getElementById('googleMap'),{ center:def, zoom:12, disableDoubleClickZoom:true, mapTypeControl:false, fullscreenControl:true, restriction:{latLngBounds: SA_BOUNDS, strictBounds:false} });
-    jubailPoly.setMap(map); map.fitBounds(jubailBounds);
-    marker=new google.maps.Marker({position:def,map,draggable:true,title:'اسحب أو اضغط لتحديد الموقع داخل الجبيل'});
-
-    const pointInJubail = (latLng) => google.maps.geometry.poly.containsLocation(latLng, jubailPoly);
-    function snapToPolygon(latLng){
-      const path = jubailPoly.getPath(); let bestPoint = null; let bestDist = Infinity;
-      function toPoint(ll){ return {x: ll.lng(), y: ll.lat()}; }
-      function fromPoint(pt){ return new google.maps.LatLng(pt.y, pt.x); }
-      function dist2(a,b){ const dx=a.x-b.x, dy=a.y-b.y; return dx*dx+dy*dy; }
-      function clamp01(t){ return Math.max(0, Math.min(1, t)); }
-      const p = toPoint(latLng);
-      for(let i=0;i<path.getLength();i++){
-        const aLL = path.getAt(i); const bLL = path.getAt((i+1)%path.getLength());
-        const a = toPoint(aLL), b = toPoint(bLL); const ab = {x: b.x - a.x, y: b.y - a.y};
-        const ap = {x: p.x - a.x, y: p.y - a.y}; const abLen2 = ab.x*ab.x + ab.y*ab.y || 1e-12;
-        const t = clamp01((ap.x*ab.x + ap.y*ab.y) / abLen2); const proj = { x: a.x + t*ab.x, y: a.y + t*ab.y };
-        const d2 = dist2(p, proj); if(d2 < bestDist){ bestDist = d2; bestPoint = proj; }
-      }
-      return fromPoint(bestPoint || p);
-    }
-    function setPos(latLng, pan=false, allowSnap=true){
-      if(!latLng) return;
-      if(!pointInJubail(latLng)){
-        if(allowSnap){ latLng = snapToPolygon(latLng); showToast('error','الموقع خارج نطاق الجبيل — تم تقريب العلامة لأقرب نقطة داخل الحدود.'); }
-        else{ showToast('error','الموقع خارج نطاق الجبيل — يرجى اختيار نقطة داخل الحدود.'); return; }
-      }
-      marker.setPosition(latLng); if(pan){ map.panTo(latLng); } map.setZoom(Math.max(15, map.getZoom()));
-      positionUrl=`https://www.google.com/maps/search/?api=1&query=${latLng.lat()},${latLng.lng()}`;
-      const hint=document.getElementById('mapHint');
-      if(hint) hint.innerHTML=`تم اختيار الموقع: <strong>${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}</strong>`;
-      renderSummary('page6'); updateNextAvailability();
-    }
-    marker.addListener('dragend',({latLng})=>setPos(latLng,false,true));
-    map.addListener('click',({latLng})=>setPos(latLng,true,true));
-    const input=document.getElementById('mapSearch');
-    const opts={ fields:['geometry','name'], componentRestrictions:{country:'sa'}, strictBounds:false };
-    autocomplete=new google.maps.places.Autocomplete(input, opts);
-    autocomplete.bindTo('bounds', map);
-    autocomplete.addListener('place_changed', ()=>{ const place=autocomplete.getPlace(); if(!place?.geometry) return; setPos(place.geometry.location,true,true); });
-    document.getElementById('show-my-location')?.addEventListener('click',()=>{
-      if(!navigator.geolocation){ showToast('error','المتصفح لا يدعم تحديد الموقع'); return; }
-      navigator.geolocation.getCurrentPosition(
-        pos=>{ const ll = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude); setPos(ll,true,true); if(!google.maps.geometry.poly.containsLocation(ll, jubailPoly)){ map.fitBounds(jubailBounds); } },
-        _=>{ showToast('error','تعذر تحديد موقعك'); },
-        { enableHighAccuracy:true, timeout:10000, maximumAge:30000 }
-      );
-    });
-  }
-  window.initMap=initMap;
-
-  /* ---------- Submit (from Review page) ---------- */
-  async function submitAllAppointments(){
-    const cleanBase = sanitizeNahlPayload(nForm);
-    const missing = [];
-    if (!cleanBase.date) missing.push('التاريخ');
-    if (!selectedTimes.length) missing.push('الأوقات');
-    if (!cleanBase.location) missing.push('المنطقة');
-    if (!cleanBase.service) missing.push('الخدمة');
-    if (!cleanBase.customerN) missing.push('الاسم');
-    if (!cleanBase.customerM) missing.push('الجوال');
-    if (!cleanBase.paymentMethod) missing.push('طريقة الدفع');
-    if (!positionUrl) missing.push('الموقع على الخريطة');
-    if (missing.length) { showToast('error', 'الحقول الناقصة: ' + missing.join('، ')); return; }
-
-    if (isSubmitting) return;
-    isSubmitting = true;
-
-    const $next=document.getElementById('footer-next');
-    const $prev=document.getElementById('footer-prev');
-    const $wait=document.getElementById('footer-wait');
-    $next.style.display='none'; $prev.style.display='none'; $wait.classList.add('show');
-
-    const successes = []; const failures  = [];
-    for (let idx=0; idx<selectedTimes.length; idx++){
-      const t = selectedTimes[idx];
-      const payload = { ...cleanBase, time: t, urlLocation: positionUrl };
-      try {
-        const r = await postReservationOriginal(payload);
-        if (r.ok && r.data?.success) successes.push({ time: t, res: r });
-        else {
-          const msg = r?.data?.msgAR || r?.data?.message || (r.status===404?'المسار غير موجود':'فشل الحجز');
-          failures.push({ time: t, msg });
-        }
-      } catch(e){ failures.push({ time: t, msg: String(e) }); }
-      await new Promise(res=>setTimeout(res, 200));
-    }
-
-    if (failures.length === 0) {
-      showToast('success', 'تم إنشاء الحجوزات لجميع السيارات');
-      document.getElementById('ts-area').textContent = $('#area').find(':selected').text() || '—';
-      document.getElementById('ts-service').textContent = $('#service').find(':selected').text() || '—';
-      document.getElementById('ts-cars').textContent = String(getCarsCount());
-      const dateTxt = cleanBase.date ? DateTime.fromISO(cleanBase.date).toFormat('d LLL yyyy') : '';
-      const timesTxt = selectedTimes.join('، ');
-      document.getElementById('ts-dt').textContent = `${dateTxt} • ${timesTxt}`;
-      document.getElementById('ts-pay').textContent = (cleanBase.paymentMethod || '').toUpperCase() || '—';
-      const waMsg = encodeURIComponent(
-        `تم إرسال طلب حجز:\nالخدمة: ${$('#service').find(':selected').text()}\nالتاريخ: ${dateTxt}\nالمواعيد: ${timesTxt}\nعدد السيارات: ${getCarsCount()}\nالرابط: ${location.href}`
-      );
-      document.getElementById('ts-whatsapp').href = `https://wa.me/?text=${waMsg}`;
-      showPage(7); // -> Thanks
-    } else {
-      let msg = `تعذر إنشاء بعض الحجوزات:\n`;
-      failures.forEach(f => { msg += `• ${f.time}: ${f.msg}\n`; });
-      showToast('error', msg.trim());
-      isSubmitting = false; $wait.classList.remove('show'); $next.style.display=''; $prev.style.display='';
-    }
-  }
-
-  /* ---------- Footer next label changes on Review ---------- */
-  (function observeStepChange(){
-    const obs = new MutationObserver(()=>{ const i=getActiveIndex(); syncProgress(i); });
-    obs.observe(document.querySelector('.stage'), { subtree:true, attributes:true, attributeFilter:['class'] });
-  })();
-
-  /* ---------- Safety: cancel fetches when leaving page ---------- */
-  window.addEventListener('pagehide', () => {
-    try { if (Array.isArray(controllers)) controllers.forEach(([c]) => { try { c.abort(); } catch(_){} }); } catch(_) {}
-  });
-
-  /* ---------- Ensure map init ---------- */
-  (function ensureMapInitSafety(){
-    if (window.__mapInitPatched) return;
-    window.__mapInitPatched = true;
-    const maybeInit = () => {
-      try{
-        if (typeof google !== 'undefined' && google.maps && document.getElementById('googleMap') && typeof window.initMap === 'function') {
-          if (!window.__mapAlreadyInited) { window.__mapAlreadyInited = true; window.initMap(); }
-        }
-      }catch(_){}
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => { maybeInit(); setTimeout(maybeInit, 500); });
-    } else { maybeInit(); setTimeout(maybeInit, 500); }
-  })();
-</script>
-
-<!-- Google Maps (with geometry lib) -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&v=weekly&loading=async&libraries=places,geometry&language=ar&region=SA" async defer></script>
+  </script>
 </body>
 </html>
