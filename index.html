@@ -1129,7 +1129,7 @@
     const raw = row?.TS_addons || row?.TS_additional_services || row?.TS_additional_services_ar || '';
     let list = toArrayTagsSafe(raw);
     if (!list.length){
-      list = ['تنظيف داخلي سريع','تعقيم المقصورة','ملمع إطارات','واكس خفيف للهيكل','تنظيف زجاج احترافي'];
+      list = ['غسيل بصابون النانو - 10 ريال +'];
     }
     const seen = new Set(); const clean = [];
     list.forEach(s=>{ const t=s.trim(); if(t && !seen.has(t)){ seen.add(t); clean.push(t); } });
@@ -1162,12 +1162,8 @@
     };
     bsModal.show();
   }
-  // window.addEventListener('service:selected', (ev) => { const { id } = ev.detail || {}; openAddonsModalFor(id); });
-  window.addEventListener('service:selected', (ev) => {
-  if (!ADDONS_ENABLED) { selectedAddons = []; renderSummary('page2'); updateNextAvailability(); return; }
-  const { id } = ev.detail || {};
-  openAddonsModalFor(id);
-});
+  window.addEventListener('service:selected', (ev) => { const { id } = ev.detail || {}; openAddonsModalFor(id); });
+
   /* ---------- NAHL category name → ID --------- */
   const NAHL_CAT_MAP = new Map();
   function updateServiceCatIdFromName(){
