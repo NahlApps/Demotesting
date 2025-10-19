@@ -22,15 +22,15 @@
   <link rel="icon" type="image/png" sizes="32x32" href="">
   <link rel="icon" type="image/png" sizes="16x16" href="">
 
+
 <style>
 /* =========================================
    TIGER 77 • TOKYO NEON THEME  —  REFINED
-   - Photo moved to ::before (fixes right-edge "cut")
+   - Photo via --page-photo on body::before
    - Global vignette (::after) for readability
-   - Harmonized color tokens (cyan→magenta system)
-   - RTL-safe logical properties
-   - Strong :focus-visible + WCAG contrast
-   - Services card uses LIGHT “paper” surface
+   - Harmonized neon palette
+   - Services card = LIGHT “paper” section
+   - Footer: sticky by default + discrete variant
 ========================================= */
 
 /* ======= Core Tokens ======= */
@@ -40,7 +40,7 @@
   --neon-magenta:#FF2DAE;
   --neon-purple:#7A5CFF;
 
-  /* Harmonized palette for UI */
+  /* Harmonized UI palette */
   --pri:#22D3EE;         /* CTA cyan */
   --pri-2:#C026D3;       /* Electric magenta */
   --pri-3:#7C3AED;       /* Bridge purple */
@@ -63,7 +63,7 @@
 
   --accent:#E4007F;      /* JP magenta accent */
 
-  /* Older tokens still used in components */
+  /* Legacy tokens used inside components */
   --ink-900:#0A0C12; --ink-800:#121624; --ink-700:#1B2033;
   --p-900:#11162A; --p-800:#182041; --p-700:#223069; --p-600:#2D43A1; --p-500:#3A5AE6;
   --p-900-58: rgba(17,22,42,.82); --p-900-34: rgba(17,22,42,.58);
@@ -98,7 +98,7 @@ html, body{ overflow-x:hidden; }
 body{
   margin:0; color:#E9EDFF;
   font-family:'Cairo','Noto Sans JP',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial,sans-serif;
-  /* Neon glows behind content */
+  /* Soft neon glows behind content */
   background:
     radial-gradient(1200px 600px at 80% -10%, rgba(255,45,174,.25), transparent 60%),
     radial-gradient(900px 500px at -10% 110%, rgba(0,229,255,.20), transparent 55%);
@@ -108,7 +108,7 @@ body{
   position:relative; isolation:isolate;
 }
 
-/* Photo layer — fixes “cut” by isolating cover image */
+/* Photo layer — uses --page-photo */
 body::before{
   content:"";
   position:fixed; inset:0;
@@ -308,7 +308,7 @@ main{flex:1 0 auto; display:flex; justify-content:center; padding:8px 12px 0}
   box-shadow:var(--shadow-xs);
 }
 
-/* ======= Footer ======= */
+/* ======= Footer (Sticky by default) ======= */
 footer.sticky-nav{
   position:sticky; bottom:0; z-index:40;
   background: linear-gradient(0deg, color-mix(in oklab, var(--elev) 96%, #000), color-mix(in oklab, var(--elev) 96%, #000));
@@ -337,6 +337,34 @@ footer.sticky-nav{
 #footer-wait{display:none; align-items:center; gap:10px; color:#fff; font-weight:800}
 #footer-wait.show{display:flex}
 
+/* ===== Footer: DISCRETE / “discontinued” variant =====
+   Add class `footer--discrete` to <footer> to:
+   - remove stickiness & heavy background
+   - reduce elevation/padding
+   - keep layout, CTAs, and links functional
+*/
+footer.sticky-nav.footer--discrete{
+  position:static;
+  background: transparent;
+  border-top: 0;
+  backdrop-filter:none;
+  padding-block: 6px;
+}
+.footer--discrete .footer-inner{
+  padding:8px 12px;
+  background: rgba(10,12,20,.32);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:12px;
+}
+.footer--discrete .btn-footer{
+  min-height:52px;
+}
+.footer--discrete .btn-footer:not(.primary){
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border-color:rgba(255,255,255,.14);
+}
+
+/* Mobile footer tweaks */
 @media (max-width: 480px){
   .brand img{ height:64px }
   .summary-chips{ overflow-x:auto; gap:6px; padding-bottom:2px; scrollbar-width:thin; }
