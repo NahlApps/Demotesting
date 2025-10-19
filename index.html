@@ -8,7 +8,7 @@
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:wght@600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
   <!-- UI libs -->
@@ -18,12 +18,10 @@
 
   <style>
   /* =====================================================
-     VOGUE EDITORIAL SKIN — Luxe, accessible, RTL-first
-     Flow: Menu → Cart → Customer → Payment → Review → Done
+     LUXE VOGUE SKIN — Accessible, RTL-first
   ====================================================== */
   :root{
     --bg:#FFFFFF; --ink:#0A0A0A; --ink-2:#5E5E5E; --rule:rgba(10,10,10,.12);
-    --accent:#C00022; --muted:#6C6C6C;
     --header-h:78px; --footer-h:112px;
     --ease:cubic-bezier(.22,.61,.36,1);
   }
@@ -64,7 +62,7 @@
   /* Layout */
   main{display:flex; justify-content:center; padding:12px}
   #app{width:100%; max-width:1180px}
-  .stage{position:relative; min-height:580px; padding-bottom:calc(var(--footer-h) + 24px)}
+  .stage{position:relative; min-height:580px; padding-bottom:max(var(--footer-h,112px),112px)}
   .page{position:absolute; inset:0; display:flex; flex-direction:column; gap:16px; padding:16px; opacity:0; transform:translateY(12px) scale(.985); pointer-events:none}
   .page.active{pointer-events:auto; animation:pageIn .42s var(--ease) both}
   .page.exit{animation:pageOut .28s var(--ease) both}
@@ -89,7 +87,7 @@
   .select2-container .select2-selection--single{height:50px !important}
   .select2-container .select2-selection--single .select2-selection__rendered{line-height:50px !important}
   .select2-dropdown{background:#fff !important; color:var(--ink) !important; border:1px solid var(--rule) !important; box-shadow:none !important}
-  .select2-results__option--highlighted{background:#F4F4F4 !important; color:var(--ink) !important}
+  .select2-results__option--highlighted{background:#F4F4F4 ! important; color:var(--ink) !important}
   .select2-results__option[aria-selected="true"]{background:#0A0A0A !important; color:#fff !important}
 
   /* Menu grid & dish cards */
@@ -111,23 +109,41 @@
   .qty{display:inline-flex; align-items:center; gap:10px; border:1px solid var(--rule); padding:8px 12px}
   .qty .btn{padding:6px 12px; font-size:16px}
 
-  /* Outline buttons */
+  /* General buttons */
   .btn-gold{color:var(--ink); border:1.5px solid var(--ink); border-radius:0; background:transparent; padding:12px 16px; font-weight:800}
   .btn-gold:hover{background:var(--ink); color:#fff}
   .btn-gold[disabled]{opacity:.45; pointer-events:none}
 
-  /* Sticky footer */
-  footer.sticky-nav{position:sticky; bottom:0; z-index:30; background:#fff; border-top:1px solid var(--rule)}
+  /* Sticky footer — never overlap content */
+  footer.sticky-nav{
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+    background:#fff;
+    border-top:1px solid var(--rule);
+    transition: transform .25s var(--ease), opacity .25s var(--ease);
+  }
   .footer-inner{max-width:1180px; margin:0 auto; padding:12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
   .footer-actions{display:flex; gap:12px; width:100%}
   .btn-footer{flex:1; border:1px solid var(--rule); background:#fff; color:var(--ink); border-radius:0; min-height:56px; font-weight:900}
   .btn-footer.primary{background:#0A0A0A; color:#fff; border-color:#0A0A0A}
   .btn-footer.hidden{visibility:hidden}
 
-  /* Cart drawer + scrim + scroll lock (open from RIGHT in RTL) */
-  .cart-drawer{position:fixed; inset-block:0; inset-inline-end:0; width:min(420px,92%); background:#fff; color:var(--ink);
-    border-inline-start:1px solid var(--rule); transform:translateX(110%); transition:transform .5s var(--ease); z-index:60}
-  .cart-drawer.open{transform:none}
+  /* Cart drawer: hidden by default, slides from RIGHT in RTL */
+  .cart-drawer{
+    position:fixed; inset-block:0; inset-inline-end:0;
+    width:min(420px,92%); background:#fff; color:#0A0A0A;
+    border-inline-start:1px solid var(--rule);
+    transform: translateX(100%);           /* off-canvas */
+    visibility: hidden; pointer-events: none;
+    transition: transform .5s var(--ease), visibility 0s linear .5s;
+    will-change: transform; z-index:60;
+  }
+  .cart-drawer.open{
+    transform: translateX(0);
+    visibility: visible; pointer-events: auto;
+    transition: transform .5s var(--ease);
+  }
   .cart-header{display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid var(--rule)}
   .cart-body{padding:12px 14px; max-height:calc(100vh - 240px); overflow:auto}
   .cart-item{display:grid; grid-template-columns:56px 1fr auto; gap:10px; align-items:center; padding:10px 0; border-bottom:1px dashed var(--rule)}
@@ -140,7 +156,10 @@
   /* Scrim + hide footer while open */
   body.cart-open::after{content:""; position:fixed; inset:0; background:rgba(0,0,0,.18); z-index:59}
   body.cart-open{overflow:hidden}
-  body.cart-open footer.sticky-nav{visibility:hidden}
+  body.cart-open footer.sticky-nav{
+    transform: translateY(100%);
+    opacity: 0; pointer-events:none; visibility: hidden;
+  }
 
   /* Review */
   .rv-line{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--rule)}
@@ -186,16 +205,13 @@
         <section id="page1" class="page active" aria-label="القائمة">
           <h1>قائمة الأطباق • Menu</h1>
           <div class="card-paper">
-            <!-- Search first (reading order) then category/diet -->
             <div class="filters" role="group" aria-label="مرشحات القائمة">
               <input id="search" class="form-control" placeholder="ابحث عن طبق" aria-label="بحث"/>
               <select id="category" style="width:100%" aria-label="التصنيف"></select>
               <select id="diet" style="width:100%" aria-label="النظام الغذائي"></select>
             </div>
           </div>
-          <div class="menu-grid" id="menuGrid" aria-live="polite">
-            <!-- skeletons appear here -->
-          </div>
+          <div class="menu-grid" id="menuGrid" aria-live="polite"></div>
         </section>
 
         <!-- 2) CART PAGE -->
@@ -296,7 +312,9 @@
   <aside id="cartDrawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
     <div class="cart-header">
       <strong id="cartTitle">سلة الطلب</strong>
-      <button id="closeCart" class="btn-gold" type="button" aria-label="إغلاق السلة" style="min-width:44px;min-height:44px"><i class="fa-solid fa-xmark"></i></button>
+      <button id="closeCart" class="btn-gold" type="button" aria-label="إغلاق السلة" style="min-width:44px;min-height:44px">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
     <div id="cartItems" class="cart-body"></div>
     <div class="card-paper" style="position:absolute; inset-inline:0; inset-block-end:0; border-top:1px solid var(--rule)">
@@ -347,6 +365,16 @@
   let itiPhone=null;
   const order={ type:'pickup', name:'', phone:'', address:'', notes:'', pay:'' };
 
+  // Keep footer height accurate (prevents overlap)
+  (function syncFooterHeight(){
+    const f = document.querySelector('footer.sticky-nav');
+    if(!f) return;
+    const set = () => document.documentElement.style.setProperty('--footer-h', f.offsetHeight + 'px');
+    window.addEventListener('load', set);
+    window.addEventListener('resize', set);
+    set();
+  })();
+
   // ===== Init =====
   $(function(){
     // Select2
@@ -387,9 +415,9 @@
     // Cart drawer
     $('#openCart').on('click', ()=>toggleCart(true));
     $('#closeCart').on('click', ()=>toggleCart(false));
-    $('#goCheckout').on('click', ()=>{ toggleCart(false); showPage(1); }); // go to Cart page
+    $('#goCheckout').on('click', ()=>{ toggleCart(false); showPage(1); });
 
-    // Global close handlers (ESC/backdrop + focus trap)
+    // Close handlers & focus trap
     document.addEventListener('keydown', e=>{
       if(e.key==='Escape') toggleCart(false);
       if(document.body.classList.contains('cart-open') && e.key==='Tab'){
@@ -451,9 +479,7 @@
   function dishCard(m){
     const wrap=document.createElement('div'); wrap.className='dish';
     wrap.innerHTML=`
-      <div class="thumb">
-        ${buildImgHTML(m.img)}
-      </div>
+      <div class="thumb">${buildImgHTML(m.img)}</div>
       <div class="dish-body">
         <div class="dish-title">
           <span>${m.title}</span>
@@ -479,11 +505,10 @@
       const vEl=qtyBox.querySelector('.qv'); let v=parseInt(vEl.textContent||'1',10);
       v = act==='inc'? Math.min(v+1,99) : Math.max(v-1,1); vEl.textContent=v;
     });
-    const addBtn=wrap.querySelector('[data-add]');
-    const imgEl=wrap.querySelector('.thumb img');
-    addBtn?.addEventListener('click',()=>{
+    wrap.querySelector('[data-add]')?.addEventListener('click',()=>{
       const qty=parseInt(qtyBox.querySelector('.qv').textContent||'1',10);
-      addToCart(m, qty, addBtn, imgEl);
+      const imgEl=wrap.querySelector('.thumb img');
+      addToCart(m, qty, wrap.querySelector('[data-add]'), imgEl);
     });
     return wrap;
   }
@@ -540,14 +565,14 @@
   function addToCart(item, qty, addBtn, imgEl){
     const row=cart.get(item.id) || { item, qty:0 }; row.qty += qty; cart.set(item.id,row);
 
-    // Inline confirmation on button
+    // Inline confirmation
     if(addBtn){ const txt=addBtn.textContent; addBtn.textContent='✓ تمت الإضافة'; addBtn.disabled=true; setTimeout(()=>{ addBtn.textContent=txt; addBtn.disabled=false; }, 1200); }
 
-    // Micro flight to cart badge (reduced motion aware)
+    // Micro flight to cart button
     try{
-      const badge = document.getElementById('openCart');
-      if(imgEl && badge && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-        const r1 = imgEl.getBoundingClientRect(); const r2 = badge.getBoundingClientRect();
+      const badgeBtn = document.getElementById('openCart');
+      if(imgEl && badgeBtn && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        const r1 = imgEl.getBoundingClientRect(); const r2 = badgeBtn.getBoundingClientRect();
         const ghost = imgEl.cloneNode(true);
         Object.assign(ghost.style,{position:'fixed',left:r1.left+'px',top:r1.top+'px',width:r1.width+'px',height:r1.height+'px',zIndex:1200,transition:'transform .6s var(--ease), opacity .6s var(--ease)',pointerEvents:'none'});
         document.body.appendChild(ghost);
@@ -598,7 +623,7 @@
   }
   function updateNextAvailability(){
     const i=getActiveIndex(); const nextBtn=document.getElementById('footer-next'); let enable=true;
-    if(i===0){ enable = cart.size>0; }        // menu → goto cart
+    if(i===0){ enable = cart.size>0; }        // menu → cart
     else if(i===1){ enable = cart.size>0; }   // cart → customer
     else if(i===2){
       const nameOk=($('#custName').val()||'').trim().length>0;
@@ -658,7 +683,7 @@
     document.getElementById('confirmOrder').addEventListener('click', submitOrder);
   }
 
-  // ===== Submit (demo only) =====
+  // ===== Submit (demo) =====
   function submitOrder(){
     if(cart.size===0){ toast('السلة فارغة'); return; }
     if(!order.name || !(itiPhone && itiPhone.isValidNumber())){ toast('أكمل بيانات العميل'); return; }
