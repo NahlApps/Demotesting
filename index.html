@@ -1,135 +1,139 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="tokyo">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>メニュー • Restaurant Menu | قائمة المطعم</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>قائمة المطعم الفاخر • Luxury Restaurant</title>
 
-  <!-- UI libs -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <!-- Arabic + Japanese fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+  <!-- UI libs (optional but handy) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css" rel="stylesheet"/>
 
   <style>
-  /* =========================================
-     TOKYO NEON THEME — RESTAURANT MENU
-     - Sections: Menu → Cart → Info → Payment → Review → Done
-     - RTL-first, mobile-first, glass cards
-  ========================================= */
+  /* =====================================================
+     LUXURY RESTAURANT THEME — BEST UX / UI (RTL-first)
+     - Dark charcoal + gold accents
+     - Mobile-first, accessible, high-contrast
+     - Pages: Menu → Cart → Info → Payment → Review → Done
+  ====================================================== */
   :root{
-    --neon-cyan:#00E5FF; --neon-magenta:#FF2DAE; --neon-purple:#7A5CFF;
-    --pri:#22D3EE; --pri-2:#C026D3; --pri-3:#7C3AED;
-    --surface:#0E1220; --elev:#151A2B; --paper:#fff; --paper-ink:#0E1320;
-    --chip-bg:#1E2438; --chip-ink:#DDE6FF; --muted:#9CA3AF;
-    --radius-md:14px; --shadow-sm:0 10px 24px rgba(0,0,0,.35); --shadow-md:0 24px 64px rgba(0,0,0,.45);
-    --ease:cubic-bezier(.22,.61,.36,1); --dur-sm:220ms; --dur-md:420ms;
-    --header-h:76px; --footer-h:118px;
-    --input-bg: rgba(10,12,18,.90); --input-border: rgba(255,255,255,.22);
-    --page-photo:url("https://images.unsplash.com/photo-1562158070-1d3b16c45653?q=80&w=1600&auto=format&fit=crop");
+    /* Palette */
+    --surface:#0C0E12; --elev:#12151C; --panel:#151922; --ink:#F5F7FA; --ink-2:#C9CED6;
+    --gold:#D4AF37; --champ:#F2E6C2; --muted:#8F96A3; --error:#E05D5D; --success:#7BC97B;
+
+    /* Effects */
+    --hairline:1px solid rgba(255,255,255,.08);
+    --gold-hairline:1px solid color-mix(in oklab, var(--gold) 28%, transparent);
+    --glass:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+    --shadow-sm:0 6px 18px rgba(0,0,0,.35);
+    --shadow-md:0 18px 42px rgba(0,0,0,.45);
+    --ease:cubic-bezier(.22,.61,.36,1);
+
+    /* Radii & spacing */
+    --r-md:14px; --r-lg:18px; --r-pill:999px;
+    --sp-1:8px; --sp-2:12px; --sp-3:16px; --sp-4:24px; --sp-5:32px; --sp-6:48px;
+
+    --header-h:76px; --footer-h:112px;
   }
-  html,body{height:100%;min-height:100dvh;overflow-x:hidden}
+
+  html,body{height:100%;min-height:100dvh}
+  *{box-sizing:border-box}
   body{
-    margin:0;color:#E9EDFF;font-family:'Cairo','Noto Sans JP',system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(255,45,174,.25), transparent 60%),
-      radial-gradient(900px 500px at -10% 110%, rgba(0,229,255,.20), transparent 55%);
+    margin:0; color:var(--ink); background:var(--surface);
+    font-family:'Cairo','Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     padding-block:var(--header-h) var(--footer-h); display:flex; flex-direction:column; isolation:isolate;
-  }
-  body::before{content:"";position:fixed;inset:0;z-index:-1;background:
-    linear-gradient(180deg, rgba(0,229,255,.10), rgba(255,45,174,.10)),
-    var(--page-photo) center/cover no-repeat;}
-  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
-    radial-gradient(1200px 700px at 50% 0%, rgba(8,12,24,.25), transparent 60%),
-    linear-gradient(180deg, rgba(8,12,24,.45), rgba(8,12,24,.65) 40%, rgba(8,12,24,.55) 100%);
+    background-image:
+      radial-gradient(900px 500px at 100% -20%, rgba(212,175,55,.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 120%, rgba(242,230,194,.06), transparent 60%);
   }
 
   /* Header */
-  header{position:fixed;inset-block-start:0;inset-inline:0;z-index:30;background:
-    linear-gradient(0deg, rgba(16,20,35,.94), rgba(16,20,35,.94)),
-    radial-gradient(900px 500px at 90% -20%, rgba(192,38,211,.18), transparent 60%),
-    radial-gradient(900px 500px at 10% 140%, rgba(34,211,238,.18), transparent 55%);
-    border-bottom:1px solid rgba(255,255,255,.10);box-shadow:0 12px 30px rgba(0,0,0,.35);backdrop-filter:blur(8px)}
-  .header-inner{max-width:1120px;margin:0 auto;padding:10px 12px;display:flex;align-items:center;gap:12px;justify-content:space-between}
-  .brand{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12);box-shadow: inset 0 1px 0 rgba(255,255,255,.20), 0 8px 20px rgba(0,0,0,.35)}
-  .brand img{height:64px;filter:drop-shadow(0 0 14px rgba(0,229,255,.55)) drop-shadow(0 0 10px rgba(255,45,174,.35))}
-  .header-right{flex:1;display:flex;flex-direction:column;gap:6px}
-  .mini-progress{display:flex;align-items:center;gap:10px}
-  .mini-progress .bar{flex:1;height:8px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
-  .mini-progress .bar>span{height:100%;width:0%;background:linear-gradient(90deg, var(--pri), var(--pri-3), var(--pri-2));box-shadow:0 0 16px var(--pri), 0 0 24px var(--pri-2);transition:width var(--dur-md) var(--ease)}
-  .mini-progress .step{font-weight:900;font-size:1rem;color:#fff}
-  .summary-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-  .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid rgba(255,255,255,.10);border-radius:999px;font-size:.85rem;background:linear-gradient(180deg, #1E2438, #161B2C);color:#DDE6FF;box-shadow:0 4px 10px rgba(0,0,0,.25)}
-  .chip.current{ box-shadow:0 0 0 2px rgba(255,255,255,.25) inset, 0 0 14px rgba(0,229,255,.35) }
+  header{position:fixed;inset-block-start:0;inset-inline:0;z-index:50;background:
+    linear-gradient(0deg, rgba(18,21,28,.94), rgba(18,21,28,.94)); border-bottom:var(--hairline); backdrop-filter:blur(10px); box-shadow:0 12px 30px rgba(0,0,0,.35)}
+  .header-inner{max-width:1180px;margin:0 auto;padding:10px 12px;display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:var(--glass);border:var(--gold-hairline);box-shadow:inset 0 .5px 0 rgba(255,255,255,.12)}
+  .brand img{height:60px;border-radius:10px;object-fit:cover}
+  .nav-spacer{flex:1}
+  .btn-cart{border:var(--gold-hairline);border-radius:12px;padding:10px 14px;color:var(--champ);background:transparent}
+  .btn-cart:hover{background:color-mix(in oklab, var(--gold) 14%, transparent)}
 
-  main{flex:1 0 auto;display:flex;justify-content:center;padding:8px 12px 0}
-  #app{width:100%;max-width:1120px}
-  .stage{position:relative;min-height:560px;padding:8px 0 20px}
-  .page{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;gap:18px;padding:20px 12px 28px;overflow:auto;opacity:0;transform:translateY(12px) scale(.992);pointer-events:none}
-  .page.active{pointer-events:auto;animation:pageIn var(--dur-md) var(--ease) both}
-  .page.exit{animation:pageOut var(--dur-sm) var(--ease) both}
-  @keyframes pageIn{from{opacity:0;transform:translateY(12px) scale(.992)}to{opacity:1;transform:translateY(0) scale(1)}}
-  @keyframes pageOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(14px) scale(.985)}}
-  .page h1{font-family:'Cairo','Noto Sans JP',sans-serif;font-size:1.45rem;font-weight:900;margin:0;text-align:center;text-shadow:0 0 18px rgba(0,229,255,.35)}
+  .mini-progress{display:flex;align-items:center;gap:10px;max-width:640px;margin-inline:auto}
+  .mini-progress .bar{flex:1;height:8px;background:rgba(255,255,255,.10);border-radius:999px;overflow:hidden}
+  .mini-progress .bar>span{height:100%;width:0%;background:linear-gradient(90deg, var(--champ), var(--gold));box-shadow:0 0 16px rgba(212,175,55,.35);transition:width .45s var(--ease)}
+  .mini-progress .step{font-weight:900}
 
-  .card-glass{background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));color:#E9EDFF;border-radius:14px;box-shadow:var(--shadow-md);padding:16px 18px;width:100%;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12)}
-  .card-paper{background:linear-gradient(180deg, #fff, #F8FAFF);color:#0F172A;border-radius:14px;border:1px solid rgba(15,23,42,.12);box-shadow:0 8px 20px rgba(15,23,42,.08);padding:14px 16px}
+  /* Layout */
+  main{flex:1 0 auto;display:flex;justify-content:center;padding:12px}
+  #app{width:100%;max-width:1180px}
+  .stage{position:relative;min-height:560px}
+  .page{position:absolute;inset:0;display:flex;flex-direction:column;gap:16px;padding:16px;opacity:0;transform:translateY(12px) scale(.985);pointer-events:none}
+  .page.active{pointer-events:auto;animation:pageIn .42s var(--ease) both}
+  .page.exit{animation:pageOut .28s var(--ease) both}
+  @keyframes pageIn{from{opacity:0;transform:translateY(12px) scale(.985)} to{opacity:1;transform:none}}
+  @keyframes pageOut{from{opacity:1;transform:none} to{opacity:0;transform:translateY(8px) scale(.98)}}
+  .page h1{font-weight:900;font-size:clamp(22px,3.6vw,34px);margin:0;text-align:center}
 
-  /* Filters row */
+  /* Cards */
+  .card-glass{background:var(--glass);border:var(--hairline);border-radius:var(--r-md);box-shadow:var(--shadow-md);backdrop-filter:blur(8px);padding:16px}
+  .card-paper{background:linear-gradient(180deg, #0F131B, #111620);border:var(--hairline);border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:14px}
+
+  /* Filters */
   .filters{display:grid;gap:10px;grid-template-columns:1fr}
   @media(min-width:768px){.filters{grid-template-columns:2fr 1fr 1fr}}
-  .form-control, .select2-selection{background:var(--input-bg)!important;color:#fff!important;border:1px solid var(--input-border)!important;border-radius:12px!important;min-height:48px;text-align:center}
+  .form-control, .select2-selection{background:#0F141D!important;color:#fff!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:12px!important;min-height:48px;text-align:center}
   .select2-container .select2-selection--single .select2-selection__rendered{color:#fff!important;line-height:48px!important}
-  .select2-container .select2-selection--single{height:48px!important;display:flex;align-items:center}
-  .select2-dropdown{background:#0B0D13!important;color:#fff!important;border:1px solid rgba(255,255,255,.16)!important;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+  .select2-dropdown{background:#0B1017!important;color:#fff!important;border:1px solid rgba(255,255,255,.16)!important;box-shadow:0 18px 40px rgba(0,0,0,.45)}
 
   /* Menu grid */
   .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
   @media(min-width:560px){.menu-grid{grid-template-columns:repeat(2,1fr)}}
   @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,1fr)}}
-  .dish{position:relative;display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 20px rgba(0,0,0,.2)}
-  .thumb{width:88px;height:88px;flex:0 0 88px;border-radius:12px;overflow:hidden;background:#F2F5FF;border:1px solid #E2E8F0}
+  .dish{position:relative;display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:14px;background:var(--glass);border:var(--hairline)}
+  .thumb{width:96px;height:96px;flex:0 0 96px;border-radius:12px;overflow:hidden;border:var(--gold-hairline);background:#0B0F15}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .dish-body{flex:1 1 auto;min-width:0;text-align:right}
-  .dish-title{font-weight:900;margin:0 0 4px}
-  .dish-desc{color:#cbd5e1;font-size:.95rem;margin:0 0 6px;line-height:1.5}
+  .dish-title{font-weight:900;margin:0 0 4px;display:flex;gap:8px;align-items:center}
+  .price{color:var(--champ);font-weight:900;letter-spacing:.2px;margin-inline-start:auto}
+  .dish-desc{color:var(--ink-2);font-size:.95rem;margin:2px 0 8px;line-height:1.5}
   .dish-tags{display:flex;flex-wrap:wrap;gap:6px}
-  .tag{background:#EEF2FF;color:#0F172A;border-radius:999px;padding:4px 8px;font-size:.78rem;white-space:nowrap}
-  .dish-cta{display:flex;gap:8px;align-items:center;margin-top:8px;justify-content:flex-start}
+  .tag{border:var(--gold-hairline);border-radius:999px;padding:4px 8px;font-size:.78rem;white-space:nowrap;color:var(--champ)}
+  .dish-cta{display:flex;gap:8px;align-items:center;margin-top:8px}
   .qty{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:6px 10px}
-  .btn-add{border:1px solid rgba(255,255,255,.16);border-radius:10px;min-height:40px;padding:8px 12px;background:linear-gradient(90deg, var(--pri), var(--pri-2));color:#0B0D13;font-weight:900}
+  .btn-gold{color:var(--champ);border:1px solid color-mix(in oklab, var(--gold) 60%, transparent);border-radius:12px;padding:10px 14px;font-weight:900;background:transparent;transition:background .18s var(--ease), transform .12s var(--ease)}
+  .btn-gold:hover{background:color-mix(in oklab, var(--gold) 16%, transparent);transform:translateY(-1px)}
+  .btn-gold:focus-visible{outline:2px solid color-mix(in oklab, var(--champ) 60%, transparent);outline-offset:2px}
 
-  /* Cart drawer */
-  .cart-drawer{position:fixed;inset-block:0;inset-inline-end:0;width:min(420px,92%);background:rgba(13,17,27,.95);backdrop-filter:blur(10px);box-shadow:-24px 0 60px rgba(0,0,0,.45);transform:translateX(110%);transition:transform var(--dur-md) var(--ease);z-index:50}
+  /* Cart Drawer */
+  .cart-drawer{position:fixed;inset-block:0;inset-inline-end:0;width:min(420px,92%);background:rgba(17,22,30,.96);backdrop-filter:blur(10px);box-shadow:-24px 0 60px rgba(0,0,0,.45);transform:translateX(110%);transition:transform .42s var(--ease);z-index:60}
   .cart-drawer.open{transform:none}
-  .cart-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.12)}
+  .cart-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:var(--hairline)}
   .cart-body{padding:12px 14px;max-height:calc(100vh - 220px);overflow:auto}
-  .cart-item{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
-  .cart-thumb{width:56px;height:56px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+  .cart-item{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,.12)}
+  .cart-thumb{width:56px;height:56px;border-radius:10px;overflow:hidden;border:var(--gold-hairline)}
   .cart-meta .title{font-weight:800}
-  .cart-meta .note{font-size:.85rem;color:#cbd5e1}
-  .price{font-weight:900}
-  .cart-footer{position:absolute;inset-inline:0;inset-block-end:0;padding:12px 14px;border-top:1px solid rgba(255,255,255,.12);background:linear-gradient(0deg, rgba(16,20,35,.96), rgba(16,20,35,.92))}
+  .cart-meta .note{font-size:.85rem;color:var(--ink-2)}
   .line{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
   .btn-wide{width:100%;border:1px solid rgba(255,255,255,.16);border-radius:12px;min-height:52px;font-weight:900}
-  .btn-primary-grad{background:linear-gradient(90deg,var(--pri),var(--pri-3) 55%,var(--pri-2));color:#071018;border-color:transparent}
+  .btn-primary-grad{background:linear-gradient(90deg, var(--champ), var(--gold));color:#0A0C10;border-color:transparent}
 
   /* Footer nav */
-  footer.sticky-nav{position:sticky;bottom:0;z-index:40;background:linear-gradient(0deg, rgba(16,20,35,.96), rgba(16,20,35,.96));border-top:1px solid rgba(255,255,255,.10);backdrop-filter:blur(12px)}
-  .footer-inner{max-width:1120px;margin:0 auto;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  footer.sticky-nav{position:sticky;bottom:0;z-index:40;background:linear-gradient(0deg, rgba(18,21,28,.96), rgba(18,21,28,.96));border-top:var(--hairline);backdrop-filter:blur(12px)}
+  .footer-inner{max-width:1180px;margin:0 auto;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .footer-actions{display:flex;gap:12px;width:100%}
-  .btn-footer{flex:1;border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px;min-height:56px;font-size:1rem;font-weight:900;background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));color:#fff}
-  .btn-footer.primary{background:linear-gradient(90deg, var(--pri), var(--pri-3) 55%, var(--pri-2));color:#071018;border-color:transparent}
+  .btn-footer{flex:1;border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px;min-height:56px;font-size:1rem;font-weight:900;background:var(--glass);color:#fff}
+  .btn-footer.primary{background:linear-gradient(90deg, var(--champ), var(--gold));color:#0A0C10;border-color:transparent}
   .btn-footer.hidden{visibility:hidden}
 
-  /* Info & payment */
-  .form-label{display:inline-block;margin-bottom:6px;font-size:.9rem;font-weight:800;color:#D8DEFF}
-  .field-error{color:#FF6B6B;font-size:.85rem;margin-top:6px;display:none}
+  /* Form & validation */
+  .form-label{display:inline-block;margin-bottom:6px;font-size:.9rem;font-weight:800;color:var(--ink)}
+  .field-error{color:var(--error);font-size:.85rem;margin-top:6px;display:none}
 
   /* Review */
   .rv-line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.18)}
@@ -139,87 +143,89 @@
   </style>
 </head>
 <body>
-  <div id="toastWrap"></div>
-  <header id="siteHeader">
+  <div id="toastWrap" aria-live="polite"></div>
+
+  <header>
     <div class="header-inner">
-      <div class="brand">
-        <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=300&auto=format&fit=crop" alt="Brand"/>
+      <div class="brand" aria-label="الشعار">
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300&auto=format&fit=crop" alt="Luxury Restaurant" width="120" height="60" />
+        <strong>Maison Hikari</strong>
       </div>
-      <div class="header-right">
-        <div class="mini-progress" aria-hidden="true">
-          <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
-          <div class="step" id="miniStepTitle">القائمة</div>
-        </div>
-        <div id="summaryChips" class="summary-chips" aria-live="polite"></div>
-      </div>
-      <button id="openCart" class="btn btn-sm btn-outline-light" type="button" title="السلة"><i class="fa-solid fa-bag-shopping"></i></button>
+      <div class="nav-spacer"></div>
+      <button id="openCart" class="btn-cart" type="button" aria-haspopup="dialog" aria-controls="cartDrawer">
+        <i class="fa-solid fa-bag-shopping"></i> السلة <span id="cartBadge" class="ms-1">0</span>
+      </button>
+    </div>
+    <div class="mini-progress" aria-hidden="true">
+      <div class="bar"><span id="miniBarFill" style="width:0%"></span></div>
+      <div class="step" id="miniStepTitle">القائمة</div>
     </div>
   </header>
 
   <main>
     <div id="app">
       <div class="stage">
-        <!-- 1) Menu -->
+        <!-- 1) MENU -->
         <section id="page1" class="page active" aria-label="القائمة">
-          <h1>🍱 メニュー • قائمة الأطباق</h1>
+          <h1>قائمة الأطباق • Menu</h1>
           <div class="card-glass">
-            <div class="filters">
-              <input id="search" class="form-control" placeholder="ابحث عن طبق / Search"/>
-              <select id="category" style="width:100%"></select>
-              <select id="diet" style="width:100%"></select>
+            <div class="filters" role="group" aria-label="مرشحات القائمة">
+              <input id="search" class="form-control" placeholder="ابحث عن طبق / Search" aria-label="بحث" />
+              <select id="category" style="width:100%" aria-label="التصنيف"></select>
+              <select id="diet" style="width:100%" aria-label="النظام الغذائي"></select>
             </div>
           </div>
-          <div class="menu-grid" id="menuGrid"></div>
+          <div class="menu-grid" id="menuGrid" aria-live="polite"></div>
         </section>
 
-        <!-- 2) Cart (inline summary page for Next) -->
+        <!-- 2) CART PAGE (inline summary) -->
         <section id="page2" class="page" aria-label="السلة">
-          <h1>🧺 السلة • カート</h1>
+          <h1>السلة • Cart</h1>
           <div class="card-glass" id="cartSummary"></div>
         </section>
 
-        <!-- 3) Customer info -->
+        <!-- 3) CUSTOMER INFO -->
         <section id="page3" class="page" aria-label="بيانات العميل">
-          <h1>👤 بيانات العميل • お客様情報</h1>
+          <h1>بيانات العميل • Customer</h1>
           <div class="card-glass">
             <div class="row g-3">
               <div class="col-12 col-md-6">
-                <label class="form-label" for="custName">الاسم</label>
-                <input id="custName" class="form-control" placeholder="اسمك"/>
+                <label for="custName" class="form-label">الاسم</label>
+                <input id="custName" class="form-control" placeholder="اسمك" autocomplete="name" />
                 <div class="field-error" id="err-name">يرجى إدخال الاسم</div>
               </div>
               <div class="col-12 col-md-6">
-                <label class="form-label" for="custPhone">الجوال</label>
-                <input id="custPhone" type="tel" class="form-control" placeholder="5XXXXXXXX"/>
+                <label for="custPhone" class="form-label">الجوال</label>
+                <input id="custPhone" type="tel" class="form-control" placeholder="5XXXXXXXX" autocomplete="tel" />
                 <div class="field-error" id="err-phone">الرجاء إدخال رقم صحيح</div>
               </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label" for="orderType">نوع الطلب</label>
+              <div class="col-12 col-md-4">
+                <label for="orderType" class="form-label">نوع الطلب</label>
                 <select id="orderType" style="width:100%">
-                  <option value="delivery">توصيل</option>
                   <option value="pickup">استلام من المطعم</option>
+                  <option value="delivery">توصيل</option>
                 </select>
               </div>
-              <div class="col-12 col-md-6" id="addressWrap">
-                <label class="form-label" for="address">العنوان</label>
-                <input id="address" class="form-control" placeholder="الحي، الشارع، رقم المبنى"/>
+              <div class="col-12 col-md-8" id="addressWrap">
+                <label for="address" class="form-label">العنوان (للتوصيل)</label>
+                <input id="address" class="form-control" placeholder="الحي، الشارع، رقم المبنى" autocomplete="address-line1" />
                 <div class="field-error" id="err-address">يرجى إدخال العنوان للتوصيل</div>
               </div>
               <div class="col-12">
-                <label class="form-label" for="notes">ملاحظات</label>
+                <label for="notes" class="form-label">ملاحظات</label>
                 <textarea id="notes" class="form-control" rows="3" placeholder="بدون بصل، درجة حار، إلخ"></textarea>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 4) Payment -->
+        <!-- 4) PAYMENT -->
         <section id="page4" class="page" aria-label="الدفع">
-          <h1>💳 الدفع • お支払い</h1>
+          <h1>الدفع • Payment</h1>
           <div class="card-glass">
             <div class="row g-3">
               <div class="col-12 col-md-4">
-                <label class="form-label">طريقة الدفع</label>
+                <label class="form-label" for="payMethod">طريقة الدفع</label>
                 <select id="payMethod" style="width:100%">
                   <option value="mada">مدى</option>
                   <option value="cash">نقدًا</option>
@@ -228,23 +234,25 @@
                 <div class="field-error" id="err-pay">اختر طريقة الدفع</div>
               </div>
               <div class="col-12 col-md-8">
-                <div class="alert alert-info" style="background:rgba(0,229,255,.08);color:#E9EDFF;border:1px solid rgba(0,229,255,.25)">قد تنطبق رسوم توصيل. الأسعار تشمل الضريبة إن وجدت.</div>
+                <div class="card-paper" role="note">
+                  الأسعار تشمل الضريبة إن وجدت. قد تنطبق رسوم توصيل بسيطة على الطلبات المنزلية.
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 5) Review -->
+        <!-- 5) REVIEW -->
         <section id="page5" class="page" aria-label="مراجعة الطلب">
-          <h1>🔎 مراجعة الطلب • 最終確認</h1>
-          <div class="card-glass" id="reviewBox"></div>
+          <h1>مراجعة الطلب • Review</h1>
+          <div id="reviewBox" class="card-glass"></div>
         </section>
 
-        <!-- 6) Done -->
+        <!-- 6) DONE -->
         <section id="page6" class="page" aria-label="تم">
-          <h1>🌸 ありがとうございました • شكراً لكم</h1>
-          <div class="card-glass text-center" style="max-width:720px">
-            <p class="mb-3">تم استلام طلبكم. سنقوم بالتأكيد قريبًا على واتساب.</p>
+          <h1>تم الطلب • شكراً لكم</h1>
+          <div class="card-glass text-center" style="max-width:720px;margin-inline:auto">
+            <p class="mb-3">تم استلام طلبكم. سنؤكد قريبًا على واتساب.</p>
             <div class="d-flex gap-2 justify-content-center flex-wrap">
               <a id="shareWA" class="btn btn-success" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> مشاركة الملخص</a>
               <button id="newOrder" class="btn btn-primary" type="button">🔁 طلب جديد</button>
@@ -255,7 +263,7 @@
     </div>
   </main>
 
-  <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
+  <footer class="sticky-nav" aria-label="التنقل بين الخطوات">
     <div class="footer-inner">
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
@@ -264,18 +272,18 @@
     </div>
   </footer>
 
-  <!-- Cart Drawer -->
-  <aside id="cartDrawer" class="cart-drawer" aria-label="سلة المشتريات" aria-hidden="true">
+  <!-- CART DRAWER (dialog) -->
+  <aside id="cartDrawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
     <div class="cart-header">
-      <strong>سلة الطلب • カート</strong>
-      <button id="closeCart" class="btn btn-sm btn-outline-light" type="button"><i class="fa-solid fa-xmark"></i></button>
+      <strong id="cartTitle">سلة الطلب</strong>
+      <button id="closeCart" class="btn-gold" type="button" aria-label="إغلاق السلة"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div id="cartItems" class="cart-body"></div>
-    <div class="cart-footer">
+    <div class="card-paper" style="position:absolute;inset-inline:0;inset-block-end:0;border-top:var(--hairline)">
       <div class="line"><span>المجموع الفرعي</span><strong id="subTotal">—</strong></div>
       <div class="line"><span>الضريبة</span><strong id="vat">—</strong></div>
       <div class="line"><span>التوصيل</span><strong id="deliveryFee">—</strong></div>
-      <div class="line" style="border-top:1px solid rgba(255,255,255,.12);margin-top:6px;padding-top:8px"><span>الإجمالي</span><strong id="grandTotal">—</strong></div>
+      <div class="line" style="border-top:var(--hairline);margin-top:6px;padding-top:8px"><span>الإجمالي</span><strong id="grandTotal">—</strong></div>
       <button id="goCheckout" class="btn-wide btn-primary-grad mt-2" type="button">إتمام الشراء</button>
     </div>
   </aside>
@@ -287,40 +295,39 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-  // -------- Helpers / Currency / Toast --------
-  const SAR = new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'});
-  function showToast(type='info', msg=''){
+  // ===== Currency & Toast =====
+  const SAR = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
+  function toast(type='info', msg=''){
     const wrap=document.getElementById('toastWrap');
     const div=document.createElement('div');
-    div.style.minWidth='260px';div.style.color='#fff';div.style.padding='10px 14px';
-    div.style.borderRadius='10px';div.style.boxShadow='var(--shadow-md)';
-    div.style.background= type==='error'? '#dc2626' : type==='success'? '#16a34a' : '#0284c7';
-    div.textContent=msg;wrap.appendChild(div);
-    setTimeout(()=>{div.style.opacity='0';div.style.transform='translateY(-6px)';setTimeout(()=>div.remove(),180)},2200);
+    div.style.minWidth='260px'; div.style.color='#fff'; div.style.padding='10px 14px';
+    div.style.border='var(--gold-hairline)'; div.style.borderRadius='10px'; div.style.boxShadow='var(--shadow-md)';
+    div.style.background= type==='error'? '#7a1f1f' : type==='success'? '#143b25' : '#0F141D';
+    div.textContent=msg; wrap.appendChild(div);
+    setTimeout(()=>{div.style.opacity='0'; div.style.transform='translateY(-6px)'; setTimeout(()=>div.remove(),180)}, 2200);
   }
 
-  // -------- Data (mock menu) --------
+  // ===== Mock Menu Data =====
   const MENU=[
-    {id:'101', title:'رامن تانتان', desc:'مرق حار غني + لحم مفروم', price:36, img:'https://images.unsplash.com/photo-1617195737496-7e0b1e0fd2aa?w=600', cat:'نودلز', diet:['حار']},
-    {id:'102', title:'رامن ميزو', desc:'مرق ميزو مع ذرة وزبدة', price:34, img:'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600', cat:'نودلز', diet:[]},
-    {id:'201', title:'سوشي سالمون', desc:'6 قطع سالمون طازج', price:42, img:'https://images.unsplash.com/photo-1580828343064-fde4fc206bc6?w=600', cat:'سوشي', diet:['بحري']},
-    {id:'202', title:'سوشي تونا', desc:'6 قطع تونا مميزة', price:44, img:'https://images.unsplash.com/photo-1607301405390-1b9f2b805d6e?w=600', cat:'سوشي', diet:['بحري']},
-    {id:'301', title:'دمبلنغ خضار', desc:'مقلي خفيف مع صوص', price:22, img:'https://images.unsplash.com/photo-1544025162-d76694265947?w=600', cat:'مقبلات', diet:['نباتي']},
-    {id:'401', title:'شاي ماتشا', desc:'ماتشا ياباني', price:12, img:'https://images.unsplash.com/photo-1553456558-aff63285bdd1?w=600', cat:'مشروبات', diet:[]},
+    {id:'101', title:'ستيك واجيو A5', desc:'ياكينيكو على الجريل الحجري مع صوص بونزو', price:420, img:'https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=800', cat:'الأطباق الرئيسية', diet:['لحوم','خالٍ من الجلوتين']},
+    {id:'102', title:'سالمون ميزو', desc:'سالمون محمّر بزبدة ميزو وميسو حلو', price:210, img:'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=800', cat:'الأطباق الرئيسية', diet:['بحري']},
+    {id:'201', title:'رامن بونيتو', desc:'مرق خفيف مع بونيتو، نودلز طازجة', price:96, img:'https://images.unsplash.com/photo-1604908554027-843f2a828bdf?w=800', cat:'نودلز', diet:[]},
+    {id:'202', title:'رامن تانتان', desc:'مرق حار غني + لحم مفروم', price:104, img:'https://images.unsplash.com/photo-1617195737496-7e0b1e0fd2aa?w=800', cat:'نودلز', diet:['حار']},
+    {id:'301', title:'دمبلنغ ترافل', desc:'خضار موسمية وزيت الكمأة', price:68, img:'https://images.unsplash.com/photo-1544025162-d76694265947?w=800', cat:'مقبلات', diet:['نباتي']},
+    {id:'302', title:'ساشيمي تونا أزرق', desc:'6 قطع تونا طازجة', price:180, img:'https://images.unsplash.com/photo-1607301405390-1b9f2b805d6e?w=800', cat:'سوشي/ساشيمي', diet:['بحري']},
+    {id:'401', title:'شاي ماتشا بريميوم', desc:'ماتشا ياباني مخملي', price:48, img:'https://images.unsplash.com/photo-1553456558-aff63285bdd1?w=800', cat:'مشروبات', diet:[]},
   ];
   const CATS=[...new Set(MENU.map(m=>m.cat))];
   const DIETS=[...new Set(MENU.flatMap(m=>m.diet))];
 
-  // -------- State --------
+  // ===== State =====
   const orderedPages=["page1","page2","page3","page4","page5","page6"];
   const STEPS_LABELS=["القائمة","السلة","البيانات","الدفع","مراجعة","تم"];
   const cart=new Map(); // id -> {item, qty}
   let itiPhone=null;
-  const order={
-    type:'delivery', name:'', phone:'', address:'', notes:'', pay:'',
-  };
+  const order={ type:'pickup', name:'', phone:'', address:'', notes:'', pay:'' };
 
-  // -------- Init --------
+  // ===== Init =====
   $(function(){
     // Select2
     $('#category').select2({width:'100%',dir:'rtl',placeholder:'التصنيف'});
@@ -335,17 +342,18 @@
     DIETS.forEach(d=>$('#diet').append(new Option(d,d,false,false)));
 
     // Phone input
-    itiPhone=window.intlTelInput(document.querySelector('#custPhone'), { initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], separateDialCode:true });
+    itiPhone=window.intlTelInput(document.querySelector('#custPhone'), { initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], separateDialCode:true, placeholderNumberType:'MOBILE' });
 
     // Events
     $('#search').on('input', renderMenu);
     $('#category').on('change', renderMenu);
     $('#diet').on('change', renderMenu);
+
     $('#orderType').on('change', function(){ order.type=this.value; $('#addressWrap').toggle(this.value==='delivery'); updateNextAvailability();});
-    $('#custName').on('input', function(){ order.name=this.value.trim(); updateSummary(); updateNextAvailability();});
-    $('#address').on('input', function(){ order.address=this.value.trim(); updateNextAvailability();});
-    $('#notes').on('input', function(){ order.notes=this.value;});
-    $('#payMethod').on('change', function(){ order.pay=this.value; updateSummary(); updateNextAvailability();});
+    $('#custName').on('input', function(){ order.name=this.value.trim(); updateNextAvailability(); });
+    $('#address').on('input', function(){ order.address=this.value.trim(); updateNextAvailability(); });
+    $('#notes').on('input', function(){ order.notes=this.value; });
+    $('#payMethod').on('change', function(){ order.pay=this.value; updateNextAvailability(); });
 
     // Footer nav
     document.getElementById('footer-next').addEventListener('click', gotoNext);
@@ -360,10 +368,10 @@
     $('#newOrder').on('click', ()=>location.reload());
 
     // Initial
-    renderMenu(); updateSummary(); syncProgress(0); updateNextAvailability();
+    renderMenu(); syncProgress(0); updateNextAvailability();
   });
 
-  // -------- Rendering Menu --------
+  // ===== Rendering Menu =====
   function renderMenu(){
     const q=($('#search').val()||'').toLowerCase();
     const c=$('#category').val()||'all';
@@ -381,22 +389,24 @@
   function dishCard(m){
     const wrap=document.createElement('div'); wrap.className='dish';
     wrap.innerHTML=`
-      <div class="thumb">${m.img?`<img src="${m.img}" alt="${m.title}" loading="lazy">`:''}</div>
+      <div class="thumb">${m.img?`<img src="${m.img}" alt="${m.title}" loading="lazy" width="96" height="96">`:''}</div>
       <div class="dish-body">
-        <div class="dish-title">${m.title}</div>
+        <div class="dish-title">
+          <span>${m.title}</span>
+          <span class="price">${SAR.format(m.price)}</span>
+        </div>
         <p class="dish-desc">${m.desc||''}</p>
         <div class="dish-tags">
-          <span class="tag">${SAR.format(m.price)}</span>
           <span class="tag">${m.cat}</span>
           ${(m.diet||[]).map(t=>`<span class="tag">${t}</span>`).join('')}
         </div>
         <div class="dish-cta">
           <div class="qty" data-id="${m.id}">
-            <button class="btn btn-sm btn-outline-light" data-act="dec" type="button">−</button>
-            <span class="qv">1</span>
-            <button class="btn btn-sm btn-outline-light" data-act="inc" type="button">＋</button>
+            <button class="btn btn-sm btn-outline-light" data-act="dec" type="button" aria-label="إنقاص الكمية">−</button>
+            <span class="qv" aria-live="polite">1</span>
+            <button class="btn btn-sm btn-outline-light" data-act="inc" type="button" aria-label="زيادة الكمية">＋</button>
           </div>
-          <button class="btn-add" data-add="${m.id}"><i class="fa-solid fa-plus"></i> أضف للسلة</button>
+          <button class="btn-gold" data-add="${m.id}"><i class="fa-solid fa-plus"></i> أضف للسلة</button>
         </div>
       </div>`;
     const qtyBox=wrap.querySelector('.qty');
@@ -412,18 +422,19 @@
     return wrap;
   }
 
-  // -------- Cart --------
+  // ===== Cart =====
   function addToCart(item, qty){
     const row=cart.get(item.id) || { item, qty:0 };
     row.qty += qty; cart.set(item.id,row);
-    showToast('success', `أضيف ${item.title} ×${qty}`);
-    renderCart(); updateSummary(); updateNextAvailability();
+    toast('success', `أضيف ${item.title} ×${qty}`);
+    renderCart(); updateBadge(); updateNextAvailability();
   }
-  function removeFromCart(id){ cart.delete(id); renderCart(); updateSummary(); updateNextAvailability(); }
-  function setQty(id, q){ const row=cart.get(id); if(!row) return; row.qty=Math.max(1,Math.min(99,q)); renderCart(); updateSummary(); updateNextAvailability(); }
+  function removeFromCart(id){ cart.delete(id); renderCart(); updateBadge(); updateNextAvailability(); }
+  function setQty(id, q){ const row=cart.get(id); if(!row) return; row.qty=Math.max(1,Math.min(99,q)); renderCart(); updateBadge(); updateNextAvailability(); }
+  function updateBadge(){ const n=[...cart.values()].reduce((s,r)=>s+r.qty,0); document.getElementById('cartBadge').textContent=n; }
   function cartTotals(){
     let sub=0; cart.forEach(r=>{ sub += r.item.price * r.qty; });
-    const vat=sub*0.15; const delivery = (order.type==='delivery' && sub>0)? 10 : 0;
+    const vat=sub*0.15; const delivery = (order.type==='delivery' && sub>0)? 15 : 0;
     const grand=sub+vat+delivery; return {sub, vat, delivery, grand};
   }
   function renderCart(){
@@ -441,7 +452,10 @@
             <button class="btn btn-xs btn-outline-light" data-act="inc" type="button">＋</button>
           </div>
         </div>
-        <div class="price">${SAR.format(item.price*qty)}<div><button class="btn btn-sm btn-link text-danger" data-remove>حذف</button></div></div>`;
+        <div style="text-align:end">
+          <div class="price">${SAR.format(item.price*qty)}</div>
+          <button class="btn btn-sm btn-link text-danger" data-remove type="button">حذف</button>
+        </div>`;
       row.querySelector('[data-remove]')?.addEventListener('click', ()=>removeFromCart(item.id));
       row.querySelector('[data-act="dec"]').addEventListener('click', ()=>setQty(item.id, qty-1));
       row.querySelector('[data-act="inc"]').addEventListener('click', ()=>setQty(item.id, qty+1));
@@ -455,7 +469,7 @@
   }
   function toggleCart(open){ const el=document.getElementById('cartDrawer'); el.classList.toggle('open', !!open); el.setAttribute('aria-hidden', open? 'false':'true'); if(open) renderCart(); }
 
-  // -------- Footer / Steps --------
+  // ===== Footer / Steps =====
   function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
   function syncProgress(i){
     const pct=((i+1)/orderedPages.length)*100;
@@ -472,7 +486,7 @@
     const next=document.getElementById(orderedPages[idx]); if(!next||cur===next) return;
     if(cur){cur.classList.remove('active');cur.classList.add('exit');}
     next.style.display='flex'; requestAnimationFrame(()=>{ next.classList.add('active'); setTimeout(()=>{ if(cur){cur.classList.remove('exit'); cur.style.display='none';} }, 240); });
-    syncProgress(idx); updateSummary(); updateNextAvailability();
+    syncProgress(idx); updateNextAvailability();
     if(next.id==='page2') renderCartSummary();
     if(next.id==='page5') renderReview();
   }
@@ -489,55 +503,34 @@
     }
     else if(i===3){ enable = !!($('#payMethod').val()); $('#err-pay').toggle(!enable); }
     else if(i===4){ enable = true; }
+    document.getElementById('footer-prev').disabled = (i===0);
     nextBtn.disabled=!enable; nextBtn.classList.toggle('disabled',!enable);
   }
-  async function gotoNext(){
+  function gotoNext(){
     const i=getActiveIndex(); const id=orderedPages[i];
     if(id==='page1'){ showPage(1); return; }
     if(id==='page2'){ showPage(2); return; }
-    if(id==='page3'){ order.name=$('#custName').val().trim(); order.phone = itiPhone.getNumber().replace(/^\+/,''); order.address=$('#address').val().trim(); showPage(3); return; }
+    if(id==='page3'){
+      order.name=$('#custName').val().trim(); order.phone = itiPhone.getNumber().replace(/^\+/,''); order.address=$('#address').val().trim(); showPage(3); return; }
     if(id==='page4'){ order.pay=$('#payMethod').val(); showPage(4); return; }
-    if(id==='page5'){ // submit
-      fakeSubmit(); return;
-    }
+    if(id==='page5'){ submitOrder(); return; }
     showPage(Math.min(i+1, orderedPages.length-1));
   }
 
-  // -------- Chips / Summary --------
-  function updateSummary(){
-    const wrap=document.getElementById('summaryChips'); if(!wrap) return;
-    const i=getActiveIndex(); wrap.innerHTML=''; if(i===0) return;
-    const cartCount=[...cart.values()].reduce((s,r)=>s+r.qty,0);
-    const t=cartTotals();
-    const chips=[
-      {i:'fa-bag-shopping',t:'العناصر',v:String(cartCount)},
-      {i:'fa-sack-dollar',t:'الإجمالي',v:SAR.format(t.grand)},
-      {i:'fa-user',t:'العميل',v:(order.name||'')},
-      {i:'fa-truck',t:'نوع الطلب',v:(order.type==='delivery'?'توصيل':'استلام')},
-      {i:'fa-credit-card',t:'الدفع',v:(order.pay||'')},
-    ];
-    chips.filter(c=>c.v).forEach((c,idx)=>{
-      const el=document.createElement('div'); el.className='chip'+(idx===chips.length-1?' current':'');
-      el.innerHTML=`<i class="fa-solid ${c.i}"></i><span class="title">${c.t}:</span><span class="value">${c.v}</span>`; wrap.appendChild(el);
-    });
-  }
-
-  // -------- Cart summary page --------
+  // ===== Cart Summary Page =====
   function renderCartSummary(){
     const box=document.getElementById('cartSummary');
-    if(cart.size===0){ box.innerHTML='<div class="text-center">السلة فارغة</div>'; return; }
-    let html=''; cart.forEach(({item,qty})=>{
-      html+=`<div class="rv-line"><span>${item.title} × ${qty}</span><strong>${SAR.format(item.price*qty)}</strong></div>`;
-    });
+    if(cart.size===0){ box.innerHTML='<div class="text-center text-muted">السلة فارغة</div>'; return; }
+    let html=''; cart.forEach(({item,qty})=>{ html+=`<div class="rv-line"><span>${item.title} × ${qty}</span><strong>${SAR.format(item.price*qty)}</strong></div>`; });
     const t=cartTotals();
     html+=`<div class="rv-line"><span>المجموع الفرعي</span><strong>${SAR.format(t.sub)}</strong></div>`;
     html+=`<div class="rv-line"><span>الضريبة</span><strong>${SAR.format(t.vat)}</strong></div>`;
     html+=`<div class="rv-line"><span>التوصيل</span><strong>${SAR.format(t.delivery)}</strong></div>`;
-    html+=`<div class="rv-line" style="border-top:1px solid rgba(255,255,255,.18);margin-top:6px;padding-top:10px"><span>الإجمالي</span><strong>${SAR.format(t.grand)}</strong></div>`;
+    html+=`<div class="rv-line" style="border-top:var(--hairline);margin-top:6px;padding-top:10px"><span>الإجمالي</span><strong>${SAR.format(t.grand)}</strong></div>`;
     box.innerHTML=html;
   }
 
-  // -------- Review --------
+  // ===== Review =====
   function renderReview(){
     const box=document.getElementById('reviewBox');
     let html='<div class="mb-2 text-muted">راجع التفاصيل ثم اضغط \"تأكيد الطلب\"</div>';
@@ -549,39 +542,4 @@
     html+=`<div class="rv-line"><span>النوع</span><strong>${order.type==='delivery'?'توصيل':'استلام'}</strong></div>`;
     if(order.type==='delivery') html+=`<div class="rv-line"><span>العنوان</span><strong>${order.address||'—'}</strong></div>`;
     if(order.notes) html+=`<div class="rv-line"><span>ملاحظات</span><strong>${order.notes}</strong></div>`;
-    html+=`<div class="d-flex gap-2 flex-wrap mt-3">
-      <button class="btn btn-outline-secondary" type="button" onclick="showPage(0)">تعديل القائمة</button>
-      <button class="btn btn-outline-secondary" type="button" onclick="showPage(2)">تعديل البيانات</button>
-      <button id="confirmOrder" class="btn btn-primary ms-auto" type="button">✅ تأكيد الطلب</button>
-    </div>`;
-    box.innerHTML=html;
-    document.getElementById('confirmOrder').addEventListener('click', fakeSubmit);
-  }
-
-  // -------- Submit (fake demo) --------
-  function fakeSubmit(){
-    // Validation guard
-    if(cart.size===0){ showToast('error','السلة فارغة'); return; }
-    if(!order.name || !(itiPhone && itiPhone.isValidNumber())){ showToast('error','الرجاء إكمال بيانات العميل'); return; }
-    if(order.type==='delivery' && !order.address){ showToast('error','أدخل العنوان للتوصيل'); return; }
-    if(!order.pay){ showToast('error','اختر طريقة الدفع'); return; }
-
-    // Success → Done page + WhatsApp share
-    const t=cartTotals();
-    const lines=[]; cart.forEach(({item,qty})=>lines.push(`${item.title} × ${qty} = ${SAR.format(item.price*qty)}`));
-    const msg=encodeURIComponent([
-      'طلب جديد:',
-      ...lines,
-      `الإجمالي: ${SAR.format(t.grand)}`,
-      `الاسم: ${order.name}`,
-      `الجوال: ${order.phone}`,
-      `النوع: ${order.type==='delivery'?'توصيل':'استلام'}`,
-      order.type==='delivery' ? `العنوان: ${order.address}` : '',
-      order.notes? `ملاحظات: ${order.notes}` : ''
-    ].filter(Boolean).join('\n'));
-    document.getElementById('shareWA').href=`https://wa.me/?text=${msg}`;
-    showPage(5);
-  }
-  </script>
-</body>
-</html>
+    html+=`<div class="d-fl
