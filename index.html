@@ -31,7 +31,8 @@
   body{
     margin:0; background:var(--bg); color:var(--ink);
     font-family:'Inter','Cairo',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    padding-block:var(--header-h) var(--footer-h);
+    /* header padding only; footer is fixed now */
+    padding-block-start:var(--header-h);
   }
 
   /* Header */
@@ -62,7 +63,11 @@
   /* Layout */
   main{display:flex; justify-content:center; padding:12px}
   #app{width:100%; max-width:1180px}
-  .stage{position:relative; min-height:580px; padding-bottom:max(var(--footer-h,112px),112px)}
+  .stage{
+    position:relative; min-height:580px;
+    /* space for fixed footer so content never hides underneath */
+    padding-bottom: max(var(--footer-h, 112px), 112px);
+  }
   .page{position:absolute; inset:0; display:flex; flex-direction:column; gap:16px; padding:16px; opacity:0; transform:translateY(12px) scale(.985); pointer-events:none}
   .page.active{pointer-events:auto; animation:pageIn .42s var(--ease) both}
   .page.exit{animation:pageOut .28s var(--ease) both}
@@ -114,18 +119,19 @@
   .btn-gold:hover{background:var(--ink); color:#fff}
   .btn-gold[disabled]{opacity:.45; pointer-events:none}
 
-  /* Sticky footer — never overlap content */
+  /* === Footer: fixed to viewport bottom === */
   footer.sticky-nav{
-    position: sticky;
+    position: fixed;
+    inset-inline: 0;
     bottom: 0;
-    z-index: 30;
+    z-index: 40;
     background:#fff;
     border-top:1px solid var(--rule);
     transition: transform .25s var(--ease), opacity .25s var(--ease);
   }
   .footer-inner{max-width:1180px; margin:0 auto; padding:12px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
   .footer-actions{display:flex; gap:12px; width:100%}
-  .btn-footer{flex:1; border:1px solid var(--rule); background:#fff; color:var(--ink); border-radius:0; min-height:56px; font-weight:900}
+  .btn-footer{flex:1; border:1px solid var(--rule); background:#fff; color:#0A0A0A; border-radius:0; min-height:56px; font-weight:900}
   .btn-footer.primary{background:#0A0A0A; color:#fff; border-color:#0A0A0A}
   .btn-footer.hidden{visibility:hidden}
 
@@ -134,7 +140,7 @@
     position:fixed; inset-block:0; inset-inline-end:0;
     width:min(420px,92%); background:#fff; color:#0A0A0A;
     border-inline-start:1px solid var(--rule);
-    transform: translateX(100%);           /* off-canvas */
+    transform: translateX(100%);
     visibility: hidden; pointer-events: none;
     transition: transform .5s var(--ease), visibility 0s linear .5s;
     will-change: transform; z-index:60;
@@ -153,7 +159,7 @@
   .line{display:flex; justify-content:space-between; align-items:center; padding:4px 0}
   .btn-wide{width:100%; border:1px solid var(--rule); border-radius:0; min-height:52px; font-weight:900; background:#0A0A0A; color:#fff}
 
-  /* Scrim + hide footer while open */
+  /* Scrim + hide footer while cart is open */
   body.cart-open::after{content:""; position:fixed; inset:0; background:rgba(0,0,0,.18); z-index:59}
   body.cart-open{overflow:hidden}
   body.cart-open footer.sticky-nav{
@@ -206,9 +212,9 @@
           <h1>قائمة الأطباق • Menu</h1>
           <div class="card-paper">
             <div class="filters" role="group" aria-label="مرشحات القائمة">
-              <input id="search" class="form-control" placeholder="ابحث عن طبق" aria-label="بحث"/>
               <select id="category" style="width:100%" aria-label="التصنيف"></select>
               <select id="diet" style="width:100%" aria-label="النظام الغذائي"></select>
+              <input id="search" class="form-control" placeholder="ابحث عن طبق" aria-label="بحث"/>
             </div>
           </div>
           <div class="menu-grid" id="menuGrid" aria-live="polite"></div>
@@ -365,7 +371,7 @@
   let itiPhone=null;
   const order={ type:'pickup', name:'', phone:'', address:'', notes:'', pay:'' };
 
-  // Keep footer height accurate (prevents overlap)
+  // Keep --footer-h accurate for bottom padding
   (function syncFooterHeight(){
     const f = document.querySelector('footer.sticky-nav');
     if(!f) return;
