@@ -8,8 +8,9 @@
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  $1
+  <!-- Vogue serif for headlines -->
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
 
   <!-- UI libs (optional but handy) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -193,6 +194,76 @@
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important }
     }
+  </style>
+  <!-- VOGUE EDITORIAL SKIN -->
+  <style id="vogue-skin">
+    /* Tokens: crisp monochrome + fashion red accent */
+    :root{
+      --bg:#FFFFFF; --ink:#0A0A0A; --ink-2:#5E5E5E; --rule:rgba(10,10,10,.12);
+      --accent:#C00022; --metal:#B7A57A; /* soft gold for hairlines if needed */
+    }
+
+    /* Global reset to light editorial */
+    body{ background:var(--bg) !important; color:var(--ink) !important; }
+    body::before{ display:none !important; }
+
+    /* Typography: Didone headlines, restrained sans body */
+    h1,h2,h3,.dish-title span, .brand strong, .rv-line span:first-child{ font-family:'Libre Bodoni','Cairo','Inter',serif !important; letter-spacing:.2px; }
+    body, .form-control, .select2-selection{ font-family:'Inter','Cairo',system-ui,sans-serif; }
+    h1{ font-weight:700 !important; font-size:clamp(38px,6vw,80px) !important; line-height:1.05; letter-spacing:.1px; }
+
+    /* Header: white, hairline, slim cart */
+    header{ background:#fff !important; border-bottom:1px solid var(--rule) !important; box-shadow:none !important; }
+    .brand{ background:transparent !important; border:0 !important; box-shadow:none !important; padding:4px 0 !important; }
+    .brand img{ height:52px; border-radius:0; }
+    .btn-cart{ color:var(--ink) !important; border:1px solid var(--ink) !important; border-radius:999px; background:transparent !important; }
+    .btn-cart:hover{ background:var(--ink); color:#fff !important; }
+
+    /* Progress: thin black bar */
+    .mini-progress .bar{ background:rgba(10,10,10,.06) !important; height:6px !important; }
+    .mini-progress .bar>span{ background:var(--ink) !important; box-shadow:none !important; }
+    .mini-progress .step{ color:var(--ink-2); font-weight:600; }
+
+    /* Cards → paper blocks, hairline borders, no heavy glass/shadow */
+    .card-glass, .card-paper{ background:#fff !important; border:1px solid var(--rule) !important; border-radius:0 !important; box-shadow:none !important; backdrop-filter:none !important; }
+
+    /* Filters: minimalist */
+    .form-control, .select2-selection{ background:#fff !important; color:var(--ink) !important; border:1px solid var(--rule) !important; min-height:48px; }
+    .select2-dropdown{ background:#fff !important; color:var(--ink) !important; border:1px solid var(--rule) !important; box-shadow:none !important; }
+    .select2-results__option--highlighted{ background:#F4F4F4 !important; color:var(--ink) !important; }
+    .select2-results__option[aria-selected="true"]{ background:#0A0A0A !important; color:#fff !important; }
+
+    /* Menu grid + dish cards */
+    .dish{ background:#fff !important; border:1px solid var(--rule) !important; border-radius:0 !important; gap:16px; padding:16px; }
+    .thumb{ width:120px; height:160px; border-radius:0 !important; border:1px solid var(--rule) !important; }
+    .price{ color:var(--ink) !important; font-weight:700 !important; }
+    .dish-desc{ color:#333 !important; }
+    .tag{ border:1px solid var(--rule) !important; color:#222 !important; }
+
+    /* Buttons → editorial outline */
+    .btn-gold{ color:var(--ink) !important; border:1px solid var(--ink) !important; border-radius:0 !important; background:transparent !important; }
+    .btn-gold:hover{ background:var(--ink) !important; color:#fff !important; transform:none !important; }
+    .btn-footer{ background:#fff !important; color:var(--ink) !important; border:1px solid var(--rule) !important; border-radius:0 !important; }
+    .btn-footer.primary{ background:#0A0A0A !important; color:#fff !important; border-color:#0A0A0A !important; }
+
+    /* Cart drawer: light, paper, subtle shadow */
+    .cart-drawer{ background:#fff !important; color:var(--ink) !important; box-shadow:-24px 0 60px rgba(0,0,0,.1) !important; border-inline-start:1px solid var(--rule) !important; }
+    .cart-header{ border-bottom:1px solid var(--rule) !important; }
+    .cart-item{ border-bottom:1px dashed var(--rule) !important; }
+
+    /* Review lines */
+    .rv-line{ border-bottom:1px dashed var(--rule) !important; }
+
+    /* Toasts: chic black/white */
+    #toastWrap > div{ background:#0A0A0A !important; color:#fff !important; border:1px solid #0A0A0A !important; }
+
+    /* Focus states: crisp black ring */
+    :where(button, .btn, .form-control, .select2-selection):focus-visible{
+      outline:2px solid #0A0A0A !important; outline-offset:2px; box-shadow:none !important;
+    }
+
+    /* Reduce rounded corners globally */
+    *{ border-radius:0 !important; }
   </style>
 </head>
 <body>
