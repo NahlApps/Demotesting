@@ -22,7 +22,6 @@
   <link rel="icon" type="image/png" sizes="32x32" href="">
   <link rel="icon" type="image/png" sizes="16x16" href="">
 
-
 <style>
 /* =========================================
    TIGER 77 • TOKYO NEON THEME  —  REFINED
@@ -484,7 +483,6 @@ html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
   background: linear-gradient(90deg, var(--pri), var(--pri-2)) !important; color:#0B0D13 !important;
 }
 </style>
-
 
 </head>
 
@@ -957,7 +955,9 @@ html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
     const el=document.getElementById('timeCountHint');
     if(el) el.textContent = `${got}/${need} وقت محدد`;
   }
-  function setPageBackground(id){ document.documentElement.style.setProperty('--page-bg', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`); }
+  function setPageBackground(id){
+    document.documentElement.style.setProperty('--page-photo', `url("${PAGE_BACKGROUNDS[id]||PAGE_BACKGROUNDS.page1}")`);
+  }
 
   function getActiveIndex(){ const id=document.querySelector('.page.active')?.id; return Math.max(0, orderedPages.indexOf(id)); }
   function syncProgress(i){
@@ -1293,7 +1293,6 @@ html[dir="rtl"] .iti--allow-dropdown input#mobile.form-control{
   function onCardKeydown(e){
     const cards=[...document.querySelectorAll('#serviceCards .svc-card')];
     const cur=e.currentTarget; const idx=cards.indexOf(cur);
-    if(idx<0) return;
     const gridCols=(getComputedStyle(document.querySelector('.svc-grid')).gridTemplateColumns||'').split(' ').length||3;
     if(e.key==='ArrowRight'||e.key==='ArrowDown'){ e.preventDefault(); (cards[Math.min(cards.length-1, idx+(e.key==='ArrowRight'?1:gridCols))]||cur).focus(); }
     else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); (cards[Math.max(0, idx-(e.key==='ArrowLeft'?1:gridCols))]||cur).focus(); }
