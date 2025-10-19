@@ -288,6 +288,9 @@
   @media (prefers-reduced-motion: reduce){
     *{animation:none!important; transition:none!important}
   }
+.footer-social a[aria-label="Snapchat"] i { color: #FFFC00; }
+.footer-social a[aria-label="Snapchat"]:hover i { filter: brightness(0.9); }
+
 </style>
 
 
@@ -580,15 +583,21 @@
   </main>
 
   <footer id="siteFooter" class="sticky-nav" aria-label="التنقل بين الخطوات">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a></span>
-        <div class="footer-social">
-          <a href="https://wa.me/966509027172" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-          <a href="https://www.instagram.com/nahl.app?igsh=ZmljaXNncGtudjJ2" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="https://www.tiktok.com/@nahl.app?_t=ZS-8zgmzEQTSQW&_r=1" target="_blank" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        </div>
-      </div>
+<div class="footer-inner">
+  <div class="footer-brand">
+    <span>نحل • <a href="https://nahl.app" target="_blank" rel="noopener">Nahl.app</a></span>
+    <div class="footer-social">
+      <a href="https://wa.me/966509027172" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="https://www.instagram.com/nahl.app?igsh=ZmljaXNncGtudjJ2" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram" hidden></i></a>
+      <a href="https://www.tiktok.com/@nahl.app?_t=ZS-8zgmzEQTSQW&_r=1" target="_blank" rel="noopener" aria-label="TikTok"><i class="fa-brands fa-tiktok" hidden></i></a>
+      <!-- Snapchat -->
+      <a href="https://www.snapchat.com/@h.aea10" target="_blank" rel="noopener" aria-label="Snapchat">
+        <i class="fa-brands fa-snapchat"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
       <div class="footer-actions">
         <button id="footer-prev" type="button" class="btn-footer hidden">السابق</button>
         <button id="footer-next" type="button" class="btn-footer primary disabled" disabled>تخطي العرض</button>
