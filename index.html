@@ -38,9 +38,9 @@
     .cart-btn{position:relative;min-width:46px;min-height:46px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
-    /* Stepper (anchors for tabs) */
-    .stepper{display:flex;gap:8px;align-items:center;overflow:auto;padding:8px 0;border-bottom:1px solid var(--rule)}
-    .step{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap;text-decoration:none}
+    /* Stepper (Bootstrap .nav to satisfy Tab plugin expectations) */
+    .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0;border-bottom:1px solid var(--rule)}
+    .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
     .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
     .step.active{color:#111}
     .step.active .dot{border-color:#111;color:#111}
@@ -118,12 +118,22 @@
       </button>
     </div>
 
-    <!-- Stepper nav (anchors are the tab triggers) -->
-    <div class="container stepper" aria-label="خطوات الطلب">
-      <a class="step" data-bs-toggle="tab" href="#tab-menu"><span class="dot">1</span> القائمة <span class="sep"></span></a>
-      <a class="step" data-bs-toggle="tab" href="#tab-cart"><span class="dot">2</span> السلة <span class="sep"></span></a>
-      <a class="step" data-bs-toggle="tab" href="#tab-data"><span class="dot">3</span> البيانات <span class="sep"></span></a>
-      <a class="step" data-bs-toggle="tab" href="#tab-thanks"><span class="dot">4</span> تمّ</a>
+    <!-- Stepper: valid Bootstrap .nav container -->
+    <div class="container">
+      <div class="nav stepper" aria-label="خطوات الطلب" role="tablist">
+        <a class="nav-link step" data-bs-toggle="tab" href="#tab-menu" role="tab">
+          <span class="dot">1</span> القائمة <span class="sep"></span>
+        </a>
+        <a class="nav-link step" data-bs-toggle="tab" href="#tab-cart" role="tab">
+          <span class="dot">2</span> السلة <span class="sep"></span>
+        </a>
+        <a class="nav-link step" data-bs-toggle="tab" href="#tab-data" role="tab">
+          <span class="dot">3</span> البيانات <span class="sep"></span>
+        </a>
+        <a class="nav-link step" data-bs-toggle="tab" href="#tab-thanks" role="tab">
+          <span class="dot">4</span> تمّ
+        </a>
+      </div>
     </div>
   </header>
 
@@ -399,7 +409,7 @@
     function showTab(href){
       const a = document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`);
       if(!a) return;
-      new bootstrap.Tab(a).show();
+      bootstrap.Tab.getOrCreateInstance(a).show();
     }
 
     /* ---------- Fetch menu from GAS ---------- */
@@ -564,7 +574,7 @@
     });
 
     // Buttons to switch steps
-    document.getElementById('openCart').addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
+    openCartBtn.addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
     goCartBtn.addEventListener('click', ()=>{ if(!goCartBtn.classList.contains('disabled')){ showTab('#tab-cart'); renderCartList(); } });
 
     /* ---------- Form & intl-tel-input ---------- */
@@ -612,7 +622,7 @@
       if(!GAS_WEBAPP_URL) throw new Error('GAS_WEBAPP_URL not set');
       const res = await fetch(GAS_WEBAPP_URL + '?action=order.create', {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'text/plain' }, // avoid CORS preflight
         body: JSON.stringify(payload)
       });
       return res.json();
