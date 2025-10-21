@@ -38,7 +38,7 @@
     .cart-btn{position:relative;min-width:46px;min-height:46px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
-    /* Stepper (Bootstrap .nav to satisfy Tab plugin expectations) */
+    /* Stepper (.nav to satisfy Bootstrap Tab) */
     .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0;border-bottom:1px solid var(--rule)}
     .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
     .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
@@ -56,7 +56,7 @@
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Menu & Cards */
+    /* Menu */
     main{flex:1 1 auto;display:flex;flex-direction:column}
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -68,14 +68,14 @@
     .price{font-weight:900}
     .tags{display:flex;flex-wrap:wrap;gap:6px}
     .tag{border:1px solid var(--rule);border-radius:999px;padding:4px 8px;font-size:.8rem;color:#555}
-    .add-wrap{display:flex;align-items:center;gap:8px;margin-top:8px}
-    .add-btn{flex:1;min-height:46px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900}
+    .add-wrap{margin-top:8px}
+    .add-btn{width:100%;min-height:46px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900}
 
-    /* Cart & Forms */
+    /* Cards & forms */
     .cart-card,.card-paper{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
     .line{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--rule)}
     .seg{display:inline-grid;grid-auto-flow:column;gap:8px;background:#F6F6F6;padding:6px;border-radius:999px;border:1px solid var(--rule)}
-    .seg button{background:#fff;border:1px solid var(--rule);border-radius:999px;padding:11px 16px;min-height:46px;font-weight:900;transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)}
+    .seg button{background:#fff;border:1px solid var(--rule);border-radius:999px;padding:11px 16px;min-height:46px;font-weight:900}
     .seg button[aria-pressed="true"]{background:#0A0A0A;color:#fff;border-color:#0A0A0A}
     #etaBadge{background:#E6F6FE;color:#0369A1;padding:4px 10px;border-radius:999px;font-weight:800}
     .inp-wrap{position:relative}
@@ -83,7 +83,7 @@
     .pad-icon{padding-inline-start:42px}
     .form-control,.form-select{min-height:56px}
 
-    /* Mini bar (menu step) */
+    /* Mini bar */
     .mini-bar{position:sticky;bottom:0;z-index:55;background:#0A0A0A;color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);
       padding-bottom:calc(14px + env(safe-area-inset-bottom))}
     .mini-btn{min-height:52px;border-radius:999px;font-weight:900}
@@ -115,21 +115,13 @@
       </button>
     </div>
 
-    <!-- Stepper: valid Bootstrap .nav container -->
+    <!-- Stepper -->
     <div class="container">
       <div class="nav stepper" aria-label="خطوات الطلب" role="tablist">
-        <a class="nav-link step" data-bs-toggle="tab" href="#tab-menu" role="tab">
-          <span class="dot">1</span> القائمة <span class="sep"></span>
-        </a>
-        <a class="nav-link step" data-bs-toggle="tab" href="#tab-cart" role="tab">
-          <span class="dot">2</span> السلة <span class="sep"></span>
-        </a>
-        <a class="nav-link step" data-bs-toggle="tab" href="#tab-data" role="tab">
-          <span class="dot">3</span> البيانات <span class="sep"></span>
-        </a>
-        <a class="nav-link step" data-bs-toggle="tab" href="#tab-thanks" role="tab">
-          <span class="dot">4</span> تمّ
-        </a>
+        <a class="nav-link step active" data-bs-toggle="tab" href="#tab-menu"   role="tab"><span class="dot">1</span> القائمة  <span class="sep"></span></a>
+        <a class="nav-link step"          data-bs-toggle="tab" href="#tab-cart"   role="tab"><span class="dot">2</span> السلة   <span class="sep"></span></a>
+        <a class="nav-link step"          data-bs-toggle="tab" href="#tab-data"   role="tab"><span class="dot">3</span> البيانات<span class="sep"></span></a>
+        <a class="nav-link step"          data-bs-toggle="tab" href="#tab-thanks" role="tab"><span class="dot">4</span> تمّ</a>
       </div>
     </div>
   </header>
@@ -291,7 +283,7 @@
     </div>
   </main>
 
-  <!-- Option Modal (Additional Options) -->
+  <!-- Options Modal -->
   <div class="modal fade" id="optModal" tabindex="-1" aria-labelledby="optTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -364,42 +356,16 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
-  // ===== GAS Web App URL (exec) =====
-  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyPanj4oGsy8cy_OjCqaRJ-62qFnu_mku2oBFFi40adnzj-uZadvFykoRyNZjjG0rC0zg/exec';
+  // === GAS Web App URL (exec) ===
+  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw-pRi3wAeTX-vwyJ5o91bkZdaiqXeZpv8yjy34-Mhl5BjhN_RcUpbsgQ-VhA99LQamFQ/exec';
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
-    // Cart now stores lines by generated lineId (item + options hash)
+    // cart: { [lineId]: {lineId,id,title,basePrice,unitPrice,qty,options,optionsText,notes} }
     const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    // Client-side default options for known items (can be overriden by backend: item.options)
-    const OPTIONS_MAP = {
-      // Example schema per item id:
-      // type: radio | checkbox
-      // delta: price adjustment (SAR)
-      's1': {
-        groups: [
-          { type:'radio', key:'size', label:'الحجم', required:true,
-            items:[ {value:'regular', label:'عادي', delta:0}, {value:'large', label:'كبير', delta:12} ] },
-          { type:'radio', key:'spice', label:'حدة', required:false,
-            items:[ {value:'none', label:'بدون', delta:0}, {value:'normal', label:'عادي', delta:0}, {value:'hot', label:'حار', delta:0} ] },
-          { type:'checkbox', key:'extras', label:'إضافات', required:false,
-            items:[ {value:'wasabi', label:'واسابي', delta:2}, {value:'ginger', label:'زنجبيل', delta:1} ] }
-        ]
-      },
-      's2': {
-        groups: [
-          { type:'radio', key:'doneness', label:'درجة النضج', required:true,
-            items:[ {value:'m', label:'ميديم', delta:0}, {value:'mw', label:'ميديم ويل', delta:0} ] },
-          { type:'checkbox', key:'extras', label:'إضافات', required:false,
-            items:[ {value:'egg', label:'بيض أونسن', delta:6}, {value:'truffle', label:'ترفل', delta:18} ] }
-        ]
-      }
-      // Add more mappings as needed (m1, m2, d1, ...)
-    };
-
-    /* ---------- Stepper ---------- */
+    /* ---------- Stepper helpers ---------- */
     const steps = ['menu','cart','data','thanks'];
     function setStep(active){
       const els = document.querySelectorAll('.stepper .step');
@@ -411,6 +377,20 @@
         if(idx < activeIdx) el.classList.add('done');
       });
     }
+    function showTab(href){
+      const a = document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`);
+      if(!a) return;
+      bootstrap.Tab.getOrCreateInstance(a).show();
+    }
+
+    document.addEventListener('shown.bs.tab', (e) => {
+      const href = e.target && e.target.getAttribute('href');
+      if (!href) return;
+      if (href === '#tab-menu')   setStep('menu');
+      if (href === '#tab-cart')   setStep('cart');
+      if (href === '#tab-data')   setStep('data');
+      if (href === '#tab-thanks') setStep('thanks');
+    });
 
     /* ---------- DOM ---------- */
     const grid = document.getElementById('grid');
@@ -424,12 +404,12 @@
     const miniCount = document.getElementById('miniCount');
     const miniTotal = document.getElementById('miniTotal');
     const goCartBtn = document.getElementById('goCartBtn');
+    const openCartBtn = document.getElementById('openCart');
 
     const cartList = document.getElementById('cartList');
     const cartLineTpl = document.getElementById('cartLineTpl');
     const cartTotal = document.getElementById('cartTotal');
     const toDataBtn = document.getElementById('toDataBtn');
-    const openCartBtn = document.getElementById('openCart');
 
     const nameEl   = document.getElementById('custName');
     const phoneEl  = document.getElementById('custPhone');
@@ -462,13 +442,7 @@
       setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(), 180); }, 2200);
     }
 
-    function showTab(href){
-      const a = document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`);
-      if(!a) return;
-      bootstrap.Tab.getOrCreateInstance(a).show();
-    }
-
-    /* ---------- Fetch menu from GAS ---------- */
+    /* ---------- Fetch menu (Sheet-driven options) ---------- */
     async function fetchMenu() {
       if(!GAS_WEBAPP_URL){ console.warn('GAS_WEBAPP_URL not set'); return []; }
       try{
@@ -481,7 +455,7 @@
       }
     }
 
-    /* ---------- Options Modal Logic ---------- */
+    /* ---------- Options Modal ---------- */
     const optModalEl = document.getElementById('optModal');
     const optModal = new bootstrap.Modal(optModalEl);
     const optTitle = document.getElementById('optTitle');
@@ -494,12 +468,12 @@
     const optNotes = document.getElementById('optNotes');
     const optAddBtn= document.getElementById('optAddBtn');
 
-    let currentItem = null; // item object {id,title,price,...}
+    let currentItem = null;
     let currentBase = 0;
 
     function buildOptionsUI(item){
       optForm.innerHTML = '';
-      const schema = (item.options && item.options.groups) ? item.options : OPTIONS_MAP[item.id];
+      const schema = item.options; // ONLY from Sheet
       if (!schema || !schema.groups || !schema.groups.length) {
         const p = document.createElement('div');
         p.className = 'text-secondary small';
@@ -542,11 +516,10 @@
     }
 
     function selectedOptionsAndDelta(item){
-      const schema = (item.options && item.options.groups) ? item.options : OPTIONS_MAP[item.id];
+      const schema = item.options;
       let delta = 0;
       const summary = [];
       const result = {};
-
       if (schema && schema.groups) {
         schema.groups.forEach(group=>{
           if (group.type === 'radio') {
@@ -559,10 +532,6 @@
                 delta += Number(meta.delta||0);
                 summary.push(`${group.label||group.key}: ${meta.label}`);
               }
-            } else if (group.required) {
-              // enforce first as default
-              const f = optForm.querySelector(`input[name="${group.key}"]`);
-              if (f) f.checked = true;
             }
           } else if (group.type === 'checkbox') {
             const list = [...optForm.querySelectorAll(`input[name="${group.key}"]:checked`)];
@@ -615,7 +584,7 @@
       const qty = Math.max(1, Number(optQtyEl.value||1));
       const notes = (optNotes.value||'').trim();
 
-      // Line key = item + options + note (notes optional in key)
+      // Unique line key by item + options + notes
       const lineKey = JSON.stringify({ id: currentItem.id, opt: result, notes });
       const lineId = 'l_' + btoa(unescape(encodeURIComponent(lineKey))).replace(/=/g,'');
       const exists = state.cart[lineId];
@@ -640,7 +609,7 @@
       optModal.hide();
     });
 
-    /* ---------- Render menu ---------- */
+    /* ---------- Render grid ---------- */
     function renderGrid(){
       grid.innerHTML='';
       const q = state.q.trim().toLowerCase();
@@ -663,7 +632,6 @@
         const img = node.querySelector('.dish-img');
         img.src = d.img || '';
         img.alt = d.title || '';
-        img.loading='lazy'; img.width=240; img.height=240;
 
         node.querySelector('.title').textContent = d.title || '';
         node.querySelector('.desc').textContent = d.desc || '';
@@ -671,14 +639,7 @@
         const tagsWrap = node.querySelector('.tags');
         (Array.isArray(d.tags)?d.tags:[]).forEach(t=>{ const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagsWrap.appendChild(span); });
 
-        const addBtn = node.querySelector('.add-btn');
-        addBtn.addEventListener('click', ()=>{
-          // Use backend-provided options if present; else OPTIONS_MAP
-          const item = { ...d };
-          if (!item.options && OPTIONS_MAP[item.id]) item.options = OPTIONS_MAP[item.id];
-          openOptions(item);
-        });
-
+        node.querySelector('.add-btn').addEventListener('click', ()=> openOptions({ ...d }) );
         grid.appendChild(node);
       });
 
@@ -765,16 +726,6 @@
       });
     }
 
-    // Tab event delegation (robust)
-    document.addEventListener('shown.bs.tab', (e) => {
-      const href = e.target && e.target.getAttribute('href');
-      if (!href) return;
-      if (href === '#tab-menu')   setStep('menu');
-      if (href === '#tab-cart')   setStep('cart');
-      if (href === '#tab-data')   setStep('data');
-      if (href === '#tab-thanks') setStep('thanks');
-    });
-
     // Buttons to switch steps (no data-bs-toggle here)
     openCartBtn.addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
     goCartBtn.addEventListener('click', (e)=>{ if(!goCartBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-cart'); renderCartList(); }});
@@ -782,7 +733,7 @@
     document.querySelectorAll('a[href="#tab-menu"]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); showTab('#tab-menu'); }));
     document.querySelectorAll('a[href="#tab-cart"]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); showTab('#tab-cart'); }));
 
-    /* ---------- Form & intl-tel-input ---------- */
+    /* ---------- Form & tel input ---------- */
     const iti = window.intlTelInput(phoneEl,{
       initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
       utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js',
@@ -848,7 +799,7 @@
           address: addrEl.value.trim(),
           notes: notesEl.value.trim(),
           items: cartArr().map(x=>({
-            id:x.id, title:x.title, qty:x.qty, price:x.unitPrice,
+            lineId:x.lineId, id:x.id, title:x.title, qty:x.qty, price:x.unitPrice,
             options:x.options, optionsText:x.optionsText, lineNotes:x.notes
           }))
         };
@@ -892,7 +843,7 @@
       renderGrid(); bump(); renderCartList();
     })();
 
-    // Thanks → back to menu/cart
+    // Thanks → back actions
     thBackMenu.addEventListener('click', (e)=>{ e.preventDefault(); setStep('menu'); showTab('#tab-menu'); });
     thBackCart.addEventListener('click', (e)=>{ e.preventDefault(); showTab('#tab-cart'); });
   });
