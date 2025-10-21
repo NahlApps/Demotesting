@@ -361,9 +361,9 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
-  // ====== CONFIG: set to your deployed Web App URL ======
-  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby9mzgWBlymqAxKk6I88ssuorkDy1RclJqQ62YrMmpqqIo9Iy84Mmh0OTfoUx85Jp-1JA/exec';
-  // ======================================================
+  // ====== CONFIG: replace with your deployed Web App URL ======
+  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbz8swweHD2J-Mf_JrWADPSwjZW3IeA3hcaiT-dPFLm4gdg1mDKSJ63B-v-uVUaQzEYW2A/exec';
+  // ===========================================================
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
@@ -489,7 +489,7 @@
 
     function buildOptionsUI(item){
       optForm.innerHTML = '';
-      const schema = item.options; // ONLY from Sheet
+      const schema = item.options; // from Options sheet or OptionsJson
       if (!schema || !schema.groups || !schema.groups.length) {
         const p = document.createElement('div');
         p.className = 'text-secondary small';
@@ -667,7 +667,7 @@
         const img = node.querySelector('.dish-img');
         img.alt = d.title || '';
         img.addEventListener('error', ()=>imgFallback(img));
-        img.src = (d.img && d.img.startsWith('http')) ? d.img : (imgFallback(img), img.src);
+        if (d.img && /^https?:\/\//.test(d.img)) img.src = d.img; else imgFallback(img);
 
         node.querySelector('.title').textContent = d.title || '—';
         node.querySelector('.desc').textContent = d.desc || '';
@@ -681,7 +681,7 @@
           tagsWrap.appendChild(span);
         });
 
-        // Option chips
+        // Option chips (from Options sheet/JSON)
         const optWrap = node.querySelector('.opt-chips');
         (function buildOptionChips(item){
           const schema = item.options;
