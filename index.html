@@ -38,7 +38,7 @@
     .cart-btn{position:relative;min-width:46px;min-height:46px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
-    /* Stepper (.nav to satisfy Bootstrap Tab) */
+    /* Stepper */
     .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0;border-bottom:1px solid var(--rule)}
     .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
     .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
@@ -356,16 +356,21 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
-  // === GAS Web App URL (exec) ===
-  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw-pRi3wAeTX-vwyJ5o91bkZdaiqXeZpv8yjy34-Mhl5BjhN_RcUpbsgQ-VhA99LQamFQ/exec';
+  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwCL37oWpUEcWEC7LL_8v7aFYIkFCHp1do9aWkONRhsfG6D2plM-LRrWolgr3kinWWEGQ/exec';
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
-    // cart: { [lineId]: {lineId,id,title,basePrice,unitPrice,qty,options,optionsText,notes} }
     const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* ---------- Stepper helpers ---------- */
+    /* ---------- Utilities ---------- */
+    function stableId(str){
+      let h = 0;
+      for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
+      return 'l_' + Math.abs(h).toString(36);
+    }
+
+    /* ---------- Stepper ---------- */
     const steps = ['menu','cart','data','thanks'];
     function setStep(active){
       const els = document.querySelectorAll('.stepper .step');
@@ -382,7 +387,6 @@
       if(!a) return;
       bootstrap.Tab.getOrCreateInstance(a).show();
     }
-
     document.addEventListener('shown.bs.tab', (e) => {
       const href = e.target && e.target.getAttribute('href');
       if (!href) return;
@@ -392,7 +396,7 @@
       if (href === '#tab-thanks') setStep('thanks');
     });
 
-    /* ---------- DOM ---------- */
+    /* ---------- DOM refs ---------- */
     const grid = document.getElementById('grid');
     const dishTpl = document.getElementById('dishTpl');
     const chips = document.getElementById('chips');
@@ -442,7 +446,7 @@
       setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(), 180); }, 2200);
     }
 
-    /* ---------- Fetch menu (Sheet-driven options) ---------- */
+    /* ---------- Fetch menu ---------- */
     async function fetchMenu() {
       if(!GAS_WEBAPP_URL){ console.warn('GAS_WEBAPP_URL not set'); return []; }
       try{
@@ -561,32 +565,30 @@
     }
 
     optMinus.addEventListener('click', ()=>{ const n=Math.max(1, Number(optQtyEl.value||1)-1); optQtyEl.value=n; updateOptPrice(); });
-    optPlus.addEventListener('click',  ()=>{ const n=Math.max(1, Number(optQtyEl.value||1)+1); optQtyEl.value=n; updateOptPrice(); });
+    optPlus .addEventListener('click', ()=>{ const n=Math.max(1, Number(optQtyEl.value||1)+1); optQtyEl.value=n; updateOptPrice(); });
     optForm.addEventListener('change', updateOptPrice);
     optQtyEl.addEventListener('input', updateOptPrice);
 
     function openOptions(item){
       currentItem = item;
       currentBase = Number(item.price||0);
-      optTitle.textContent = `خيارات ${item.title}`;
-      optSummary.textContent = item.desc || '';
-      optQtyEl.value = 1;
-      optNotes.value = '';
+      document.getElementById('optTitle').textContent = `خيارات ${item.title}`;
+      document.getElementById('optSummary').textContent = item.desc || '';
+      document.getElementById('optQty').value = 1;
+      document.getElementById('optNotes').value = '';
       buildOptionsUI(item);
       updateOptPrice();
       optModal.show();
     }
 
-    optAddBtn.addEventListener('click', ()=>{
+    document.getElementById('optAddBtn').addEventListener('click', ()=>{
       if(!currentItem) return;
       const { delta, summary, result } = selectedOptionsAndDelta(currentItem);
       const unit = currentBase + delta;
       const qty = Math.max(1, Number(optQtyEl.value||1));
       const notes = (optNotes.value||'').trim();
-
-      // Unique line key by item + options + notes
       const lineKey = JSON.stringify({ id: currentItem.id, opt: result, notes });
-      const lineId = 'l_' + btoa(unescape(encodeURIComponent(lineKey))).replace(/=/g,'');
+      const lineId = stableId(lineKey);
       const exists = state.cart[lineId];
 
       if (exists) {
@@ -694,7 +696,6 @@
     if(saved){ try{ state.cart = JSON.parse(saved)||{}; }catch{} }
 
     function renderCartList(){
-      if(!cartList) return;
       cartList.innerHTML='';
       const {arr} = totals();
       if(arr.length===0){
@@ -726,12 +727,10 @@
       });
     }
 
-    // Buttons to switch steps (no data-bs-toggle here)
+    // Step changes
     openCartBtn.addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
     goCartBtn.addEventListener('click', (e)=>{ if(!goCartBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-cart'); renderCartList(); }});
     toDataBtn.addEventListener('click', (e)=>{ if(!toDataBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-data'); }});
-    document.querySelectorAll('a[href="#tab-menu"]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); showTab('#tab-menu'); }));
-    document.querySelectorAll('a[href="#tab-cart"]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); showTab('#tab-cart'); }));
 
     /* ---------- Form & tel input ---------- */
     const iti = window.intlTelInput(phoneEl,{
@@ -823,11 +822,15 @@
     };
     confirmBtn.addEventListener('click', submitOrder);
 
+    // Thanks → back actions
+    thBackMenu.addEventListener('click', (e)=>{ e.preventDefault(); setStep('menu'); showTab('#tab-menu'); });
+    thBackCart.addEventListener('click', (e)=>{ e.preventDefault(); showTab('#tab-cart'); });
+
     // Keyboard flow
     nameEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); phoneEl.focus(); }});
     phoneEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); (segDel.getAttribute('aria-pressed')==='true'?addrEl:notesEl).focus(); }});
 
-    /* ---------- Prefill saved user info ---------- */
+    /* ---------- Prefill ---------- */
     try {
       const savedInfo = JSON.parse(localStorage.getItem('hk_user_v1') || '{}');
       if (savedInfo.name) nameEl.value = savedInfo.name;
@@ -842,10 +845,6 @@
       if (!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'), 600);
       renderGrid(); bump(); renderCartList();
     })();
-
-    // Thanks → back actions
-    thBackMenu.addEventListener('click', (e)=>{ e.preventDefault(); setStep('menu'); showTab('#tab-menu'); });
-    thBackCart.addEventListener('click', (e)=>{ e.preventDefault(); showTab('#tab-cart'); });
   });
   </script>
 </body>
