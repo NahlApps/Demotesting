@@ -38,9 +38,9 @@
     .cart-btn{position:relative;min-width:46px;min-height:46px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
-    /* Stepper */
+    /* Stepper (anchors for tabs) */
     .stepper{display:flex;gap:8px;align-items:center;overflow:auto;padding:8px 0;border-bottom:1px solid var(--rule)}
-    .step{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
+    .step{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap;text-decoration:none}
     .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
     .step.active{color:#111}
     .step.active .dot{border-color:#111;color:#111}
@@ -56,7 +56,7 @@
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Menu */
+    /* Menu & Cards */
     main{flex:1 1 auto;display:flex;flex-direction:column}
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -74,17 +74,9 @@
     .qty .count{min-width:24px;text-align:center;font-weight:900}
     .add-btn{flex:1;min-height:46px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900}
 
-    /* Cart page */
-    .cart-card{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
+    /* Cart & Forms */
+    .cart-card,.card-paper{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
     .line{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--rule)}
-
-    /* Mini checkout bar (menu step) */
-    .mini-bar{position:sticky;bottom:0;z-index:55;background:#0A0A0A;color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);
-      padding-bottom:calc(14px + env(safe-area-inset-bottom))}
-    .mini-btn{min-height:52px;border-radius:999px;font-weight:900}
-
-    /* Forms */
-    .card-paper{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
     .seg{display:inline-grid;grid-auto-flow:column;gap:8px;background:#F6F6F6;padding:6px;border-radius:999px;border:1px solid var(--rule)}
     .seg button{background:#fff;border:1px solid var(--rule);border-radius:999px;padding:11px 16px;min-height:46px;font-weight:900;transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)}
     .seg button[aria-pressed="true"]{background:#0A0A0A;color:#fff;border-color:#0A0A0A}
@@ -94,7 +86,12 @@
     .pad-icon{padding-inline-start:42px}
     .form-control,.form-select{min-height:56px}
 
-    /* Toast + helpers */
+    /* Mini bar (menu step) */
+    .mini-bar{position:sticky;bottom:0;z-index:55;background:#0A0A0A;color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);
+      padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+    .mini-btn{min-height:52px;border-radius:999px;font-weight:900}
+
+    /* Toast & helpers */
     #toasts{position:fixed;inset-block-start:14px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px}
     .toast-msg{background:#111;color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.25);font-weight:800}
     .spacer{height:18vh}
@@ -121,12 +118,12 @@
       </button>
     </div>
 
-    <!-- Stepper -->
+    <!-- Stepper nav (anchors are the tab triggers) -->
     <div class="container stepper" aria-label="خطوات الطلب">
-      <div class="step" data-step="menu"><span class="dot">1</span> القائمة <span class="sep"></span></div>
-      <div class="step" data-step="cart"><span class="dot">2</span> السلة <span class="sep"></span></div>
-      <div class="step" data-step="data"><span class="dot">3</span> البيانات <span class="sep"></span></div>
-      <div class="step" data-step="thanks"><span class="dot">4</span> تمّ</div>
+      <a class="step" data-bs-toggle="tab" href="#tab-menu"><span class="dot">1</span> القائمة <span class="sep"></span></a>
+      <a class="step" data-bs-toggle="tab" href="#tab-cart"><span class="dot">2</span> السلة <span class="sep"></span></a>
+      <a class="step" data-bs-toggle="tab" href="#tab-data"><span class="dot">3</span> البيانات <span class="sep"></span></a>
+      <a class="step" data-bs-toggle="tab" href="#tab-thanks"><span class="dot">4</span> تمّ</a>
     </div>
   </header>
 
@@ -331,7 +328,7 @@
 
   <script>
   // ===== GAS Web App URL (exec) =====
-  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbz_6rBZaGO39fVlLyISxSAhSOca9YTKeZpk4KsYuamAF4hHocaK9f7Gihc9YV3VH3ZAtg/exec';
+  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyPanj4oGsy8cy_OjCqaRJ-62qFnu_mku2oBFFi40adnzj-uZadvFykoRyNZjjG0rC0zg/exec';
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
@@ -343,7 +340,7 @@
     function setStep(active){
       const els = document.querySelectorAll('.stepper .step');
       els.forEach((el,idx)=>{
-        const id = el.getAttribute('data-step');
+        const id = (el.getAttribute('href')||'').replace('#tab-','');
         el.classList.remove('active','done');
         if(id === active) el.classList.add('active');
         const activeIdx = steps.indexOf(active);
@@ -385,7 +382,7 @@
     const thType    = document.getElementById('thType');
     const thBackMenu= document.getElementById('thBackMenu');
 
-    /* ---------- Toast ---------- */
+    /* ---------- Helpers ---------- */
     function toast(msg, undoCb){
       const el = document.createElement('div');
       el.className='toast-msg';
@@ -399,8 +396,13 @@
       toasts.appendChild(el);
       setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(), 180); }, 2200);
     }
+    function showTab(href){
+      const a = document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`);
+      if(!a) return;
+      new bootstrap.Tab(a).show();
+    }
 
-    /* ---------- Data: menu from GAS ---------- */
+    /* ---------- Fetch menu from GAS ---------- */
     async function fetchMenu() {
       if(!GAS_WEBAPP_URL){ console.warn('GAS_WEBAPP_URL not set'); return []; }
       try{
@@ -519,7 +521,6 @@
       renderCartList();
       localStorage.setItem('hk_cart_v2', JSON.stringify(state.cart));
 
-      // enable/disable navigation buttons
       const has = t.count>0;
       goCartBtn.classList.toggle('disabled', !has);
       goCartBtn.setAttribute('aria-disabled', String(!has));
@@ -530,7 +531,7 @@
     if(saved){ try{ state.cart = JSON.parse(saved)||{}; }catch{} }
 
     function renderCartList(){
-      if(!cartList) return; // not on cart tab yet
+      if(!cartList) return;
       cartList.innerHTML='';
       const {arr} = totals();
       if(arr.length===0){
@@ -552,22 +553,19 @@
       });
     }
 
-    // Step navigation
-    openCartBtn.addEventListener('click', ()=>{
-      new bootstrap.Tab(document.querySelector('[href="#tab-cart"]')).show();
-      setStep('cart');
-      renderCartList();
+    // Tab event delegation (robust)
+    document.addEventListener('shown.bs.tab', (e) => {
+      const href = e.target && e.target.getAttribute('href');
+      if (!href) return;
+      if (href === '#tab-menu')   setStep('menu');
+      if (href === '#tab-cart')   setStep('cart');
+      if (href === '#tab-data')   setStep('data');
+      if (href === '#tab-thanks') setStep('thanks');
     });
-    goCartBtn.addEventListener('click', ()=>{
-      if(goCartBtn.classList.contains('disabled')) return;
-      new bootstrap.Tab(document.querySelector('[href="#tab-cart"]')).show();
-      setStep('cart');
-      renderCartList();
-    });
-    document.querySelector('[href="#tab-menu"]').addEventListener('shown.bs.tab', ()=> setStep('menu'));
-    document.querySelector('[href="#tab-cart"]').addEventListener('shown.bs.tab', ()=> setStep('cart'));
-    document.querySelector('[href="#tab-data"]').addEventListener('shown.bs.tab', ()=> setStep('data'));
-    document.querySelector('[href="#tab-thanks"]').addEventListener('shown.bs.tab', ()=> setStep('thanks'));
+
+    // Buttons to switch steps
+    document.getElementById('openCart').addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
+    goCartBtn.addEventListener('click', ()=>{ if(!goCartBtn.classList.contains('disabled')){ showTab('#tab-cart'); renderCartList(); } });
 
     /* ---------- Form & intl-tel-input ---------- */
     const iti = window.intlTelInput(phoneEl,{
@@ -609,7 +607,7 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* ---------- Submit to GAS (text/plain) ---------- */
+    /* ---------- Submit to GAS ---------- */
     async function createOrder(payload) {
       if(!GAS_WEBAPP_URL) throw new Error('GAS_WEBAPP_URL not set');
       const res = await fetch(GAS_WEBAPP_URL + '?action=order.create', {
@@ -639,16 +637,15 @@
         const res = await createOrder(payload);
         if (res && res.ok) {
           state.lastOrder = { id: res.orderId, total: res.totals && res.totals.total, type: payload.type };
-          // Reset cart and save user info
+          // Save user info & reset cart
           localStorage.setItem('hk_user_v1', JSON.stringify({ name: payload.name, phone: phoneEl.value, address: payload.address }));
           state.cart = {}; bump();
-          // Fill thank you page
+          // Fill thank you
           thOrderId.textContent = state.lastOrder.id || '—';
           thTotal.textContent   = typeof state.lastOrder.total==='number' ? fmt.format(state.lastOrder.total) : '—';
           thType.textContent    = state.lastOrder.type==='delivery' ? 'نوع الطلب: توصيل' : 'نوع الطلب: استلام';
           // Go to Thank You
-          new bootstrap.Tab(document.querySelector('[href="#tab-thanks"]')).show();
-          setStep('thanks');
+          showTab('#tab-thanks');
         } else {
           toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error('order.create error', res);
         }
@@ -680,7 +677,7 @@
       renderGrid(); bump(); renderCartList();
     })();
 
-    // Allow the "رجوع للقائمة" after thank you to clear selections visually
+    // Thank-you → back to menu
     thBackMenu.addEventListener('click', ()=>{
       setStep('menu'); renderGrid(); bump(); renderCartList();
     });
