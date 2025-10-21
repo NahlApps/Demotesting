@@ -340,6 +340,7 @@
     </div>
   </template>
 
+  <!-- CHANGED: removed .opt (options text) from the cart line template -->
   <template id="cartLineTpl">
     <div class="line">
       <div class="d-flex align-items-center gap-2">
@@ -349,7 +350,7 @@
       </div>
       <div class="flex-grow-1 text-truncate text-end">
         <div class="fw-bold name"></div>
-        <div class="small text-secondary opt"></div>
+        <!-- options are intentionally NOT shown in the cart -->
         <div class="small text-secondary">× <span class="unit">0.00</span> ر.س</div>
       </div>
       <div class="text-nowrap fw-bold total">0.00 ر.س</div>
@@ -602,22 +603,22 @@
     function openOptions(item, preselect){
       currentItem = item;
       currentBase = Number(item.price||0);
-      optTitle.textContent = `خيارات ${item.title}`;
-      optSummary.textContent = item.desc || '';
-      optQtyEl.value = 1;
-      optNotes.value = '';
+      document.getElementById('optTitle').textContent = `خيارات ${item.title}`;
+      document.getElementById('optSummary').textContent = item.desc || '';
+      document.getElementById('optQty').value = 1;
+      document.getElementById('optNotes').value = '';
       buildOptionsUI(item);
       if(preselect){ applyPreselect(preselect, item.options); }
       updateOptPrice();
       optModal.show();
     }
 
-    optAddBtn.addEventListener('click', ()=>{
+    document.getElementById('optAddBtn').addEventListener('click', ()=>{
       if(!currentItem) return;
       const { delta, summary, result } = selectedOptionsAndDelta(currentItem);
       const unit = currentBase + delta;
       const qty = Math.max(1, Number(optQtyEl.value||1));
-      const notes = (optNotes.value||'').trim();
+      const notes = (document.getElementById('optNotes').value||'').trim();
       const lineKey = JSON.stringify({ id: currentItem.id, opt: result, notes });
       const lineId = stableId(lineKey);
       const exists = state.cart[lineId];
@@ -633,7 +634,7 @@
           unitPrice: unit,
           qty: qty,
           options: result,
-          optionsText: summary.join(' • '),
+          optionsText: summary.join(' • '), // kept for backend logging; not shown in cart
           notes: notes
         };
       }
@@ -786,7 +787,7 @@
       arr.forEach(it=>{
         const row = cartLineTpl.content.firstElementChild.cloneNode(true);
         row.querySelector('.name').textContent = it.title;
-        row.querySelector('.opt').textContent = [it.optionsText, it.notes].filter(Boolean).join(' • ');
+        // CHANGED: options/notes are not rendered in cart anymore
         row.querySelector('.unit').textContent = Number(it.unitPrice||0).toFixed(2);
         row.querySelector('.qty').textContent  = it.qty;
         row.querySelector('.total').textContent= fmt.format(it.qty*it.unitPrice);
