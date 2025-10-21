@@ -48,7 +48,7 @@
     .step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips & search */
+    /* Top chips & search */
     .chips-wrap{position:sticky;top:64px;z-index:60;background:#fff;border-bottom:1px solid var(--rule);padding:10px 0}
     .chip{background:var(--chip);color:var(--chip-ink);border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:all .18s var(--ease)}
     .chip.active{background:#111;color:#fff;border-color:#111}
@@ -331,7 +331,7 @@
           <div class="price"></div>
           <div class="tags"></div>
         </div>
-        <!-- NEW: option chips preview -->
+        <!-- Option chips -->
         <div class="opt-chips"></div>
         <div class="add-wrap">
           <button class="add-btn" type="button" aria-label="أضف للسلة">أضف للسلة</button>
@@ -361,7 +361,9 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
+  // ====== CONFIG: set to your deployed Web App URL ======
   const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby9mzgWBlymqAxKk6I88ssuorkDy1RclJqQ62YrMmpqqIo9Iy84Mmh0OTfoUx85Jp-1JA/exec';
+  // ======================================================
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
@@ -373,6 +375,11 @@
       let h = 0;
       for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
       return 'l_' + Math.abs(h).toString(36);
+    }
+    function imgFallback(el){
+      el.src = 'data:image/svg+xml;utf8,'+encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="16">لا صورة</text></svg>`
+      );
     }
 
     /* ---------- Stepper ---------- */
@@ -404,7 +411,7 @@
     /* ---------- DOM refs ---------- */
     const grid = document.getElementById('grid');
     const dishTpl = document.getElementById('dishTpl');
-    const chips = document.getElementById('chips');
+    const chipsTop = document.getElementById('chips');
     const clearFilters = document.getElementById('clearFilters');
     const search = document.getElementById('q');
     const toasts = document.getElementById('toasts');
@@ -574,7 +581,6 @@
     optForm.addEventListener('change', updateOptPrice);
     optQtyEl.addEventListener('input', updateOptPrice);
 
-    // NEW: apply preselect map { [group.key]: value | value[] }
     function applyPreselect(preselect, schema){
       if(!preselect || !schema) return;
       (schema.groups||[]).forEach(group=>{
@@ -593,21 +599,20 @@
       });
     }
 
-    // UPDATED: openOptions with optional preselect
     function openOptions(item, preselect){
       currentItem = item;
       currentBase = Number(item.price||0);
-      document.getElementById('optTitle').textContent = `خيارات ${item.title}`;
-      document.getElementById('optSummary').textContent = item.desc || '';
-      document.getElementById('optQty').value = 1;
-      document.getElementById('optNotes').value = '';
+      optTitle.textContent = `خيارات ${item.title}`;
+      optSummary.textContent = item.desc || '';
+      optQtyEl.value = 1;
+      optNotes.value = '';
       buildOptionsUI(item);
       if(preselect){ applyPreselect(preselect, item.options); }
       updateOptPrice();
       optModal.show();
     }
 
-    document.getElementById('optAddBtn').addEventListener('click', ()=>{
+    optAddBtn.addEventListener('click', ()=>{
       if(!currentItem) return;
       const { delta, summary, result } = selectedOptionsAndDelta(currentItem);
       const unit = currentBase + delta;
@@ -642,8 +647,8 @@
       grid.innerHTML='';
       const q = state.q.trim().toLowerCase();
       const list = state.menu.filter(d=>{
-        const inCat = (state.cat==='all' || d.cat===state.cat);
-        const inTxt = !q || [d.title,d.desc].join(' ').toLowerCase().includes(q);
+        const inCat = (state.cat==='all' || (d.cat||'')===state.cat);
+        const inTxt = !q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
         return inCat && inTxt;
       });
 
@@ -657,15 +662,18 @@
       list.forEach(d=>{
         const node = dishTpl.content.firstElementChild.cloneNode(true);
         node.dataset.cat = d.cat || '';
-        const img = node.querySelector('.dish-img');
-        img.src = d.img || '';
-        img.alt = d.title || '';
 
-        node.querySelector('.title').textContent = d.title || '';
+        // Image (with fallback)
+        const img = node.querySelector('.dish-img');
+        img.alt = d.title || '';
+        img.addEventListener('error', ()=>imgFallback(img));
+        img.src = (d.img && d.img.startsWith('http')) ? d.img : (imgFallback(img), img.src);
+
+        node.querySelector('.title').textContent = d.title || '—';
         node.querySelector('.desc').textContent = d.desc || '';
         node.querySelector('.price').textContent = fmt.format(Number(d.price||0));
 
-        // Tags from item.tags
+        // Tags
         const tagsWrap = node.querySelector('.tags');
         (Array.isArray(d.tags)?d.tags:[]).forEach(t=>{
           const span=document.createElement('span');
@@ -673,7 +681,7 @@
           tagsWrap.appendChild(span);
         });
 
-        // NEW: Option chips from OptionsJson
+        // Option chips
         const optWrap = node.querySelector('.opt-chips');
         (function buildOptionChips(item){
           const schema = item.options;
@@ -718,7 +726,7 @@
       clearFilters.classList.toggle('d-none', state.cat==='all' && !state.q.trim());
     }
 
-    /* ---------- Search & chips ---------- */
+    /* ---------- Search & chips (top) ---------- */
     let searchTimer=null;
     search.addEventListener('input', e=>{
       clearTimeout(searchTimer);
@@ -730,7 +738,7 @@
       document.querySelector('.chip[data-cat="all"]').classList.add('active');
       renderGrid();
     });
-    chips.addEventListener('click', e=>{
+    chipsTop.addEventListener('click', e=>{
       const b = e.target.closest('.chip'); if(!b || b.id==='clearFilters') return;
       document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
       b.classList.add('active');
@@ -857,7 +865,7 @@
       const t = totals();
       if(t.count===0){ toast('السلة فارغة'); return; }
       if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); return; }
-      confirmBtn.classList.add('is-loading'); confirmBtn.disabled = true;
+      confirmBtn.disabled = true; confirmBtn.classList.add('disabled');
       try{
         let phoneNumber = phoneEl.value.trim();
         try { phoneNumber = iti.getNumber(); } catch (_e) {}
@@ -887,7 +895,7 @@
       } catch (err) {
         toast('خطأ في الاتصال بالخدمة'); console.error(err);
       } finally{
-        confirmBtn.classList.remove('is-loading'); confirmBtn.disabled = false;
+        confirmBtn.disabled = false; confirmBtn.classList.remove('disabled');
       }
     };
     confirmBtn.addEventListener('click', submitOrder);
