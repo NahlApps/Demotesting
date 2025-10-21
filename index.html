@@ -52,6 +52,8 @@
     .chips-wrap{position:sticky;top:64px;z-index:60;background:#fff;border-bottom:1px solid var(--rule);padding:10px 0}
     .chip{background:var(--chip);color:var(--chip-ink);border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:all .18s var(--ease)}
     .chip.active{background:#111;color:#fff;border-color:#111}
+    .chip.sm{min-height:auto;padding:6px 10px;font-weight:800;font-size:.84rem}
+    .chip.ghost{background:#fff;border-style:dashed}
     .pill-clear{background:#fff;border:1px dashed #bbb}
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
@@ -70,6 +72,7 @@
     .tag{border:1px solid var(--rule);border-radius:999px;padding:4px 8px;font-size:.8rem;color:#555}
     .add-wrap{margin-top:8px}
     .add-btn{width:100%;min-height:46px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900}
+    .opt-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 
     /* Cards & forms */
     .cart-card,.card-paper{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -328,6 +331,8 @@
           <div class="price"></div>
           <div class="tags"></div>
         </div>
+        <!-- NEW: option chips preview -->
+        <div class="opt-chips"></div>
         <div class="add-wrap">
           <button class="add-btn" type="button" aria-label="أضف للسلة">أضف للسلة</button>
         </div>
@@ -356,7 +361,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
-  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwCL37oWpUEcWEC7LL_8v7aFYIkFCHp1do9aWkONRhsfG6D2plM-LRrWolgr3kinWWEGQ/exec';
+  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxbxr0vaJQnhmmfJDowOnYK5gmR-rtOpLbSna1iBI9R7tCiEwGEDRZRFUYVwj3tRtPWyQ/exec';
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
@@ -569,7 +574,27 @@
     optForm.addEventListener('change', updateOptPrice);
     optQtyEl.addEventListener('input', updateOptPrice);
 
-    function openOptions(item){
+    // NEW: apply preselect map { [group.key]: value | value[] }
+    function applyPreselect(preselect, schema){
+      if(!preselect || !schema) return;
+      (schema.groups||[]).forEach(group=>{
+        const val = preselect[group.key];
+        if(val===undefined) return;
+        if(group.type==='radio'){
+          const input = optForm.querySelector(`input[name="${group.key}"][value="${val}"]`);
+          if(input){ input.checked = true; }
+        }else if(group.type==='checkbox'){
+          const arr = Array.isArray(val)? val : [val];
+          arr.forEach(v=>{
+            const input = optForm.querySelector(`input[name="${group.key}"][value="${v}"]`);
+            if(input){ input.checked = true; }
+          });
+        }
+      });
+    }
+
+    // UPDATED: openOptions with optional preselect
+    function openOptions(item, preselect){
       currentItem = item;
       currentBase = Number(item.price||0);
       document.getElementById('optTitle').textContent = `خيارات ${item.title}`;
@@ -577,6 +602,7 @@
       document.getElementById('optQty').value = 1;
       document.getElementById('optNotes').value = '';
       buildOptionsUI(item);
+      if(preselect){ applyPreselect(preselect, item.options); }
       updateOptPrice();
       optModal.show();
     }
@@ -638,8 +664,52 @@
         node.querySelector('.title').textContent = d.title || '';
         node.querySelector('.desc').textContent = d.desc || '';
         node.querySelector('.price').textContent = fmt.format(Number(d.price||0));
+
+        // Tags from item.tags
         const tagsWrap = node.querySelector('.tags');
-        (Array.isArray(d.tags)?d.tags:[]).forEach(t=>{ const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagsWrap.appendChild(span); });
+        (Array.isArray(d.tags)?d.tags:[]).forEach(t=>{
+          const span=document.createElement('span');
+          span.className='tag'; span.textContent=t;
+          tagsWrap.appendChild(span);
+        });
+
+        // NEW: Option chips from OptionsJson
+        const optWrap = node.querySelector('.opt-chips');
+        (function buildOptionChips(item){
+          const schema = item.options;
+          if(!schema || !schema.groups || !schema.groups.length) return;
+
+          const chips = [];
+          schema.groups.forEach(group=>{
+            const items = group.items || [];
+            items.forEach(it=>{
+              const btn = document.createElement('button');
+              btn.type='button';
+              btn.className='chip sm';
+              const delta = (it.delta && Number(it.delta) !== 0) ? ` (+${it.delta})` : '';
+              btn.textContent = (group.label ? `${group.label}: ` : '') + `${it.label}${delta}`;
+              btn.title = `اختر ${group.label || group.key} → ${it.label}`;
+              btn.addEventListener('click', ()=>{
+                const pre = {};
+                if(group.type==='radio'){ pre[group.key] = it.value; }
+                else if(group.type==='checkbox'){ pre[group.key] = [it.value]; }
+                openOptions({ ...item }, pre);
+              });
+              chips.push(btn);
+            });
+          });
+
+          const MAX = 6;
+          chips.slice(0,MAX).forEach(b=>optWrap.appendChild(b));
+          if(chips.length > MAX){
+            const more = document.createElement('button');
+            more.type='button';
+            more.className='chip sm ghost';
+            more.textContent = `+${chips.length - MAX}`;
+            more.addEventListener('click', ()=> openOptions({ ...item }) );
+            optWrap.appendChild(more);
+          }
+        })(d);
 
         node.querySelector('.add-btn').addEventListener('click', ()=> openOptions({ ...d }) );
         grid.appendChild(node);
