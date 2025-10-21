@@ -1,10 +1,9 @@
-<!DOCTYPE html> 
-
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Maison Hikari • القائمة</title>
+  <title>Maison Hikari • الطلب</title>
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -17,7 +16,7 @@
   <link href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css" rel="stylesheet"/>
 
   <meta name="theme-color" content="#0A0A0A">
-  <meta name="description" content="مطعم Maison Hikari — قائمة الطعام والطلب السريع">
+  <meta name="description" content="Maison Hikari — اطلب الآن">
 
   <style>
     :root{
@@ -32,7 +31,6 @@
       color:var(--ink); background:var(--bg); display:flex; flex-direction:column;
       -webkit-tap-highlight-color:transparent;
     }
-    .body-locked{ overflow:hidden; touch-action:none; }
 
     /* Header */
     .app-header{position:sticky;top:0;z-index:70;background:#fff;border-bottom:1px solid var(--rule);backdrop-filter:saturate(1.15) blur(6px)}
@@ -40,18 +38,26 @@
     .cart-btn{position:relative;min-width:46px;min-height:46px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
+    /* Stepper */
+    .stepper{display:flex;gap:8px;align-items:center;overflow:auto;padding:8px 0;border-bottom:1px solid var(--rule)}
+    .step{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
+    .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
+    .step.active{color:#111}
+    .step.active .dot{border-color:#111;color:#111}
+    .step.done{color:#16a34a}
+    .step.done .dot{border-color:#16a34a;color:#16a34a}
+    .step .sep{width:24px;height:2px;background:#e5e7eb}
+
     /* Chips & search */
     .chips-wrap{position:sticky;top:64px;z-index:60;background:#fff;border-bottom:1px solid var(--rule);padding:10px 0}
     .chip{background:var(--chip);color:var(--chip-ink);border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:all .18s var(--ease)}
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
-
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
+    /* Menu */
     main{flex:1 1 auto;display:flex;flex-direction:column}
-
-    /* Menu grid & card */
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -68,33 +74,16 @@
     .qty .count{min-width:24px;text-align:center;font-weight:900}
     .add-btn{flex:1;min-height:46px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900}
 
-    /* Mini checkout bar */
+    /* Cart page */
+    .cart-card{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .line{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--rule)}
+
+    /* Mini checkout bar (menu step) */
     .mini-bar{position:sticky;bottom:0;z-index:55;background:#0A0A0A;color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);
       padding-bottom:calc(14px + env(safe-area-inset-bottom))}
     .mini-btn{min-height:52px;border-radius:999px;font-weight:900}
 
-    /* Drawer cart */
-    .drawer{position:fixed;inset-block:0;inset-inline-start:0;width:min(420px,92vw);background:#fff;border-inline-end:1px solid var(--rule);box-shadow:0 30px 80px rgba(0,0,0,.25);transform:translateX(-100%);transition:transform .28s var(--ease);z-index:100;display:flex;flex-direction:column}
-    .drawer.open{transform:none}
-    .drawer-header{padding:12px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between}
-    .drawer-body{padding:12px;overflow:auto}
-    .drawer.open .drawer-body{overscroll-behavior:contain}
-    .drawer-footer{padding:12px;border-top:1px solid var(--rule)}
-    .line{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--rule)}
-    .drawer [role="document"]{display:flex;flex-direction:column;height:100%}
-
-    /* Scrim */
-    #scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:saturate(1.1) blur(2px);z-index:99;opacity:0;transition:opacity .22s var(--ease)}
-
-    /* Toast */
-    #toasts{position:fixed;inset-block-start:14px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px}
-    .toast-msg{background:#111;color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.25);font-weight:800}
-
-    /* Tabs */
-    .nav-underline .nav-link{color:#555;font-weight:800}
-    .nav-underline .nav-link.active{color:#111;border-color:#111}
-
-    /* بيانات page */
+    /* Forms */
     .card-paper{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
     .seg{display:inline-grid;grid-auto-flow:column;gap:8px;background:#F6F6F6;padding:6px;border-radius:999px;border:1px solid var(--rule)}
     .seg button{background:#fff;border:1px solid var(--rule);border-radius:999px;padding:11px 16px;min-height:46px;font-weight:900;transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease)}
@@ -104,27 +93,11 @@
     .inp-wrap .ico{position:absolute;inset-inline-start:12px;inset-block-start:50%;transform:translateY(-50%);color:#6b7280;pointer-events:none}
     .pad-icon{padding-inline-start:42px}
     .form-control,.form-select{min-height:56px}
-    .help-row{display:flex;gap:8px;align-items:center}
 
-    /* intlTelInput RTL tidy */
-    .iti{width:100%}
-    html[dir="rtl"] .iti--allow-dropdown .iti__flag-container{left:12px;right:auto}
-    html[dir="rtl"] #custPhone.form-control{padding-inline-start:76px}
-    .iti__country-list{z-index:10000 !important;max-height:320px !important;overflow:auto !important;border-radius:10px;box-shadow:0 18px 38px rgba(0,0,0,.18)}
-    .iti__search-results{display:none}
-
-    /* Buttons: loading state */
-    .btn[disabled], .btn.disabled{pointer-events:none;opacity:.6}
-    .btn.is-loading{position:relative}
-    .btn.is-loading::after{
-      content:""; position:absolute; inset-inline-end:12px; inset-block:50%;
-      width:16px;height:16px; border-radius:50%; border:2px solid currentColor; border-inline-start-color:transparent;
-      transform:translateY(-50%); animation:spin .7s linear infinite;
-    }
-    @keyframes spin{ to{ transform:translateY(-50%) rotate(360deg) } }
-
+    /* Toast + helpers */
+    #toasts{position:fixed;inset-block-start:14px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px}
+    .toast-msg{background:#111;color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.25);font-weight:800}
     .spacer{height:18vh}
-    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
   </style>
 </head>
 <body>
@@ -138,30 +111,30 @@
         <img src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=120&auto=format&fit=crop" alt="" width="44" height="44" style="border-radius:12px;object-fit:cover" loading="lazy">
         <div>
           <div class="brand">Maison Hikari</div>
-          <small class="text-secondary">القائمة اليابانية</small>
+          <small class="text-secondary">الياباني المعاصر</small>
         </div>
       </div>
 
-      <button id="openCart" class="cart-btn px-3" aria-label="فتح السلة" aria-haspopup="dialog" aria-controls="drawer" aria-expanded="false">
+      <button id="openCart" class="cart-btn px-3" aria-label="السلة (الخطوة 2)">
         <i class="fa-solid fa-bag-shopping"></i>
         <span id="badge" class="cart-badge" aria-live="polite">0</span>
       </button>
     </div>
 
-    <div class="container">
-      <ul class="nav nav-underline">
-        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-menu">القائمة</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-data">البيانات</a></li>
-      </ul>
+    <!-- Stepper -->
+    <div class="container stepper" aria-label="خطوات الطلب">
+      <div class="step" data-step="menu"><span class="dot">1</span> القائمة <span class="sep"></span></div>
+      <div class="step" data-step="cart"><span class="dot">2</span> السلة <span class="sep"></span></div>
+      <div class="step" data-step="data"><span class="dot">3</span> البيانات <span class="sep"></span></div>
+      <div class="step" data-step="thanks"><span class="dot">4</span> تمّ</div>
     </div>
   </header>
 
   <main>
     <div class="tab-content flex-1">
 
-      <!-- MENU -->
+      <!-- 1) MENU -->
       <section id="tab-menu" class="tab-pane fade show active">
-        <!-- Sticky chips + search -->
         <div class="chips-wrap">
           <div class="container">
             <div class="row g-2 align-items-center">
@@ -200,15 +173,34 @@
                 <span class="text-white-50">•</span>
                 <strong id="miniTotal" aria-live="polite" aria-atomic="true">0.00 ر.س</strong>
               </div>
-              <small class="text-white-50">يُضاف الضريبة ورسوم التوصيل (إن وجدت) أثناء الدفع</small>
+              <small class="text-white-50">الضريبة ورسوم التوصيل تُضاف لاحقاً</small>
             </div>
-            <button id="miniCartBtn" class="btn btn-outline-light mini-btn" aria-label="عرض السلة"><i class="fa-solid fa-bag-shopping"></i> عرض السلة</button>
-            <a href="#tab-data" data-bs-toggle="tab" id="nextBtn" class="btn btn-light mini-btn text-dark disabled" aria-disabled="true" aria-label="التالي معطل، أضف عناصر أولاً">التالي</a>
+            <button id="goCartBtn" class="btn btn-light mini-btn text-dark disabled" aria-disabled="true">الانتقال للسلة</button>
           </div>
         </div>
       </section>
 
-      <!-- DATA -->
+      <!-- 2) CART -->
+      <section id="tab-cart" class="tab-pane fade">
+        <div class="container py-3">
+          <div class="cart-card p-3 p-md-4">
+            <h5 class="mb-3"><i class="fa-solid fa-bag-shopping"></i> السلة</h5>
+            <div id="cartList" class="mb-3"></div>
+
+            <div class="d-flex justify-content-between border-top pt-3">
+              <span>الإجمالي</span>
+              <strong id="cartTotal">0.00 ر.س</strong>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+              <a data-bs-toggle="tab" href="#tab-menu" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للقائمة</a>
+              <a id="toDataBtn" data-bs-toggle="tab" href="#tab-data" class="btn btn-dark flex-fill py-3 fw-bold disabled" aria-disabled="true">متابعة</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3) CUSTOMER INFO -->
       <section id="tab-data" class="tab-pane fade">
         <div class="container py-4">
           <div class="d-flex align-items-center gap-2 mb-3">
@@ -243,7 +235,7 @@
                   <input id="address" class="form-control pad-icon" placeholder="الحي، الشارع، علامة مميزة" autocomplete="street-address"/>
                 </div>
                 <div id="err-address" class="text-danger small d-none mt-2">أدخل العنوان للتوصيل</div>
-                <div class="help-row mt-2 text-secondary small">
+                <div class="mt-2 text-secondary small">
                   <i class="fa-regular fa-clock"></i>
                   <span id="typeHint">التوصيل عادة 30–45 دقيقة حسب الموقع.</span>
                 </div>
@@ -261,7 +253,7 @@
           </div>
 
           <div class="d-flex gap-2 mt-3">
-            <a href="#tab-menu" data-bs-toggle="tab" class="btn btn-outline-dark flex-fill py-3 fw-bold">السلة</a>
+            <a href="#tab-cart" data-bs-toggle="tab" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للسلة</a>
             <button id="confirmBtn" class="btn btn-dark flex-fill py-3 fw-bold" aria-label="تأكيد الطلب">تأكيد الطلب</button>
           </div>
 
@@ -273,30 +265,27 @@
         <div class="spacer"></div>
       </section>
 
+      <!-- 4) THANK YOU -->
+      <section id="tab-thanks" class="tab-pane fade">
+        <div class="container py-5">
+          <div class="card-paper p-4 text-center">
+            <div class="display-6 mb-2">🎉 شكراً لطلبك</div>
+            <p class="text-secondary mb-3">تم استلام طلبك بنجاح</p>
+            <div class="d-inline-block text-start bg-light p-3 rounded-3" style="min-width:260px">
+              <div><strong>رقم الطلب:</strong> <span id="thOrderId">—</span></div>
+              <div><strong>الإجمالي:</strong> <span id="thTotal">—</span></div>
+              <div class="small text-secondary mt-1" id="thType">—</div>
+            </div>
+            <div class="mt-4 d-flex gap-2 justify-content-center">
+              <a href="#tab-menu" data-bs-toggle="tab" id="thBackMenu" class="btn btn-dark">طلب جديد</a>
+              <a href="#tab-cart" data-bs-toggle="tab" class="btn btn-outline-dark">عرض السلة</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
-
-  <!-- Drawer Cart -->
-  <aside id="drawer" class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true" tabindex="-1">
-    <div role="document" class="h-100">
-      <div class="drawer-header">
-        <strong id="drawerTitle">سلة الطلب</strong>
-        <button id="closeCart" class="btn btn-sm btn-outline-dark" aria-label="إغلاق السلة"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div id="cartList" class="drawer-body" tabindex="0"></div>
-      <div class="drawer-footer">
-        <div class="d-flex justify-content-between">
-          <span>الإجمالي</span>
-          <strong id="cartTotal">0.00 ر.س</strong>
-        </div>
-        <a href="#tab-data" data-bs-toggle="tab" class="btn btn-dark w-100 mt-2 py-3 fw-bold" id="goCheckout" aria-label="إتمام الطلب">إتمام الدفع</a>
-        <div class="mt-2 small text-secondary">يُضاف الضريبة ورسوم التوصيل (إن وجدت)</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- Scrim (backdrop) -->
-  <div id="scrim" hidden></div>
 
   <!-- Templates -->
   <template id="dishTpl">
@@ -341,15 +330,28 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
-  // ===== Configure your GAS Web App URL (exec) =====
-  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbz_6rBZaGO39fVlLyISxSAhSOca9YTKeZpk4KsYuamAF4hHocaK9f7Gihc9YV3VH3ZAtg/exec';
+  // ===== GAS Web App URL (exec) =====
+  const GAS_WEBAPP_URL = 'PUT_YOUR_GAS_EXEC_URL_HERE';
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
-    const state = { q:'', cat:'all', cart:{}, menu:[] };
+    const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* ---------- DOM refs ---------- */
+    /* ---------- Stepper ---------- */
+    const steps = ['menu','cart','data','thanks'];
+    function setStep(active){
+      const els = document.querySelectorAll('.stepper .step');
+      els.forEach((el,idx)=>{
+        const id = el.getAttribute('data-step');
+        el.classList.remove('active','done');
+        if(id === active) el.classList.add('active');
+        const activeIdx = steps.indexOf(active);
+        if(idx < activeIdx) el.classList.add('done');
+      });
+    }
+
+    /* ---------- DOM ---------- */
     const grid = document.getElementById('grid');
     const dishTpl = document.getElementById('dishTpl');
     const chips = document.getElementById('chips');
@@ -360,17 +362,13 @@
     const badge = document.getElementById('badge');
     const miniCount = document.getElementById('miniCount');
     const miniTotal = document.getElementById('miniTotal');
-    const nextBtn = document.getElementById('nextBtn');
+    const goCartBtn = document.getElementById('goCartBtn');
 
-    const drawer = document.getElementById('drawer');
     const cartList = document.getElementById('cartList');
     const cartLineTpl = document.getElementById('cartLineTpl');
     const cartTotal = document.getElementById('cartTotal');
+    const toDataBtn = document.getElementById('toDataBtn');
     const openCartBtn = document.getElementById('openCart');
-    const miniCartBtn = document.getElementById('miniCartBtn');
-    const closeCartBtn = document.getElementById('closeCart');
-    const goCheckout = document.getElementById('goCheckout');
-    const scrim = document.getElementById('scrim');
 
     const nameEl   = document.getElementById('custName');
     const phoneEl  = document.getElementById('custPhone');
@@ -381,6 +379,11 @@
     const segDel   = document.getElementById('segDelivery');
     const typeHint = document.getElementById('typeHint');
     const confirmBtn = document.getElementById('confirmBtn');
+
+    const thOrderId = document.getElementById('thOrderId');
+    const thTotal   = document.getElementById('thTotal');
+    const thType    = document.getElementById('thType');
+    const thBackMenu= document.getElementById('thBackMenu');
 
     /* ---------- Toast ---------- */
     function toast(msg, undoCb){
@@ -414,7 +417,6 @@
     function renderGrid(){
       grid.innerHTML='';
       const q = state.q.trim().toLowerCase();
-
       const list = state.menu.filter(d=>{
         const inCat = (state.cat==='all' || d.cat===state.cat);
         const inTxt = !q || [d.title,d.desc].join(' ').toLowerCase().includes(q);
@@ -456,9 +458,8 @@
 
         addBtn.addEventListener('click', ()=>{
           state.cart[d.id] = {id:d.id, title:d.title, price:Number(d.price||0), qty:(state.cart[d.id]?.qty||0)+1};
-          bump();
-          reflect();
-          toast(`تم إضافة ${d.title} ✅`, ()=>{ // undo
+          bump(); reflect();
+          toast(`تم إضافة ${d.title} ✅`, ()=>{
             state.cart[d.id].qty--; if(state.cart[d.id].qty<=0) delete state.cart[d.id];
             bump(); reflect();
           });
@@ -516,13 +517,20 @@
       miniTotal.textContent = fmt.format(t.total);
       cartTotal.textContent = fmt.format(t.total);
       renderCartList();
-      localStorage.setItem('hk_cart_v1', JSON.stringify(state.cart));
-      reflectNext();
+      localStorage.setItem('hk_cart_v2', JSON.stringify(state.cart));
+
+      // enable/disable navigation buttons
+      const has = t.count>0;
+      goCartBtn.classList.toggle('disabled', !has);
+      goCartBtn.setAttribute('aria-disabled', String(!has));
+      toDataBtn.classList.toggle('disabled', !has);
+      toDataBtn.setAttribute('aria-disabled', String(!has));
     }
-    const saved = localStorage.getItem('hk_cart_v1');
+    const saved = localStorage.getItem('hk_cart_v2');
     if(saved){ try{ state.cart = JSON.parse(saved)||{}; }catch{} }
 
     function renderCartList(){
+      if(!cartList) return; // not on cart tab yet
       cartList.innerHTML='';
       const {arr} = totals();
       if(arr.length===0){
@@ -530,7 +538,6 @@
         p.className='text-secondary text-center my-4';
         p.textContent='السلة فارغة';
         cartList.appendChild(p);
-        if(drawer.classList.contains('open')) setTimeout(closeDrawer, 300);
         return;
       }
       arr.forEach(it=>{
@@ -545,58 +552,22 @@
       });
     }
 
-    /* ---------- Drawer open/close + scrim + focus trap ---------- */
-    let lastFocus = null;
-    const focusablesSel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-
-    function lockBody(on){
-      document.body.classList.toggle('body-locked', on);
-      const main = document.querySelector('main');
-      if(on){ main && main.setAttribute('inert',''); main && main.setAttribute('aria-hidden','true'); }
-      else { if(main){ main.removeAttribute('inert'); main.setAttribute('aria-hidden','false'); } }
-    }
-
-    function openDrawer(){
-      lastFocus = document.activeElement;
-      drawer.classList.add('open');
-      drawer.setAttribute('aria-hidden','false');
-      openCartBtn.setAttribute('aria-expanded','true');
-      lockBody(true);
-      scrim.hidden = false;
-      requestAnimationFrame(()=> scrim.style.opacity = '1');
-      const f = drawer.querySelector(focusablesSel);
-      setTimeout(()=> (f?f:drawer).focus(), 20);
-    }
-    function closeDrawer(){
-      drawer.classList.remove('open');
-      drawer.setAttribute('aria-hidden','true');
-      openCartBtn.setAttribute('aria-expanded','false');
-      lockBody(false);
-      scrim.style.opacity = '0';
-      setTimeout(()=>{ scrim.hidden = true; }, 200);
-      if(lastFocus){ lastFocus.focus(); }
-    }
-    scrim.addEventListener('click', closeDrawer);
-    drawer.addEventListener('keydown', (e)=>{
-      if(e.key==='Escape'){ e.preventDefault(); closeDrawer(); }
-      if(e.key!=='Tab') return;
-      const focusables = Array.prototype.slice.call(drawer.querySelectorAll(focusablesSel)).filter(function(el){ return !el.disabled && el.offsetParent!==null; });
-      if(!focusables.length) return;
-      const first=focusables[0], last=focusables[focusables.length-1];
-      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
-      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    // Step navigation
+    openCartBtn.addEventListener('click', ()=>{
+      new bootstrap.Tab(document.querySelector('[href="#tab-cart"]')).show();
+      setStep('cart');
+      renderCartList();
     });
-
-    openCartBtn.addEventListener('click', openDrawer);
-    miniCartBtn.addEventListener('click', openDrawer);
-    closeCartBtn.addEventListener('click', closeDrawer);
-    document.addEventListener('click', (e)=>{
-      if(!drawer.classList.contains('open')) return;
-      const within = drawer.contains(e.target) || openCartBtn.contains(e.target) || miniCartBtn.contains(e.target);
-      if(!within) closeDrawer();
+    goCartBtn.addEventListener('click', ()=>{
+      if(goCartBtn.classList.contains('disabled')) return;
+      new bootstrap.Tab(document.querySelector('[href="#tab-cart"]')).show();
+      setStep('cart');
+      renderCartList();
     });
-
-    goCheckout.addEventListener('click', closeDrawer);
+    document.querySelector('[href="#tab-menu"]').addEventListener('shown.bs.tab', ()=> setStep('menu'));
+    document.querySelector('[href="#tab-cart"]').addEventListener('shown.bs.tab', ()=> setStep('cart'));
+    document.querySelector('[href="#tab-data"]').addEventListener('shown.bs.tab', ()=> setStep('data'));
+    document.querySelector('[href="#tab-thanks"]').addEventListener('shown.bs.tab', ()=> setStep('thanks'));
 
     /* ---------- Form & intl-tel-input ---------- */
     const iti = window.intlTelInput(phoneEl,{
@@ -638,7 +609,7 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* ---------- Submit to GAS (text/plain to avoid preflight) ---------- */
+    /* ---------- Submit to GAS (text/plain) ---------- */
     async function createOrder(payload) {
       if(!GAS_WEBAPP_URL) throw new Error('GAS_WEBAPP_URL not set');
       const res = await fetch(GAS_WEBAPP_URL + '?action=order.create', {
@@ -667,11 +638,17 @@
         };
         const res = await createOrder(payload);
         if (res && res.ok) {
-          toast('تم إرسال الطلب 🎉');
-          // Save user info for next time
+          state.lastOrder = { id: res.orderId, total: res.totals && res.totals.total, type: payload.type };
+          // Reset cart and save user info
           localStorage.setItem('hk_user_v1', JSON.stringify({ name: payload.name, phone: phoneEl.value, address: payload.address }));
-          // Reset cart
-          state.cart = {}; bump(); renderCartList();
+          state.cart = {}; bump();
+          // Fill thank you page
+          thOrderId.textContent = state.lastOrder.id || '—';
+          thTotal.textContent   = typeof state.lastOrder.total==='number' ? fmt.format(state.lastOrder.total) : '—';
+          thType.textContent    = state.lastOrder.type==='delivery' ? 'نوع الطلب: توصيل' : 'نوع الطلب: استلام';
+          // Go to Thank You
+          new bootstrap.Tab(document.querySelector('[href="#tab-thanks"]')).show();
+          setStep('thanks');
         } else {
           toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error('order.create error', res);
         }
@@ -687,14 +664,6 @@
     nameEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); phoneEl.focus(); }});
     phoneEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); (segDel.getAttribute('aria-pressed')==='true'?addrEl:notesEl).focus(); }});
 
-    /* ---------- Next button enable/disable ---------- */
-    function reflectNext(){
-      const has = totals().count>0;
-      nextBtn.classList.toggle('disabled', !has);
-      nextBtn.setAttribute('aria-disabled', String(!has));
-      nextBtn.setAttribute('aria-label', has ? 'التالي، السلة جاهزة' : 'التالي معطل، أضف عناصر أولاً');
-    }
-
     /* ---------- Prefill saved user info ---------- */
     try {
       const savedInfo = JSON.parse(localStorage.getItem('hk_user_v1') || '{}');
@@ -705,10 +674,16 @@
 
     /* ---------- Init ---------- */
     (async () => {
+      setStep('menu');
       state.menu = await fetchMenu();
       if (!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'), 600);
-      renderGrid(); bump(); reflectNext(); renderCartList();
+      renderGrid(); bump(); renderCartList();
     })();
+
+    // Allow the "رجوع للقائمة" after thank you to clear selections visually
+    thBackMenu.addEventListener('click', ()=>{
+      setStep('menu'); renderGrid(); bump(); renderCartList();
+    });
   });
   </script>
 </body>
