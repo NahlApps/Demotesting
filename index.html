@@ -69,9 +69,6 @@
     .tags{display:flex;flex-wrap:wrap;gap:6px}
     .tag{border:1px solid var(--rule);border-radius:999px;padding:4px 8px;font-size:.8rem;color:#555}
     .add-wrap{display:flex;align-items:center;gap:8px;margin-top:8px}
-    .qty{display:inline-grid;grid-auto-flow:column;gap:6px;align-items:center;border:1px solid var(--rule);border-radius:999px;padding:4px;min-height:44px}
-    .qty button{width:40px;height:40px;border:0;background:#f6f6f6;border-radius:999px;font-weight:900;margin:2px}
-    .qty .count{min-width:24px;text-align:center;font-weight:900}
     .add-btn{flex:1;min-height:46px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900}
 
     /* Cart & Forms */
@@ -200,8 +197,8 @@
             </div>
 
             <div class="d-flex gap-2 mt-3">
-              <a data-bs-toggle="tab" href="#tab-menu" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للقائمة</a>
-              <a id="toDataBtn" data-bs-toggle="tab" href="#tab-data" class="btn btn-dark flex-fill py-3 fw-bold disabled" aria-disabled="true">متابعة</a>
+              <a href="#tab-menu" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للقائمة</a>
+              <a id="toDataBtn" href="#tab-data" class="btn btn-dark flex-fill py-3 fw-bold disabled" aria-disabled="true">متابعة</a>
             </div>
           </div>
         </div>
@@ -260,7 +257,7 @@
           </div>
 
           <div class="d-flex gap-2 mt-3">
-            <a href="#tab-cart" data-bs-toggle="tab" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للسلة</a>
+            <a href="#tab-cart" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للسلة</a>
             <button id="confirmBtn" class="btn btn-dark flex-fill py-3 fw-bold" aria-label="تأكيد الطلب">تأكيد الطلب</button>
           </div>
 
@@ -284,8 +281,8 @@
               <div class="small text-secondary mt-1" id="thType">—</div>
             </div>
             <div class="mt-4 d-flex gap-2 justify-content-center">
-              <a href="#tab-menu" data-bs-toggle="tab" id="thBackMenu" class="btn btn-dark">طلب جديد</a>
-              <a href="#tab-cart" data-bs-toggle="tab" class="btn btn-outline-dark">عرض السلة</a>
+              <a href="#tab-menu" id="thBackMenu" class="btn btn-dark">طلب جديد</a>
+              <a href="#tab-cart" id="thBackCart" class="btn btn-outline-dark">عرض السلة</a>
             </div>
           </div>
         </div>
@@ -293,6 +290,40 @@
 
     </div>
   </main>
+
+  <!-- Option Modal (Additional Options) -->
+  <div class="modal fade" id="optModal" tabindex="-1" aria-labelledby="optTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title fw-bold" id="optTitle">خيارات إضافية</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        </div>
+        <div class="modal-body">
+          <div id="optSummary" class="mb-2 text-secondary small"></div>
+          <div id="optForm" class="vstack gap-3"></div>
+          <div class="d-flex align-items-center justify-content-between mt-3">
+            <div class="input-group" style="width:150px">
+              <button class="btn btn-outline-dark" id="optMinus" type="button" aria-label="إنقاص">−</button>
+              <input id="optQty" class="form-control text-center" type="number" min="1" step="1" value="1">
+              <button class="btn btn-dark" id="optPlus" type="button" aria-label="زيادة">+</button>
+            </div>
+            <div class="fw-bold">
+              <span>السعر:</span>
+              <span id="optPrice">0.00 ر.س</span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label fw-bold" for="optNotes">ملاحظات للطبق (اختياري)</label>
+            <input id="optNotes" class="form-control" maxlength="100" placeholder="بدون بصل، صوص أقل …">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="optAddBtn" class="btn btn-dark w-100 fw-bold" type="button">إضافة للسلة</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Templates -->
   <template id="dishTpl">
@@ -306,11 +337,6 @@
           <div class="tags"></div>
         </div>
         <div class="add-wrap">
-          <div class="qty" hidden>
-            <button class="minus" type="button" aria-label="إنقاص الكمية">−</button>
-            <div class="count px-1" aria-live="polite">1</div>
-            <button class="plus" type="button" aria-label="زيادة الكمية">+</button>
-          </div>
           <button class="add-btn" type="button" aria-label="أضف للسلة">أضف للسلة</button>
         </div>
       </div>
@@ -326,6 +352,7 @@
       </div>
       <div class="flex-grow-1 text-truncate text-end">
         <div class="fw-bold name"></div>
+        <div class="small text-secondary opt"></div>
         <div class="small text-secondary">× <span class="unit">0.00</span> ر.س</div>
       </div>
       <div class="text-nowrap fw-bold total">0.00 ر.س</div>
@@ -342,8 +369,35 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     /* ---------- State ---------- */
+    // Cart now stores lines by generated lineId (item + options hash)
     const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
+
+    // Client-side default options for known items (can be overriden by backend: item.options)
+    const OPTIONS_MAP = {
+      // Example schema per item id:
+      // type: radio | checkbox
+      // delta: price adjustment (SAR)
+      's1': {
+        groups: [
+          { type:'radio', key:'size', label:'الحجم', required:true,
+            items:[ {value:'regular', label:'عادي', delta:0}, {value:'large', label:'كبير', delta:12} ] },
+          { type:'radio', key:'spice', label:'حدة', required:false,
+            items:[ {value:'none', label:'بدون', delta:0}, {value:'normal', label:'عادي', delta:0}, {value:'hot', label:'حار', delta:0} ] },
+          { type:'checkbox', key:'extras', label:'إضافات', required:false,
+            items:[ {value:'wasabi', label:'واسابي', delta:2}, {value:'ginger', label:'زنجبيل', delta:1} ] }
+        ]
+      },
+      's2': {
+        groups: [
+          { type:'radio', key:'doneness', label:'درجة النضج', required:true,
+            items:[ {value:'m', label:'ميديم', delta:0}, {value:'mw', label:'ميديم ويل', delta:0} ] },
+          { type:'checkbox', key:'extras', label:'إضافات', required:false,
+            items:[ {value:'egg', label:'بيض أونسن', delta:6}, {value:'truffle', label:'ترفل', delta:18} ] }
+        ]
+      }
+      // Add more mappings as needed (m1, m2, d1, ...)
+    };
 
     /* ---------- Stepper ---------- */
     const steps = ['menu','cart','data','thanks'];
@@ -391,8 +445,9 @@
     const thTotal   = document.getElementById('thTotal');
     const thType    = document.getElementById('thType');
     const thBackMenu= document.getElementById('thBackMenu');
+    const thBackCart= document.getElementById('thBackCart');
 
-    /* ---------- Helpers ---------- */
+    /* ---------- Toast ---------- */
     function toast(msg, undoCb){
       const el = document.createElement('div');
       el.className='toast-msg';
@@ -406,6 +461,7 @@
       toasts.appendChild(el);
       setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(), 180); }, 2200);
     }
+
     function showTab(href){
       const a = document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`);
       if(!a) return;
@@ -424,6 +480,165 @@
         return [];
       }
     }
+
+    /* ---------- Options Modal Logic ---------- */
+    const optModalEl = document.getElementById('optModal');
+    const optModal = new bootstrap.Modal(optModalEl);
+    const optTitle = document.getElementById('optTitle');
+    const optSummary = document.getElementById('optSummary');
+    const optForm = document.getElementById('optForm');
+    const optPriceEl = document.getElementById('optPrice');
+    const optQtyEl = document.getElementById('optQty');
+    const optMinus = document.getElementById('optMinus');
+    const optPlus  = document.getElementById('optPlus');
+    const optNotes = document.getElementById('optNotes');
+    const optAddBtn= document.getElementById('optAddBtn');
+
+    let currentItem = null; // item object {id,title,price,...}
+    let currentBase = 0;
+
+    function buildOptionsUI(item){
+      optForm.innerHTML = '';
+      const schema = (item.options && item.options.groups) ? item.options : OPTIONS_MAP[item.id];
+      if (!schema || !schema.groups || !schema.groups.length) {
+        const p = document.createElement('div');
+        p.className = 'text-secondary small';
+        p.textContent = 'لا خيارات إضافية لهذا الطبق.';
+        optForm.appendChild(p);
+        return;
+      }
+      schema.groups.forEach(group=>{
+        const wrap = document.createElement('div');
+        const label = document.createElement('div');
+        label.className='fw-bold mb-1';
+        label.textContent = group.label || group.key;
+        wrap.appendChild(label);
+
+        if(group.type === 'radio'){
+          (group.items||[]).forEach((it, idx)=>{
+            const id = `opt-${group.key}-${idx}`;
+            const div = document.createElement('div');
+            div.className='form-check';
+            div.innerHTML = `
+              <input class="form-check-input" type="radio" name="${group.key}" id="${id}" value="${it.value}" ${idx===0?'checked':''}>
+              <label class="form-check-label" for="${id}">${it.label}${it.delta?` (+${it.delta} ر.س)`:''}</label>
+            `;
+            wrap.appendChild(div);
+          });
+        } else if(group.type === 'checkbox'){
+          (group.items||[]).forEach((it, idx)=>{
+            const id = `opt-${group.key}-${idx}`;
+            const div = document.createElement('div');
+            div.className='form-check';
+            div.innerHTML = `
+              <input class="form-check-input" type="checkbox" name="${group.key}" id="${id}" value="${it.value}">
+              <label class="form-check-label" for="${id}">${it.label}${it.delta?` (+${it.delta} ر.س)`:''}</label>
+            `;
+            wrap.appendChild(div);
+          });
+        }
+        optForm.appendChild(wrap);
+      });
+    }
+
+    function selectedOptionsAndDelta(item){
+      const schema = (item.options && item.options.groups) ? item.options : OPTIONS_MAP[item.id];
+      let delta = 0;
+      const summary = [];
+      const result = {};
+
+      if (schema && schema.groups) {
+        schema.groups.forEach(group=>{
+          if (group.type === 'radio') {
+            const chosen = optForm.querySelector(`input[name="${group.key}"]:checked`);
+            if (chosen) {
+              const val = chosen.value;
+              result[group.key] = val;
+              const meta = (group.items||[]).find(x=>x.value===val);
+              if (meta) {
+                delta += Number(meta.delta||0);
+                summary.push(`${group.label||group.key}: ${meta.label}`);
+              }
+            } else if (group.required) {
+              // enforce first as default
+              const f = optForm.querySelector(`input[name="${group.key}"]`);
+              if (f) f.checked = true;
+            }
+          } else if (group.type === 'checkbox') {
+            const list = [...optForm.querySelectorAll(`input[name="${group.key}"]:checked`)];
+            result[group.key] = list.map(x=>x.value);
+            list.forEach(ch=>{
+              const meta = (group.items||[]).find(x=>x.value===ch.value);
+              if (meta) delta += Number(meta.delta||0);
+            });
+            if (result[group.key] && result[group.key].length) {
+              const labels = result[group.key].map(v=>{
+                const m=(group.items||[]).find(x=>x.value===v); return m?m.label:v;
+              }).join('، ');
+              summary.push(`${group.label||group.key}: ${labels}`);
+            }
+          }
+        });
+      }
+      return { delta, summary, result };
+    }
+
+    function updateOptPrice(){
+      if(!currentItem) return;
+      const { delta } = selectedOptionsAndDelta(currentItem);
+      const unit = currentBase + delta;
+      const qty = Math.max(1, Number(optQtyEl.value||1));
+      optPriceEl.textContent = fmt.format(unit * qty);
+    }
+
+    optMinus.addEventListener('click', ()=>{ const n=Math.max(1, Number(optQtyEl.value||1)-1); optQtyEl.value=n; updateOptPrice(); });
+    optPlus.addEventListener('click',  ()=>{ const n=Math.max(1, Number(optQtyEl.value||1)+1); optQtyEl.value=n; updateOptPrice(); });
+    optForm.addEventListener('change', updateOptPrice);
+    optQtyEl.addEventListener('input', updateOptPrice);
+
+    function openOptions(item){
+      currentItem = item;
+      currentBase = Number(item.price||0);
+      optTitle.textContent = `خيارات ${item.title}`;
+      optSummary.textContent = item.desc || '';
+      optQtyEl.value = 1;
+      optNotes.value = '';
+      buildOptionsUI(item);
+      updateOptPrice();
+      optModal.show();
+    }
+
+    optAddBtn.addEventListener('click', ()=>{
+      if(!currentItem) return;
+      const { delta, summary, result } = selectedOptionsAndDelta(currentItem);
+      const unit = currentBase + delta;
+      const qty = Math.max(1, Number(optQtyEl.value||1));
+      const notes = (optNotes.value||'').trim();
+
+      // Line key = item + options + note (notes optional in key)
+      const lineKey = JSON.stringify({ id: currentItem.id, opt: result, notes });
+      const lineId = 'l_' + btoa(unescape(encodeURIComponent(lineKey))).replace(/=/g,'');
+      const exists = state.cart[lineId];
+
+      if (exists) {
+        exists.qty += qty;
+      } else {
+        state.cart[lineId] = {
+          lineId,
+          id: currentItem.id,
+          title: currentItem.title,
+          basePrice: currentBase,
+          unitPrice: unit,
+          qty: qty,
+          options: result,
+          optionsText: summary.join(' • '),
+          notes: notes
+        };
+      }
+      bump(); renderCartList();
+      toast(`أُضيف ${currentItem.title} ✅`);
+      optModal.hide();
+    });
 
     /* ---------- Render menu ---------- */
     function renderGrid(){
@@ -457,36 +672,13 @@
         (Array.isArray(d.tags)?d.tags:[]).forEach(t=>{ const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagsWrap.appendChild(span); });
 
         const addBtn = node.querySelector('.add-btn');
-        const qtyWrap = node.querySelector('.qty');
-        const minus = qtyWrap.querySelector('.minus');
-        const plus  = qtyWrap.querySelector('.plus');
-        const count = qtyWrap.querySelector('.count');
-
-        function reflect(){
-          const line = state.cart[d.id];
-          if(line && line.qty>0){ addBtn.hidden=true; qtyWrap.hidden=false; count.textContent=line.qty; }
-          else{ addBtn.hidden=false; qtyWrap.hidden=true; }
-        }
-
         addBtn.addEventListener('click', ()=>{
-          state.cart[d.id] = {id:d.id, title:d.title, price:Number(d.price||0), qty:(state.cart[d.id]?.qty||0)+1};
-          bump(); reflect();
-          toast(`تم إضافة ${d.title} ✅`, ()=>{
-            state.cart[d.id].qty--; if(state.cart[d.id].qty<=0) delete state.cart[d.id];
-            bump(); reflect();
-          });
-        });
-        minus.addEventListener('click', ()=>{
-          if(!state.cart[d.id]) return;
-          state.cart[d.id].qty--; if(state.cart[d.id].qty<=0) delete state.cart[d.id];
-          bump(); reflect();
-        });
-        plus.addEventListener('click', ()=>{
-          state.cart[d.id]=(state.cart[d.id]||{id:d.id, title:d.title, price:Number(d.price||0), qty:0}); state.cart[d.id].qty++;
-          bump(); reflect();
+          // Use backend-provided options if present; else OPTIONS_MAP
+          const item = { ...d };
+          if (!item.options && OPTIONS_MAP[item.id]) item.options = OPTIONS_MAP[item.id];
+          openOptions(item);
         });
 
-        reflect();
         grid.appendChild(node);
       });
 
@@ -517,8 +709,8 @@
     function totals(){
       const arr = cartArr();
       return {
-        count: arr.reduce((a,b)=>a+b.qty,0),
-        total: arr.reduce((a,b)=>a+b.qty*b.price,0),
+        count: arr.reduce((a,b)=>a + b.qty, 0),
+        total: arr.reduce((a,b)=>a + b.qty * b.unitPrice, 0),
         arr
       };
     }
@@ -529,7 +721,7 @@
       miniTotal.textContent = fmt.format(t.total);
       cartTotal.textContent = fmt.format(t.total);
       renderCartList();
-      localStorage.setItem('hk_cart_v2', JSON.stringify(state.cart));
+      localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
 
       const has = t.count>0;
       goCartBtn.classList.toggle('disabled', !has);
@@ -537,7 +729,7 @@
       toDataBtn.classList.toggle('disabled', !has);
       toDataBtn.setAttribute('aria-disabled', String(!has));
     }
-    const saved = localStorage.getItem('hk_cart_v2');
+    const saved = localStorage.getItem('hk_cart_v3');
     if(saved){ try{ state.cart = JSON.parse(saved)||{}; }catch{} }
 
     function renderCartList(){
@@ -554,11 +746,21 @@
       arr.forEach(it=>{
         const row = cartLineTpl.content.firstElementChild.cloneNode(true);
         row.querySelector('.name').textContent = it.title;
-        row.querySelector('.unit').textContent = Number(it.price||0).toFixed(2);
+        row.querySelector('.opt').textContent = [it.optionsText, it.notes].filter(Boolean).join(' • ');
+        row.querySelector('.unit').textContent = Number(it.unitPrice||0).toFixed(2);
         row.querySelector('.qty').textContent  = it.qty;
-        row.querySelector('.total').textContent= fmt.format(it.qty*it.price);
-        row.querySelector('.minus').addEventListener('click', ()=>{ state.cart[it.id].qty--; if(state.cart[it.id].qty<=0) delete state.cart[it.id]; bump(); });
-        row.querySelector('.plus').addEventListener('click',  ()=>{ state.cart[it.id].qty++; bump(); });
+        row.querySelector('.total').textContent= fmt.format(it.qty*it.unitPrice);
+        row.querySelector('.minus').addEventListener('click', ()=>{
+          if(!state.cart[it.lineId]) return;
+          state.cart[it.lineId].qty--;
+          if(state.cart[it.lineId].qty<=0) delete state.cart[it.lineId];
+          bump();
+        });
+        row.querySelector('.plus').addEventListener('click',  ()=>{
+          if(!state.cart[it.lineId]) return;
+          state.cart[it.lineId].qty++;
+          bump();
+        });
         cartList.appendChild(row);
       });
     }
@@ -573,9 +775,12 @@
       if (href === '#tab-thanks') setStep('thanks');
     });
 
-    // Buttons to switch steps
+    // Buttons to switch steps (no data-bs-toggle here)
     openCartBtn.addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
-    goCartBtn.addEventListener('click', ()=>{ if(!goCartBtn.classList.contains('disabled')){ showTab('#tab-cart'); renderCartList(); } });
+    goCartBtn.addEventListener('click', (e)=>{ if(!goCartBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-cart'); renderCartList(); }});
+    toDataBtn.addEventListener('click', (e)=>{ if(!toDataBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-data'); }});
+    document.querySelectorAll('a[href="#tab-menu"]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); showTab('#tab-menu'); }));
+    document.querySelectorAll('a[href="#tab-cart"]').forEach(a=>a.addEventListener('click', e=>{ e.preventDefault(); showTab('#tab-cart'); }));
 
     /* ---------- Form & intl-tel-input ---------- */
     const iti = window.intlTelInput(phoneEl,{
@@ -642,19 +847,19 @@
           phone: phoneNumber,
           address: addrEl.value.trim(),
           notes: notesEl.value.trim(),
-          items: cartArr().map(x=>({id:x.id, title:x.title, qty:x.qty, price:x.price}))
+          items: cartArr().map(x=>({
+            id:x.id, title:x.title, qty:x.qty, price:x.unitPrice,
+            options:x.options, optionsText:x.optionsText, lineNotes:x.notes
+          }))
         };
         const res = await createOrder(payload);
         if (res && res.ok) {
           state.lastOrder = { id: res.orderId, total: res.totals && res.totals.total, type: payload.type };
-          // Save user info & reset cart
           localStorage.setItem('hk_user_v1', JSON.stringify({ name: payload.name, phone: phoneEl.value, address: payload.address }));
           state.cart = {}; bump();
-          // Fill thank you
           thOrderId.textContent = state.lastOrder.id || '—';
           thTotal.textContent   = typeof state.lastOrder.total==='number' ? fmt.format(state.lastOrder.total) : '—';
           thType.textContent    = state.lastOrder.type==='delivery' ? 'نوع الطلب: توصيل' : 'نوع الطلب: استلام';
-          // Go to Thank You
           showTab('#tab-thanks');
         } else {
           toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error('order.create error', res);
@@ -687,10 +892,9 @@
       renderGrid(); bump(); renderCartList();
     })();
 
-    // Thank-you → back to menu
-    thBackMenu.addEventListener('click', ()=>{
-      setStep('menu'); renderGrid(); bump(); renderCartList();
-    });
+    // Thanks → back to menu/cart
+    thBackMenu.addEventListener('click', (e)=>{ e.preventDefault(); setStep('menu'); showTab('#tab-menu'); });
+    thBackCart.addEventListener('click', (e)=>{ e.preventDefault(); showTab('#tab-cart'); });
   });
   </script>
 </body>
