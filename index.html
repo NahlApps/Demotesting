@@ -52,8 +52,6 @@
     .chips-wrap{position:sticky;top:64px;z-index:60;background:#fff;border-bottom:1px solid var(--rule);padding:10px 0}
     .chip{background:var(--chip);color:var(--chip-ink);border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:all .18s var(--ease)}
     .chip.active{background:#111;color:#fff;border-color:#111}
-    .chip.sm{min-height:auto;padding:6px 10px;font-weight:800;font-size:.84rem}
-    .chip.ghost{background:#fff;border-style:dashed}
     .pill-clear{background:#fff;border:1px dashed #bbb}
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
@@ -72,7 +70,6 @@
     .tag{border:1px solid var(--rule);border-radius:999px;padding:4px 8px;font-size:.8rem;color:#555}
     .add-wrap{margin-top:8px}
     .add-btn{width:100%;min-height:46px;border-radius:999px;border:1px solid #111;background:#111;color:#fff;font-weight:900}
-    .opt-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 
     /* Cards & forms */
     .cart-card,.card-paper{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -286,7 +283,7 @@
     </div>
   </main>
 
-  <!-- Options Modal -->
+  <!-- Options Modal (the only place options are shown) -->
   <div class="modal fade" id="optModal" tabindex="-1" aria-labelledby="optTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -331,8 +328,6 @@
           <div class="price"></div>
           <div class="tags"></div>
         </div>
-        <!-- Option chips -->
-        <div class="opt-chips"></div>
         <div class="add-wrap">
           <button class="add-btn" type="button" aria-label="أضف للسلة">أضف للسلة</button>
         </div>
@@ -340,7 +335,6 @@
     </div>
   </template>
 
-  <!-- CHANGED: removed .opt (options text) from the cart line template -->
   <template id="cartLineTpl">
     <div class="line">
       <div class="d-flex align-items-center gap-2">
@@ -350,7 +344,7 @@
       </div>
       <div class="flex-grow-1 text-truncate text-end">
         <div class="fw-bold name"></div>
-        <!-- options are intentionally NOT shown in the cart -->
+        <!-- options intentionally NOT shown in cart -->
         <div class="small text-secondary">× <span class="unit">0.00</span> ر.س</div>
       </div>
       <div class="text-nowrap fw-bold total">0.00 ر.س</div>
@@ -362,169 +356,98 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
-  // ====== CONFIG: replace with your deployed Web App URL ======
   const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbz8swweHD2J-Mf_JrWADPSwjZW3IeA3hcaiT-dPFLm4gdg1mDKSJ63B-v-uVUaQzEYW2A/exec';
-  // ===========================================================
 
   window.addEventListener('DOMContentLoaded', () => {
-    /* ---------- State ---------- */
     const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* ---------- Utilities ---------- */
-    function stableId(str){
-      let h = 0;
-      for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str.charCodeAt(i); h |= 0; }
-      return 'l_' + Math.abs(h).toString(36);
-    }
+    function stableId(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36); }
     function imgFallback(el){
-      el.src = 'data:image/svg+xml;utf8,'+encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="16">لا صورة</text></svg>`
-      );
+      el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="16">لا صورة</text></svg>`);
     }
 
-    /* ---------- Stepper ---------- */
-    const steps = ['menu','cart','data','thanks'];
+    const steps=['menu','cart','data','thanks'];
     function setStep(active){
-      const els = document.querySelectorAll('.stepper .step');
-      els.forEach((el,idx)=>{
-        const id = (el.getAttribute('href')||'').replace('#tab-','');
-        el.classList.remove('active','done');
-        if(id === active) el.classList.add('active');
-        const activeIdx = steps.indexOf(active);
-        if(idx < activeIdx) el.classList.add('done');
+      document.querySelectorAll('.stepper .step').forEach((el,idx)=>{
+        const id=(el.getAttribute('href')||'').replace('#tab-','');
+        el.classList.remove('active','done'); if(id===active) el.classList.add('active');
+        const activeIdx=steps.indexOf(active); if(idx<activeIdx) el.classList.add('done');
       });
     }
-    function showTab(href){
-      const a = document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`);
-      if(!a) return;
-      bootstrap.Tab.getOrCreateInstance(a).show();
-    }
-    document.addEventListener('shown.bs.tab', (e) => {
-      const href = e.target && e.target.getAttribute('href');
-      if (!href) return;
-      if (href === '#tab-menu')   setStep('menu');
-      if (href === '#tab-cart')   setStep('cart');
-      if (href === '#tab-data')   setStep('data');
-      if (href === '#tab-thanks') setStep('thanks');
+    function showTab(href){ const a=document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`); if(a) bootstrap.Tab.getOrCreateInstance(a).show(); }
+    document.addEventListener('shown.bs.tab', e=>{
+      const href=e.target && e.target.getAttribute('href'); if(!href) return;
+      if(href==='#tab-menu') setStep('menu');
+      if(href==='#tab-cart') setStep('cart');
+      if(href==='#tab-data') setStep('data');
+      if(href==='#tab-thanks') setStep('thanks');
     });
 
-    /* ---------- DOM refs ---------- */
-    const grid = document.getElementById('grid');
-    const dishTpl = document.getElementById('dishTpl');
-    const chipsTop = document.getElementById('chips');
-    const clearFilters = document.getElementById('clearFilters');
-    const search = document.getElementById('q');
-    const toasts = document.getElementById('toasts');
+    const grid=document.getElementById('grid');
+    const dishTpl=document.getElementById('dishTpl');
+    const chipsTop=document.getElementById('chips');
+    const clearFilters=document.getElementById('clearFilters');
+    const search=document.getElementById('q');
+    const badge=document.getElementById('badge');
+    const miniCount=document.getElementById('miniCount');
+    const miniTotal=document.getElementById('miniTotal');
+    const goCartBtn=document.getElementById('goCartBtn');
+    const openCartBtn=document.getElementById('openCart');
+    const cartList=document.getElementById('cartList');
+    const cartLineTpl=document.getElementById('cartLineTpl');
+    const cartTotal=document.getElementById('cartTotal');
+    const toDataBtn=document.getElementById('toDataBtn');
+    const nameEl=document.getElementById('custName');
+    const phoneEl=document.getElementById('custPhone');
+    const addrWrap=document.getElementById('addressWrap');
+    const addrEl=document.getElementById('address');
+    const notesEl=document.getElementById('notes');
+    const segPick=document.getElementById('segPickup');
+    const segDel=document.getElementById('segDelivery');
+    const typeHint=document.getElementById('typeHint');
+    const confirmBtn=document.getElementById('confirmBtn');
+    const thOrderId=document.getElementById('thOrderId');
+    const thTotal=document.getElementById('thTotal');
+    const thType=document.getElementById('thType');
 
-    const badge = document.getElementById('badge');
-    const miniCount = document.getElementById('miniCount');
-    const miniTotal = document.getElementById('miniTotal');
-    const goCartBtn = document.getElementById('goCartBtn');
-    const openCartBtn = document.getElementById('openCart');
+    function toast(msg){ const box=document.getElementById('toasts'); const el=document.createElement('div'); el.className='toast-msg'; el.textContent=msg; box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200); }
 
-    const cartList = document.getElementById('cartList');
-    const cartLineTpl = document.getElementById('cartLineTpl');
-    const cartTotal = document.getElementById('cartTotal');
-    const toDataBtn = document.getElementById('toDataBtn');
-
-    const nameEl   = document.getElementById('custName');
-    const phoneEl  = document.getElementById('custPhone');
-    const addrWrap = document.getElementById('addressWrap');
-    const addrEl   = document.getElementById('address');
-    const notesEl  = document.getElementById('notes');
-    const segPick  = document.getElementById('segPickup');
-    const segDel   = document.getElementById('segDelivery');
-    const typeHint = document.getElementById('typeHint');
-    const confirmBtn = document.getElementById('confirmBtn');
-
-    const thOrderId = document.getElementById('thOrderId');
-    const thTotal   = document.getElementById('thTotal');
-    const thType    = document.getElementById('thType');
-    const thBackMenu= document.getElementById('thBackMenu');
-    const thBackCart= document.getElementById('thBackCart');
-
-    /* ---------- Toast ---------- */
-    function toast(msg, undoCb){
-      const el = document.createElement('div');
-      el.className='toast-msg';
-      el.textContent = msg;
-      if(undoCb){
-        const u=document.createElement('button');
-        u.className='btn btn-sm btn-light ms-2'; u.textContent='رجوع';
-        u.onclick=()=>{ undoCb(); el.remove(); };
-        el.appendChild(u);
-      }
-      toasts.appendChild(el);
-      setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(), 180); }, 2200);
+    async function fetchMenu(){
+      if(!GAS_WEBAPP_URL) return [];
+      try{ const r=await fetch(GAS_WEBAPP_URL+'?action=menu.list'); const j=await r.json(); return j.ok?(j.data||[]):[]; }
+      catch(e){ console.error(e); return []; }
     }
 
-    /* ---------- Fetch menu ---------- */
-    async function fetchMenu() {
-      if(!GAS_WEBAPP_URL){ console.warn('GAS_WEBAPP_URL not set'); return []; }
-      try{
-        const res = await fetch(GAS_WEBAPP_URL + '?action=menu.list', { method:'GET' });
-        const json = await res.json();
-        return json.ok ? (json.data || []) : [];
-      }catch(e){
-        console.error('menu.list failed', e);
-        return [];
-      }
-    }
-
-    /* ---------- Options Modal ---------- */
-    const optModalEl = document.getElementById('optModal');
-    const optModal = new bootstrap.Modal(optModalEl);
-    const optTitle = document.getElementById('optTitle');
-    const optSummary = document.getElementById('optSummary');
-    const optForm = document.getElementById('optForm');
-    const optPriceEl = document.getElementById('optPrice');
-    const optQtyEl = document.getElementById('optQty');
-    const optMinus = document.getElementById('optMinus');
-    const optPlus  = document.getElementById('optPlus');
-    const optNotes = document.getElementById('optNotes');
-    const optAddBtn= document.getElementById('optAddBtn');
-
-    let currentItem = null;
-    let currentBase = 0;
+    // Modal
+    const optModal=new bootstrap.Modal(document.getElementById('optModal'));
+    const optForm=document.getElementById('optForm');
+    const optPriceEl=document.getElementById('optPrice');
+    const optQtyEl=document.getElementById('optQty');
+    let currentItem=null, currentBase=0;
 
     function buildOptionsUI(item){
-      optForm.innerHTML = '';
-      const schema = item.options; // from Options sheet or OptionsJson
-      if (!schema || !schema.groups || !schema.groups.length) {
-        const p = document.createElement('div');
-        p.className = 'text-secondary small';
-        p.textContent = 'لا خيارات إضافية لهذا الطبق.';
-        optForm.appendChild(p);
-        return;
+      optForm.innerHTML=''; const schema=item.options;
+      if(!schema || !schema.groups || !schema.groups.length){
+        const p=document.createElement('div'); p.className='text-secondary small'; p.textContent='لا خيارات إضافية لهذا الطبق.'; optForm.appendChild(p); return;
       }
       schema.groups.forEach(group=>{
-        const wrap = document.createElement('div');
-        const label = document.createElement('div');
-        label.className='fw-bold mb-1';
-        label.textContent = group.label || group.key;
-        wrap.appendChild(label);
-
-        if(group.type === 'radio'){
-          (group.items||[]).forEach((it, idx)=>{
-            const id = `opt-${group.key}-${idx}`;
-            const div = document.createElement('div');
-            div.className='form-check';
-            div.innerHTML = `
-              <input class="form-check-input" type="radio" name="${group.key}" id="${id}" value="${it.value}" ${idx===0?'checked':''}>
-              <label class="form-check-label" for="${id}">${it.label}${it.delta?` (+${it.delta} ر.س)`:''}</label>
-            `;
+        const wrap=document.createElement('div');
+        const label=document.createElement('div'); label.className='fw-bold mb-1'; label.textContent=group.label||group.key; wrap.appendChild(label);
+        if(group.type==='radio'){
+          (group.items||[]).forEach((it,idx)=>{
+            const id=`opt-${group.key}-${idx}`;
+            const div=document.createElement('div'); div.className='form-check';
+            div.innerHTML=`<input class="form-check-input" type="radio" name="${group.key}" id="${id}" value="${it.value}" ${idx===0?'checked':''}>
+              <label class="form-check-label" for="${id}">${it.label}${it.delta?` (+${it.delta} ر.س)`:''}</label>`;
             wrap.appendChild(div);
           });
-        } else if(group.type === 'checkbox'){
-          (group.items||[]).forEach((it, idx)=>{
-            const id = `opt-${group.key}-${idx}`;
-            const div = document.createElement('div');
-            div.className='form-check';
-            div.innerHTML = `
-              <input class="form-check-input" type="checkbox" name="${group.key}" id="${id}" value="${it.value}">
-              <label class="form-check-label" for="${id}">${it.label}${it.delta?` (+${it.delta} ر.س)`:''}</label>
-            `;
+        }else if(group.type==='checkbox'){
+          (group.items||[]).forEach((it,idx)=>{
+            const id=`opt-${group.key}-${idx}`;
+            const div=document.createElement('div'); div.className='form-check';
+            div.innerHTML=`<input class="form-check-input" type="checkbox" name="${group.key}" id="${id}" value="${it.value}">
+              <label class="form-check-label" for="${id}">${it.label}${it.delta?` (+${it.delta} ر.س)`:''}</label>`;
             wrap.appendChild(div);
           });
         }
@@ -533,34 +456,19 @@
     }
 
     function selectedOptionsAndDelta(item){
-      const schema = item.options;
-      let delta = 0;
-      const summary = [];
-      const result = {};
-      if (schema && schema.groups) {
+      const schema=item.options; let delta=0; const summary=[]; const result={};
+      if(schema && schema.groups){
         schema.groups.forEach(group=>{
-          if (group.type === 'radio') {
-            const chosen = optForm.querySelector(`input[name="${group.key}"]:checked`);
-            if (chosen) {
-              const val = chosen.value;
-              result[group.key] = val;
-              const meta = (group.items||[]).find(x=>x.value===val);
-              if (meta) {
-                delta += Number(meta.delta||0);
-                summary.push(`${group.label||group.key}: ${meta.label}`);
-              }
-            }
-          } else if (group.type === 'checkbox') {
-            const list = [...optForm.querySelectorAll(`input[name="${group.key}"]:checked`)];
-            result[group.key] = list.map(x=>x.value);
-            list.forEach(ch=>{
-              const meta = (group.items||[]).find(x=>x.value===ch.value);
-              if (meta) delta += Number(meta.delta||0);
-            });
-            if (result[group.key] && result[group.key].length) {
-              const labels = result[group.key].map(v=>{
-                const m=(group.items||[]).find(x=>x.value===v); return m?m.label:v;
-              }).join('، ');
+          if(group.type==='radio'){
+            const chosen=optForm.querySelector(`input[name="${group.key}"]:checked`);
+            if(chosen){ const val=chosen.value; result[group.key]=val;
+              const meta=(group.items||[]).find(x=>x.value===val); if(meta){ delta+=Number(meta.delta||0); summary.push(`${group.label||group.key}: ${meta.label}`); } }
+          } else if(group.type==='checkbox'){
+            const list=[...optForm.querySelectorAll(`input[name="${group.key}"]:checked`)];
+            result[group.key]=list.map(x=>x.value);
+            list.forEach(ch=>{ const meta=(group.items||[]).find(x=>x.value===ch.value); if(meta) delta+=Number(meta.delta||0); });
+            if(result[group.key].length){
+              const labels=result[group.key].map(v=>{ const m=(group.items||[]).find(x=>x.value===v); return m?m.label:v; }).join('، ');
               summary.push(`${group.label||group.key}: ${labels}`);
             }
           }
@@ -568,281 +476,116 @@
       }
       return { delta, summary, result };
     }
+    function updateOptPrice(){ if(!currentItem) return; const {delta}=selectedOptionsAndDelta(currentItem); const unit=currentBase+delta; const qty=Math.max(1,Number(optQtyEl.value||1)); optPriceEl.textContent=fmt.format(unit*qty); }
+    document.getElementById('optMinus').onclick=()=>{ optQtyEl.value=Math.max(1,Number(optQtyEl.value||1)-1); updateOptPrice(); };
+    document.getElementById('optPlus').onclick =()=>{ optQtyEl.value=Math.max(1,Number(optQtyEl.value||1)+1); updateOptPrice(); };
+    optForm.addEventListener('change', updateOptPrice); optQtyEl.addEventListener('input', updateOptPrice);
 
-    function updateOptPrice(){
+    function openOptions(item){
+      currentItem=item; currentBase=Number(item.price||0);
+      document.getElementById('optTitle').textContent=`خيارات ${item.title}`;
+      document.getElementById('optSummary').textContent=item.desc||'';
+      document.getElementById('optQty').value=1;
+      document.getElementById('optNotes').value='';
+      buildOptionsUI(item); updateOptPrice(); optModal.show();
+    }
+
+    document.getElementById('optAddBtn').onclick=()=>{
       if(!currentItem) return;
-      const { delta } = selectedOptionsAndDelta(currentItem);
-      const unit = currentBase + delta;
-      const qty = Math.max(1, Number(optQtyEl.value||1));
-      optPriceEl.textContent = fmt.format(unit * qty);
-    }
-
-    optMinus.addEventListener('click', ()=>{ const n=Math.max(1, Number(optQtyEl.value||1)-1); optQtyEl.value=n; updateOptPrice(); });
-    optPlus .addEventListener('click', ()=>{ const n=Math.max(1, Number(optQtyEl.value||1)+1); optQtyEl.value=n; updateOptPrice(); });
-    optForm.addEventListener('change', updateOptPrice);
-    optQtyEl.addEventListener('input', updateOptPrice);
-
-    function applyPreselect(preselect, schema){
-      if(!preselect || !schema) return;
-      (schema.groups||[]).forEach(group=>{
-        const val = preselect[group.key];
-        if(val===undefined) return;
-        if(group.type==='radio'){
-          const input = optForm.querySelector(`input[name="${group.key}"][value="${val}"]`);
-          if(input){ input.checked = true; }
-        }else if(group.type==='checkbox'){
-          const arr = Array.isArray(val)? val : [val];
-          arr.forEach(v=>{
-            const input = optForm.querySelector(`input[name="${group.key}"][value="${v}"]`);
-            if(input){ input.checked = true; }
-          });
-        }
-      });
-    }
-
-    function openOptions(item, preselect){
-      currentItem = item;
-      currentBase = Number(item.price||0);
-      document.getElementById('optTitle').textContent = `خيارات ${item.title}`;
-      document.getElementById('optSummary').textContent = item.desc || '';
-      document.getElementById('optQty').value = 1;
-      document.getElementById('optNotes').value = '';
-      buildOptionsUI(item);
-      if(preselect){ applyPreselect(preselect, item.options); }
-      updateOptPrice();
-      optModal.show();
-    }
-
-    document.getElementById('optAddBtn').addEventListener('click', ()=>{
-      if(!currentItem) return;
-      const { delta, summary, result } = selectedOptionsAndDelta(currentItem);
-      const unit = currentBase + delta;
-      const qty = Math.max(1, Number(optQtyEl.value||1));
-      const notes = (document.getElementById('optNotes').value||'').trim();
-      const lineKey = JSON.stringify({ id: currentItem.id, opt: result, notes });
-      const lineId = stableId(lineKey);
-      const exists = state.cart[lineId];
-
-      if (exists) {
-        exists.qty += qty;
-      } else {
-        state.cart[lineId] = {
-          lineId,
-          id: currentItem.id,
-          title: currentItem.title,
-          basePrice: currentBase,
-          unitPrice: unit,
-          qty: qty,
-          options: result,
-          optionsText: summary.join(' • '), // kept for backend logging; not shown in cart
-          notes: notes
-        };
+      const {delta, summary, result}=selectedOptionsAndDelta(currentItem);
+      const unit=currentBase+delta; const qty=Math.max(1,Number(optQtyEl.value||1));
+      const notes=(document.getElementById('optNotes').value||'').trim();
+      const lineKey=JSON.stringify({id:currentItem.id,opt:result,notes});
+      const lineId=stableId(lineKey); const exists=state.cart[lineId];
+      if(exists){ exists.qty+=qty; } else {
+        state.cart[lineId]={ lineId, id:currentItem.id, title:currentItem.title, basePrice:currentBase, unitPrice:unit, qty, options:result, optionsText:summary.join(' • '), notes };
       }
-      bump(); renderCartList();
-      toast(`أُضيف ${currentItem.title} ✅`);
-      optModal.hide();
-    });
+      bump(); renderCartList(); toast(`أُضيف ${currentItem.title} ✅`); optModal.hide();
+    };
 
-    /* ---------- Render grid ---------- */
+    // Grid
     function renderGrid(){
       grid.innerHTML='';
-      const q = state.q.trim().toLowerCase();
-      const list = state.menu.filter(d=>{
-        const inCat = (state.cat==='all' || (d.cat||'')===state.cat);
-        const inTxt = !q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
+      const q=state.q.trim().toLowerCase();
+      const list=state.menu.filter(d=>{
+        const inCat=(state.cat==='all'||(d.cat||'')===state.cat);
+        const inTxt=!q||[d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
         return inCat && inTxt;
       });
 
       if(list.length===0){
-        const empty = document.createElement('div');
-        empty.className='text-center text-secondary py-5';
-        empty.textContent='لا توجد أطباق مطابقة — جرّب تصنيف آخر أو كلمة مختلفة';
-        grid.appendChild(empty);
+        const empty=document.createElement('div'); empty.className='text-center text-secondary py-5';
+        empty.textContent='لا توجد أطباق مطابقة — جرّب تصنيف آخر أو كلمة مختلفة'; grid.appendChild(empty);
       }
 
       list.forEach(d=>{
-        const node = dishTpl.content.firstElementChild.cloneNode(true);
-        node.dataset.cat = d.cat || '';
-
-        // Image (with fallback)
-        const img = node.querySelector('.dish-img');
-        img.alt = d.title || '';
-        img.addEventListener('error', ()=>imgFallback(img));
-        if (d.img && /^https?:\/\//.test(d.img)) img.src = d.img; else imgFallback(img);
-
-        node.querySelector('.title').textContent = d.title || '—';
-        node.querySelector('.desc').textContent = d.desc || '';
-        node.querySelector('.price').textContent = fmt.format(Number(d.price||0));
-
-        // Tags
-        const tagsWrap = node.querySelector('.tags');
-        (Array.isArray(d.tags)?d.tags:[]).forEach(t=>{
-          const span=document.createElement('span');
-          span.className='tag'; span.textContent=t;
-          tagsWrap.appendChild(span);
-        });
-
-        // Option chips (from Options sheet/JSON)
-        const optWrap = node.querySelector('.opt-chips');
-        (function buildOptionChips(item){
-          const schema = item.options;
-          if(!schema || !schema.groups || !schema.groups.length) return;
-
-          const chips = [];
-          schema.groups.forEach(group=>{
-            const items = group.items || [];
-            items.forEach(it=>{
-              const btn = document.createElement('button');
-              btn.type='button';
-              btn.className='chip sm';
-              const delta = (it.delta && Number(it.delta) !== 0) ? ` (+${it.delta})` : '';
-              btn.textContent = (group.label ? `${group.label}: ` : '') + `${it.label}${delta}`;
-              btn.title = `اختر ${group.label || group.key} → ${it.label}`;
-              btn.addEventListener('click', ()=>{
-                const pre = {};
-                if(group.type==='radio'){ pre[group.key] = it.value; }
-                else if(group.type==='checkbox'){ pre[group.key] = [it.value]; }
-                openOptions({ ...item }, pre);
-              });
-              chips.push(btn);
-            });
-          });
-
-          const MAX = 6;
-          chips.slice(0,MAX).forEach(b=>optWrap.appendChild(b));
-          if(chips.length > MAX){
-            const more = document.createElement('button');
-            more.type='button';
-            more.className='chip sm ghost';
-            more.textContent = `+${chips.length - MAX}`;
-            more.addEventListener('click', ()=> openOptions({ ...item }) );
-            optWrap.appendChild(more);
-          }
-        })(d);
-
-        node.querySelector('.add-btn').addEventListener('click', ()=> openOptions({ ...d }) );
+        const node=dishTpl.content.firstElementChild.cloneNode(true);
+        const img=node.querySelector('.dish-img');
+        img.alt=d.title||''; img.addEventListener('error',()=>imgFallback(img));
+        if(d.img && /^https?:\/\//.test(d.img)) img.src=d.img; else imgFallback(img);
+        node.querySelector('.title').textContent=d.title||'—';
+        node.querySelector('.desc').textContent=d.desc||'';
+        node.querySelector('.price').textContent=fmt.format(Number(d.price||0));
+        const tagsWrap=node.querySelector('.tags');
+        (Array.isArray(d.tags)?d.tags:[]).forEach(t=>{ const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagsWrap.appendChild(span); });
+        node.querySelector('.add-btn').addEventListener('click', ()=> openOptions({...d}) );
         grid.appendChild(node);
       });
 
       clearFilters.classList.toggle('d-none', state.cat==='all' && !state.q.trim());
     }
 
-    /* ---------- Search & chips (top) ---------- */
+    // Top filters
     let searchTimer=null;
-    search.addEventListener('input', e=>{
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(()=>{ state.q=e.target.value; renderGrid(); }, 180);
-    });
-    clearFilters.addEventListener('click', ()=>{
-      state.q=''; search.value=''; state.cat='all';
-      document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-      document.querySelector('.chip[data-cat="all"]').classList.add('active');
-      renderGrid();
-    });
-    chipsTop.addEventListener('click', e=>{
-      const b = e.target.closest('.chip'); if(!b || b.id==='clearFilters') return;
-      document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      state.cat = b.dataset.cat; renderGrid();
-    });
+    search.addEventListener('input', e=>{ clearTimeout(searchTimer); searchTimer=setTimeout(()=>{ state.q=e.target.value; renderGrid(); },180); });
+    clearFilters.addEventListener('click', ()=>{ state.q=''; search.value=''; state.cat='all'; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); document.querySelector('.chip[data-cat="all"]').classList.add('active'); renderGrid(); });
+    chipsTop.addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(!b||b.id==='clearFilters') return; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.cat=b.dataset.cat; renderGrid(); });
 
-    /* ---------- Cart ---------- */
+    // Cart
     function cartArr(){ return Object.values(state.cart); }
-    function totals(){
-      const arr = cartArr();
-      return {
-        count: arr.reduce((a,b)=>a + b.qty, 0),
-        total: arr.reduce((a,b)=>a + b.qty * b.unitPrice, 0),
-        arr
-      };
-    }
+    function totals(){ const arr=cartArr(); return { count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr }; }
     function bump(){
-      const t = totals();
-      badge.textContent = t.count;
-      miniCount.textContent = `${t.count} عنصر`;
-      miniTotal.textContent = fmt.format(t.total);
-      cartTotal.textContent = fmt.format(t.total);
-      renderCartList();
-      localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
-
-      const has = t.count>0;
-      goCartBtn.classList.toggle('disabled', !has);
-      goCartBtn.setAttribute('aria-disabled', String(!has));
-      toDataBtn.classList.toggle('disabled', !has);
-      toDataBtn.setAttribute('aria-disabled', String(!has));
+      const t=totals();
+      badge.textContent=t.count; miniCount.textContent=`${t.count} عنصر`; miniTotal.textContent=fmt.format(t.total); cartTotal.textContent=fmt.format(t.total);
+      renderCartList(); localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
+      const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
     }
-    const saved = localStorage.getItem('hk_cart_v3');
-    if(saved){ try{ state.cart = JSON.parse(saved)||{}; }catch{} }
+    const saved=localStorage.getItem('hk_cart_v3'); if(saved){ try{ state.cart=JSON.parse(saved)||{}; }catch{} }
 
     function renderCartList(){
       cartList.innerHTML='';
-      const {arr} = totals();
-      if(arr.length===0){
-        const p=document.createElement('p');
-        p.className='text-secondary text-center my-4';
-        p.textContent='السلة فارغة';
-        cartList.appendChild(p);
-        return;
-      }
+      const {arr}=totals();
+      if(arr.length===0){ const p=document.createElement('p'); p.className='text-secondary text-center my-4'; p.textContent='السلة فارغة'; cartList.appendChild(p); return; }
       arr.forEach(it=>{
-        const row = cartLineTpl.content.firstElementChild.cloneNode(true);
-        row.querySelector('.name').textContent = it.title;
-        // CHANGED: options/notes are not rendered in cart anymore
-        row.querySelector('.unit').textContent = Number(it.unitPrice||0).toFixed(2);
-        row.querySelector('.qty').textContent  = it.qty;
-        row.querySelector('.total').textContent= fmt.format(it.qty*it.unitPrice);
-        row.querySelector('.minus').addEventListener('click', ()=>{
-          if(!state.cart[it.lineId]) return;
-          state.cart[it.lineId].qty--;
-          if(state.cart[it.lineId].qty<=0) delete state.cart[it.lineId];
-          bump();
-        });
-        row.querySelector('.plus').addEventListener('click',  ()=>{
-          if(!state.cart[it.lineId]) return;
-          state.cart[it.lineId].qty++;
-          bump();
-        });
+        const row=cartLineTpl.content.firstElementChild.cloneNode(true);
+        row.querySelector('.name').textContent=it.title;
+        row.querySelector('.unit').textContent=Number(it.unitPrice||0).toFixed(2);
+        row.querySelector('.qty').textContent=it.qty;
+        row.querySelector('.total').textContent=fmt.format(it.qty*it.unitPrice);
+        row.querySelector('.minus').addEventListener('click', ()=>{ if(!state.cart[it.lineId]) return; state.cart[it.lineId].qty--; if(state.cart[it.lineId].qty<=0) delete state.cart[it.lineId]; bump(); });
+        row.querySelector('.plus').addEventListener('click',  ()=>{ if(!state.cart[it.lineId]) return; state.cart[it.lineId].qty++; bump(); });
         cartList.appendChild(row);
       });
     }
 
-    // Step changes
     openCartBtn.addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
-    goCartBtn.addEventListener('click', (e)=>{ if(!goCartBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-cart'); renderCartList(); }});
-    toDataBtn.addEventListener('click', (e)=>{ if(!toDataBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-data'); }});
+    goCartBtn.addEventListener('click', e=>{ if(!goCartBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-cart'); renderCartList(); }});
 
-    /* ---------- Form & tel input ---------- */
-    const iti = window.intlTelInput(phoneEl,{
-      initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'],
-      utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js',
-      separateDialCode:true
-    });
-
-    function setType(delivery){
-      segPick.setAttribute('aria-pressed', String(!delivery));
-      segDel.setAttribute('aria-pressed', String(delivery));
-      addrWrap.style.display = delivery ? '' : 'none';
-      typeHint.textContent = delivery ? 'التوصيل عادة 30–45 دقيقة حسب الموقع.' : 'الاستلام من المطعم أسرع (10–15 دقيقة).';
-      if(delivery) setTimeout(()=>addrEl.focus(), 80);
-    }
-    segPick.addEventListener('click', ()=>setType(false));
-    segDel.addEventListener('click', ()=>setType(true));
-    setType(false);
-
-    notesEl.addEventListener('input', ()=>{ document.getElementById('notesCount').textContent = (notesEl.value||'').length; });
+    // Form & phone
+    const iti=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js', separateDialCode:true });
+    function setType(delivery){ segPick.setAttribute('aria-pressed',String(!delivery)); segDel.setAttribute('aria-pressed',String(delivery)); addrWrap.style.display=delivery?'':'none'; typeHint.textContent=delivery?'التوصيل عادة 30–45 دقيقة حسب الموقع.':'الاستلام من المطعم أسرع (10–15 دقيقة).'; if(delivery) setTimeout(()=>addrEl.focus(),80); }
+    segPick.onclick=()=>setType(false); segDel.onclick=()=>setType(true); setType(false);
+    notesEl.addEventListener('input', ()=>{ document.getElementById('notesCount').textContent=(notesEl.value||'').length; });
 
     function validate(){
-      const nameOk = (nameEl.value||'').trim().length>1;
-      let phoneOk = false;
-      try { phoneOk = iti.isValidNumber(); } catch (_e) { phoneOk = (phoneEl.value||'').trim().length>=8; }
-      const delivery = segDel.getAttribute('aria-pressed')==='true';
-      const addressOk = !delivery || (addrEl.value||'').trim().length>3;
-
-      document.getElementById('err-name').classList.toggle('d-none', nameOk);
-      document.getElementById('ok-phone').classList.toggle('d-none', !phoneOk);
-      document.getElementById('err-phone').classList.toggle('d-none', phoneOk);
-      document.getElementById('err-address').classList.toggle('d-none', addressOk);
-
+      const nameOk=(nameEl.value||'').trim().length>1;
+      let phoneOk=false; try{ phoneOk=iti.isValidNumber(); }catch(_){ phoneOk=(phoneEl.value||'').trim().length>=8; }
+      const delivery=segDel.getAttribute('aria-pressed')==='true';
+      const addressOk=!delivery || (addrEl.value||'').trim().length>3;
+      document.getElementById('err-name').classList.toggle('d-none',nameOk);
+      document.getElementById('ok-phone').classList.toggle('d-none',!phoneOk);
+      document.getElementById('err-phone').classList.toggle('d-none',phoneOk);
+      document.getElementById('err-address').classList.toggle('d-none',addressOk);
       return nameOk && phoneOk && addressOk;
     }
     ['input','blur'].forEach(ev=>{
@@ -851,79 +594,37 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* ---------- Submit to GAS ---------- */
-    async function createOrder(payload) {
-      if(!GAS_WEBAPP_URL) throw new Error('GAS_WEBAPP_URL not set');
-      const res = await fetch(GAS_WEBAPP_URL + '?action=order.create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, // avoid CORS preflight
-        body: JSON.stringify(payload)
-      });
-      return res.json();
+    async function createOrder(payload){
+      const r=await fetch(GAS_WEBAPP_URL+'?action=order.create',{ method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+      return r.json();
     }
 
-    const submitOrder = async () => {
-      const t = totals();
+    confirmBtn.onclick=async()=>{
+      const t=totals();
       if(t.count===0){ toast('السلة فارغة'); return; }
       if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); return; }
-      confirmBtn.disabled = true; confirmBtn.classList.add('disabled');
+      confirmBtn.disabled=true; confirmBtn.classList.add('disabled');
       try{
-        let phoneNumber = phoneEl.value.trim();
-        try { phoneNumber = iti.getNumber(); } catch (_e) {}
-        const payload = {
-          type: segDel.getAttribute('aria-pressed')==='true' ? 'delivery' : 'pickup',
-          name: nameEl.value.trim(),
-          phone: phoneNumber,
-          address: addrEl.value.trim(),
-          notes: notesEl.value.trim(),
-          items: cartArr().map(x=>({
-            lineId:x.lineId, id:x.id, title:x.title, qty:x.qty, price:x.unitPrice,
-            options:x.options, optionsText:x.optionsText, lineNotes:x.notes
-          }))
-        };
-        const res = await createOrder(payload);
-        if (res && res.ok) {
-          state.lastOrder = { id: res.orderId, total: res.totals && res.totals.total, type: payload.type };
-          localStorage.setItem('hk_user_v1', JSON.stringify({ name: payload.name, phone: phoneEl.value, address: payload.address }));
-          state.cart = {}; bump();
-          thOrderId.textContent = state.lastOrder.id || '—';
-          thTotal.textContent   = typeof state.lastOrder.total==='number' ? fmt.format(state.lastOrder.total) : '—';
-          thType.textContent    = state.lastOrder.type==='delivery' ? 'نوع الطلب: توصيل' : 'نوع الطلب: استلام';
+        let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
+        const payload={ type: segDel.getAttribute('aria-pressed')==='true'?'delivery':'pickup', name:nameEl.value.trim(), phone, address:addrEl.value.trim(), notes:notesEl.value.trim(),
+          items: cartArr().map(x=>({ lineId:x.lineId, id:x.id, title:x.title, qty:x.qty, price:x.unitPrice, options:x.options, optionsText:x.optionsText, lineNotes:x.notes })) };
+        const res=await createOrder(payload);
+        if(res && res.ok){
+          const thOrderIdEl=document.getElementById('thOrderId'); const thTotalEl=document.getElementById('thTotal'); const thTypeEl=document.getElementById('thType');
+          localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address}));
+          state.cart={}; bump();
+          thOrderIdEl.textContent=res.orderId||'—';
+          thTotalEl.textContent=typeof res.totals.total==='number'?fmt.format(res.totals.total):'—';
+          thTypeEl.textContent=payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام';
           showTab('#tab-thanks');
-        } else {
-          toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error('order.create error', res);
-        }
-      } catch (err) {
-        toast('خطأ في الاتصال بالخدمة'); console.error(err);
-      } finally{
-        confirmBtn.disabled = false; confirmBtn.classList.remove('disabled');
-      }
+        } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error(res); }
+      } catch(err){ toast('خطأ في الاتصال بالخدمة'); console.error(err); }
+      finally{ confirmBtn.disabled=false; confirmBtn.classList.remove('disabled'); }
     };
-    confirmBtn.addEventListener('click', submitOrder);
 
-    // Thanks → back actions
-    thBackMenu.addEventListener('click', (e)=>{ e.preventDefault(); setStep('menu'); showTab('#tab-menu'); });
-    thBackCart.addEventListener('click', (e)=>{ e.preventDefault(); showTab('#tab-cart'); });
-
-    // Keyboard flow
-    nameEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); phoneEl.focus(); }});
-    phoneEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); (segDel.getAttribute('aria-pressed')==='true'?addrEl:notesEl).focus(); }});
-
-    /* ---------- Prefill ---------- */
-    try {
-      const savedInfo = JSON.parse(localStorage.getItem('hk_user_v1') || '{}');
-      if (savedInfo.name) nameEl.value = savedInfo.name;
-      if (savedInfo.phone) phoneEl.value = savedInfo.phone;
-      if (savedInfo.address) { addrEl.value = savedInfo.address; setType(true); }
-    } catch (_e) {}
-
-    /* ---------- Init ---------- */
-    (async () => {
-      setStep('menu');
-      state.menu = await fetchMenu();
-      if (!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'), 600);
-      renderGrid(); bump(); renderCartList();
-    })();
+    // Prefill & init
+    try{ const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}'); if(savedInfo.name) nameEl.value=savedInfo.name; if(savedInfo.phone) phoneEl.value=savedInfo.phone; if(savedInfo.address){ addrEl.value=savedInfo.address; setType(true);} }catch(_){}
+    (async()=>{ setStep('menu'); state.menu=await fetchMenu(); if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600); renderGrid(); bump(); renderCartList(); })();
   });
   </script>
 </body>
