@@ -118,10 +118,10 @@
     <!-- Stepper -->
     <div class="container">
       <div class="nav stepper" aria-label="خطوات الطلب" role="tablist">
-        <a class="nav-link step active" data-bs-toggle="tab" href="#tab-menu"   role="tab"><span class="dot">1</span> القائمة  <span class="sep"></span></a>
-        <a class="nav-link step"          data-bs-toggle="tab" href="#tab-cart"   role="tab"><span class="dot">2</span> السلة   <span class="sep"></span></a>
-        <a class="nav-link step"          data-bs-toggle="tab" href="#tab-data"   role="tab"><span class="dot">3</span> البيانات<span class="sep"></span></a>
-        <a class="nav-link step"          data-bs-toggle="tab" href="#tab-thanks" role="tab"><span class="dot">4</span> تمّ</a>
+        <a class="nav-link step active" data-step="menu"   data-bs-toggle="tab" href="#tab-menu"   role="tab"><span class="dot">1</span> القائمة  <span class="sep"></span></a>
+        <a class="nav-link step"          data-step="cart"   data-bs-toggle="tab" href="#tab-cart"   role="tab"><span class="dot">2</span> السلة   <span class="sep"></span></a>
+        <a class="nav-link step"          data-step="data"   data-bs-toggle="tab" href="#tab-data"   role="tab"><span class="dot">3</span> البيانات<span class="sep"></span></a>
+        <a class="nav-link step"          data-step="thanks" data-bs-toggle="tab" href="#tab-thanks" role="tab"><span class="dot">4</span> تمّ</a>
       </div>
     </div>
   </header>
@@ -171,7 +171,7 @@
               </div>
               <small class="text-white-50">الضريبة ورسوم التوصيل تُضاف لاحقاً</small>
             </div>
-            <button id="goCartBtn" class="btn btn-light mini-btn text-dark disabled" aria-disabled="true">الانتقال للسلة</button>
+            <a id="goCartBtn" href="#tab-cart" class="btn btn-light mini-btn text-dark disabled" aria-disabled="true">الانتقال للسلة</a>
           </div>
         </div>
       </section>
@@ -189,8 +189,8 @@
             </div>
 
             <div class="d-flex gap-2 mt-3">
-              <a href="#tab-menu" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للقائمة</a>
-              <a id="toDataBtn" href="#tab-data" class="btn btn-dark flex-fill py-3 fw-bold disabled" aria-disabled="true">متابعة</a>
+              <a href="#tab-menu" class="btn btn-outline-dark flex-fill py-3 fw-bold" data-go="menu">رجوع للقائمة</a>
+              <a id="toDataBtn" href="#tab-data" class="btn btn-dark flex-fill py-3 fw-bold disabled" aria-disabled="true" data-go="data">متابعة</a>
             </div>
           </div>
         </div>
@@ -249,7 +249,7 @@
           </div>
 
           <div class="d-flex gap-2 mt-3">
-            <a href="#tab-cart" class="btn btn-outline-dark flex-fill py-3 fw-bold">رجوع للسلة</a>
+            <a href="#tab-cart" class="btn btn-outline-dark flex-fill py-3 fw-bold" data-go="cart">رجوع للسلة</a>
             <button id="confirmBtn" class="btn btn-dark flex-fill py-3 fw-bold" aria-label="تأكيد الطلب">تأكيد الطلب</button>
           </div>
 
@@ -273,8 +273,8 @@
               <div class="small text-secondary mt-1" id="thType">—</div>
             </div>
             <div class="mt-4 d-flex gap-2 justify-content-center">
-              <a href="#tab-menu" id="thBackMenu" class="btn btn-dark">طلب جديد</a>
-              <a href="#tab-cart" id="thBackCart" class="btn btn-outline-dark">عرض السلة</a>
+              <a href="#tab-menu" id="thBackMenu" class="btn btn-dark" data-go="menu">طلب جديد</a>
+              <a href="#tab-cart" id="thBackCart" class="btn btn-outline-dark" data-go="cart">عرض السلة</a>
             </div>
           </div>
         </div>
@@ -359,7 +359,7 @@
   const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzd4lONa4U_-TFuhIZHhwiPifXj38PqN5I7Gt90Pa2ttI7zkvL4_FMemzHW7q4dKDNIrA/exec';
 
   window.addEventListener('DOMContentLoaded', () => {
-    const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null };
+    const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null, unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
     function stableId(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36); }
@@ -369,8 +369,9 @@
 
     const steps=['menu','cart','data','thanks'];
     function setStep(active){
+      state.active = active;
       document.querySelectorAll('.stepper .step').forEach((el,idx)=>{
-        const id=(el.getAttribute('href')||'').replace('#tab-','');
+        const id=el.dataset.step;
         el.classList.remove('active','done'); if(id===active) el.classList.add('active');
         const activeIdx=steps.indexOf(active); if(idx<activeIdx) el.classList.add('done');
       });
@@ -382,8 +383,80 @@
       if(href==='#tab-cart') setStep('cart');
       if(href==='#tab-data') setStep('data');
       if(href==='#tab-thanks') setStep('thanks');
+      // keep URL hash aligned but we also guard it elsewhere
+      history.replaceState(null, '', href);
     });
 
+    // ======== GUARD LOGIC (FSM) ========
+    function cartCount(){ return Object.values(state.cart).reduce((a,b)=>a+b.qty,0); }
+    function canGo(target){
+      if(target==='menu') return true;
+      if(target==='cart') return cartCount()>0;
+      if(target==='data') return cartCount()>0;
+      if(target==='thanks') return state.unlockThanks === true;
+      return false;
+    }
+    function toast(msg){
+      const box=document.getElementById('toasts'); const el=document.createElement('div');
+      el.className='toast-msg'; el.textContent=msg; box.appendChild(el);
+      setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200);
+    }
+    function safeGo(target,{fromClick=true}={}){
+      if(!canGo(target)){
+        if(target==='cart' || target==='data') toast('أضِف عناصر للسلة أولاً');
+        else if(target==='thanks') toast('أكمل تأكيد الطلب أولاً');
+        else toast('تنقّل غير مسموح');
+        // snap back to current active tab
+        showTab('#tab-'+state.active);
+        return false;
+      }
+      showTab('#tab-'+target);
+      return true;
+    }
+    // Intercept clicks on stepper/tabs
+    document.querySelectorAll('.stepper [data-bs-toggle="tab"]').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const target = a.dataset.step || (a.getAttribute('href')||'').replace('#tab-','');
+        safeGo(target);
+      });
+    });
+    // Intercept Bootstrap tab show to hard-block programmatic hash jumps
+    document.querySelectorAll('.stepper [data-bs-toggle="tab"]').forEach(a=>{
+      a.addEventListener('show.bs.tab', (e)=>{
+        const target = a.dataset.step || (a.getAttribute('href')||'').replace('#tab-','');
+        if(!canGo(target)){ e.preventDefault(); }
+      });
+    });
+    // Intercept any CTA links with data-go or hash to tabs
+    document.body.addEventListener('click', (e)=>{
+      const a = e.target.closest('a[href^="#tab-"],[data-go]');
+      if(!a) return;
+      const to = (a.dataset.go) ? a.dataset.go : (a.getAttribute('href')||'').replace('#tab-','');
+      if(['menu','cart','data','thanks'].includes(to)){
+        e.preventDefault();
+        safeGo(to);
+      }
+    });
+    // Guard direct hash navigation (reload/deep link)
+    function enforceHashOnLoad(){
+      const hash = (location.hash||'#tab-menu').replace('#tab-','');
+      if(!canGo(hash)) {
+        // choose the furthest allowed step
+        const fallback = state.unlockThanks ? 'thanks' : (cartCount()>0 ? 'data' : 'menu');
+        showTab('#tab-'+fallback);
+      } else {
+        showTab('#tab-'+hash);
+      }
+    }
+    window.addEventListener('hashchange', ()=> {
+      const hash = (location.hash||'').replace('#tab-','');
+      if(['menu','cart','data','thanks'].includes(hash)){
+        if(!safeGo(hash)) return; // safeGo will snap back
+      }
+    });
+
+    // ======== DOM refs ========
     const grid=document.getElementById('grid');
     const dishTpl=document.getElementById('dishTpl');
     const chipsTop=document.getElementById('chips');
@@ -411,15 +484,13 @@
     const thTotal=document.getElementById('thTotal');
     const thType=document.getElementById('thType');
 
-    function toast(msg){ const box=document.getElementById('toasts'); const el=document.createElement('div'); el.className='toast-msg'; el.textContent=msg; box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200); }
-
     async function fetchMenu(){
       if(!GAS_WEBAPP_URL) return [];
       try{ const r=await fetch(GAS_WEBAPP_URL+'?action=menu.list'); const j=await r.json(); return j.ok?(j.data||[]):[]; }
       catch(e){ console.error(e); return []; }
     }
 
-    // Modal
+    // Options Modal
     const optModal=new bootstrap.Modal(document.getElementById('optModal'));
     const optForm=document.getElementById('optForm');
     const optPriceEl=document.getElementById('optPrice');
@@ -506,7 +577,7 @@
     // Grid
     function renderGrid(){
       grid.innerHTML='';
-      const q=state.q.trim().toLowerCase();
+      const q=(state.q||'').trim().toLowerCase();
       const list=state.menu.filter(d=>{
         const inCat=(state.cat==='all'||(d.cat||'')===state.cat);
         const inTxt=!q||[d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
@@ -546,9 +617,17 @@
     function totals(){ const arr=cartArr(); return { count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr }; }
     function bump(){
       const t=totals();
-      badge.textContent=t.count; miniCount.textContent=`${t.count} عنصر`; miniTotal.textContent=fmt.format(t.total); cartTotal.textContent=fmt.format(t.total);
-      renderCartList(); localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
-      const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
+      document.getElementById('badge').textContent=t.count;
+      document.getElementById('miniCount').textContent=`${t.count} عنصر`;
+      document.getElementById('miniTotal').textContent=fmt.format(t.total);
+      cartTotal.textContent=fmt.format(t.total);
+      renderCartList();
+      localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
+      const has=t.count>0;
+      // visual disable + ARIA
+      goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has));
+      toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
+      // do not unlock thanks here
     }
     const saved=localStorage.getItem('hk_cart_v3'); if(saved){ try{ state.cart=JSON.parse(saved)||{}; }catch{} }
 
@@ -568,8 +647,9 @@
       });
     }
 
-    openCartBtn.addEventListener('click', ()=>{ showTab('#tab-cart'); renderCartList(); });
-    goCartBtn.addEventListener('click', e=>{ if(!goCartBtn.classList.contains('disabled')){ e.preventDefault(); showTab('#tab-cart'); renderCartList(); }});
+    // Buttons opening cart & guarded moves
+    document.getElementById('openCart').addEventListener('click', ()=> safeGo('cart'));
+    // goCartBtn & toDataBtn are intercepted globally via [data-go]/hash handler
 
     // Form & phone
     const iti=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js', separateDialCode:true });
@@ -601,8 +681,8 @@
 
     confirmBtn.onclick=async()=>{
       const t=totals();
-      if(t.count===0){ toast('السلة فارغة'); return; }
-      if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); return; }
+      if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
+      if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
       confirmBtn.disabled=true; confirmBtn.classList.add('disabled');
       try{
         let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
@@ -610,21 +690,33 @@
           items: cartArr().map(x=>({ lineId:x.lineId, id:x.id, title:x.title, qty:x.qty, price:x.unitPrice, options:x.options, optionsText:x.optionsText, lineNotes:x.notes })) };
         const res=await createOrder(payload);
         if(res && res.ok){
-          const thOrderIdEl=document.getElementById('thOrderId'); const thTotalEl=document.getElementById('thTotal'); const thTypeEl=document.getElementById('thType');
           localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address}));
           state.cart={}; bump();
-          thOrderIdEl.textContent=res.orderId||'—';
-          thTotalEl.textContent=typeof res.totals.total==='number'?fmt.format(res.totals.total):'—';
-          thTypeEl.textContent=payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام';
-          showTab('#tab-thanks');
-        } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error(res); }
+          thOrderId.textContent=res.orderId||'—';
+          thTotal.textContent=typeof res.totals?.total==='number'?fmt.format(res.totals.total):'—';
+          thType.textContent=payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام';
+          state.unlockThanks = true; // unlock final step only on success
+          safeGo('thanks');
+        } else {
+          toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error(res);
+        }
       } catch(err){ toast('خطأ في الاتصال بالخدمة'); console.error(err); }
       finally{ confirmBtn.disabled=false; confirmBtn.classList.remove('disabled'); }
     };
 
     // Prefill & init
-    try{ const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}'); if(savedInfo.name) nameEl.value=savedInfo.name; if(savedInfo.phone) phoneEl.value=savedInfo.phone; if(savedInfo.address){ addrEl.value=savedInfo.address; setType(true);} }catch(_){}
-    (async()=>{ setStep('menu'); state.menu=await fetchMenu(); if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600); renderGrid(); bump(); renderCartList(); })();
+    try{
+      const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}');
+      if(savedInfo.name) nameEl.value=savedInfo.name;
+      if(savedInfo.phone) phoneEl.value=savedInfo.phone;
+      if(savedInfo.address){ addrEl.value=savedInfo.address; setType(true); }
+    }catch(_){}
+    (async()=>{
+      setStep('menu');
+      state.menu=await fetchMenu();
+      if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
+      renderGrid(); bump(); renderCartList(); enforceHashOnLoad();
+    })();
   });
   </script>
 </body>
