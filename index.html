@@ -92,6 +92,11 @@
     #toasts{position:fixed;inset-block-start:14px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px}
     .toast-msg{background:#111;color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.25);font-weight:800}
     .spacer{height:18vh}
+
+    /* Thank page extras */
+    .ticket{font-weight:900; letter-spacing:2px; font-size:1.35rem; background:#0A0A0A; color:#fff; padding:.4rem .8rem; border-radius:10px;}
+    .pill{display:inline-flex; align-items:center; gap:.5rem; border:1px dashed #cbd5e1; padding:.35rem .7rem; border-radius:999px; font-weight:800; font-size:.9rem; color:#475569; background:#f8fafc;}
+    .copy-btn{border:1px solid #e5e7eb; border-radius:10px; padding:.35rem .6rem; background:#fff;}
   </style>
 </head>
 <body>
@@ -266,12 +271,23 @@
         <div class="container py-5">
           <div class="card-paper p-4 text-center">
             <div class="display-6 mb-2">🎉 شكراً لطلبك</div>
-            <p class="text-secondary mb-3">تم استلام طلبك بنجاح</p>
-            <div class="d-inline-block text-start bg-light p-3 rounded-3" style="min-width:260px">
-              <div><strong>رقم الطلب:</strong> <span id="thOrderId">—</span></div>
-              <div><strong>الإجمالي:</strong> <span id="thTotal">—</span></div>
-              <div class="small text-secondary mt-1" id="thType">—</div>
+            <p class="text-secondary mb-4">تم استلام طلبك بنجاح</p>
+
+            <!-- Ticket & summary -->
+            <div class="d-flex flex-column align-items-center gap-3">
+              <div class="ticket" id="thTicket">— — — —</div>
+              <div class="d-inline-flex flex-wrap gap-2 justify-content-center">
+                <span class="pill"><i class="fa-regular fa-calendar"></i><span id="thDate">—</span></span>
+                <span class="pill"><strong>رقم الطلب:</strong>&nbsp;<span id="thOrderId">—</span></span>
+                <span class="pill"><strong>الإجمالي:</strong>&nbsp;<span id="thTotal">—</span></span>
+                <span class="pill" id="thType">—</span>
+              </div>
+              <div class="d-flex gap-2 mt-1">
+                <button type="button" id="copyTicket" class="copy-btn"><i class="fa-regular fa-copy"></i> نسخ التذكرة</button>
+                <button type="button" id="copySummary" class="copy-btn"><i class="fa-regular fa-clipboard"></i> نسخ الملخص</button>
+              </div>
             </div>
+
             <div class="mt-4 d-flex gap-2 justify-content-center">
               <a href="#tab-menu" id="thBackMenu" class="btn btn-dark" data-go="menu">طلب جديد</a>
               <a href="#tab-cart" id="thBackCart" class="btn btn-outline-dark" data-go="cart">عرض السلة</a>
@@ -356,7 +372,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
   <script>
-  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzd4lONa4U_-TFuhIZHhwiPifXj38PqN5I7Gt90Pa2ttI7zkvL4_FMemzHW7q4dKDNIrA/exec';
+  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxZ4BBp3sfpfLdyXtCGUuB7-BoXAN6ZOzQhUkWMt_KgC43_XelZdyq3O0B0OIUxAkvR2w/exec';
 
   window.addEventListener('DOMContentLoaded', () => {
     const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null, unlockThanks:false, active:'menu' };
@@ -383,7 +399,6 @@
       if(href==='#tab-cart') setStep('cart');
       if(href==='#tab-data') setStep('data');
       if(href==='#tab-thanks') setStep('thanks');
-      // keep URL hash aligned but we also guard it elsewhere
       history.replaceState(null, '', href);
     });
 
@@ -401,34 +416,30 @@
       el.className='toast-msg'; el.textContent=msg; box.appendChild(el);
       setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200);
     }
-    function safeGo(target,{fromClick=true}={}){
+    function safeGo(target){
       if(!canGo(target)){
         if(target==='cart' || target==='data') toast('أضِف عناصر للسلة أولاً');
         else if(target==='thanks') toast('أكمل تأكيد الطلب أولاً');
         else toast('تنقّل غير مسموح');
-        // snap back to current active tab
         showTab('#tab-'+state.active);
         return false;
       }
       showTab('#tab-'+target);
       return true;
     }
-    // Intercept clicks on stepper/tabs
+    // Intercept stepper/tab clicks
     document.querySelectorAll('.stepper [data-bs-toggle="tab"]').forEach(a=>{
       a.addEventListener('click', (e)=>{
         e.preventDefault();
         const target = a.dataset.step || (a.getAttribute('href')||'').replace('#tab-','');
         safeGo(target);
       });
-    });
-    // Intercept Bootstrap tab show to hard-block programmatic hash jumps
-    document.querySelectorAll('.stepper [data-bs-toggle="tab"]').forEach(a=>{
       a.addEventListener('show.bs.tab', (e)=>{
         const target = a.dataset.step || (a.getAttribute('href')||'').replace('#tab-','');
         if(!canGo(target)){ e.preventDefault(); }
       });
     });
-    // Intercept any CTA links with data-go or hash to tabs
+    // Guard CTA links
     document.body.addEventListener('click', (e)=>{
       const a = e.target.closest('a[href^="#tab-"],[data-go]');
       if(!a) return;
@@ -438,11 +449,10 @@
         safeGo(to);
       }
     });
-    // Guard direct hash navigation (reload/deep link)
+    // Guard hash navigation
     function enforceHashOnLoad(){
       const hash = (location.hash||'#tab-menu').replace('#tab-','');
       if(!canGo(hash)) {
-        // choose the furthest allowed step
         const fallback = state.unlockThanks ? 'thanks' : (cartCount()>0 ? 'data' : 'menu');
         showTab('#tab-'+fallback);
       } else {
@@ -452,7 +462,7 @@
     window.addEventListener('hashchange', ()=> {
       const hash = (location.hash||'').replace('#tab-','');
       if(['menu','cart','data','thanks'].includes(hash)){
-        if(!safeGo(hash)) return; // safeGo will snap back
+        if(!safeGo(hash)) return;
       }
     });
 
@@ -483,6 +493,8 @@
     const thOrderId=document.getElementById('thOrderId');
     const thTotal=document.getElementById('thTotal');
     const thType=document.getElementById('thType');
+    const thTicket=document.getElementById('thTicket');
+    const thDate=document.getElementById('thDate');
 
     async function fetchMenu(){
       if(!GAS_WEBAPP_URL) return [];
@@ -624,10 +636,8 @@
       renderCartList();
       localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
       const has=t.count>0;
-      // visual disable + ARIA
       goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has));
       toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
-      // do not unlock thanks here
     }
     const saved=localStorage.getItem('hk_cart_v3'); if(saved){ try{ state.cart=JSON.parse(saved)||{}; }catch{} }
 
@@ -647,9 +657,7 @@
       });
     }
 
-    // Buttons opening cart & guarded moves
     document.getElementById('openCart').addEventListener('click', ()=> safeGo('cart'));
-    // goCartBtn & toDataBtn are intercepted globally via [data-go]/hash handler
 
     // Form & phone
     const iti=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js', separateDialCode:true });
@@ -674,12 +682,37 @@
       addrEl.addEventListener(ev, validate);
     });
 
+    // ======== Thank page helpers (Daily 4-digit Ticket) ========
+    function todayKey(){
+      const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    }
+    function nextDailyTicketLocal(){
+      const key = todayKey();
+      const savedDay = localStorage.getItem('hk_ticket_day');
+      let seq = Number(localStorage.getItem('hk_ticket_seq')||0);
+      if(savedDay !== key){ seq = 0; }
+      seq = (seq % 9999) + 1;
+      localStorage.setItem('hk_ticket_day', key);
+      localStorage.setItem('hk_ticket_seq', String(seq));
+      return String(seq).padStart(4,'0');
+    }
+    function setThankDate(){
+      const d=new Date();
+      const fmtDate = d.toLocaleDateString('ar-SA', { weekday:'short', year:'numeric', month:'2-digit', day:'2-digit' });
+      thDate.textContent = fmtDate;
+    }
+    async function copy(text){
+      try{ await navigator.clipboard.writeText(text); toast('تم النسخ ✅'); }catch{ toast('تعذّر النسخ'); }
+    }
+
     async function createOrder(payload){
       const r=await fetch(GAS_WEBAPP_URL+'?action=order.create',{ method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
       return r.json();
     }
 
-    confirmBtn.onclick=async()=>{
+    // Confirm & finish
+    document.getElementById('confirmBtn').onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
       if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
@@ -692,10 +725,28 @@
         if(res && res.ok){
           localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address}));
           state.cart={}; bump();
+
+          // Ticket number: prefer backend, fallback to local daily counter
+          const ticket4 = (res.ticket4 && String(res.ticket4).padStart(4,'0')) || nextDailyTicketLocal();
+          thTicket.textContent = ticket4.replace(/(\d)(?=\d)/g,'$1 '); // a small spaced look
+          setThankDate();
+
           thOrderId.textContent=res.orderId||'—';
           thTotal.textContent=typeof res.totals?.total==='number'?fmt.format(res.totals.total):'—';
           thType.textContent=payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام';
-          state.unlockThanks = true; // unlock final step only on success
+
+          // Copy buttons
+          document.getElementById('copyTicket').onclick = ()=>copy(`تذكرة ${ticket4} • ${todayKey()}`);
+          document.getElementById('copySummary').onclick = ()=>{
+            const txt = `طلب Maison Hikari
+تذكرة: ${ticket4} — ${todayKey()}
+رقم الطلب: ${res.orderId||'—'}
+النوع: ${payload.type==='delivery'?'توصيل':'استلام'}
+الإجمالي: ${thTotal.textContent}`;
+            copy(txt);
+          };
+
+          state.unlockThanks = true;
           safeGo('thanks');
         } else {
           toast('تعذر إرسال الطلب، حاول لاحقًا'); console.error(res);
