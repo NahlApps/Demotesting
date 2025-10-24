@@ -25,8 +25,12 @@
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
       --ease:cubic-bezier(.22,.61,.36,1);
       --focus:#0A0A0A;
-      --header-h:64px; /* updated by JS */
-      --ok:#16a34a; --warn:#f97316; --bad:#dc2626;
+
+      /* Will be measured by JS */
+      --topbar-h:56px;
+      --stepper-h:44px;
+      /* Where the chips bar should stick */
+      --chips-top: calc(var(--topbar-h) + var(--stepper-h));
     }
     html,body{height:100%}
     body{
@@ -41,18 +45,30 @@
       outline-offset:2px;
     }
     .chip:focus-visible{ box-shadow:0 0 0 3px rgba(0,0,0,.12); }
-
-    /* Active micro-interaction */
     .btn:active{ transform:translateY(1px); }
 
-    /* Header */
-    .app-header{position:sticky;top:0;z-index:70;background:#fff;border-bottom:1px solid var(--rule);backdrop-filter:saturate(1.15) blur(6px)}
+    /* Topbar */
+    .app-header{
+      position:sticky; top:0; z-index:70; background:#fff;
+      border-bottom:1px solid var(--rule);
+      backdrop-filter:saturate(1.15) blur(6px);
+      padding-top:max(0px, env(safe-area-inset-top));
+      transition: padding .2s var(--ease);
+    }
     .brand{font-weight:900}
-    .cart-btn{position:relative;min-width:46px;min-height:46px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
+
+    .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
-    /* Stepper */
-    .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0;border-bottom:1px solid var(--rule)}
+    /* Stepper (separate sticky layer) */
+    .stepper-wrap{
+      position:sticky;
+      top:var(--topbar-h);
+      z-index:65;
+      background:#fff;
+      border-bottom:1px solid var(--rule);
+    }
+    .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0}
     .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
     .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
     .step.active{color:#111}
@@ -61,27 +77,50 @@
     .step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Top chips & search */
-    .chips-wrap{position:sticky;top:calc(var(--header-h));z-index:60;background:#fff;border-bottom:1px solid var(--rule);padding:10px 0}
+    /* Chips & search (third sticky layer) */
+    .chips-wrap{
+      position:sticky;
+      top:var(--chips-top);
+      z-index:60;
+      background:#fff;
+      border-bottom:1px solid var(--rule);
+      padding:10px 0;
+      transition: box-shadow .2s var(--ease);
+    }
     .chip{background:var(--chip);color:var(--chip-ink);border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:all .18s var(--ease)}
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Sticky category label */
+    /* Sticky category label (same top offset as chips) */
     .sticky-cat{
-      position:sticky; top:calc(var(--header-h) + 58px); z-index:40; background:#fff;
-      border-bottom:1px dashed var(--rule); padding:6px 0 8px; font-weight:800; color:#374151;
+      position:sticky; top:var(--chips-top);
+      z-index:40; background:#fff; border-bottom:1px dashed var(--rule);
+      padding:6px 0 8px; font-weight:800; color:#374151;
     }
 
-    /* Menu */
+    /* Docked mode: chips go directly under topbar, stepper collapses */
+    body.dock-chips{ --chips-top: var(--topbar-h); }
+    body.dock-chips .stepper-wrap{ height:0; padding:0; overflow:hidden; border-bottom:0; }
+    body.dock-chips .stepper{ display:none; }
+    body.dock-chips .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
+
+    /* Compact topbar on scroll (mobile polish) */
+    @media (max-width:576px){
+      body.compact .app-header .container{ padding-block:.25rem !important; }
+      body.compact .brand{ font-size:.95rem; }
+      body.compact .app-header small{ display:none; }
+      .step .dot{ width:24px; height:24px; }
+    }
+
+    /* Menu grid */
     main{flex:1 1 auto;display:flex;flex-direction:column}
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-    /* New Card (image top 16:9) */
+    /* Card (image top) */
     .dish{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
     .dish-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#f3f4f6}
     .dish-body{padding:12px 12px 14px}
@@ -141,20 +180,7 @@
     .pill{display:inline-flex; align-items:center; gap:.5rem; border:1px dashed #cbd5e1; padding:.35rem .7rem; border-radius:999px; font-weight:800; font-size:.9rem; color:#475569; background:#f8fafc;}
     .copy-btn{border:1px solid #e5e7eb; border-radius:10px; padding:.35rem .6rem; background:#fff;}
 
-    /* Overlays (App loading + Submit loading) */
-    .overlay{
-      position:fixed; inset:0; z-index:999; display:none;
-      align-items:center; justify-content:center; text-align:center;
-      background:rgba(255,255,255,.92); backdrop-filter:blur(6px) saturate(1.1);
-    }
-    .overlay.show{ display:flex; }
-    .overlay .box{
-      background:#fff; border:1px solid var(--rule); border-radius:16px;
-      padding:18px 20px; box-shadow:var(--shadow); min-width:220px;
-    }
-    .overlay .msg{ margin-top:.5rem; color:#555; font-weight:800 }
-
-    /* Cart recommendations */
+    /* Recommendations */
     .reco{border-top:1px dashed var(--rule); padding-top:12px; margin-top:8px}
     .reco h6{font-weight:900; margin:0 0 8px; font-size:.95rem}
     .reco .chip{background:#f4f4f5;border-color:#e4e4e7}
@@ -162,7 +188,7 @@
 </head>
 <body>
   <!-- App Loading Overlay -->
-  <div id="appLoading" class="overlay" aria-live="polite" aria-busy="true">
+  <div id="appLoading" class="overlay" aria-live="polite" aria-busy="true" style="display:none">
     <div class="box">
       <div class="spinner-border" role="status" aria-label="جارِ التحميل"></div>
       <div class="msg">جاري تحميل القائمة…</div>
@@ -180,8 +206,8 @@
   <!-- Toasts -->
   <div id="toasts" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Header -->
-  <header class="app-header">
+  <!-- Topbar -->
+  <header class="app-header" id="topbar">
     <div class="container py-2 d-flex align-items-center justify-content-between gap-2">
       <div class="d-flex align-items-center gap-3">
         <img src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=120&auto=format&fit=crop" alt="" width="44" height="44" style="border-radius:12px;object-fit:cover" loading="lazy">
@@ -196,8 +222,10 @@
         <span id="badge" class="cart-badge" aria-live="polite">0</span>
       </button>
     </div>
+  </header>
 
-    <!-- Stepper -->
+  <!-- Stepper -->
+  <div class="stepper-wrap" id="stepperWrap">
     <div class="container">
       <div class="nav stepper" aria-label="خطوات الطلب" role="tablist">
         <a class="nav-link step active" data-step="menu"   data-bs-toggle="tab" href="#tab-menu"   role="tab"><span class="dot">1</span> القائمة  <span class="sep"></span></a>
@@ -206,38 +234,38 @@
         <a class="nav-link step"          data-step="thanks" data-bs-toggle="tab" href="#tab-thanks" role="tab"><span class="dot">4</span> تمّ</a>
       </div>
     </div>
-  </header>
+  </div>
+
+  <!-- Chips & search -->
+  <div class="chips-wrap">
+    <div class="container">
+      <div class="row g-2 align-items-center">
+        <div class="col-12 col-lg-8">
+          <div id="chips" class="d-flex flex-nowrap gap-2 overflow-auto pb-1" aria-label="تصنيفات">
+            <button class="chip active" data-cat="all">الكل</button>
+            <button class="chip" data-cat="sushi">سوشي</button>
+            <button class="chip" data-cat="don">دون</button>
+            <button class="chip" data-cat="meat">لحوم</button>
+            <button class="chip" data-cat="drinks">مشروبات</button>
+            <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <div class="searchbox d-flex" role="search">
+            <input id="q" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
+            <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-cat"><span id="catNow">الكل</span></div>
+    </div>
+  </div>
 
   <main>
     <div class="tab-content flex-1">
 
       <!-- 1) MENU -->
       <section id="tab-menu" class="tab-pane fade show active">
-        <div class="chips-wrap">
-          <div class="container">
-            <div class="row g-2 align-items-center">
-              <div class="col-12 col-lg-8">
-                <div id="chips" class="d-flex flex-nowrap gap-2 overflow-auto pb-1" aria-label="تصنيفات">
-                  <button class="chip active" data-cat="all">الكل</button>
-                  <button class="chip" data-cat="sushi">سوشي</button>
-                  <button class="chip" data-cat="don">دون</button>
-                  <button class="chip" data-cat="meat">لحوم</button>
-                  <button class="chip" data-cat="drinks">مشروبات</button>
-                  <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
-                </div>
-              </div>
-              <div class="col-12 col-lg-4">
-                <div class="searchbox d-flex" role="search">
-                  <input id="q" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
-                  <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
-                </div>
-              </div>
-            </div>
-            <div class="container sticky-cat"><span id="catNow">الكل</span></div>
-          </div>
-        </div>
-
-        <!-- Menu grid -->
         <div class="container py-3">
           <div id="grid" class="menu-grid" aria-live="polite"></div>
           <div class="spacer"></div>
@@ -356,7 +384,6 @@
             <div class="display-6 mb-2">🎉 شكراً لطلبك</div>
             <p class="text-secondary mb-4">تم استلام طلبك بنجاح</p>
 
-            <!-- Ticket & summary -->
             <div class="d-flex flex-column align-items-center gap-3">
               <div class="ticket" id="thTicket">----</div>
               <div class="d-inline-flex flex-wrap gap-2 justify-content-center">
@@ -464,7 +491,7 @@
 
   <script>
   const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxyGwCUJRwjVfJDtq5bxqN9Thm_KU4zOfNiNt0ENtW2jbDonr_yp3W2xDZCNXkmSHZNLw/exec';
-  const FREE_SHIP = 79; // مثال توصيل مجاني
+  const FREE_SHIP = 79; // مثال
 
   window.addEventListener('DOMContentLoaded', () => {
     const state = { q:'', cat:'all', cart:{}, menu:[], lastOrder:null, unlockThanks:false, active:'menu' };
@@ -482,16 +509,42 @@
       setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200);
     }
 
-    /* ===== Dynamic header height (for sticky chips offset) ===== */
-    const headerEl = document.querySelector('.app-header');
-    function setHeaderHeightVar(){
-      const h = headerEl?.getBoundingClientRect().height || 64;
-      document.documentElement.style.setProperty('--header-h', `${Math.round(h)}px`);
-    }
-    window.addEventListener('resize', setHeaderHeightVar, {passive:true});
-    setHeaderHeightVar();
+    /* ===== Sticky heights & behaviors ===== */
+    const topbarEl  = document.getElementById('topbar');
+    const stepperEl = document.getElementById('stepperWrap');
 
-    /* ===== Stepper / FSM (guards) ===== */
+    function setStickyVars(){
+      const topH = topbarEl?.getBoundingClientRect().height || 56;
+      const stpH = stepperEl?.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty('--topbar-h',  `${Math.round(topH)}px`);
+      document.documentElement.style.setProperty('--stepper-h', `${Math.round(stpH)}px`);
+      // --chips-top is derived in CSS; no need to set directly.
+    }
+    function bindCompactHeader(){
+      const onScroll = () => {
+        document.body.classList.toggle('compact', window.scrollY > 12);
+        setStickyVars(); // heights can change with compact class
+      };
+      window.addEventListener('scroll', onScroll, { passive:true });
+      onScroll();
+    }
+    function bindDockChips(){
+      let last = false;
+      const onScroll = ()=>{
+        const dock = window.scrollY > 12;
+        if(dock !== last){
+          document.body.classList.toggle('dock-chips', dock);
+          setStickyVars();
+          last = dock;
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive:true });
+      onScroll();
+    }
+    window.addEventListener('resize', setStickyVars, { passive:true });
+    setStickyVars(); bindCompactHeader(); bindDockChips();
+
+    /* ===== Stepper / guards ===== */
     const steps=['menu','cart','data','thanks'];
     function setStep(active){
       state.active = active;
@@ -500,6 +553,7 @@
         el.classList.remove('active','done'); if(id===active) el.classList.add('active');
         const activeIdx=steps.indexOf(active); if(idx<activeIdx) el.classList.add('done');
       });
+      setStickyVars();
     }
     function showTab(href){ const a=document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`); if(a) bootstrap.Tab.getOrCreateInstance(a).show(); }
     document.addEventListener('shown.bs.tab', e=>{
@@ -509,6 +563,7 @@
       if(href==='#tab-data') setStep('data');
       if(href==='#tab-thanks') setStep('thanks');
       history.replaceState(null, '', href);
+      setStickyVars();
     });
 
     function cartCount(){ return Object.values(state.cart).reduce((a,b)=>a+b.qty,0); }
@@ -530,7 +585,6 @@
       showTab('#tab-'+target);
       return true;
     }
-    // Intercept stepper/tab clicks
     document.querySelectorAll('.stepper [data-bs-toggle="tab"]').forEach(a=>{
       a.addEventListener('click', (e)=>{
         e.preventDefault();
@@ -542,31 +596,24 @@
         if(!canGo(target)){ e.preventDefault(); }
       });
     });
-    // Guard CTA links
     document.body.addEventListener('click', (e)=>{
       const a = e.target.closest('a[href^="#tab-"],[data-go]');
       if(!a) return;
       const to = (a.dataset.go) ? a.dataset.go : (a.getAttribute('href')||'').replace('#tab-','');
       if(['menu','cart','data','thanks'].includes(to)){
-        e.preventDefault();
-        safeGo(to);
+        e.preventDefault(); safeGo(to);
       }
     });
-    // Hash nav
     function enforceHashOnLoad(){
       const hash = (location.hash||'#tab-menu').replace('#tab-','');
       if(!canGo(hash)) {
         const fallback = state.unlockThanks ? 'thanks' : (cartCount()>0 ? 'data' : 'menu');
         showTab('#tab-'+fallback);
-      } else {
-        showTab('#tab-'+hash);
-      }
+      } else showTab('#tab-'+hash);
     }
     window.addEventListener('hashchange', ()=> {
       const hash = (location.hash||'').replace('#tab-','');
-      if(['menu','cart','data','thanks'].includes(hash)){
-        if(!safeGo(hash)) return;
-      }
+      if(['menu','cart','data','thanks'].includes(hash)) if(!safeGo(hash)) return;
     });
 
     /* ===== DOM refs ===== */
@@ -646,7 +693,6 @@
         optForm.appendChild(wrap);
       });
     }
-
     function selectedOptionsAndDelta(item){
       const schema=item.options; let delta=0; const summary=[]; const result={};
       if(schema && schema.groups){
@@ -681,8 +727,6 @@
       document.getElementById('optNotes').value='';
       buildOptionsUI(item); updateOptPrice(); optModal.show();
     }
-
-    /* Required options validation */
     function validateRequiredOptions(schema){
       if(!schema || !schema.groups) return {ok:true};
       for(const g of schema.groups){
@@ -697,16 +741,13 @@
       }
       return {ok:true};
     }
-
     function addLine(item, qty=1){
       const lineKey=JSON.stringify({id:item.id,opt:null,notes:''});
       const lineId=stableId(lineKey);
       if(state.cart[lineId]) state.cart[lineId].qty+=qty;
       else state.cart[lineId]={lineId, id:item.id, title:item.title, basePrice:Number(item.price||0), unitPrice:Number(item.price||0), qty, options:null, optionsText:'', notes:''};
-      bump();
-      toast(`أُضيف ${item.title} ✅`);
+      bump(); toast(`أُضيف ${item.title} ✅`);
     }
-
     function addOrCustomize(item){
       const hasGroups = item.options?.groups?.length > 0;
       const hasRequired = !!item.options?.groups?.some(g=>g.required);
@@ -714,12 +755,10 @@
       if(!hasRequired){ addLine(item, 1); toast('أُضيف — يمكنك التخصيص من السلة'); return; }
       openOptions(item);
     }
-
     document.getElementById('optAddBtn').onclick=()=>{
       if(!currentItem) return;
       const v = validateRequiredOptions(currentItem.options);
       if(!v.ok){ toast(v.msg); return; }
-
       const {delta, summary, result}=selectedOptionsAndDelta(currentItem);
       const unit=currentBase+delta; const qty=Math.max(1,Number(optQtyEl.value||1));
       const notes=(document.getElementById('optNotes').value||'').trim();
@@ -731,48 +770,18 @@
       bump(); renderCartList(); toast(`أُضيف ${currentItem.title} ✅`); optModal.hide();
     };
 
-    /* ===== Grid ===== */
+    /* ===== Grid & headings ===== */
     function byCat(a,b){ return (a.cat||'').localeCompare(b.cat||''); }
+    function catLabel(key){
+      const map={sushi:'سوشي', don:'دون', meat:'لحوم', drinks:'مشروبات'};
+      return map[key] || 'القسم';
+    }
     function renderCatHeader(label){
       const node=catHeaderTpl.content.firstElementChild.cloneNode(true);
       node.querySelector('strong').textContent=label;
       node.dataset.catHeader = label;
       return node;
     }
-
-    function renderGrid(){
-      grid.innerHTML='';
-      const q=(state.q||'').trim().toLowerCase();
-      const filtered=state.menu.filter(d=>{
-        const inCat=(state.cat==='all'||(d.cat||'')===state.cat);
-        const inTxt=!q||[d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
-        return inCat && inTxt;
-      }).sort(byCat);
-
-      if(filtered.length===0){
-        const empty=document.createElement('div'); empty.className='text-center text-secondary py-5';
-        empty.innerHTML='لا توجد أطباق مطابقة — جرّب تصنيف آخر أو كلمة مختلفة<br/><br/><strong>الأكثر طلبًا</strong>';
-        grid.appendChild(empty);
-      }
-
-      let lastCat=null;
-      filtered.forEach(d=>{
-        if(d.cat!==lastCat){
-          grid.appendChild(renderCatHeader(catLabel(d.cat)));
-          lastCat=d.cat;
-        }
-        grid.appendChild(renderDishCard(d));
-      });
-
-      clearFilters.classList.toggle('d-none', state.cat==='all' && !state.q.trim());
-      observeHeaders();
-    }
-
-    function catLabel(key){
-      const map={sushi:'سوشي', don:'دون', meat:'لحوم', drinks:'مشروبات'};
-      return map[key] || 'القسم';
-    }
-
     function renderDishCard(d){
       const node=dishTpl.content.firstElementChild.cloneNode(true);
       node.dataset.cat = d.cat||'';
@@ -798,18 +807,15 @@
       tags.slice(0,2).forEach(t=>{ const span=document.createElement('span'); span.className='tag'; span.textContent=t; tagsWrap.appendChild(span); });
       if(tags.length>2){ const more=document.createElement('span'); more.className='more-tags'; more.textContent=`+${tags.length-2}`; tagsWrap.appendChild(more); }
 
-      const btn=node.querySelector('.add-btn');
-      btn.addEventListener('click', ()=> addOrCustomize({...d}) );
+      node.querySelector('.add-btn').addEventListener('click', ()=> addOrCustomize({...d}) );
 
       if(d.available===false){
         node.classList.add('soldout');
-        btn.disabled=true; btn.classList.add('disabled'); btn.textContent='غير متوفر';
+        const btn=node.querySelector('.add-btn'); btn.disabled=true; btn.classList.add('disabled'); btn.textContent='غير متوفر';
       }
-
       return node;
     }
 
-    /* Sticky "current category" label using intersection observers */
     let headerObserver=null;
     function observeHeaders(){
       catNow.textContent = state.cat==='all' ? 'الكل' : catLabel(state.cat);
@@ -822,7 +828,6 @@
       document.querySelectorAll('[data-cat-header]').forEach(h=>headerObserver.observe(h));
     }
 
-    /* Skeletons while loading menu */
     function renderSkeleton(n=6){
       grid.innerHTML='';
       for(let i=0;i<n;i++){
@@ -837,13 +842,41 @@
       }
     }
 
+    function renderGrid(){
+      grid.innerHTML='';
+      const q=(state.q||'').trim().toLowerCase();
+      const filtered=state.menu.filter(d=>{
+        const inCat=(state.cat==='all'||(d.cat||'')===state.cat);
+        const inTxt=!q||[d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
+        return inCat && inTxt;
+      }).sort(byCat);
+
+      if(filtered.length===0){
+        const empty=document.createElement('div'); empty.className='text-center text-secondary py-5';
+        empty.textContent='لا توجد أطباق مطابقة — جرّب تصنيف آخر أو كلمة مختلفة'; grid.appendChild(empty);
+      }
+
+      let lastCat=null;
+      filtered.forEach(d=>{
+        if(d.cat!==lastCat){
+          grid.appendChild(renderCatHeader(catLabel(d.cat)));
+          lastCat=d.cat;
+        }
+        grid.appendChild(renderDishCard(d));
+      });
+
+      clearFilters.classList.toggle('d-none', state.cat==='all' && !state.q.trim());
+      observeHeaders();
+      setStickyVars();
+    }
+
     /* ===== Filters ===== */
     let searchTimer=null;
     search.addEventListener('input', e=>{ clearTimeout(searchTimer); searchTimer=setTimeout(()=>{ state.q=e.target.value; renderGrid(); },180); });
     clearFilters.addEventListener('click', ()=>{ state.q=''; search.value=''; state.cat='all'; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); document.querySelector('.chip[data-cat="all"]').classList.add('active'); renderGrid(); });
     chipsTop.addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(!b||b.id==='clearFilters') return; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.cat=b.dataset.cat; renderGrid(); });
 
-    /* ===== Cart, totals, free-ship progress, recommendations ===== */
+    /* ===== Cart & totals ===== */
     function cartArr(){ return Object.values(state.cart); }
     function totals(){ const arr=cartArr(); return { count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr }; }
     function updateProgress(total){
@@ -878,7 +911,6 @@
     }
 
     function pickRecommendations(){
-      // very light heuristic: if any sushi in cart → suggest drinks; if drinks→ suggest sushi/don
       const arr = cartArr();
       const hasSushi = arr.some(l=> (state.menu.find(m=>m.id===l.id)?.cat)==='sushi');
       const hasDrinks = arr.some(l=> (state.menu.find(m=>m.id===l.id)?.cat)==='drinks');
@@ -934,7 +966,7 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* ===== Thank page helpers (Daily 4-digit Ticket) ===== */
+    /* ===== Thank-you helpers ===== */
     function todayKey(){
       const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0');
       return `${y}-${m}-${day}`;
@@ -973,7 +1005,6 @@
       thType.textContent = payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام';
 
       document.getElementById('copyTicket').onclick = ()=>copy(`تذكرة ${t4} • ${ticketDate||todayKey()}`);
-      // WhatsApp summary: ticket ONLY
       document.getElementById('copySummary').onclick = ()=>{
         const txt = `طلب Maison Hikari
 تذكرة: ${t4} — ${thDate.textContent.trim()}
@@ -996,7 +1027,7 @@ ${items}
 تأكيد؟`;
     }
 
-    /* ===== Confirm & finish (with SUBMIT overlay) ===== */
+    /* ===== Confirm & finish ===== */
     confirmBtn.onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
@@ -1015,9 +1046,7 @@ ${items}
         if(res && res.ok){
           localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address}));
           state.cart={}; bump();
-
           renderThanks({ orderId:res.orderId, totals:res.totals||{}, payload, ticket4:res.ticket4, ticketDate:res.ticketDate });
-
           state.unlockThanks = true;
           safeGo('thanks');
         } else {
@@ -1030,7 +1059,7 @@ ${items}
       }
     };
 
-    /* ===== Prefill & INIT (with APP LOADING overlay + skeletons) ===== */
+    /* ===== Prefill & INIT ===== */
     try{
       const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}');
       if(savedInfo.name) nameEl.value=savedInfo.name;
@@ -1040,14 +1069,11 @@ ${items}
 
     (async()=>{
       setStep('menu');
-      showOverlay('appLoading', true);
       renderSkeleton(6);
-      let hideTimer = setTimeout(()=>showOverlay('appLoading', false), 10000);
       state.menu=await fetchMenu();
       if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
       renderGrid(); bump(); renderCartList(); enforceHashOnLoad();
-      showOverlay('appLoading', false);
-      clearTimeout(hideTimer);
+      setStickyVars();
     })();
   });
   </script>
