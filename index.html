@@ -22,9 +22,9 @@
     :root{
       --bg:#FAFAFA; --ink:#0B0D13; --muted:#6B7280; --rule:#EAEAEA;
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
-      --topbar-h:56px;     /* updated by JS */
-      --stepper-h:44px;    /* updated by JS */
-      --chips-h:56px;      /* updated by JS (multi-row aware) */
+      --topbar-h:56px;    /* measured via JS */
+      --stepper-h:44px;   /* measured via JS */
+      --chips-h:56px;     /* measured via JS (multi-row aware) */
     }
     html,body{height:100%}
     html{scroll-behavior:smooth;}
@@ -34,27 +34,11 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-    /* Header */
-    .app-header{position:sticky;top:0;z-index:70;background:#fff;border-bottom:1px solid var(--rule);backdrop-filter:saturate(1.15) blur(6px)}
-    .brand{font-weight:900}
-    .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
-    .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
-
-    /* Stepper */
-    .stepper-wrap{position:sticky; top:var(--topbar-h); z-index:65; background:#fff; border-bottom:1px solid var(--rule)}
-    .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0}
-    .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
-    .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
-    .step.active{color:#111}.step.active .dot{border-color:#111;color:#111}
-    .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
-    .step .sep{width:24px;height:2px;background:#e5e7eb}
-
-    /* Chips bar — ALWAYS visible (fixed), multi-row */
+    /* Chips bar — ALWAYS at very top (fixed) */
     .chips-wrap{
-      position: fixed;                 /* fixed to viewport */
-      inset-inline: 0;
-      top: 0;                          /* JS will set the correct offset each time */
-      z-index: 100;
+      position: fixed;
+      left: 0; right: 0; top: 0;                 /* <— top of viewport */
+      z-index: 120;
       background:#fff;
       border-bottom:1px solid var(--rule);
     }
@@ -63,7 +47,23 @@
       padding-block:10px; align-items:center;
     }
     body.scrolled .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
-    #chipsSpacer{ height: var(--chips-h); }  /* layout spacer under fixed bar */
+
+    /* This spacer reserves the chips height in normal flow */
+    #chipsSpacer{ height: var(--chips-h); }
+
+    /* Header + Stepper stick UNDER the chips */
+    .app-header{position:sticky; top: var(--chips-h); z-index:90; background:#fff;border-bottom:1px solid var(--rule);backdrop-filter:saturate(1.15) blur(6px)}
+    .brand{font-weight:900}
+    .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
+    .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+
+    .stepper-wrap{position:sticky; top: calc(var(--chips-h) + var(--topbar-h)); z-index:85; background:#fff; border-bottom:1px solid var(--rule)}
+    .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0}
+    .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
+    .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
+    .step.active{color:#111}.step.active .dot{border-color:#111;color:#111}
+    .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
+    .step .sep{width:24px;height:2px;background:#e5e7eb}
 
     .chip{
       background:#F2F2F2;color:#111;border:1px solid var(--rule);
@@ -76,9 +76,9 @@
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff; width:100%}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Sections */
+    /* Sections account for the 3 stacked bars (chips + header + stepper) */
     .menu-section{
-      scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px);
+      scroll-margin-top: calc(var(--chips-h) + var(--topbar-h) + var(--stepper-h) + 12px);
       padding-top: 8px;
     }
     .sec-title{margin:8px 0 12px 0;font-weight:900}
@@ -126,14 +126,28 @@
   </style>
 </head>
 <body>
-  <!-- Overlays -->
-  <div id="appLoading" class="overlay" aria-live="polite" aria-busy="true">
-    <div class="box"><div class="spinner-border" role="status" aria-label="جارِ التحميل"></div><div class="msg">جاري تحميل القائمة…</div></div>
+  <!-- Chips fixed at very top -->
+  <div class="chips-wrap" id="chipsWrap">
+    <div class="container">
+      <div id="chips" aria-label="تصنيفات">
+        <button class="chip active" data-target="#topOfMenu">الكل</button>
+        <button class="chip" data-target="#sec-sushi">سوشي</button>
+        <button class="chip" data-target="#sec-don">دون</button>
+        <button class="chip" data-target="#sec-meat">لحوم</button>
+        <button class="chip" data-target="#sec-drinks">مشروبات</button>
+
+        <div class="ms-auto" style="min-width:260px;flex:1 1 260px">
+          <div class="searchbox d-flex" role="search">
+            <input id="q" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
+            <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+        </div>
+
+        <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
+      </div>
+    </div>
   </div>
-  <div id="submitLoading" class="overlay" aria-live="polite" aria-busy="true">
-    <div class="box"><div class="spinner-border" role="status" aria-label="جارِ المعالجة"></div><div class="msg">جارِ تأكيد الطلب…</div></div>
-  </div>
-  <div id="toasts" aria-live="polite" aria-atomic="true"></div>
+  <div id="chipsSpacer" aria-hidden="true"></div>
 
   <!-- Header -->
   <header class="app-header" id="topbar">
@@ -163,30 +177,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Chips + Search (always visible, fixed) -->
-  <div class="chips-wrap" id="chipsWrap">
-    <div class="container">
-      <div id="chips" aria-label="تصنيفات">
-        <button class="chip active" data-target="#topOfMenu">الكل</button>
-        <button class="chip" data-target="#sec-sushi">سوشي</button>
-        <button class="chip" data-target="#sec-don">دون</button>
-        <button class="chip" data-target="#sec-meat">لحوم</button>
-        <button class="chip" data-target="#sec-drinks">مشروبات</button>
-
-        <div class="ms-auto" style="min-width:260px;flex:1 1 260px">
-          <div class="searchbox d-flex" role="search">
-            <input id="q" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
-            <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
-          </div>
-        </div>
-
-        <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
-      </div>
-    </div>
-  </div>
-  <!-- Spacer to avoid layout jump under fixed chips -->
-  <div id="chipsSpacer" aria-hidden="true"></div>
 
   <!-- Content -->
   <main id="topOfMenu">
@@ -397,7 +387,7 @@
     const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers (chips fixed at top, we compute its top offset live) */
+    /* Measure heights and keep offsets correct */
     const topbarEl   = document.getElementById('topbar');
     const stepperEl  = document.getElementById('stepperWrap');
     const chipsWrap  = document.getElementById('chipsWrap');
@@ -405,8 +395,7 @@
 
     const setStickyVars = () => {
       const topH   = Math.round(topbarEl?.getBoundingClientRect().height || 56);
-      const stepH  = Math.round(stepperEl?.getBoundingClientRect().height || 0);
-      chipsWrap.style.top = (topH + stepH) + 'px';                 // << set real top
+      const stepH  = Math.round(stepperEl?.getBoundingClientRect().height || 44);
       const chipsH = Math.round(chipsWrap?.getBoundingClientRect().height || 56);
       document.documentElement.style.setProperty('--topbar-h', topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
@@ -418,8 +407,6 @@
     });
     document.addEventListener('shown.bs.tab', setStickyVars);
     window.addEventListener('load', setStickyVars);
-
-    /* Header shadow on scroll */
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
 
     /* Stepper guards */
@@ -535,7 +522,7 @@
       emptyMsg.classList.toggle('d-none', totalMatches>0);
       clearFilters.classList.toggle('d-none', !state.q.trim());
 
-      setStickyVars();   // recalc chips top/height if wrapping changed
+      setStickyVars();   // recalc offsets (chips may wrap on different widths)
       setupScrollspy();
     }
 
@@ -679,22 +666,21 @@
     }
 
     /* Confirm */
-    const confirmBtnEl=document.getElementById('confirmBtn');
-    confirmBtnEl.onclick=async()=>{
+    document.getElementById('confirmBtn').onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); showTab('#tab-menu'); return; }
       if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
 
       let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
       const payload={
-        type: segDel.getAttribute('aria-pressed')==='true'?'delivery':'pickup',
+        type: document.getElementById('segDelivery').getAttribute('aria-pressed')==='true'?'delivery':'pickup',
         name: nameEl.value.trim(), phone, address: addrEl.value.trim(), notes: notesEl.value.trim(),
         items: t.arr.map(x=>({ id:x.id, title:x.title, qty:x.qty, price:x.unitPrice }))
       };
 
       const submitLoading=document.getElementById('submitLoading');
       submitLoading.classList.add('show');
-      confirmBtnEl.disabled=true; confirmBtnEl.classList.add('disabled');
+      const btn=this; btn.disabled=true; btn.classList.add('disabled');
 
       try{
         const res=await createOrder(payload);
@@ -706,7 +692,7 @@
         } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); }
       }catch{ toast('خطأ في الاتصال بالخدمة'); }
       finally{
-        confirmBtnEl.disabled=false; confirmBtnEl.classList.remove('disabled');
+        btn.disabled=false; btn.classList.remove('disabled');
         submitLoading.classList.remove('show');
       }
     };
@@ -719,10 +705,9 @@
         const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}');
         if(savedInfo.name) document.getElementById('custName').value=savedInfo.name;
         if(savedInfo.phone) document.getElementById('custPhone').value=savedInfo.phone;
-        if(savedInfo.address){ document.getElementById('address').value=savedInfo.address; setType(true); }
+        if(savedInfo.address){ document.getElementById('address').value=savedInfo.address; document.getElementById('segDelivery').setAttribute('aria-pressed','true'); document.getElementById('segPickup').setAttribute('aria-pressed','false'); document.getElementById('addressWrap').style.display=''; }
       }catch{}
       state.menu=await fetchMenu();
-      if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
       renderSections(); setStickyVars(); bump(); setStep('menu');
       appLoading.classList.remove('show');
     })();
