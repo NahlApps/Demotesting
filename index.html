@@ -19,31 +19,29 @@
   <meta name="theme-color" content="#2F2F2F" />
   <meta name="description" content="Maison Hikari — اطلب الآن" />
 
-  <!-- Color System: Modern Bistro (60/30/10) -->
+  <!-- Color System: Modern Bistro (60/30/10 + teal CTAs) -->
   <style>
     :root{
-      /* Core 4 tokens */
-      --gray-900:#2F2F2F;        /* 60% — text, headers, bars */
-      --offwhite:#FAFAF9;        /* 30% — surfaces/background */
-      --mustard:#F4CE14;         /* 10% — chips, highlights */
-      --teal:#0EA5A5;            /* CTA / active / discount */
+      /* Core 4 tokens (do not add new hues) */
+      --gray-900:#2F2F2F;  /* 60% — text, headers, bars */
+      --offwhite:#FAFAF9;  /* 30% — surfaces/background */
+      --mustard:#F4CE14;   /* 10% — chips, highlights */
+      --teal:#0EA5A5;      /* CTAs / discounts / active filters */
 
       /* Derived (no new hues): borders from gray alpha */
       --border: rgba(47,47,47,.14);
       --border-strong: rgba(47,47,47,.22);
 
-      /* Shadows, radii */
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
       --topbar-h:56px; --stepper-h:44px; --chips-h:0px;
 
-      /* Focus ring */
       --focus: var(--teal);
     }
 
     html,body{height:100%}
     html{scroll-behavior:smooth;}
     body{
-      /* Display: Perandory (if you load it), Latin fallback Didact, Arabic Cairo */
+      /* Display: Perandory (if loaded), Latin Didact, Arabic Cairo */
       font-family:'Cairo','Didact Gothic','Perandory',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--gray-900);
       background:var(--offwhite);
@@ -51,7 +49,7 @@
       -webkit-tap-highlight-color:transparent;
     }
 
-    /* Global focus for accessibility */
+    /* Focus ring */
     :where(a,button,[role="button"],input,select,textarea):focus-visible{
       outline: 2px solid var(--focus);
       outline-offset: 2px;
@@ -78,7 +76,7 @@
     .kpi{background:var(--offwhite);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;box-shadow:var(--shadow)}
     .kpi .num{font-weight:900;font-size:1.25rem;line-height:1}
 
-    /* Chips/Search (MENU tuned) */
+    /* Chips/Search (MENU only; JS toggles) */
     .chips-wrap{
       position: sticky; top: calc(var(--topbar-h) + var(--stepper-h)); z-index: 90;
       background:var(--offwhite); border-bottom:1px solid var(--border); box-shadow: none;
@@ -156,12 +154,9 @@
     .inp-wrap .ico{position:absolute;inset-inline-start:12px;inset-block-start:50%;transform:translateY(-50%);color:rgba(47,47,47,.55);pointer-events:none}
     .pad-icon{padding-inline-start:42px}
     .form-control,.form-select{min-height:56px;border-color:var(--border)}
+    .iti{ direction: ltr; } .iti input{ text-align: left; } /* keep LTR numbers inside RTL */
 
-    /* Keep intlTelInput numeric LTR inside RTL */
-    .iti{ direction: ltr; }
-    .iti input{ text-align: left; }
-
-    /* Mini bar (warm gray) */
+    /* Mini bar */
     .mini-bar{position:sticky;bottom:0;z-index:55;background:var(--gray-900);color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
     .mini-btn{min-height:52px;border-radius:999px;font-weight:900}
 
@@ -170,12 +165,12 @@
     .toast-msg{background:var(--gray-900);color:#fff;padding:10px 14px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.25);font-weight:800}
 
     /* Overlays */
-    .overlay{position:fixed; inset:0; z-index:999; display:none; align-items:center; justify-content:center; text-align:center; background:rgba(250,250,249,.92); backdrop-filter:blur(6px)}
+    #appLoading,#submitLoading{position:fixed; inset:0; z-index:999; display:none; align-items:center; justify-content:center; text-align:center; background:rgba(250,250,249,.92); backdrop-filter:blur(6px)}
     .overlay.show{display:flex}
     .overlay .box{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);min-width:220px}
     .overlay .msg{margin-top:.5rem;color:rgba(47,47,47,.75);font-weight:800}
 
-    /* Motion (safe) */
+    /* Motion */
     @media (prefers-reduced-motion:no-preference){
       .cart-badge.bump{ animation:bump .4s; }
       .add-btn:active{ transform: translateY(1px) scale(.98); }
@@ -184,7 +179,7 @@
       @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.18)}100%{transform:scale(1)}}
     }
 
-    /* Themed Buttons (map Bootstrap "dark" to TEAL) */
+    /* Map Bootstrap "dark" → TEAL */
     .btn-dark,
     #optAddBtn,#confirmBtn,#thBackMenu{
       background:var(--teal)!important;
@@ -280,7 +275,7 @@
     </div>
   </div>
 
-  <!-- Chips + Search (only visible on Menu; JS toggles hidden elsewhere) -->
+  <!-- Chips + Search (only visible on Menu; JS toggles) -->
   <div class="chips-wrap" id="chipsWrap" hidden aria-hidden="true">
     <div class="container">
       <div id="chips" aria-label="تصنيفات">
@@ -537,7 +532,7 @@
     window.state = state;
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers with hidden-aware height */
+    /* Sticky helpers (chips height aware) */
     const topbarEl   = document.getElementById('topbar');
     const stepperEl  = document.getElementById('stepperWrap');
     const chipsWrap  = document.getElementById('chipsWrap');
@@ -596,7 +591,7 @@
     const cartTotal=document.getElementById('cartTotal');
     const offerBadge=document.getElementById('offerCountdown');
 
-    /* Menu fetch */
+    /* Fetch Menu */
     async function fetchMenu(){
       try{ const r=await fetch(GAS_WEBAPP_URL+'?action=menu.list'); const j=await r.json(); return j.ok?(j.data||[]):[]; }
       catch{ return []; }
@@ -623,6 +618,16 @@
       el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#fafaf9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="28">لا صورة</text></svg>`);
     }
 
+    /* Reveal on scroll */
+    let ro=null;
+    function revealObserve(){
+      if(ro){ ro.disconnect(); ro=null; }
+      ro=new IntersectionObserver(es=>{
+        es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); ro.unobserve(e.target); }});
+      },{threshold:.2});
+      document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+    }
+
     /* Render sections */
     function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
@@ -631,7 +636,7 @@
       let totalMatches=0;
 
       ORDERED_CATS.forEach(({key,label})=>{
-        const items = (groups[key]|||[]).filter(d=>{
+        const items = (groups[key] || []).filter(d=>{
           const inTxt = !q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
           return inTxt;
         });
@@ -686,7 +691,7 @@
       document.querySelector(b.dataset.target)?.scrollIntoView({behavior:'smooth', block:'start'});
     });
 
-    /* Scrollspy */
+    /* Scrollspy for chips */
     let spyObserver=null;
     function setupScrollspy(){
       if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
@@ -866,6 +871,23 @@
     }
     initCountdown(45);
 
+    /* KPI counters */
+    function initCounters(){
+      if (!matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
+      const io=new IntersectionObserver(es=>{
+        es.forEach(e=>{
+          if(!e.isIntersecting) return;
+          const el=e.target; const target=+el.dataset.count; let n=0;
+          const step=Math.max(1, Math.floor(target/40));
+          const isFloat = (''+el.dataset.count).includes('.');
+          const iv=setInterval(()=>{ n=Math.min(target, n+step); el.textContent = isFloat ? n.toFixed(1) : n; if(n>=target) clearInterval(iv); }, 20);
+          io.unobserve(el);
+        });
+      },{threshold:.4});
+      document.querySelectorAll('.kpi .num').forEach(el=>io.observe(el));
+    }
+    initCounters();
+
     /* INIT */
     (async()=>{
       const appLoading=document.getElementById('appLoading');
@@ -884,7 +906,7 @@
   });
   </script>
 
-  <!-- Reels module (sanitized + one-by-one + a11y + no leaks) -->
+  <!-- Reels module (one-by-one snap + a11y) -->
   <script>
   (() => {
     const reels = document.getElementById('reels');
