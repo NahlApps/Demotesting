@@ -49,6 +49,12 @@
       -webkit-tap-highlight-color:transparent;
     }
 
+    /* Helpers */
+    .text-gold{ color:var(--gold)!important; }
+    .spinner-gold .spinner-border{ color:var(--gold)!important; }
+    .btn .spinner-border{ width:1rem;height:1rem;border-width:.2em; margin-inline-start:.5rem; }
+    .btn-loading[disabled]{ opacity:.85; }
+
     /* Focus ring */
     :where(a,button,[role="button"],input,select,textarea):focus-visible{
       outline: 2px solid var(--focus);
@@ -251,15 +257,24 @@
     .reel .tag{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:4px 8px; font-size:.8rem; }
     .reel .cta{ position:absolute; inset-inline:12px; inset-block-end:12px; z-index:2; display:flex; gap:8px; }
     .reel .cta .btn{ border-radius:999px; font-weight:900; min-height:46px; }
+    /* Reels loading indicator */
+    #reelsLoading{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3; background:linear-gradient(180deg, rgba(0,0,0,.5), rgba(0,0,0,.35)); }
+    #reelsLoading[hidden]{ display:none; }
   </style>
 </head>
 <body>
   <!-- Overlays -->
   <div id="appLoading" class="overlay" aria-live="polite" aria-busy="true">
-    <div class="box"><div class="spinner-border" role="status" aria-label="جارِ التحميل"></div><div class="msg">جاري تحميل القائمة…</div></div>
+    <div class="box">
+      <div class="spinner-border text-gold" role="status" aria-label="جارِ التحميل"></div>
+      <div class="msg">جاري تحميل القائمة…</div>
+    </div>
   </div>
   <div id="submitLoading" class="overlay" aria-live="polite" aria-busy="true">
-    <div class="box"><div class="spinner-border" role="status" aria-label="جارِ المعالجة"></div><div class="msg">جارِ تأكيد الطلب…</div></div>
+    <div class="box">
+      <div class="spinner-border text-gold" role="status" aria-label="جارِ المعالجة"></div>
+      <div class="msg">جارِ تأكيد الطلب…</div>
+    </div>
   </div>
   <div id="toasts" aria-live="polite" aria-atomic="true"></div>
 
@@ -474,6 +489,10 @@
       <span class="small text-white-50 me-auto ms-2">اسحب للأعلى/الأسفل</span>
       <button id="reelsToCart" class="chip" type="button" aria-label="فتح السلة">السلة</button>
     </div>
+    <!-- Reels loading spinner -->
+    <div id="reelsLoading">
+      <div class="spinner-border text-gold" role="status" aria-label="جارِ التحميل"></div>
+    </div>
     <div class="reels-list" id="reelsList" tabindex="0" aria-live="polite"></div>
   </div>
 
@@ -538,7 +557,7 @@
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
 
-    /* Chips visibility toggle (menu only) + simple tab switcher (no BS triggers) */
+    /* Chips visibility toggle (menu only) + simple tab switcher */
     const tabs=['menu','cart','data','thanks'];
     function setStep(active){
       state.active=active;
@@ -595,6 +614,7 @@
     const goCartBtn=document.getElementById('goCartBtn');
     const toDataBtn=document.getElementById('toDataBtn');
     const cartTotal=document.getElementById('cartTotal');
+    const confirmBtn=document.getElementById('confirmBtn');
 
     /* Search toggle */
     function closeSearch(){
@@ -679,7 +699,7 @@
           node.querySelector('.desc').textContent=d.desc||'';
           const pEl=node.querySelector('.price'); pEl.textContent=fmt.format(Number(d.price||0)); pEl.style.color='var(--gold)';
           const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,3).forEach(t=>{ const s=document.createElement('span'); s.className='tag'; s.textContent=t; tags.appendChild(s); });
-          node.querySelector('.add-btn').addEventListener('click', ()=> addLine(d,1));
+          node.querySelector('.add-btn').addEventListener('click', (ev)=> addLine(d,1,ev.currentTarget));
 
           grid.appendChild(node);
         });
@@ -751,12 +771,26 @@
       renderCartList();
     }
     function bumpBadge(){ badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
-    function addLine(item, qty=1){
+
+    /* Add to cart with inline spinner */
+    function addLine(item, qty=1, btn){
+      const restoreBtn = ()=>{
+        if(btn){
+          btn.disabled=false; btn.classList.remove('btn-loading');
+          btn.innerHTML = 'أضف للسلة';
+        }
+      };
+      if(btn){
+        btn.disabled=true; btn.classList.add('btn-loading');
+        btn.innerHTML = `جاري الإضافة <span class="spinner-border" role="status" aria-hidden="true"></span>`;
+      }
       const key=stableId(JSON.stringify({id:item.id, price:item.price}));
       const exist=state.cart[key];
       if(exist) exist.qty+=qty;
       else state.cart[key]={lineId:key, id:item.id, title:item.title, unitPrice:Number(item.price||0), qty};
       bump(); bumpBadge(); toast(`أُضيف ${item.title} ✅`);
+      // brief UI feedback
+      setTimeout(restoreBtn, 450);
     }
     window.addLine = addLine;
 
@@ -785,7 +819,6 @@
     const phoneEl=document.getElementById('custPhone');
     const addrEl=document.getElementById('address');
     const notesEl=document.getElementById('notes');
-    const confirmBtn=document.getElementById('confirmBtn');
 
     const iti=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], separateDialCode:true });
 
@@ -809,7 +842,12 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* Thank you refs */
+    /* Confirm with inline spinner + overlay */
+    async function createOrder(payload){
+      const r=await fetch(GAS_WEBAPP_URL+'?action=order.create',{ method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+      return r.json();
+    }
+
     const thOrderId=document.getElementById('thOrderId');
     const thTotal=document.getElementById('thTotal');
     const thType=document.getElementById('thType');
@@ -827,11 +865,6 @@
     function setThankDate(){ const d=new Date(); thDate.textContent=d.toLocaleDateString('ar-SA',{ weekday:'short', year:'numeric', month:'2-digit', day:'2-digit'}); }
     async function copy(text){ try{ await navigator.clipboard.writeText(text); toast('تم النسخ ✅'); }catch{ toast('تعذّر النسخ'); } }
 
-    async function createOrder(payload){
-      const r=await fetch(GAS_WEBAPP_URL+'?action=order.create',{ method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
-      return r.json();
-    }
-
     function renderThanks({orderId, totals, payload}){
       const t4 = nextDailyTicketLocal(); thTicket.textContent=t4; setThankDate();
       thOrderId.textContent = orderId || '—';
@@ -840,6 +873,43 @@
       document.getElementById('copyTicket').onclick = ()=>copy(`تذكرة ${t4} • ${todayKey()}`);
       document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
     }
+
+    const submitLoading=document.getElementById('submitLoading');
+
+    confirmBtn.onclick=async()=>{
+      const t=totals();
+      if(t.count===0){ toast('السلة فارغة'); switchTab('menu'); return; }
+      if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
+
+      let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
+      const payload={
+        type: segDel.getAttribute('aria-pressed')==='true'?'delivery':'pickup',
+        name: nameEl.value.trim(), phone, address: addrEl.value.trim(), notes: notesEl.value.trim(),
+        items: t.arr.map(x=>({ id:x.id, title:x.title, qty:x.qty, price:x.unitPrice }))
+      };
+
+      // Inline spinner on button
+      const prevHTML = confirmBtn.innerHTML;
+      confirmBtn.disabled=true; confirmBtn.classList.add('btn-loading');
+      confirmBtn.innerHTML = `جارٍ التأكيد <span class="spinner-border" role="status" aria-hidden="true"></span>`;
+
+      // Full-screen overlay while sending
+      submitLoading.classList.add('show');
+      try{
+        const res=await createOrder(payload);
+        if(res && res.ok){
+          localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address}));
+          state.cart={}; bump();
+          renderThanks({ orderId:res.orderId, totals:res.totals||t.total, payload });
+          state.unlockThanks = true; switchTab('thanks');
+        } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); }
+      }catch{ toast('خطأ في الاتصال بالخدمة'); }
+      finally{
+        confirmBtn.disabled=false; confirmBtn.classList.remove('btn-loading');
+        confirmBtn.innerHTML = prevHTML;
+        submitLoading.classList.remove('show');
+      }
+    };
 
     /* INIT */
     (async()=>{
@@ -856,10 +926,21 @@
       renderSections(); setStep('menu'); setStickyVars(); bump();
       appLoading.classList.remove('show');
     })();
+
+    /* Optional: modal "optAddBtn" inline spinner (UX polish) */
+    const optAddBtn = document.getElementById('optAddBtn');
+    if(optAddBtn){
+      optAddBtn.addEventListener('click', ()=>{
+        const prev=optAddBtn.innerHTML;
+        optAddBtn.disabled=true; optAddBtn.classList.add('btn-loading');
+        optAddBtn.innerHTML=`جاري الإضافة <span class="spinner-border" role="status" aria-hidden="true"></span>`;
+        setTimeout(()=>{ optAddBtn.disabled=false; optAddBtn.classList.remove('btn-loading'); optAddBtn.innerHTML=prev; }, 500);
+      });
+    }
   });
   </script>
 
-  <!-- Reels module (snap + a11y) -->
+  <!-- Reels module (snap + a11y + spinner) -->
   <script>
   (() => {
     const reels = document.getElementById('reels');
@@ -867,6 +948,7 @@
     const open  = document.getElementById('openReels');
     const closeBtn = document.getElementById('closeReels');
     const toCart= document.getElementById('reelsToCart');
+    const reelsLoading = document.getElementById('reelsLoading');
 
     let currentIdx = 0;
     let resizeHandler = null;
@@ -960,11 +1042,23 @@
       if(!filtered.length){ window.toast && window.toast('لا توجد أطباق مطابقة لعرض الرييل'); return; }
 
       list.innerHTML='';
+      reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+      reelsLoading.hidden=false;
+
       filtered.forEach((d,i)=>list.appendChild(reelNode(d,i)));
 
-      reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
       list.focus({preventScroll:true});
       currentIdx=0; preloadAround(0);
+
+      // hide spinner once first image is loaded or after a short fallback delay
+      const firstImg = list.querySelector('img[data-src]') || list.querySelector('img');
+      let done=false;
+      const hideLoader = ()=>{ if(done) return; done=true; reelsLoading.hidden=true; };
+      if(firstImg){
+        firstImg.addEventListener('load', hideLoader, {once:true});
+        firstImg.addEventListener('error', hideLoader, {once:true});
+      }
+      setTimeout(hideLoader, 900);
 
       [...list.children].forEach(n=>idxObserver.observe(n));
       list.addEventListener('wheel', onWheel, {passive:false});
@@ -978,6 +1072,7 @@
 
     function closeReels(){
       reels.classList.remove('show'); reels.setAttribute('aria-hidden','true'); document.body.style.overflow='';
+      reelsLoading.hidden=true;
       idxObserver.disconnect();
       list.removeEventListener('wheel', onWheel);
       list.removeEventListener('touchstart', onTouchStart);
