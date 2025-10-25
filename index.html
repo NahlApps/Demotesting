@@ -24,7 +24,7 @@
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
       --topbar-h:56px;    /* updated by JS */
       --stepper-h:44px;   /* updated by JS */
-      --chips-h:56px;     /* approx chips bar height */
+      --chips-h:56px;     /* updated by JS (multi-row aware) */
     }
     html,body{height:100%}
     html{scroll-behavior:smooth;}
@@ -49,19 +49,28 @@
     .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips + search wrapper */
+    /* Chips bar — always visible, multi-row, sticky under header+stepper */
     .chips-wrap{background:#fff;border-bottom:1px solid var(--rule)}
-    /* >>> Freeze ONLY the #chips row below the header while scrolling <<< */
     #chips{
       position: sticky;
-      top: calc(var(--topbar-h) + var(--stepper-h)); /* always right under stepper */
-      z-index: 66;
-      background: #fff;
-      padding-block: 10px;
-      border-bottom: 1px solid var(--rule);
+      top: calc(var(--topbar-h) + var(--stepper-h));
+      z-index: 90;
+      background:#fff;
+      padding-block:10px;
+      border-bottom:1px solid var(--rule);
+      display:flex;
+      flex-wrap:wrap;              /* allow multiple rows */
+      gap:8px;
+      overflow:visible;            /* prevent clipping */
+      align-items:center;
     }
     body.scrolled #chips{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
-    .chip{background:#F2F2F2;color:#111;border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:.18s}
+    .chip{
+      background:#F2F2F2;color:#111;border:1px solid var(--rule);
+      border-radius:var(--radius-pill);padding:10px 14px;
+      font-weight:800;font-size:.95rem;min-height:44px;
+      transition:.18s; flex:0 0 auto; /* chips don’t shrink */
+    }
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
@@ -69,7 +78,7 @@
 
     /* Sections for scrollspy */
     .menu-section{
-      scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px); /* prevent hiding under sticky bars */
+      scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px);
       padding-top: 8px;
     }
     .menu-head{
@@ -78,9 +87,9 @@
       z-index: 10;
       background: #fff;
       padding: 8px 0;
-      border-top: 1px solid transparent;
     }
     .menu-head h5{margin:0;font-weight:900}
+
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -162,17 +171,15 @@
     </div>
   </div>
 
-  <!-- Chips + Search (sticky bar) -->
+  <!-- Chips + Search (always visible, multi-row) -->
   <div class="chips-wrap">
     <div class="container">
-      <div id="chips" class="d-flex flex-wrap gap-2 align-items-center" aria-label="تصنيفات">
-        <!-- chips now SCROLL to sections -->
+      <div id="chips" aria-label="تصنيفات">
         <button class="chip active" data-target="#topOfMenu">الكل</button>
         <button class="chip" data-target="#sec-sushi">سوشي</button>
         <button class="chip" data-target="#sec-don">دون</button>
         <button class="chip" data-target="#sec-meat">لحوم</button>
         <button class="chip" data-target="#sec-drinks">مشروبات</button>
-        <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
 
         <div class="ms-auto" style="min-width:260px;flex:1 1 260px">
           <div class="searchbox d-flex" role="search">
@@ -180,6 +187,8 @@
             <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
           </div>
         </div>
+
+        <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
       </div>
     </div>
   </div>
@@ -394,7 +403,7 @@
     const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers so bars know where to stick */
+    /* Sticky helpers: measure heights (chips can wrap to multiple rows) */
     const topbarEl = document.getElementById('topbar');
     const stepperEl = document.getElementById('stepperWrap');
     const chipsEl = document.getElementById('chips');
@@ -491,7 +500,7 @@
         sec.className = 'menu-section';
         sec.id = 'sec-'+key;
 
-        // Sticky heading inside section (nice context on long scroll)
+        // Sticky heading inside section
         const head = document.createElement('div');
         head.className = 'menu-head';
         head.innerHTML = `<h5>${label}</h5>`;
@@ -536,8 +545,7 @@
     document.getElementById('chips').addEventListener('click',(e)=>{
       const b=e.target.closest('.chip');
       if(!b || !b.dataset.target) return;
-      const to = b.dataset.target;
-      const el = document.querySelector(to);
+      const el = document.querySelector(b.dataset.target);
       if(!el) return;
       el.scrollIntoView({behavior:'smooth', block:'start'});
     });
@@ -555,13 +563,13 @@
           .sort((a,b)=>b.intersectionRatio - a.intersectionRatio)[0];
         if(!visible) return;
         const id = '#'+visible.target.id;
-        chips.forEach(c=>c.classList.toggle('active', c.dataset.target===id || (id && c.dataset.target==='#topOfMenu' && id==='#topOfMenu')));
+        chips.forEach(c=>c.classList.toggle('active', c.dataset.target===id || (id==='#topOfMenu' && c.dataset.target==='#topOfMenu')));
       },{
         rootMargin: '-40% 0px -50% 0px',
         threshold: [0.2,0.4,0.6,0.8,1]
       });
 
-      // Observe each section; also observe the top anchor to activate "الكل" when above first section
+      // Observe each section; also observe the top anchor to activate "الكل"
       document.querySelectorAll('.menu-section').forEach(sec=>spyObserver.observe(sec));
       const top = document.getElementById('topOfMenu');
       if(top) spyObserver.observe(top);
@@ -569,14 +577,13 @@
 
     /* Search */
     let t=null;
-    document.getElementById('q').addEventListener('input', e=>{
+    search.addEventListener('input', e=>{
       clearTimeout(t);
       t=setTimeout(()=>{ state.q=e.target.value||''; renderSections(); }, 160);
     });
     clearFilters.addEventListener('click', ()=>{
-      state.q=''; document.getElementById('q').value='';
+      state.q=''; search.value='';
       renderSections();
-      // Scroll up a bit so "الكل" becomes active visually
       document.getElementById('topOfMenu').scrollIntoView({behavior:'smooth',block:'start'});
     });
 
