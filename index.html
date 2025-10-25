@@ -19,11 +19,12 @@
   <meta name="description" content="Maison Hikari — اطلب الآن" />
 
   <style>
-    /* ===== Base from your last version ===== */
     :root{
       --bg:#FAFAFA; --ink:#0B0D13; --muted:#6B7280; --rule:#EAEAEA;
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
-      --topbar-h:56px; --stepper-h:44px; --chips-h:56px;
+      --topbar-h:56px;    /* updated by JS */
+      --stepper-h:44px;   /* updated by JS */
+      --chips-h:56px;     /* updated by JS (multi-row aware) */
     }
     html,body{height:100%}
     html{scroll-behavior:smooth;}
@@ -34,13 +35,13 @@
     }
 
     /* Header */
-    .app-header{position:sticky;top:0;z-index:90;background:#fff;border-bottom:1px solid var(--rule);backdrop-filter:saturate(1.15) blur(6px)}
+    .app-header{position:sticky;top:0;z-index:70;background:#fff;border-bottom:1px solid var(--rule);backdrop-filter:saturate(1.15) blur(6px)}
     .brand{font-weight:900}
     .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--rule);background:#fff}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:#111;color:#fff;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
     /* Stepper */
-    .stepper-wrap{position:sticky; top:var(--topbar-h); z-index:85; background:#fff; border-bottom:1px solid var(--rule)}
+    .stepper-wrap{position:sticky; top:var(--topbar-h); z-index:65; background:#fff; border-bottom:1px solid var(--rule)}
     .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0}
     .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:#6b7280;white-space:nowrap}
     .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid #d1d5db;display:inline-grid;place-items:center;font-size:.9rem}
@@ -48,36 +49,48 @@
     .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips */
+    /* KPI Tiles row */
+    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .kpi{background:#fff;border:1px solid var(--rule);border-radius:12px;padding:10px;text-align:center;box-shadow:var(--shadow)}
+    .kpi .num{font-weight:900;font-size:1.25rem;line-height:1}
+
+    /* Chips bar — ALWAYS visible (sticky), multi-row */
     .chips-wrap{
       position: sticky;
       top: calc(var(--topbar-h) + var(--stepper-h));
-      z-index: 80;
+      z-index: 90;
       background:#fff;
       border-bottom:1px solid var(--rule);
       box-shadow: none;
     }
     body.scrolled .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
-    #chips{ display:flex; flex-wrap:wrap; gap:8px; padding-block:10px; align-items:center; overflow:visible; }
+    #chips{
+      display:flex; flex-wrap:wrap; gap:8px; padding-block:10px; align-items:center; overflow:visible;
+    }
     .chip{
       background:#F2F2F2;color:#111;border:1px solid var(--rule);
       border-radius:var(--radius-pill);padding:10px 14px;
-      font-weight:800;font-size:.95rem;min-height:44px;transition:.18s; flex:0 0 auto;
+      font-weight:800;font-size:.95rem;min-height:44px;
+      transition:.18s; flex:0 0 auto;
     }
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
+    .offer-badge{margin-inline-start:auto}
 
     /* Sections */
-    .menu-section{ scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px); padding-top: 8px; }
+    .menu-section{
+      scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px);
+      padding-top: 8px;
+    }
     .sec-title{margin:8px 0 12px 0;font-weight:900}
 
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-    /* Cards */
+    /* Menu cards */
     .dish{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
     .dish-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#f3f4f6}
     .dish-body{padding:12px 12px 14px}
@@ -101,7 +114,7 @@
     .form-control,.form-select{min-height:56px}
 
     /* Mini bar */
-    .mini-bar{position:sticky;bottom:0;z-index:70;background:#0A0A0A;color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+    .mini-bar{position:sticky;bottom:0;z-index:55;background:#0A0A0A;color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
     .mini-btn{min-height:52px;border-radius:999px;font-weight:900}
 
     /* Toast */
@@ -114,127 +127,152 @@
     .overlay .box{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);min-width:220px}
     .overlay .msg{margin-top:.5rem;color:#555;font-weight:800}
 
-    /* ===== Color system (gold/indigo) from last patch ===== */
+    /* Motion (safe) */
+    @media (prefers-reduced-motion:no-preference){
+      .cart-badge.bump{ animation:bump .4s; }
+      .add-btn:active{ transform: translateY(1px) scale(.98); }
+      .reveal{opacity:0; transform:translateY(12px); transition:.4s ease;}
+      .reveal.in{opacity:1; transform:none;}
+      @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.18)}100%{transform:scale(1)}}
+    }
+  </style>
+
+  <!-- === Color System Patch (Japanese-inspired gold/indigo) === -->
+  <style>
+    /* Light theme remap */
     :root{
-      --brand-50:#FFF8D9; --brand-300:#F7DC72; --brand-600:#F4CE14; --brand-800:#B38705; --brand-900:#8A6F00;
-      --sakura-600:#E11D48; --indigo-600:#223554;
-      --bg:#FAFAF9; --surface:#FFFFFF; --surface-2:#F5F5F4; --ink-900:#0B0D13; --ink-700:#2B2F36; --rule:#E7E5E4;
-      --success-600:#16A34A; --warn-600:#F59E0B; --error-600:#DC2626; --info-600:#0369A1;
+      /* Brand & Accents */
+      --brand-50:#FFF8D9;
+      --brand-300:#F7DC72;
+      --brand-600:#F4CE14;  /* highlights / badges */
+      --brand-800:#B38705;  /* primary buttons */
+      --brand-900:#8A6F00;  /* hover/active */
+
+      --sakura-600:#E11D48; /* alert badge / cart ping */
+      --indigo-600:#223554; /* links/info */
+
+      /* Neutrals (slightly warm) */
+      --bg:#FAFAF9;
+      --surface:#FFFFFF;
+      --surface-2:#F5F5F4;
+      --ink-900:#0B0D13;
+      --ink-700:#2B2F36;
+      --rule:#E7E5E4;
+
+      /* States */
+      --success-600:#16A34A;
+      --warn-600:#F59E0B;
+      --error-600:#DC2626;
+      --info-600:#0369A1;
+
+      /* Elevation */
       --shadow:0 10px 30px rgba(0,0,0,.06);
     }
+
+    /* Base */
     body{ background:var(--bg); color:var(--ink-900); }
     .app-header,.stepper-wrap,.chips-wrap{ background:var(--surface); border-color:var(--rule); }
-    .btn-dark,.add-btn,#optAddBtn,#confirmBtn,.mini-bar .btn,#thBackMenu{
-      background:var(--brand-800)!important;border-color:var(--brand-800)!important;color:#fff!important;
+
+    /* CTA remap */
+    .btn-dark,
+    .add-btn,
+    #optAddBtn,
+    #confirmBtn,
+    .mini-bar .btn,
+    #thBackMenu{
+      background:var(--brand-800)!important;
+      border-color:var(--brand-800)!important;
+      color:#fff!important;
     }
-    .btn-dark:hover,.add-btn:hover,#optAddBtn:hover,#confirmBtn:hover,.mini-bar .btn:hover,#thBackMenu:hover{
-      background:var(--brand-900)!important;border-color:var(--brand-900)!important;
+    .btn-dark:hover,
+    .add-btn:hover,
+    #optAddBtn:hover,
+    #confirmBtn:hover,
+    .mini-bar .btn:hover,
+    #thBackMenu:hover{
+      background:var(--brand-900)!important;
+      border-color:var(--brand-900)!important;
     }
-    .btn-outline-dark,#thBackCart{ color:var(--brand-800)!important;border-color:var(--brand-300)!important;background:transparent!important; }
-    .btn-outline-dark:hover,#thBackCart:hover{ background:var(--brand-50)!important;border-color:var(--brand-600)!important;color:var(--ink-900)!important; }
+
+    .btn-outline-dark,
+    #thBackCart{
+      color:var(--brand-800)!important;
+      border-color:var(--brand-300)!important;
+      background:transparent!important;
+    }
+    .btn-outline-dark:hover,
+    #thBackCart:hover{
+      background:var(--brand-50)!important;
+      border-color:var(--brand-600)!important;
+      color:var(--ink-900)!important;
+    }
+
+    /* Chips */
     .chip{ background:var(--surface-2); border-color:var(--rule); color:var(--ink-900); }
     .chip.active{ background:var(--brand-800); border-color:var(--brand-800); color:#fff; }
     .pill-clear{ background:var(--surface); border-color:var(--brand-300); color:var(--brand-800); }
+
+    /* Segmented toggle */
     .seg{ background:var(--surface-2); border-color:var(--rule); }
-    .seg button[aria-pressed="true"]{ background:var(--brand-800); border-color:var(--brand-800); color:#fff; }
+    .seg button[aria-pressed="true"]{
+      background:var(--brand-800); border-color:var(--brand-800); color:#fff;
+    }
+
+    /* Badge & minibar */
     .cart-badge{ background:var(--sakura-600); }
-    .mini-bar{ background:linear-gradient(0deg, rgba(0,0,0,.72), rgba(0,0,0,.72)), var(--ink-900); }
-    #etaBadge{ background:color-mix(in oklab, var(--indigo-600) 14%, white); color:var(--indigo-600); }
-    a.link-dark{ color:var(--indigo-600) !important; } a.link-dark:hover{ text-decoration:underline; }
+    .mini-bar{
+      background:linear-gradient(0deg, rgba(0,0,0,.72), rgba(0,0,0,.72)), var(--ink-900);
+    }
+
+    /* Info/ETA */
+    #etaBadge{
+      background:color-mix(in oklab, var(--indigo-600) 14%, white);
+      color:var(--indigo-600);
+    }
+    .toast-msg{ background:var(--ink-900); }
+
+    /* Links */
+    a.link-dark{ color:var(--indigo-600) !important; }
+    a.link-dark:hover{ text-decoration:underline; }
+
+    /* Cards & tags */
     .dish,.cart-card,.card-paper{ background:var(--surface); border-color:var(--rule); box-shadow:var(--shadow); }
     .line{ border-bottom-color:var(--rule); }
     .tag{ border-color:var(--rule); color:var(--ink-700); background:var(--surface); }
+
+    /* Inputs */
+    .searchbox,
+    .form-control,
+    .form-select{ border-color:var(--rule); }
+
+    /* Strong headings */
+    .sec-title,.brand{ color:var(--ink-900); }
+
+    /* Thanks */
+    #tab-thanks .badge{ background:var(--surface); border-color:var(--rule); color:var(--ink-900); }
+    .ticket#thTicket{ color:var(--brand-800); }
+
+    /* Dark mode */
     @media (prefers-color-scheme: dark){
-      :root{ --bg:#0D0F13; --surface:#111318; --surface-2:#1A1D23; --ink-900:#F5F6F7; --ink-700:#D6D8DC; --rule:#252930; --shadow:0 12px 34px rgba(0,0,0,.4); }
+      :root{
+        --bg:#0D0F13;
+        --surface:#111318;
+        --surface-2:#1A1D23;
+        --ink-900:#F5F6F7;
+        --ink-700:#D6D8DC;
+        --rule:#252930;
+        --shadow:0 12px 34px rgba(0,0,0,.4);
+      }
       .chip{ color:var(--ink-900); }
       .chip.active{ color:#111; background:var(--brand-600); border-color:var(--brand-600); }
       .btn-outline-dark{ color:var(--brand-600)!important; border-color:color-mix(in oklab, var(--brand-600) 40%, white); }
       .btn-outline-dark:hover{ background:color-mix(in oklab, var(--brand-600) 12%, white); }
     }
-
-    /* ===== New: Cinematic layer (particles) ===== */
-    #motionCanvas{
-      position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.25; mix-blend-mode:normal;
-    }
-    main, .app-header, .chips-wrap, .stepper-wrap{ position:relative; z-index:1; }
-
-    /* ===== New: Countdown bar ===== */
-    .countdown-bar{
-      position:sticky; top:0; inset-inline:0; z-index:95;
-      background:linear-gradient(90deg, var(--brand-800), var(--brand-900));
-      color:#fff; padding:6px 0; border-bottom:1px solid rgba(255,255,255,.25);
-    }
-    .countdown-bar small{ opacity:.9 }
-    .t-nums{ font-weight:900; letter-spacing:.5px; }
-
-    /* ===== New: Orientation + Scroll-lock prompts ===== */
-    #orientOverlay .box{ text-align:center }
-    #scrollLockBtn{
-      position:fixed; inset-inline-end:12px; inset-block-end:calc(14px + env(safe-area-inset-bottom));
-      z-index:120; border-radius:999px; padding:.6rem .9rem; border:1px solid var(--brand-300);
-      background:var(--surface); color:var(--ink-900); box-shadow:var(--shadow); font-weight:800;
-    }
-    #scrollLockBtn.locked{ background:var(--brand-800); color:#fff; border-color:var(--brand-800); }
-
-    /* ===== New: KPI tiles (count up) ===== */
-    .kpi-wrap{ display:grid; gap:12px; grid-template-columns:repeat(2,minmax(0,1fr)); }
-    @media(min-width:768px){ .kpi-wrap{ grid-template-columns:repeat(4,1fr); } }
-    .kpi{
-      background:var(--surface); border:1px solid var(--rule); border-radius:16px; padding:14px; box-shadow:var(--shadow);
-      transform:translateY(8px); opacity:0; transition:.5s ease;
-    }
-    .kpi.reveal{ transform:none; opacity:1; }
-    .kpi .num{ font-size:1.8rem; font-weight:900; line-height:1; }
-    .kpi .lbl{ color:var(--muted); font-weight:800; }
-
-    /* ===== New: Calendar toggle (Track ↔ List) ===== */
-    .cal-toggle{ display:inline-grid; grid-auto-flow:column; gap:6px; background:var(--surface-2); border:1px solid var(--rule); border-radius:999px; padding:6px; }
-    .cal-toggle button{ border:1px solid var(--rule); background:#fff; border-radius:999px; padding:.55rem .9rem; font-weight:800; }
-    .cal-toggle button[aria-pressed="true"]{ background:var(--brand-800); border-color:var(--brand-800); color:#fff; }
-    .cal-views{ position:relative; min-height:180px; }
-    .cal-view{ position:absolute; inset:0; opacity:0; transform:scale(.98); transition:.35s ease; pointer-events:none; }
-    .cal-view.show{ opacity:1; transform:none; pointer-events:auto; }
-
-    /* Track visualiser mock */
-    .track{
-      width:100%; height:100%; background:
-        radial-gradient(60% 60% at 50% 50%, color-mix(in oklab, var(--brand-50) 50%, #fff) 0%, transparent 70%),
-        linear-gradient(180deg, var(--surface), var(--surface));
-      border:1px dashed var(--brand-300); border-radius:16px; position:relative; overflow:hidden;
-    }
-    .dot{ position:absolute; width:10px; height:10px; border-radius:999px; background:var(--sakura-600); box-shadow:0 0 0 6px color-mix(in oklab, var(--sakura-600) 20%, transparent); }
-
-    /* ===== New: Gallery (lazy + reveal) ===== */
-    .gallery{ display:grid; gap:10px; grid-template-columns:repeat(2,1fr); }
-    @media(min-width:768px){ .gallery{ grid-template-columns:repeat(4,1fr); } }
-    .gimg{
-      width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; border:1px solid var(--rule);
-      transform:translateY(10px); opacity:0; transition:.45s ease;
-    }
-    .gimg.reveal{ transform:none; opacity:1; }
-
-    /* ===== Reduced motion friendly ===== */
-    @media (prefers-reduced-motion: reduce){
-      #motionCanvas{ display:none; }
-      .kpi, .gimg{ transition:none; transform:none; opacity:1; }
-      .cal-view{ transition:none; }
-    }
   </style>
 </head>
 <body>
-  <!-- Cinematic: lightweight particles canvas -->
-  <canvas id="motionCanvas" aria-hidden="true"></canvas>
-
-  <!-- Countdown bar -->
-  <div class="countdown-bar" id="countdownBar" role="status" aria-live="polite">
-    <div class="container d-flex gap-2 align-items-center justify-content-between">
-      <div class="d-flex gap-2 align-items-center">
-        <i class="fa-regular fa-clock"></i>
-        <small>الحدث القادم يبدأ بعد:</small>
-      </div>
-      <div class="t-nums" id="countdownTxt">— يوم —:—:—</div>
-    </div>
-  </div>
+  <!-- One-time rotate hint -->
+  <div id="rotateHint" hidden class="position-fixed top-0 start-50 translate-middle-x p-2 small bg-dark text-white rounded-pill mt-2" style="z-index:1000">جرّب تدوير الجهاز لعرض أوسع</div>
 
   <!-- Overlays -->
   <div id="appLoading" class="overlay" aria-live="polite" aria-busy="true">
@@ -243,15 +281,6 @@
   <div id="submitLoading" class="overlay" aria-live="polite" aria-busy="true">
     <div class="box"><div class="spinner-border" role="status" aria-label="جارِ المعالجة"></div><div class="msg">جارِ تأكيد الطلب…</div></div>
   </div>
-  <div id="orientOverlay" class="overlay" aria-hidden="true">
-    <div class="box">
-      <div class="display-6">↻</div>
-      <div class="msg">فضلاً قم بتدوير جهازك إلى الوضع الطولي</div>
-      <button id="closeOrient" class="btn btn-dark mt-2">حسناً</button>
-    </div>
-  </div>
-  <button id="scrollLockBtn" type="button" aria-pressed="false" title="قفل التمرير">قفل التمرير</button>
-
   <div id="toasts" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Header -->
@@ -283,7 +312,16 @@
     </div>
   </div>
 
-  <!-- Chips + Search -->
+  <!-- KPI Tiles -->
+  <div class="container py-2">
+    <div class="kpis">
+      <div class="kpi reveal"><div class="num" data-count="15000">0</div><small class="text-secondary">طلب مُكتمل</small></div>
+      <div class="kpi reveal"><div class="num" data-count="4.8">0</div><small class="text-secondary">تقييم</small></div>
+      <div class="kpi reveal"><div class="num" data-count="15">0</div><small class="text-secondary">دقيقة تحضير</small></div>
+    </div>
+  </div>
+
+  <!-- Chips + Search (always visible, multi-row) -->
   <div class="chips-wrap" id="chipsWrap">
     <div class="container">
       <div id="chips" aria-label="تصنيفات">
@@ -300,6 +338,9 @@
           </div>
         </div>
 
+        <!-- Live countdown -->
+        <span id="offerCountdown" class="badge bg-light text-dark border offer-badge">—</span>
+
         <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
       </div>
     </div>
@@ -311,26 +352,8 @@
       <!-- MENU -->
       <section id="tab-menu" class="tab-pane fade show active">
         <div class="container py-3" id="menuContainer">
-          <!-- KPIs -->
-          <div class="kpi-wrap mb-3" id="kpis">
-            <div class="kpi"><div class="num" data-countup="4.9" data-suffix="/5">0</div><div class="lbl">تقييم الضيوف</div></div>
-            <div class="kpi"><div class="num" data-countup="42" data-suffix="+">0</div><div class="lbl">أطباق مميزة</div></div>
-            <div class="kpi"><div class="num" data-countup="28" data-suffix="د">0</div><div class="lbl">متوسط التوصيل</div></div>
-            <div class="kpi"><div class="num" data-countup="120" data-suffix="+">0</div><div class="lbl">طلبات اليوم</div></div>
-          </div>
-
           <div id="menuSections"></div>
           <p id="emptyMsg" class="text-secondary text-center my-5 d-none">لا توجد أطباق مطابقة — جرّب كلمة بحث مختلفة</p>
-
-          <!-- Gallery-led strip -->
-          <h6 class="mt-4 mb-2 fw-bold">من أجوائنا</h6>
-          <div class="gallery" id="gallery">
-            <img class="gimg" loading="lazy" src="https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=600&auto=format&fit=crop" alt="">
-            <img class="gimg" loading="lazy" src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?q=80&w=600&auto=format&fit=crop" alt="">
-            <img class="gimg" loading="lazy" src="https://images.unsplash.com/photo-1553621042-4c1a2cd1b5b9?q=80&w=600&auto=format&fit=crop" alt="">
-            <img class="gimg" loading="lazy" src="https://images.unsplash.com/photo-1607305387299-5c6f0a64a2ad?q=80&w=600&auto=format&fit=crop" alt="">
-          </div>
-
           <div style="height:18vh"></div>
         </div>
 
@@ -378,27 +401,17 @@
             <span id="etaBadge">ETA ~ 15</span>
           </div>
 
-          <!-- Calendar toggle -->
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <h6 class="fw-bold mb-0">المواعيد المتاحة اليوم</h6>
-            <div class="cal-toggle" role="tablist" aria-label="تبديل العرض">
-              <button id="btnTrack" aria-pressed="true"  class="btn" type="button">المسار</button>
-              <button id="btnList"  aria-pressed="false" class="btn" type="button">قائمة</button>
-            </div>
-          </div>
-          <div class="cal-views mb-3">
-            <div class="cal-view show" id="viewTrack" role="tabpanel" aria-hidden="false">
-              <div class="track">
-                <!-- dots placed via JS -->
+          <!-- Time Slots: List ↔ Calendar -->
+          <div class="card-paper p-3 p-md-4 mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <div class="seg" role="tablist" aria-label="طريقة العرض">
+                <button class="btn" id="viewList" aria-pressed="true">قائمة</button>
+                <button class="btn" id="viewCal" aria-pressed="false">تقويم</button>
               </div>
+              <small class="text-secondary">اختر وقت الاستلام/التوصيل</small>
             </div>
-            <div class="cal-view" id="viewList" role="tabpanel" aria-hidden="true">
-              <div class="card-paper p-3">
-                <div class="d-flex flex-wrap gap-2">
-                  <!-- times via JS -->
-                </div>
-              </div>
-            </div>
+            <div id="slotList" class="mt-2 d-flex flex-wrap gap-2"></div>
+            <div id="slotCal" class="mt-2 d-none"></div>
           </div>
 
           <div class="card-paper p-3 p-md-4">
@@ -512,7 +525,7 @@
 
   <!-- Templates -->
   <template id="dishTpl">
-    <div class="dish" data-cat="">
+    <div class="dish reveal" data-cat="">
       <img class="dish-img" alt="" width="1200" height="675" loading="lazy"/>
       <div class="dish-body">
         <div class="d-flex align-items-center justify-content-between mb-1">
@@ -551,145 +564,21 @@
   const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxyGwCUJRwjVfJDtq5bxqN9Thm_KU4zOfNiNt0ENtW2jbDonr_yp3W2xDZCNXkmSHZNLw/exec';
   const FREE_SHIP = 79;
 
-  // === Cinematic particles (very light) ===
-  function initCinematic(){
-    const canvas = document.getElementById('motionCanvas');
-    const ctx = canvas.getContext('2d');
-    let w=canvas.width=innerWidth*devicePixelRatio, h=canvas.height=innerHeight*devicePixelRatio;
-    let particles = Array.from({length: 36}, ()=>({
-      x: Math.random()*w, y: Math.random()*h, r: 1 + Math.random()*2,
-      vx: (Math.random()-.5)*0.08*devicePixelRatio, vy: (Math.random()-.5)*0.08*devicePixelRatio
-    }));
-    const gold = getComputedStyle(document.documentElement).getPropertyValue('--brand-800').trim() || '#B38705';
-
-    function draw(){
-      ctx.clearRect(0,0,w,h);
-      ctx.globalAlpha = .35;
-      particles.forEach(p=>{
-        p.x+=p.vx; p.y+=p.vy;
-        if(p.x<0||p.x>w) p.vx*=-1; if(p.y<0||p.y>h) p.vy*=-1;
-        ctx.beginPath(); ctx.fillStyle=gold; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
-      });
-      requestAnimationFrame(draw);
-    }
-    addEventListener('resize', ()=>{ w=canvas.width=innerWidth*devicePixelRatio; h=canvas.height=innerHeight*devicePixelRatio; }, {passive:true});
-    if(!matchMedia('(prefers-reduced-motion: reduce)').matches) draw();
-  }
-
-  // === Countdown (edit date/time below) ===
-  const NEXT_EVENT_ISO = '2025-11-01T20:00:00+03:00'; // Riyadh time
-  function initCountdown(){
-    const box=document.getElementById('countdownTxt');
-    function tick(){
-      const now=new Date();
-      const target=new Date(NEXT_EVENT_ISO);
-      let diff = Math.max(0, target-now);
-      const d = Math.floor(diff/86400000); diff%=86400000;
-      const h = Math.floor(diff/3600000);  diff%=3600000;
-      const m = Math.floor(diff/60000);    diff%=60000;
-      const s = Math.floor(diff/1000);
-      box.textContent = `${d} يوم ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    }
-    tick(); setInterval(tick,1000);
-  }
-
-  // === Orientation overlay + Scroll lock ===
-  function initPrompts(){
-    const overlay=document.getElementById('orientOverlay');
-    const closeBtn=document.getElementById('closeOrient');
-    function check(){
-      const isPortrait = innerHeight>innerWidth;
-      overlay.classList.toggle('show', isPortrait);
-    }
-    closeBtn.onclick=()=>overlay.classList.remove('show');
-    addEventListener('resize', check, {passive:true});
-    check();
-
-    const btn=document.getElementById('scrollLockBtn');
-    btn.addEventListener('click', ()=>{
-      const locked = btn.getAttribute('aria-pressed')==='true';
-      if(locked){
-        document.body.style.overflow=''; btn.setAttribute('aria-pressed','false'); btn.classList.remove('locked'); btn.textContent='قفل التمرير';
-      }else{
-        document.body.style.overflow='hidden'; btn.setAttribute('aria-pressed','true'); btn.classList.add('locked'); btn.textContent='عودة للتمرير';
-      }
-    });
-  }
-
-  // === Reveal on scroll for KPI + Gallery ===
-  function initReveals(){
-    const obs = new IntersectionObserver((entries)=>{
-      entries.forEach(e=>{
-        if(e.isIntersecting){
-          e.target.classList.add('reveal');
-          if(e.target.dataset.countup) countUp(e.target);
-          obs.unobserve(e.target);
-        }
-      });
-    }, {threshold:.35});
-    document.querySelectorAll('.kpi, .gimg').forEach(el=>obs.observe(el));
-  }
-  function countUp(numEl){
-    const target = parseFloat(numEl.dataset.countup||'0') || 0;
-    const suffix = numEl.dataset.suffix||'';
-    let cur = 0; const dur=900; const start=performance.now();
-    function step(t){
-      const p=Math.min(1,(t-start)/dur);
-      cur = target * (0.5 - Math.cos(Math.PI*p)/2); // ease
-      numEl.textContent = (target%1?cur.toFixed(1):Math.round(cur)) + suffix;
-      if(p<1) requestAnimationFrame(step);
-      else numEl.textContent = (target%1?target.toFixed(1):Math.round(target)) + suffix;
-    }
-    requestAnimationFrame(step);
-  }
-
-  // === Calendar toggle mock ===
-  function initCalendar(){
-    const btnTrack=document.getElementById('btnTrack');
-    const btnList=document.getElementById('btnList');
-    const vTrack=document.getElementById('viewTrack');
-    const vList =document.getElementById('viewList');
-
-    function show(track){
-      btnTrack.setAttribute('aria-pressed', String(track));
-      btnList .setAttribute('aria-pressed', String(!track));
-      vTrack.classList.toggle('show', track); vTrack.setAttribute('aria-hidden', String(!track));
-      vList .classList.toggle('show', !track); vList .setAttribute('aria-hidden', String(track));
-    }
-    btnTrack.onclick=()=>show(true);
-    btnList .onclick=()=>show(false);
-    show(true);
-
-    // place dots along a pseudo-track
-    const track=vTrack.querySelector('.track');
-    const dots = Array.from({length: 10}, (_,i)=> i);
-    dots.forEach(i=>{
-      const d=document.createElement('div'); d.className='dot';
-      d.style.insetInlineStart= (10 + i*8) + '%';
-      d.style.insetBlockStart = (30 + Math.sin(i/1.5)*12 + 10) + '%';
-      d.title = `الساعة ${12+i}:00`;
-      track.appendChild(d);
-    });
-
-    // times list
-    const list=vList.querySelector('.d-flex');
-    ['12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'].forEach(t=>{
-      const b=document.createElement('button');
-      b.className='btn btn-outline-dark';
-      b.textContent=t;
-      list.appendChild(b);
-    });
-  }
-
-  // === Original App Logic ===
   window.addEventListener('DOMContentLoaded', () => {
-    // cinematic + prompts + countdown + reveals + calendar
-    initCinematic(); initPrompts(); initCountdown(); initReveals(); initCalendar();
-
-    const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
+    const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu', slot:'' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers */
+    /* One-time rotate hint */
+    try{
+      if (matchMedia('(prefers-reduced-motion: no-preference)').matches && screen.orientation?.type.includes('portrait')) {
+        if(!localStorage.getItem('seenRotate')){
+          const rh=document.getElementById('rotateHint'); rh.hidden=false;
+          setTimeout(()=>{ rh.hidden=true; localStorage.setItem('seenRotate','1') }, 3500);
+        }
+      }
+    }catch{}
+
+    /* Sticky helpers: measure heights (chips can wrap) */
     const topbarEl   = document.getElementById('topbar');
     const stepperEl  = document.getElementById('stepperWrap');
     const chipsWrap  = document.getElementById('chipsWrap');
@@ -738,6 +627,7 @@
     const goCartBtn=document.getElementById('goCartBtn');
     const toDataBtn=document.getElementById('toDataBtn');
     const cartTotal=document.getElementById('cartTotal');
+    const offerBadge=document.getElementById('offerCountdown');
 
     /* Menu fetch */
     async function fetchMenu(){
@@ -745,7 +635,7 @@
       catch{ return []; }
     }
 
-    /* Categories */
+    /* Categories order */
     const ORDERED_CATS = [
       {key:'sushi',  label:'سوشي'},
       {key:'don',    label:'دون'},
@@ -819,6 +709,7 @@
 
       setStickyVars();
       setupScrollspy();
+      revealObserve(); // enable reveal on new nodes
     }
 
     /* Chips: click -> scroll */
@@ -828,7 +719,7 @@
       document.querySelector(b.dataset.target)?.scrollIntoView({behavior:'smooth', block:'start'});
     });
 
-    /* Scrollspy */
+    /* Scrollspy: highlight active chip */
     let spyObserver=null;
     function setupScrollspy(){
       if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
@@ -873,12 +764,13 @@
       const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
       renderCartList();
     }
+    function bumpBadge(){ badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
     function addLine(item, qty=1){
       const key=stableId(JSON.stringify({id:item.id, price:item.price}));
       const exist=state.cart[key];
       if(exist) exist.qty+=qty;
       else state.cart[key]={lineId:key, id:item.id, title:item.title, unitPrice:Number(item.price||0), qty};
-      bump(); toast(`أُضيف ${item.title} ✅`);
+      bump(); bumpBadge(); toast(`أُضيف ${item.title} ✅`);
     }
     function renderCartList(){
       cartList.innerHTML='';
@@ -928,7 +820,35 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* Thanks */
+    /* Time slot toggle */
+    const vL=document.getElementById('viewList'), vC=document.getElementById('viewCal');
+    const list=document.getElementById('slotList'), cal=document.getElementById('slotCal');
+    [vL,vC].forEach(b=>b.onclick=()=>{
+      const isList=b===vL;
+      vL.setAttribute('aria-pressed', isList); vC.setAttribute('aria-pressed', !isList);
+      list.classList.toggle('d-none', !isList); cal.classList.toggle('d-none', isList);
+    });
+    // CONFIG: time slots
+    const SLOTS=['10:30','11:00','11:30','12:00','12:30','13:00','13:30'];
+    SLOTS.forEach(t=>{
+      const btn=document.createElement('button');
+      btn.className='btn btn-outline-dark'; btn.textContent=t; btn.onclick=()=>{ state.slot=t; toast('تم اختيار '+t); };
+      list.appendChild(btn);
+    });
+    // Simple calendar (next 7 days)
+    const calWrap=document.createElement('div'); calWrap.className='row g-2';
+    for(let i=0;i<7;i++){
+      const d=new Date(); d.setDate(d.getDate()+i);
+      const col=document.createElement('div'); col.className='col-6 col-md-3';
+      const card=document.createElement('div'); card.className='card-paper p-2 text-center';
+      const ds=d.toLocaleDateString('ar-SA',{weekday:'short', month:'2-digit', day:'2-digit'});
+      card.innerHTML=`<div class="fw-bold">${ds}</div><button class="btn btn-outline-dark btn-sm mt-2">اختيار</button>`;
+      card.querySelector('button').onclick=()=>{ state.slot=ds; toast('تم اختيار '+ds); };
+      col.appendChild(card); calWrap.appendChild(col);
+    }
+    cal.appendChild(calWrap);
+
+    /* Thank you refs */
     const thOrderId=document.getElementById('thOrderId');
     const thTotal=document.getElementById('thTotal');
     const thType=document.getElementById('thType');
@@ -960,6 +880,8 @@
       document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
     }
 
+    /* Confirm */
+    const FREE_SHIP = 79;
     confirmBtn.onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
@@ -968,6 +890,7 @@
       let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
       const payload={
         type: segDel.getAttribute('aria-pressed')==='true'?'delivery':'pickup',
+        slot: state.slot || '',
         name: nameEl.value.trim(), phone, address: addrEl.value.trim(), notes: notesEl.value.trim(),
         items: t.arr.map(x=>({ id:x.id, title:x.title, qty:x.qty, price:x.unitPrice }))
       };
@@ -991,6 +914,48 @@
       }
     };
 
+    /* KPI Counters on reveal */
+    function initCounters(){
+      const io=new IntersectionObserver(es=>{
+        es.forEach(e=>{
+          if(!e.isIntersecting) return;
+          const el=e.target; const target=+el.dataset.count; let n=0;
+          const step=Math.max(1, Math.floor(target/40));
+          const isFloat = (''+el.dataset.count).includes('.');
+          const iv=setInterval(()=>{ n=Math.min(target, n+step); el.textContent = isFloat ? n.toFixed(1) : n; if(n>=target) clearInterval(iv); }, 20);
+          io.unobserve(el);
+        });
+      },{threshold:.4});
+      document.querySelectorAll('.kpi .num').forEach(el=>io.observe(el));
+    }
+    initCounters();
+
+    /* Reveal on scroll */
+    let ro=null;
+    function revealObserve(){
+      if(ro){ ro.disconnect(); ro=null; }
+      ro=new IntersectionObserver(es=>{
+        es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); ro.unobserve(e.target); }});
+      },{threshold:.2});
+      document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+    }
+
+    /* Live countdown (offer/closing) */
+    // CONFIG: minutes from now
+    function initCountdown(mins=45){
+      const end = new Date(); end.setMinutes(end.getMinutes()+mins);
+      const upd = ()=>{
+        const s = Math.max(0, Math.floor((end - Date.now())/1000));
+        const h = String(Math.floor(s/3600)).padStart(2,'0');
+        const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+        const sec = String(s%60).padStart(2,'0');
+        offerBadge.textContent = s>0 ? `عرض السوشي الذهبي ينتهي خلال ${h}:${m}:${sec}` : 'انتهى العرض';
+        if(s<=0) clearInterval(iv);
+      };
+      upd(); const iv=setInterval(upd,1000);
+    }
+    initCountdown(45);
+
     /* INIT */
     (async()=>{
       const appLoading=document.getElementById('appLoading');
@@ -1004,23 +969,21 @@
       state.menu=await fetchMenu();
       if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
       renderSections(); setStickyVars(); bump(); setStep('menu');
-
-      // Reveal gallery items progressively
-      requestAnimationFrame(()=>document.querySelectorAll('.gimg').forEach((img,i)=>setTimeout(()=>img.classList.add('reveal'), 60*i)));
-
       appLoading.classList.remove('show');
     })();
   });
+  </script>
 
-  // Theme color sync for PWA bar
-  const themeMeta = document.querySelector('meta[name="theme-color"]');
-  function setThemeColorMeta(){
-    const el = document.querySelector('.mini-bar');
-    const cs = el ? getComputedStyle(el).backgroundColor : null;
-    if(themeMeta && cs) themeMeta.setAttribute('content', cs);
-  }
-  window.addEventListener('load', setThemeColorMeta, {once:true});
-  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', setThemeColorMeta);
+  <!-- Theme color sync -->
+  <script>
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    function setThemeColorMeta(){
+      const el = document.querySelector('.mini-bar');
+      const cs = el ? getComputedStyle(el).backgroundColor : null;
+      if(themeMeta && cs) themeMeta.setAttribute('content', cs);
+    }
+    window.addEventListener('load', setThemeColorMeta, {once:true});
+    matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', setThemeColorMeta);
   </script>
 </body>
 </html>
