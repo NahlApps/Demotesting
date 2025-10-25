@@ -22,8 +22,8 @@
     :root{
       --bg:#FAFAFA; --ink:#0B0D13; --muted:#6B7280; --rule:#EAEAEA;
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
-      --topbar-h:56px;     /* updated by JS */
-      --stepper-h:44px;    /* updated by JS (0 if stepper hidden) */
+      --topbar-h:56px;     /* JS updates */
+      --stepper-h:44px;    /* JS updates (0 if stepper hidden) */
     }
     html,body{height:100%}
     body{
@@ -47,23 +47,17 @@
     .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips + Search (sticky block) */
+    /* Chips + Search (NORMAL FLOW) */
     .chips-wrap{
-      position: sticky;
-      top: calc(var(--topbar-h) + var(--stepper-h));
-      z-index: 66;
       background:#fff;
       border-bottom:1px solid var(--rule);
-      transition: box-shadow .18s ease;
     }
-    body.scrolled .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
-
-    /* Make #chips FULL-WIDTH and independent of .container */
+    /* Full-bleed chips row (free from .container) */
     #chips{
       display:flex;
       gap:8px;
-      padding:10px 12px;              /* gutter so pills don’t stick to edges */
-      overflow:auto;                   /* horizontal scroll on mobile if needed */
+      padding:10px 12px;
+      overflow:auto;
       -webkit-overflow-scrolling:touch;
       scrollbar-width:none;
     }
@@ -73,9 +67,41 @@
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
 
-    .search-row{ padding:0 12px 10px; } /* container below the free chips row */
+    .search-row{ padding:0 12px 10px; }
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
+
+    /* >>> AFFIXED CHIPS: DIFFERENT METHOD (IntersectionObserver + position:fixed) <<< */
+    #chipsAffix{
+      position:fixed;
+      inset-inline:0;
+      top: calc(var(--topbar-h) + var(--stepper-h));
+      z-index: 66;
+      display:flex;
+      gap:8px;
+      padding:10px 12px;
+      background:#fff;
+      border-bottom:1px solid var(--rule);
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+
+      /* hidden by default */
+      visibility:hidden;
+      opacity:0;
+      transform:translateY(-6px);
+      pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease, box-shadow .18s ease, visibility 0s linear .18s;
+    }
+    #chipsAffix::-webkit-scrollbar{ display:none; }
+    #chipsAffix.visible{
+      visibility:visible;
+      opacity:1;
+      transform:none;
+      pointer-events:auto;
+      transition:opacity .18s ease, transform .18s ease, box-shadow .18s ease;
+      box-shadow:0 6px 16px rgba(0,0,0,.06);
+    }
 
     /* Sections & menu cards */
     main{flex:1 1 auto;display:flex;flex-direction:column}
@@ -162,9 +188,9 @@
     </div>
   </div>
 
-  <!-- Chips + Search (ALWAYS VISIBLE). NOTE: #chips is OUTSIDE .container -->
+  <!-- Chips + Search (NORMAL FLOW) -->
   <div class="chips-wrap">
-    <!-- Full-bleed chips row (independent of container width) -->
+    <!-- Full-bleed chips row (independent of .container) -->
     <div id="chips" aria-label="تصنيفات">
       <button class="chip active" data-target="#topOfMenu">الكل</button>
       <button class="chip" data-target="#sec-sushi">سوشي</button>
@@ -174,7 +200,7 @@
       <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
     </div>
 
-    <!-- Search stays aligned to the page grid -->
+    <!-- Search aligned to grid -->
     <div class="search-row">
       <div class="container">
         <div class="row g-2">
@@ -188,6 +214,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Fixed AFFIX clone (created in JS by cloning #chips) -->
+  <div id="chipsAffix" aria-hidden="true"></div>
+
+  <!-- Sentinel that triggers affix visibility (observed via IntersectionObserver) -->
+  <div id="chipsSentinel"></div>
 
   <!-- Content -->
   <main>
@@ -414,7 +446,7 @@
     const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers so chips block stays right under header/stepper */
+    /* Offsets for fixed bars */
     const topbarEl  = document.getElementById('topbar');
     const stepperEl = document.getElementById('stepperWrap');
     function setStickyVars(){
@@ -422,10 +454,10 @@
       const stepH = Math.round(stepperEl?.getBoundingClientRect().height || 0);
       document.documentElement.style.setProperty('--topbar-h',  topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
+      rebuildObserver(); // re-calibrate affix observer
     }
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
-    setStickyVars();
 
     /* Stepper FSM */
     const steps=['menu','cart','data','thanks'];
@@ -443,34 +475,77 @@
     function canGo(t){ if(t==='menu') return true; if(t==='cart'||t==='data') return cartCount()>0; if(t==='thanks') return state.unlockThanks; return false;}
     function toast(msg){ const box=document.getElementById('toasts'); const el=document.createElement('div'); el.className='toast-msg'; el.textContent=msg; box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200); }
     function safeGo(t){ if(!canGo(t)){ toast(t==='thanks'?'أكمل تأكيد الطلب أولاً':'أضِف عناصر للسلة أولاً'); showTab('#tab-'+state.active); return false;} showTab('#tab-'+t); return true; }
-    document.addEventListener('shown.bs.tab', e=>{ const href=e.target?.getAttribute('href'); if(href==='#tab-menu') setStep('menu'); if(href==='#tab-cart') setStep('cart'); if(href==='#tab-data') setStep('data'); if(href==='#tab-thanks') setStep('thanks'); history.replaceState(null,'',href); setStickyVars(); });
+    document.addEventListener('shown.bs.tab', e=>{ const href=e.target?.getAttribute('href'); if(href==='#tab-menu') setStep('menu'); if(href==='#tab-cart') setStep('cart'); if(href==='#tab-data') setStep('data'); if(href==='#tab-thanks') setStep('thanks'); history.replaceState(null,'',href); });
     document.getElementById('openCart').addEventListener('click', ()=>safeGo('cart'));
     document.body.addEventListener('click', (e)=>{ const a=e.target.closest('a[href^="#tab-"],[data-go]'); if(!a) return; e.preventDefault(); const to=a.dataset.go||(a.getAttribute('href')||'').replace('#tab-',''); if(['menu','cart','data','thanks'].includes(to)) safeGo(to); });
 
-    /* Smooth anchor scroll for chips */
-    const chipsEl = document.getElementById('chips');
-    function stickyTotalHeight(){
+    /* ===== Chips: DIFFERENT METHOD (IntersectionObserver + fixed clone) ===== */
+    const chipsSrc   = document.getElementById('chips');
+    const chipsAffix = document.getElementById('chipsAffix');
+    const sentinel   = document.getElementById('chipsSentinel');
+    // Clone chips into affix once
+    chipsAffix.innerHTML = chipsSrc.innerHTML;
+
+    function setActiveChip(selector){
+      document.querySelectorAll('#chips .chip, #chipsAffix .chip').forEach(b=>{
+        b.classList.toggle('active', b.dataset.target === selector);
+      });
+    }
+    function currentOffsets(){
       const topH  = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h'))  || 0;
       const stepH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stepper-h')) || 0;
-      const chipsH = document.querySelector('.chips-wrap')?.getBoundingClientRect().height || 0;
-      return topH + stepH + chipsH;
+      return {topH, stepH};
     }
-    chipsEl.addEventListener('click', (e) => {
-      const btn = e.target.closest('.chip[data-target]');
-      if(!btn) return;
-      const sel = btn.dataset.target;
+    function totalFixedHeight(){
+      const {topH, stepH} = currentOffsets();
+      const affH = chipsAffix.getBoundingClientRect().height || 0;
+      return topH + stepH + (chipsAffix.classList.contains('visible') ? affH : (document.querySelector('.chips-wrap')?.getBoundingClientRect().height || 0));
+    }
+    function scrollToSelector(sel){
       const target = document.querySelector(sel);
       if(!target) return;
-      e.preventDefault();
-      chipsEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      const y = target.getBoundingClientRect().top + window.scrollY - stickyTotalHeight() - 8;
+      const y = target.getBoundingClientRect().top + window.scrollY - totalFixedHeight() - 8;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-    });
+    }
+    function onChipClick(e){
+      const btn = e.target.closest('.chip[data-target]');
+      if(!btn) return;
+      e.preventDefault();
+      const sel = btn.dataset.target;
+      setActiveChip(sel);
+      scrollToSelector(sel);
+    }
+    chipsSrc.addEventListener('click', onChipClick);
+    chipsAffix.addEventListener('click', onChipClick);
 
-    /* DOM refs */
+    let io = null;
+    function rebuildObserver(){
+      if(!sentinel) return;
+      if(io) io.disconnect();
+      const {topH, stepH} = currentOffsets();
+      const offset = Math.round(topH + stepH);
+      io = new IntersectionObserver(([entry])=>{
+        // When sentinel is NOT visible within the top offset, show the affix
+        const show = entry.intersectionRatio === 0;
+        chipsAffix.classList.toggle('visible', show);
+      }, { rootMargin: `-${offset}px 0px 0px 0px`, threshold: [0,1] });
+      io.observe(sentinel);
+    }
+
+    /* Smooth active reset for clear button */
+    const clearBtnSrc   = chipsSrc.querySelector('#clearFilters');
+    const clearBtnAffix = chipsAffix.querySelector('#clearFilters');
+    function clearSearchAndReset(){
+      state.q=''; const qEl=document.getElementById('q'); if(qEl) qEl.value='';
+      renderSections(state.menu, '');
+      setActiveChip('#topOfMenu');
+      scrollToSelector('#topOfMenu');
+    }
+    if(clearBtnSrc)   clearBtnSrc.addEventListener('click', (e)=>{ e.preventDefault(); clearSearchAndReset(); });
+    if(clearBtnAffix) clearBtnAffix.addEventListener('click', (e)=>{ e.preventDefault(); clearSearchAndReset(); });
+
+    /* DOM refs for menu & cart */
     const search=document.getElementById('q');
-    const clearFilters=document.getElementById('clearFilters');
     const gridMap={
       sushi:  document.querySelector('.menu-grid[data-sec="sushi"]'),
       don:    document.querySelector('.menu-grid[data-sec="don"]'),
@@ -498,9 +573,7 @@
     }
 
     function renderSections(menu, q=''){
-      // clear
       Object.values(gridMap).forEach(g=>g.innerHTML='');
-
       const norm = (s)=>String(s||'').toLowerCase();
       const match = (d)=>!q || norm(d.title).includes(norm(q)) || norm(d.desc).includes(norm(q));
 
@@ -514,14 +587,9 @@
         const grid = gridMap[cat];
         const filtered = list.filter(match);
         if(!grid) return;
-        if(!filtered.length){
-          const title = document.getElementById('sec-'+cat);
-          if(title) title.style.display='none';
-          grid.style.display='none';
-          return;
-        }
         const title = document.getElementById('sec-'+cat);
-        if(title){ title.style.display=''; }
+        if(!filtered.length){ if(title) title.style.display='none'; grid.style.display='none'; return; }
+        if(title) title.style.display='';
         grid.style.display='';
         filtered.forEach(d=>{
           const node=dishTpl.content.firstElementChild.cloneNode(true);
@@ -538,8 +606,9 @@
         });
       });
 
-      // Clear button visibility
-      clearFilters.classList.toggle('d-none', !q);
+      // Toggle clear button visibility in both bars
+      const showClear = !!q;
+      document.querySelectorAll('#clearFilters').forEach(btn=>btn.classList.toggle('d-none', !showClear));
     }
 
     /* Search */
@@ -548,16 +617,6 @@
       clearTimeout(timer);
       timer=setTimeout(()=>{ state.q=e.target.value.trim(); renderSections(state.menu, state.q); },160);
     });
-    clearFilters.addEventListener('click', ()=>{
-      state.q=''; search.value=''; renderSections(state.menu, '');
-      // Return chips active to "all"
-      document.querySelectorAll('#chips .chip').forEach(c=>c.classList.remove('active'));
-      const allBtn = document.querySelector('#chips .chip[data-target="#topOfMenu"]');
-      if(allBtn) allBtn.classList.add('active');
-      // Jump to top smoothly
-      const topY = document.getElementById('topOfMenu').getBoundingClientRect().top + window.scrollY - stickyTotalHeight() - 8;
-      window.scrollTo({ top: Math.max(0, topY), behavior: 'smooth' });
-    });
 
     /* Cart */
     function stableId(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36); }
@@ -565,18 +624,10 @@
     function totals(){ const arr=cartArr(); return {count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr}; }
     function bump(){
       const t=totals();
-      document.getElementById('badge').textContent=t.count;
-      document.getElementById('miniCount').textContent=`${t.count} عنصر`;
-      document.getElementById('miniTotal').textContent=fmt.format(t.total);
-      document.getElementById('cartTotal').textContent=fmt.format(t.total);
-      const need=Math.max(0, FREE_SHIP - t.total);
-      document.getElementById('miniHint').textContent = need>0 ? `تبقى ${need.toFixed(2)} ر.س للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
+      badge.textContent=t.count; miniCount.textContent=`${t.count} عنصر`; miniTotal.textContent=fmt.format(t.total); cartTotal.textContent=fmt.format(t.total);
+      const need=Math.max(0, FREE_SHIP - t.total); miniHint.textContent = need>0 ? `تبقى ${need.toFixed(2)} ر.س للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
       localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
-      const has=t.count>0;
-      const goCartBtn=document.getElementById('goCartBtn');
-      const toDataBtn=document.getElementById('toDataBtn');
-      goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has));
-      toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
+      const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
       renderCartList();
     }
     function addLine(item, qty=1){
@@ -587,7 +638,6 @@
       bump(); toast(`أُضيف ${item.title} ✅`);
     }
     function renderCartList(){
-      const cartList=document.getElementById('cartList');
       cartList.innerHTML='';
       const {arr}=totals();
       if(!arr.length){ const p=document.createElement('p'); p.className='text-secondary text-center my-4'; p.textContent='السلة فارغة'; cartList.appendChild(p); return; }
@@ -673,7 +723,7 @@
 
       let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
       const payload={
-        type: segDel.getAttribute('aria-pressed')==='true'?'delivery':'pickup',
+        type: document.getElementById('segDelivery').getAttribute('aria-pressed')==='true'?'delivery':'pickup',
         name: nameEl.value.trim(), phone, address: addrEl.value.trim(), notes: notesEl.value.trim(),
         items: t.arr.map(x=>({ id:x.id, title:x.title, qty:x.qty, price:x.unitPrice }))
       };
@@ -703,8 +753,9 @@
         const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}');
         if(savedInfo.name) document.getElementById('custName').value=savedInfo.name;
         if(savedInfo.phone) document.getElementById('custPhone').value=savedInfo.phone;
-        if(savedInfo.address){ document.getElementById('address').value=savedInfo.address; setType(true); }
+        if(savedInfo.address){ document.getElementById('address').value=savedInfo.address; document.getElementById('segPickup').setAttribute('aria-pressed','false'); document.getElementById('segDelivery').setAttribute('aria-pressed','true'); }
       }catch{}
+
       const menu = await fetchMenu();
       state.menu = Array.isArray(menu) ? menu : [];
       if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
