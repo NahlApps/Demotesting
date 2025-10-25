@@ -61,7 +61,7 @@
       display:flex;
       flex-wrap:wrap;              /* allow multiple rows */
       gap:8px;
-      overflow:visible;            /* prevent clipping */
+      overflow:visible;
       align-items:center;
     }
     body.scrolled #chips{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
@@ -69,26 +69,19 @@
       background:#F2F2F2;color:#111;border:1px solid var(--rule);
       border-radius:var(--radius-pill);padding:10px 14px;
       font-weight:800;font-size:.95rem;min-height:44px;
-      transition:.18s; flex:0 0 auto; /* chips don’t shrink */
+      transition:.18s; flex:0 0 auto;
     }
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Sections for scrollspy */
+    /* Sections (no sticky section header) */
     .menu-section{
       scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px);
       padding-top: 8px;
     }
-    .menu-head{
-      position: sticky;
-      top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h));
-      z-index: 10;
-      background: #fff;
-      padding: 8px 0;
-    }
-    .menu-head h5{margin:0;font-weight:900}
+    .sec-title{margin:8px 0 12px 0;font-weight:900}
 
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -199,7 +192,6 @@
       <!-- MENU -->
       <section id="tab-menu" class="tab-pane fade show active">
         <div class="container py-3" id="menuContainer">
-          <!-- Sections will be rendered here -->
           <div id="menuSections"></div>
           <p id="emptyMsg" class="text-secondary text-center my-5 d-none">لا توجد أطباق مطابقة — جرّب كلمة بحث مختلفة</p>
           <div style="height:18vh"></div>
@@ -460,7 +452,7 @@
       catch{ return []; }
     }
 
-    /* Build sections map from menu */
+    /* Categories order */
     const ORDERED_CATS = [
       {key:'sushi',  label:'سوشي'},
       {key:'don',    label:'دون'},
@@ -481,7 +473,7 @@
       el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="28">لا صورة</text></svg>`);
     }
 
-    /* Render ONE-PAGE menu with sections */
+    /* Render ONE-PAGE menu with sections (no sticky section header) */
     function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
       const groups = groupByCat(state.menu);
@@ -495,18 +487,16 @@
         });
         if(!items.length) return;
 
-        // Section wrapper
         const sec = document.createElement('section');
         sec.className = 'menu-section';
         sec.id = 'sec-'+key;
 
-        // Sticky heading inside section
-        const head = document.createElement('div');
-        head.className = 'menu-head';
-        head.innerHTML = `<h5>${label}</h5>`;
-        sec.appendChild(head);
+        // simple title (NOT sticky)
+        const title = document.createElement('h5');
+        title.className = 'sec-title';
+        title.textContent = label;
+        sec.appendChild(title);
 
-        // Grid
         const grid = document.createElement('div');
         grid.className = 'menu-grid';
 
@@ -524,7 +514,7 @@
           const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,2).forEach(t=>{ const s=document.createElement('span'); s.className='tag'; s.textContent=t; tags.appendChild(s); });
           node.querySelector('.add-btn').addEventListener('click', ()=> addLine(d,1));
 
-          grid.appendChild(node);
+        grid.appendChild(node);
         });
 
         sec.appendChild(grid);
@@ -532,12 +522,8 @@
         totalMatches += items.length;
       });
 
-      // No matches UI
       emptyMsg.classList.toggle('d-none', totalMatches>0);
-      // Show/hide clear filter based on query
       clearFilters.classList.toggle('d-none', !state.q.trim());
-
-      // Refresh scrollspy observers after re-render
       setupScrollspy();
     }
 
@@ -555,7 +541,6 @@
     function setupScrollspy(){
       if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
       const chips = [...document.querySelectorAll('#chips .chip[data-target]')];
-      const map = Object.fromEntries(chips.map(c=>[c.dataset.target, c]));
 
       spyObserver = new IntersectionObserver((entries)=>{
         const visible = entries
@@ -569,10 +554,8 @@
         threshold: [0.2,0.4,0.6,0.8,1]
       });
 
-      // Observe each section; also observe the top anchor to activate "الكل"
       document.querySelectorAll('.menu-section').forEach(sec=>spyObserver.observe(sec));
-      const top = document.getElementById('topOfMenu');
-      if(top) spyObserver.observe(top);
+      const top = document.getElementById('topOfMenu'); if(top) spyObserver.observe(top);
     }
 
     /* Search */
