@@ -33,7 +33,7 @@
       --border-strong: rgba(47,47,47,.22);
 
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
-      --topbar-h:56px; --stepper-h:44px; --chips-h:0px;
+      --topbar-h:56px; --stepper-h:0px; --chips-h:0px;
 
       --focus: var(--teal);
     }
@@ -62,20 +62,6 @@
     .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--border);background:var(--offwhite)}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--mustard);color:#000;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.18)}
 
-    /* Stepper */
-    .stepper-wrap{position:sticky; top:var(--topbar-h); z-index:65; background:var(--offwhite); border-bottom:1px solid var(--border)}
-    .stepper.nav{gap:8px;align-items:center;overflow:auto;padding:8px 0}
-    .step.nav-link{display:flex;align-items:center;gap:8px;font-weight:800;color:rgba(47,47,47,.68);white-space:nowrap}
-    .step .dot{width:28px;height:28px;border-radius:999px;border:2px solid var(--border);display:inline-grid;place-items:center;font-size:.9rem;color:var(--gray-900)}
-    .step.active{color:var(--gray-900)} .step.active .dot{border-color:var(--gray-900)}
-    .step.done{color:var(--teal)} .step.done .dot{border-color:var(--teal); color:var(--teal)}
-    .step .sep{width:24px;height:2px;background:var(--border)}
-
-    /* KPI tiles */
-    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .kpi{background:var(--offwhite);border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;box-shadow:var(--shadow)}
-    .kpi .num{font-weight:900;font-size:1.25rem;line-height:1}
-
     /* Chips/Search (MENU only; JS toggles) */
     .chips-wrap{
       position: sticky; top: calc(var(--topbar-h) + var(--stepper-h)); z-index: 90;
@@ -95,8 +81,29 @@
       border-color:color-mix(in srgb, var(--teal) 60%, var(--gray-900));
     }
     .pill-clear{ background:transparent; border:1px dashed var(--border); color:var(--gray-900); }
-    .searchbox{border:1px solid var(--border);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
-    .searchbox input{border:0;padding:12px 16px;min-height:46px}
+
+    /* Search — icon-only until opened */
+    .search-wrap { margin-inline-start:auto; }
+    .searchbox{
+      display:flex; align-items:center; gap:6px;
+      border:1px solid var(--border); border-radius:var(--radius-pill); background:#fff;
+      padding-inline:8px; transition:.18s;
+    }
+    .searchbox .btn{ min-width:36px; }
+    .searchbox input{
+      border:0; min-height:46px;
+      width:0; min-width:0;
+      padding:0;
+      opacity:0; pointer-events:none;
+      transition:.18s;
+    }
+    .searchbox.open{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
+    .searchbox.open input{
+      width:66vw; opacity:1; pointer-events:auto; padding:12px 16px;
+    }
+    @media (min-width:768px){
+      .searchbox.open input{ width:260px; }
+    }
 
     /* Sections */
     .menu-section{
@@ -225,9 +232,6 @@
   </style>
 </head>
 <body>
-  <!-- One-time rotate hint -->
-  <div id="rotateHint" hidden class="position-fixed top-0 start-50 translate-middle-x p-2 small bg-dark text-white rounded-pill mt-2" style="z-index:1000">جرّب تدوير الجهاز لعرض أوسع</div>
-
   <!-- Overlays -->
   <div id="appLoading" class="overlay" aria-live="polite" aria-busy="true">
     <div class="box"><div class="spinner-border" role="status" aria-label="جارِ التحميل"></div><div class="msg">جاري تحميل القائمة…</div></div>
@@ -254,27 +258,6 @@
     </div>
   </header>
 
-  <!-- Stepper -->
-  <div class="stepper-wrap" id="stepperWrap">
-    <div class="container">
-      <div class="nav stepper" aria-label="خطوات الطلب" role="tablist">
-        <a class="nav-link step active" data-step="menu"   data-bs-toggle="tab" href="#tab-menu"   role="tab"><span class="dot">1</span> القائمة  <span class="sep"></span></a>
-        <a class="nav-link step"          data-step="cart"   data-bs-toggle="tab" href="#tab-cart"   role="tab"><span class="dot">2</span> السلة   <span class="sep"></span></a>
-        <a class="nav-link step"          data-step="data"   data-bs-toggle="tab" href="#tab-data"   role="tab"><span class="dot">3</span> البيانات<span class="sep"></span></a>
-        <a class="nav-link step"          data-step="thanks" data-bs-toggle="tab" href="#tab-thanks" role="tab"><span class="dot">4</span> تمّ</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- KPI Tiles -->
-  <div class="container py-2">
-    <div class="kpis">
-      <div class="kpi reveal"><div class="num" data-count="15000">0</div><small class="text-secondary">طلب مُكتمل</small></div>
-      <div class="kpi reveal"><div class="num" data-count="4.8">0</div><small class="text-secondary">تقييم</small></div>
-      <div class="kpi reveal"><div class="num" data-count="15">0</div><small class="text-secondary">دقيقة تحضير</small></div>
-    </div>
-  </div>
-
   <!-- Chips + Search (only visible on Menu; JS toggles) -->
   <div class="chips-wrap" id="chipsWrap" hidden aria-hidden="true">
     <div class="container">
@@ -285,14 +268,13 @@
         <button class="chip" data-target="#sec-meat">لحوم</button>
         <button class="chip" data-target="#sec-drinks">مشروبات</button>
 
-        <div class="ms-auto" style="min-width:260px;flex:1 1 260px">
-          <div class="searchbox d-flex" role="search">
+        <div class="search-wrap">
+          <div class="searchbox d-flex" role="search" aria-label="بحث">
+            <button id="searchToggle" class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
             <input id="q" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
-            <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
           </div>
         </div>
 
-        <span id="offerCountdown" class="badge bg-light text-dark border offer-badge">—</span>
         <button id="openReels" class="chip" type="button" aria-haspopup="dialog">عرض رييل</button>
         <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
       </div>
@@ -352,18 +334,6 @@
               <button id="segDelivery" class="btn" aria-pressed="false" type="button">توصيل</button>
             </div>
             <span id="etaBadge">ETA ~ 15</span>
-          </div>
-
-          <div class="card-paper p-3 p-md-4 mb-3">
-            <div class="d-flex align-items-center gap-2">
-              <div class="seg" role="tablist" aria-label="طريقة العرض">
-                <button class="btn" id="viewList" aria-pressed="true">قائمة</button>
-                <button class="btn" id="viewCal" aria-pressed="false">تقويم</button>
-              </div>
-              <small class="text-secondary">اختر وقت الاستلام/التوصيل</small>
-            </div>
-            <div id="slotList" class="mt-2 d-flex flex-wrap gap-2"></div>
-            <div id="slotCal" class="mt-2 d-none"></div>
           </div>
 
           <div class="card-paper p-3 p-md-4">
@@ -534,11 +504,10 @@
 
     /* Sticky helpers (chips height aware) */
     const topbarEl   = document.getElementById('topbar');
-    const stepperEl  = document.getElementById('stepperWrap');
     const chipsWrap  = document.getElementById('chipsWrap');
     const setStickyVars = () => {
       const topH   = Math.round(topbarEl?.getBoundingClientRect().height ?? 56);
-      const stepH  = Math.round(stepperEl?.getBoundingClientRect().height ?? 0);
+      const stepH  = 0; // stepper removed
       const chipsH = Math.round(chipsWrap ? (chipsWrap.hidden ? 0 : chipsWrap.getBoundingClientRect().height) : 0);
       document.documentElement.style.setProperty('--topbar-h', topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
@@ -547,18 +516,9 @@
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
 
-    /* Stepper guards + Chips visibility toggle */
-    const steps=['menu','cart','data','thanks'];
+    /* Chips visibility toggle (menu only) */
     function setStep(active){
       state.active=active;
-      document.querySelectorAll('.stepper .step').forEach((el,idx)=>{
-        const id=el.dataset.step;
-        el.classList.remove('active','done');
-        if(id===active) el.classList.add('active');
-        const i=steps.indexOf(active);
-        if(idx<i) el.classList.add('done');
-      });
-      // Chips only on menu
       const onMenu = active === 'menu';
       chipsWrap.hidden = !onMenu;
       chipsWrap.setAttribute('aria-hidden', String(!onMenu));
@@ -577,6 +537,8 @@
     /* DOM refs */
     const clearFilters=document.getElementById('clearFilters');
     const search=document.getElementById('q');
+    const searchBox=document.querySelector('.searchbox');
+    const searchToggle=document.getElementById('searchToggle');
     const sectionsRoot=document.getElementById('menuSections');
     const emptyMsg=document.getElementById('emptyMsg');
     const dishTpl=document.getElementById('dishTpl');
@@ -589,7 +551,17 @@
     const goCartBtn=document.getElementById('goCartBtn');
     const toDataBtn=document.getElementById('toDataBtn');
     const cartTotal=document.getElementById('cartTotal');
-    const offerBadge=document.getElementById('offerCountdown');
+
+    /* Search toggle */
+    function openSearch(){ searchBox.classList.add('open'); setTimeout(()=>search.focus(), 10); }
+    function closeSearch(){
+      if(search.value.trim()) return;
+      searchBox.classList.remove('open');
+      state.q=''; search.value='';
+      renderSections();
+    }
+    searchToggle.addEventListener('click', (e)=>{ e.preventDefault(); searchBox.classList.toggle('open'); if(searchBox.classList.contains('open')) setTimeout(()=>search.focus(),10); });
+    search.addEventListener('blur', closeSearch);
 
     /* Fetch Menu */
     async function fetchMenu(){
@@ -712,7 +684,7 @@
       const top = document.getElementById('topOfMenu'); if(top) spyObserver.observe(top);
     }
 
-    /* Search */
+    /* Search logic */
     let t=null;
     search.addEventListener('input', e=>{
       clearTimeout(t);
@@ -797,32 +769,6 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* Time slots (demo) */
-    const vL=document.getElementById('viewList'), vC=document.getElementById('viewCal');
-    const listSlots=document.getElementById('slotList'), cal=document.getElementById('slotCal');
-    [vL,vC].forEach(b=>b.onclick=()=>{
-      const isList=b===vL;
-      vL.setAttribute('aria-pressed', isList); vC.setAttribute('aria-pressed', !isList);
-      listSlots.classList.toggle('d-none', !isList); cal.classList.toggle('d-none', isList);
-    });
-    const SLOTS=['10:30','11:00','11:30','12:00','12:30','13:00','13:30'];
-    SLOTS.forEach(t=>{
-      const btn=document.createElement('button');
-      btn.className='btn btn-outline-dark'; btn.textContent=t; btn.onclick=()=>{ state.slot=t; toast('تم اختيار '+t); };
-      listSlots.appendChild(btn);
-    });
-    const calWrap=document.createElement('div'); calWrap.className='row g-2';
-    for(let i=0;i<7;i++){
-      const d=new Date(); d.setDate(d.getDate()+i);
-      const col=document.createElement('div'); col.className='col-6 col-md-3';
-      const card=document.createElement('div'); card.className='card-paper p-2 text-center';
-      const ds=d.toLocaleDateString('ar-SA',{weekday:'short', month:'2-digit', day:'2-digit'});
-      card.innerHTML=`<div class="fw-bold">${ds}</div><button class="btn btn-outline-dark btn-sm mt-2">اختيار</button>`;
-      card.querySelector('button').onclick=()=>{ state.slot=ds; toast('تم اختيار '+ds); };
-      col.appendChild(card); calWrap.appendChild(col);
-    }
-    cal.appendChild(calWrap);
-
     /* Thank you refs */
     const thOrderId=document.getElementById('thOrderId');
     const thTotal=document.getElementById('thTotal');
@@ -854,39 +800,6 @@
       document.getElementById('copyTicket').onclick = ()=>copy(`تذكرة ${t4} • ${todayKey()}`);
       document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
     }
-
-    /* Live countdown (auto-hide when finished) */
-    function initCountdown(mins=45){
-      const end = new Date(); end.setMinutes(end.getMinutes()+mins);
-      const upd = ()=>{
-        const s = Math.max(0, Math.floor((end - Date.now())/1000));
-        if (s === 0) { offerBadge.classList.add('d-none'); clearInterval(iv); return; }
-        const h = String(Math.floor(s/3600)).padStart(2,'0');
-        const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
-        const sec = String(s%60).padStart(2,'0');
-        offerBadge.classList.remove('d-none');
-        offerBadge.textContent = `عرض خاص ينتهي خلال ${h}:${m}:${sec}`;
-      };
-      upd(); const iv=setInterval(upd,1000);
-    }
-    initCountdown(45);
-
-    /* KPI counters */
-    function initCounters(){
-      if (!matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
-      const io=new IntersectionObserver(es=>{
-        es.forEach(e=>{
-          if(!e.isIntersecting) return;
-          const el=e.target; const target=+el.dataset.count; let n=0;
-          const step=Math.max(1, Math.floor(target/40));
-          const isFloat = (''+el.dataset.count).includes('.');
-          const iv=setInterval(()=>{ n=Math.min(target, n+step); el.textContent = isFloat ? n.toFixed(1) : n; if(n>=target) clearInterval(iv); }, 20);
-          io.unobserve(el);
-        });
-      },{threshold:.4});
-      document.querySelectorAll('.kpi .num').forEach(el=>io.observe(el));
-    }
-    initCounters();
 
     /* INIT */
     (async()=>{
@@ -1023,8 +936,7 @@
       list.innerHTML='';
       filtered.forEach((d,i)=>list.appendChild(reelNode(d,i)));
 
-      reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); bodyLock(true);
-      lastFocused = document.activeElement;
+      reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
       list.focus({preventScroll:true});
       currentIdx=0; preloadAround(0);
 
@@ -1039,16 +951,13 @@
     }
 
     function closeReels(){
-      reels.classList.remove('show'); reels.setAttribute('aria-hidden','true'); bodyLock(false);
-
+      reels.classList.remove('show'); reels.setAttribute('aria-hidden','true'); document.body.style.overflow='';
       idxObserver.disconnect();
       list.removeEventListener('wheel', onWheel);
       list.removeEventListener('touchstart', onTouchStart);
       list.removeEventListener('touchend', onTouchEnd);
       document.removeEventListener('keydown', onKeys);
       if(resizeHandler){ window.removeEventListener('resize', resizeHandler); resizeHandler=null; }
-
-      lastFocused && lastFocused.focus();
     }
 
     open?.addEventListener('click', openReels);
