@@ -47,7 +47,7 @@
     .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips + Search (sticky as a block, supports multi-row) */
+    /* Chips + Search (sticky block) */
     .chips-wrap{
       position: sticky;
       top: calc(var(--topbar-h) + var(--stepper-h));
@@ -58,12 +58,22 @@
     }
     body.scrolled .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
 
+    /* Make #chips FULL-WIDTH and independent of .container */
     #chips{
-      display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:10px 0;
+      display:flex;
+      gap:8px;
+      padding:10px 12px;              /* gutter so pills don’t stick to edges */
+      overflow:auto;                   /* horizontal scroll on mobile if needed */
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
     }
-    .chip{background:#F2F2F2;color:#111;border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:.18s}
+    #chips::-webkit-scrollbar{ display:none; }
+
+    .chip{background:#F2F2F2;color:#111;border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;white-space:nowrap;transition:.18s}
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
+
+    .search-row{ padding:0 12px 10px; } /* container below the free chips row */
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
@@ -152,24 +162,29 @@
     </div>
   </div>
 
-  <!-- Chips + Search (always visible, multi-row) -->
+  <!-- Chips + Search (ALWAYS VISIBLE). NOTE: #chips is OUTSIDE .container -->
   <div class="chips-wrap">
-    <div class="container">
-      <div id="chips" aria-label="تصنيفات">
-        <button class="chip active" data-target="#topOfMenu">الكل</button>
-        <button class="chip" data-target="#sec-sushi">سوشي</button>
-        <button class="chip" data-target="#sec-don">دون</button>
-        <button class="chip" data-target="#sec-meat">لحوم</button>
-        <button class="chip" data-target="#sec-drinks">مشروبات</button>
+    <!-- Full-bleed chips row (independent of container width) -->
+    <div id="chips" aria-label="تصنيفات">
+      <button class="chip active" data-target="#topOfMenu">الكل</button>
+      <button class="chip" data-target="#sec-sushi">سوشي</button>
+      <button class="chip" data-target="#sec-don">دون</button>
+      <button class="chip" data-target="#sec-meat">لحوم</button>
+      <button class="chip" data-target="#sec-drinks">مشروبات</button>
+      <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
+    </div>
 
-        <div class="ms-auto" style="min-width:260px;flex:1 1 260px">
-          <div class="searchbox d-flex" role="search">
-            <input id="q" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
-            <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
+    <!-- Search stays aligned to the page grid -->
+    <div class="search-row">
+      <div class="container">
+        <div class="row g-2">
+          <div class="col-12 col-md-6 col-lg-4 ms-auto">
+            <div class="searchbox d-flex" role="search">
+              <input id="q" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
+              <button class="btn" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
           </div>
         </div>
-
-        <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
       </div>
     </div>
   </div>
@@ -429,8 +444,8 @@
     function toast(msg){ const box=document.getElementById('toasts'); const el=document.createElement('div'); el.className='toast-msg'; el.textContent=msg; box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200); }
     function safeGo(t){ if(!canGo(t)){ toast(t==='thanks'?'أكمل تأكيد الطلب أولاً':'أضِف عناصر للسلة أولاً'); showTab('#tab-'+state.active); return false;} showTab('#tab-'+t); return true; }
     document.addEventListener('shown.bs.tab', e=>{ const href=e.target?.getAttribute('href'); if(href==='#tab-menu') setStep('menu'); if(href==='#tab-cart') setStep('cart'); if(href==='#tab-data') setStep('data'); if(href==='#tab-thanks') setStep('thanks'); history.replaceState(null,'',href); setStickyVars(); });
-    document.body.addEventListener('click', (e)=>{ const a=e.target.closest('a[href^="#tab-"],[data-go]'); if(!a) return; e.preventDefault(); const to=a.dataset.go||(a.getAttribute('href')||'').replace('#tab-',''); if(['menu','cart','data','thanks'].includes(to)) safeGo(to); });
     document.getElementById('openCart').addEventListener('click', ()=>safeGo('cart'));
+    document.body.addEventListener('click', (e)=>{ const a=e.target.closest('a[href^="#tab-"],[data-go]'); if(!a) return; e.preventDefault(); const to=a.dataset.go||(a.getAttribute('href')||'').replace('#tab-',''); if(['menu','cart','data','thanks'].includes(to)) safeGo(to); });
 
     /* Smooth anchor scroll for chips */
     const chipsEl = document.getElementById('chips');
@@ -500,7 +515,6 @@
         const filtered = list.filter(match);
         if(!grid) return;
         if(!filtered.length){
-          // hide section title if empty
           const title = document.getElementById('sec-'+cat);
           if(title) title.style.display='none';
           grid.style.display='none';
@@ -524,8 +538,8 @@
         });
       });
 
-      // clear button visibility
-      document.getElementById('clearFilters').classList.toggle('d-none', !q);
+      // Clear button visibility
+      clearFilters.classList.toggle('d-none', !q);
     }
 
     /* Search */
@@ -536,10 +550,11 @@
     });
     clearFilters.addEventListener('click', ()=>{
       state.q=''; search.value=''; renderSections(state.menu, '');
-      // return chips active to "all"
-      chipsEl.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-      chipsEl.querySelector('.chip[data-target="#topOfMenu"]').classList.add('active');
-      // jump to top smoothly
+      // Return chips active to "all"
+      document.querySelectorAll('#chips .chip').forEach(c=>c.classList.remove('active'));
+      const allBtn = document.querySelector('#chips .chip[data-target="#topOfMenu"]');
+      if(allBtn) allBtn.classList.add('active');
+      // Jump to top smoothly
       const topY = document.getElementById('topOfMenu').getBoundingClientRect().top + window.scrollY - stickyTotalHeight() - 8;
       window.scrollTo({ top: Math.max(0, topY), behavior: 'smooth' });
     });
@@ -550,10 +565,18 @@
     function totals(){ const arr=cartArr(); return {count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr}; }
     function bump(){
       const t=totals();
-      badge.textContent=t.count; miniCount.textContent=`${t.count} عنصر`; miniTotal.textContent=fmt.format(t.total); cartTotal.textContent=fmt.format(t.total);
-      const need=Math.max(0, FREE_SHIP - t.total); miniHint.textContent = need>0 ? `تبقى ${need.toFixed(2)} ر.س للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
+      document.getElementById('badge').textContent=t.count;
+      document.getElementById('miniCount').textContent=`${t.count} عنصر`;
+      document.getElementById('miniTotal').textContent=fmt.format(t.total);
+      document.getElementById('cartTotal').textContent=fmt.format(t.total);
+      const need=Math.max(0, FREE_SHIP - t.total);
+      document.getElementById('miniHint').textContent = need>0 ? `تبقى ${need.toFixed(2)} ر.س للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
       localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
-      const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
+      const has=t.count>0;
+      const goCartBtn=document.getElementById('goCartBtn');
+      const toDataBtn=document.getElementById('toDataBtn');
+      goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has));
+      toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
       renderCartList();
     }
     function addLine(item, qty=1){
@@ -564,6 +587,7 @@
       bump(); toast(`أُضيف ${item.title} ✅`);
     }
     function renderCartList(){
+      const cartList=document.getElementById('cartList');
       cartList.innerHTML='';
       const {arr}=totals();
       if(!arr.length){ const p=document.createElement('p'); p.className='text-secondary text-center my-4'; p.textContent='السلة فارغة'; cartList.appendChild(p); return; }
