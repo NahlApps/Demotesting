@@ -49,24 +49,22 @@
     .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips bar — ALWAYS visible (sticky), multi-row */
+    /* Chips bar — ALWAYS visible (fixed), multi-row */
     .chips-wrap{
-      position: sticky;                              /* <-- moved sticky to wrapper (cross-browser reliable) */
+      position: fixed;                 /* fixed keeps it always visible */
+      inset-inline: 0;
       top: calc(var(--topbar-h) + var(--stepper-h));
-      z-index: 90;
+      z-index: 100;
       background:#fff;
       border-bottom:1px solid var(--rule);
-      box-shadow: none;
+    }
+    #chips{
+      display:flex; flex-wrap:wrap; gap:8px;
+      padding-block:10px; align-items:center;
     }
     body.scrolled .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
-    #chips{
-      display:flex;
-      flex-wrap:wrap;              /* allow multiple rows */
-      gap:8px;
-      padding-block:10px;
-      align-items:center;
-      overflow:visible;            /* prevent clipping of extra rows */
-    }
+    #chipsSpacer{ height: var(--chips-h); }  /* layout spacer under fixed bar */
+
     .chip{
       background:#F2F2F2;color:#111;border:1px solid var(--rule);
       border-radius:var(--radius-pill);padding:10px 14px;
@@ -166,7 +164,7 @@
     </div>
   </div>
 
-  <!-- Chips + Search (always visible, multi-row) -->
+  <!-- Chips + Search (always visible, fixed) -->
   <div class="chips-wrap" id="chipsWrap">
     <div class="container">
       <div id="chips" aria-label="تصنيفات">
@@ -187,6 +185,8 @@
       </div>
     </div>
   </div>
+  <!-- Spacer to avoid layout jump under fixed chips -->
+  <div id="chipsSpacer" aria-hidden="true"></div>
 
   <!-- Content -->
   <main id="topOfMenu">
@@ -400,7 +400,9 @@
     /* Sticky helpers: measure heights (chips can wrap) */
     const topbarEl   = document.getElementById('topbar');
     const stepperEl  = document.getElementById('stepperWrap');
-    const chipsWrap  = document.getElementById('chipsWrap');   // <-- measure wrapper (the sticky element)
+    const chipsWrap  = document.getElementById('chipsWrap');
+    const chipsSpacer= document.getElementById('chipsSpacer');
+
     const setStickyVars = () => {
       const topH   = Math.round(topbarEl?.getBoundingClientRect().height || 56);
       const stepH  = Math.round(stepperEl?.getBoundingClientRect().height || 0);
@@ -408,6 +410,7 @@
       document.documentElement.style.setProperty('--topbar-h', topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
       document.documentElement.style.setProperty('--chips-h', chipsH + 'px');
+      if(chipsSpacer) chipsSpacer.style.height = chipsH + 'px';  // keep layout from jumping
     };
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
@@ -525,7 +528,7 @@
       emptyMsg.classList.toggle('d-none', totalMatches>0);
       clearFilters.classList.toggle('d-none', !state.q.trim());
 
-      // Important: after DOM changes, recalc sticky height (chips may wrap)
+      // Important: after DOM changes, recalc fixed bar height (chips may wrap)
       setStickyVars();
       setupScrollspy();
     }
