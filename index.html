@@ -139,19 +139,16 @@
 
   <!-- === Color System Patch (Japanese-inspired gold/indigo) === -->
   <style>
-    /* Light theme remap */
     :root{
-      /* Brand & Accents */
       --brand-50:#FFF8D9;
       --brand-300:#F7DC72;
-      --brand-600:#F4CE14;  /* highlights / badges */
-      --brand-800:#B38705;  /* primary buttons */
-      --brand-900:#8A6F00;  /* hover/active */
+      --brand-600:#F4CE14;
+      --brand-800:#B38705;
+      --brand-900:#8A6F00;
 
-      --sakura-600:#E11D48; /* alert badge / cart ping */
-      --indigo-600:#223554; /* links/info */
+      --sakura-600:#E11D48;
+      --indigo-600:#223554;
 
-      /* Neutrals (slightly warm) */
       --bg:#FAFAF9;
       --surface:#FFFFFF;
       --surface-2:#F5F5F4;
@@ -159,21 +156,17 @@
       --ink-700:#2B2F36;
       --rule:#E7E5E4;
 
-      /* States */
       --success-600:#16A34A;
       --warn-600:#F59E0B;
       --error-600:#DC2626;
       --info-600:#0369A1;
 
-      /* Elevation */
       --shadow:0 10px 30px rgba(0,0,0,.06);
     }
 
-    /* Base */
     body{ background:var(--bg); color:var(--ink-900); }
     .app-header,.stepper-wrap,.chips-wrap{ background:var(--surface); border-color:var(--rule); }
 
-    /* CTA remap */
     .btn-dark,
     .add-btn,
     #optAddBtn,
@@ -207,52 +200,35 @@
       color:var(--ink-900)!important;
     }
 
-    /* Chips */
     .chip{ background:var(--surface-2); border-color:var(--rule); color:var(--ink-900); }
     .chip.active{ background:var(--brand-800); border-color:var(--brand-800); color:#fff; }
     .pill-clear{ background:var(--surface); border-color:var(--brand-300); color:var(--brand-800); }
 
-    /* Segmented toggle */
     .seg{ background:var(--surface-2); border-color:var(--rule); }
     .seg button[aria-pressed="true"]{
       background:var(--brand-800); border-color:var(--brand-800); color:#fff;
     }
 
-    /* Badge & minibar */
     .cart-badge{ background:var(--sakura-600); }
-    .mini-bar{
-      background:linear-gradient(0deg, rgba(0,0,0,.72), rgba(0,0,0,.72)), var(--ink-900);
-    }
+    .mini-bar{ background:linear-gradient(0deg, rgba(0,0,0,.72), rgba(0,0,0,.72)), var(--ink-900); }
 
-    /* Info/ETA */
     #etaBadge{
       background:color-mix(in oklab, var(--indigo-600) 14%, white);
       color:var(--indigo-600);
     }
     .toast-msg{ background:var(--ink-900); }
-
-    /* Links */
     a.link-dark{ color:var(--indigo-600) !important; }
     a.link-dark:hover{ text-decoration:underline; }
 
-    /* Cards & tags */
     .dish,.cart-card,.card-paper{ background:var(--surface); border-color:var(--rule); box-shadow:var(--shadow); }
     .line{ border-bottom-color:var(--rule); }
     .tag{ border-color:var(--rule); color:var(--ink-700); background:var(--surface); }
 
-    /* Inputs */
-    .searchbox,
-    .form-control,
-    .form-select{ border-color:var(--rule); }
-
-    /* Strong headings */
+    .searchbox, .form-control, .form-select{ border-color:var(--rule); }
     .sec-title,.brand{ color:var(--ink-900); }
-
-    /* Thanks */
     #tab-thanks .badge{ background:var(--surface); border-color:var(--rule); color:var(--ink-900); }
     .ticket#thTicket{ color:var(--brand-800); }
 
-    /* Dark mode */
     @media (prefers-color-scheme: dark){
       :root{
         --bg:#0D0F13;
@@ -270,9 +246,8 @@
     }
   </style>
 
-  <!-- Reels View Styles -->
+  <!-- Reels View Styles (one-by-one snap) -->
   <style>
-    /* === Reels View (vertical snap, 1 dish per screen) === */
     #reels {
       position: fixed; inset: 0; z-index: 1100; display: none;
       background: #000; color: #fff;
@@ -291,33 +266,25 @@
       scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
       outline: none;
+      touch-action: pan-y; /* allow vertical gestures */
     }
     .reel{
-      position: relative; height: 100vh; scroll-snap-align: start;
+      position: relative; height: 100vh;
       display: grid; grid-template-rows: 1fr auto; isolation: isolate;
+      scroll-snap-align: start;
+      scroll-snap-stop: always; /* <<< key: stop at each card */
     }
-    .reel .media{
-      position: relative; background: #000; min-height: 0;
-      display: grid; place-items: center;
-    }
-    .reel img{
-      width: 100%; height: 100%; object-fit: cover; background:#111;
-    }
+    .reel .media{ position: relative; background:#000; min-height:0; display:grid; place-items:center; }
+    .reel img{ width:100%; height:100%; object-fit:cover; background:#111; }
     .reel .glass{
-      position: absolute; inset-inline: 0; inset-block-end: 0;
-      padding: 14px 12px 18px;
-      background: linear-gradient(0deg, rgba(0,0,0,.65), rgba(0,0,0,0));
-      color:#fff; z-index: 1;
+      position:absolute; inset-inline:0; inset-block-end:0;
+      padding:14px 12px 18px; background:linear-gradient(0deg, rgba(0,0,0,.65), rgba(0,0,0,0)); color:#fff; z-index:1;
     }
-    .reel .title{ font-weight: 900; margin: 0 0 6px; }
+    .reel .title{ font-weight:900; margin:0 0 6px; }
     .reel .desc{ opacity:.9; font-size:.95rem; }
     .reel .tagbox{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
-    .reel .tag{ background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:4px 8px; font-size:.8rem; }
-
-    .reel .cta{
-      position: absolute; inset-inline: 12px; inset-block-end: 12px; z-index: 2;
-      display:flex; gap:8px;
-    }
+    .reel .tag{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:4px 8px; font-size:.8rem; }
+    .reel .cta{ position:absolute; inset-inline:12px; inset-block-end:12px; z-index:2; display:flex; gap:8px; }
     .reel .cta .btn{ border-radius:999px; font-weight:900; min-height:46px; }
   </style>
 </head>
@@ -372,7 +339,7 @@
     </div>
   </div>
 
-  <!-- Chips + Search (always visible, multi-row) -->
+  <!-- Chips + Search -->
   <div class="chips-wrap" id="chipsWrap">
     <div class="container">
       <div id="chips" aria-label="تصنيفات">
@@ -774,7 +741,7 @@
 
       setStickyVars();
       setupScrollspy();
-      revealObserve(); // enable reveal on new nodes
+      revealObserve();
     }
 
     /* Chips: click -> scroll */
@@ -893,14 +860,12 @@
       vL.setAttribute('aria-pressed', isList); vC.setAttribute('aria-pressed', !isList);
       listSlots.classList.toggle('d-none', !isList); cal.classList.toggle('d-none', isList);
     });
-    // time slots
     const SLOTS=['10:30','11:00','11:30','12:00','12:30','13:00','13:30'];
     SLOTS.forEach(t=>{
       const btn=document.createElement('button');
       btn.className='btn btn-outline-dark'; btn.textContent=t; btn.onclick=()=>{ state.slot=t; toast('تم اختيار '+t); };
       listSlots.appendChild(btn);
     });
-    // simple calendar (next 7 days)
     const calWrap=document.createElement('div'); calWrap.className='row g-2';
     for(let i=0;i<7;i++){
       const d=new Date(); d.setDate(d.getDate()+i);
@@ -946,6 +911,7 @@
     }
 
     /* Confirm */
+    const FREE_SHIP = 79;
     confirmBtn.onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
@@ -978,7 +944,7 @@
       }
     };
 
-    /* KPI Counters on reveal */
+    /* KPI counters */
     function initCounters(){
       const io=new IntersectionObserver(es=>{
         es.forEach(e=>{
@@ -1004,7 +970,7 @@
       document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
     }
 
-    /* Live countdown (offer/closing) */
+    /* Live countdown */
     function initCountdown(mins=45){
       const end = new Date(); end.setMinutes(end.getMinutes()+mins);
       const upd = ()=>{
@@ -1037,7 +1003,7 @@
   });
   </script>
 
-  <!-- Reels module -->
+  <!-- Reels module (ONE-BY-ONE snap) -->
   <script>
   (() => {
     const reels = document.getElementById('reels');
@@ -1054,6 +1020,7 @@
       document.body.style.overflow = lock ? 'hidden' : '';
     }
 
+    /* build one reel card */
     function reelNode(dish, idx){
       const div = document.createElement('section');
       div.className = 'reel';
@@ -1101,17 +1068,77 @@
       const img = el.querySelector('img[data-src]');
       if(img && !img.src){ img.src = img.dataset.src; }
     }
-
     function preloadAround(idx){
       const nodes = [...list.children];
       const cur = nodes[idx]; if(cur) loadImgIn(cur);
       const nxt = nodes[idx+1]; if(nxt) loadImgIn(nxt);
       const prv = nodes[idx-1]; if(prv) loadImgIn(prv);
     }
-
     function scrollToIndex(i, smooth=true){
       const h = list.clientHeight || window.innerHeight;
       list.scrollTo({ top: i*h, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    /* keep currentIdx in sync using IO */
+    const idxObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          currentIdx = Number(e.target.dataset.idx || 0);
+          preloadAround(currentIdx);
+        }
+      });
+    }, { root: list, threshold: 0.6 });
+
+    /* ONE-BY-ONE gates */
+    let wheelLocked = false;
+    let wheelTimer  = null;
+    function onWheel(e){
+      e.preventDefault();                // stop native momentum from skipping
+      if (wheelLocked) return;
+      wheelLocked = true;
+
+      const dir = e.deltaY > 0 ? 1 : -1;
+      const max = list.children.length - 1;
+      const next = Math.min(Math.max(currentIdx + dir, 0), max);
+      if (next !== currentIdx) scrollToIndex(next, true);
+
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(() => { wheelLocked = false; }, 300);
+    }
+
+    let touchStartY = null;
+    const SWIPE_THRESHOLD = 28; // px
+    function onTouchStart(e){ touchStartY = e.touches?.[0]?.clientY ?? null; }
+    function onTouchEnd(e){
+      if (touchStartY == null) return;
+      const endY = e.changedTouches?.[0]?.clientY ?? touchStartY;
+      const dy = touchStartY - endY;
+      touchStartY = null;
+
+      if (Math.abs(dy) < SWIPE_THRESHOLD) {
+        scrollToIndex(currentIdx, true); // minor jiggle -> snap back
+        return;
+      }
+      const dir = dy > 0 ? 1 : -1;
+      const max = list.children.length - 1;
+      const next = Math.min(Math.max(currentIdx + dir, 0), max);
+      if (next !== currentIdx) scrollToIndex(next, true);
+    }
+
+    function bindOneByOneHandlers(){
+      // observe each reel
+      [...list.children].forEach(n => idxObserver.observe(n));
+      // wheel: must be non-passive to call preventDefault
+      list.addEventListener('wheel', onWheel, { passive: false });
+      // touch: treat as discrete swipe
+      list.addEventListener('touchstart', onTouchStart, { passive: true });
+      list.addEventListener('touchend', onTouchEnd, { passive: true });
+    }
+    function unbindOneByOneHandlers(){
+      idxObserver.disconnect();
+      list.removeEventListener('wheel', onWheel);
+      list.removeEventListener('touchstart', onTouchStart);
+      list.removeEventListener('touchend', onTouchEnd);
     }
 
     function openReels(){
@@ -1120,7 +1147,7 @@
         if(!q) return true;
         return [d.title||'', d.desc||''].join(' ').toLowerCase().includes(q);
       });
-      if(!filtered.length){ const t=document.createElement('div'); t.textContent='لا توجد أطباق مطابقة'; return; }
+      if(!filtered.length){ const x=document.createElement('div'); x.textContent='لا توجد أطباق مطابقة'; return; }
 
       list.innerHTML = '';
       filtered.forEach((d, i) => list.appendChild(reelNode(d, i)));
@@ -1130,44 +1157,24 @@
       currentIdx = 0;
       preloadAround(currentIdx);
 
-      const io = new IntersectionObserver(entries => {
-        entries.forEach(e => {
-          if(e.isIntersecting){
-            const idx = Number(e.target.dataset.idx || 0);
-            currentIdx = idx;
-            preloadAround(idx);
-          }
-        });
-      }, { root: list, threshold: 0.6 });
-
-      [...list.children].forEach(n => io.observe(n));
-
-      const onKey = (ev) => {
-        if(ev.key === 'Escape'){ ev.preventDefault(); closeReels(); return; }
-        if(ev.key === 'ArrowDown' || ev.key === 'PageDown'){ ev.preventDefault(); scrollToIndex(Math.min(currentIdx+1, list.children.length-1)); }
-        if(ev.key === 'ArrowUp' || ev.key === 'PageUp'){ ev.preventDefault(); scrollToIndex(Math.max(currentIdx-1, 0)); }
-      };
-      const onResize = () => { scrollToIndex(currentIdx, false); };
-
-      document.addEventListener('keydown', onKey);
-      window.addEventListener('resize', onResize);
-
-      unbinder = () => {
-        document.removeEventListener('keydown', onKey);
-        window.removeEventListener('resize', onResize);
-        io.disconnect();
-      };
+      bindOneByOneHandlers();
+      window.addEventListener('resize', keepSnap, { passive:true });
     }
 
+    function keepSnap(){ scrollToIndex(currentIdx, false); }
+
     function closeReels(){
-      unbinder(); unbinder = () => {};
+      unbindOneByOneHandlers();
       reels.classList.remove('show'); reels.setAttribute('aria-hidden','true');
+      window.removeEventListener('resize', keepSnap);
       bodyLock(false);
     }
 
     open?.addEventListener('click', openReels);
     close?.addEventListener('click', closeReels);
     toCart?.addEventListener('click', () => { closeReels(); document.getElementById('openCart').click(); });
+    // ESC to close
+    document.addEventListener('keydown', (e)=>{ if(reels.classList.contains('show') && e.key==='Escape'){ closeReels(); }});
   })();
   </script>
 
