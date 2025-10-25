@@ -269,6 +269,57 @@
       .btn-outline-dark:hover{ background:color-mix(in oklab, var(--brand-600) 12%, white); }
     }
   </style>
+
+  <!-- Reels View Styles -->
+  <style>
+    /* === Reels View (vertical snap, 1 dish per screen) === */
+    #reels {
+      position: fixed; inset: 0; z-index: 1100; display: none;
+      background: #000; color: #fff;
+    }
+    #reels.show { display: block; }
+    #reelsHeader{
+      position: absolute; inset-inline: 0; inset-block-start: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; background: linear-gradient(180deg, rgba(0,0,0,.6), rgba(0,0,0,0));
+      pointer-events: none; z-index: 2;
+    }
+    #reelsHeader .btn, #reelsHeader .chip { pointer-events: auto; }
+
+    .reels-list{
+      height: 100vh; overflow-y: auto; overscroll-behavior: contain;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      outline: none;
+    }
+    .reel{
+      position: relative; height: 100vh; scroll-snap-align: start;
+      display: grid; grid-template-rows: 1fr auto; isolation: isolate;
+    }
+    .reel .media{
+      position: relative; background: #000; min-height: 0;
+      display: grid; place-items: center;
+    }
+    .reel img{
+      width: 100%; height: 100%; object-fit: cover; background:#111;
+    }
+    .reel .glass{
+      position: absolute; inset-inline: 0; inset-block-end: 0;
+      padding: 14px 12px 18px;
+      background: linear-gradient(0deg, rgba(0,0,0,.65), rgba(0,0,0,0));
+      color:#fff; z-index: 1;
+    }
+    .reel .title{ font-weight: 900; margin: 0 0 6px; }
+    .reel .desc{ opacity:.9; font-size:.95rem; }
+    .reel .tagbox{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+    .reel .tag{ background: rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:4px 8px; font-size:.8rem; }
+
+    .reel .cta{
+      position: absolute; inset-inline: 12px; inset-block-end: 12px; z-index: 2;
+      display:flex; gap:8px;
+    }
+    .reel .cta .btn{ border-radius:999px; font-weight:900; min-height:46px; }
+  </style>
 </head>
 <body>
   <!-- One-time rotate hint -->
@@ -340,6 +391,9 @@
 
         <!-- Live countdown -->
         <span id="offerCountdown" class="badge bg-light text-dark border offer-badge">—</span>
+
+        <!-- Open Reels chip -->
+        <button id="openReels" class="chip" type="button" aria-haspopup="dialog">عرض رييل</button>
 
         <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
       </div>
@@ -523,6 +577,16 @@
     </div>
   </div>
 
+  <!-- Reels overlay -->
+  <div id="reels" aria-hidden="true" role="dialog" aria-label="استعراض الأطباق بشكل رييل">
+    <div id="reelsHeader" dir="rtl">
+      <button id="closeReels" class="chip" type="button" aria-label="إغلاق">إغلاق</button>
+      <span class="small text-white-50 me-auto ms-2">اسحب للأعلى/الأسفل</span>
+      <button id="reelsToCart" class="chip" type="button" aria-label="فتح السلة">السلة</button>
+    </div>
+    <div class="reels-list" id="reelsList" tabindex="0" aria-live="polite"></div>
+  </div>
+
   <!-- Templates -->
   <template id="dishTpl">
     <div class="dish reveal" data-cat="">
@@ -566,6 +630,7 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu', slot:'' };
+    window.state = state; // expose for reels module
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
     /* One-time rotate hint */
@@ -822,20 +887,20 @@
 
     /* Time slot toggle */
     const vL=document.getElementById('viewList'), vC=document.getElementById('viewCal');
-    const list=document.getElementById('slotList'), cal=document.getElementById('slotCal');
+    const listSlots=document.getElementById('slotList'), cal=document.getElementById('slotCal');
     [vL,vC].forEach(b=>b.onclick=()=>{
       const isList=b===vL;
       vL.setAttribute('aria-pressed', isList); vC.setAttribute('aria-pressed', !isList);
-      list.classList.toggle('d-none', !isList); cal.classList.toggle('d-none', isList);
+      listSlots.classList.toggle('d-none', !isList); cal.classList.toggle('d-none', isList);
     });
-    // CONFIG: time slots
+    // time slots
     const SLOTS=['10:30','11:00','11:30','12:00','12:30','13:00','13:30'];
     SLOTS.forEach(t=>{
       const btn=document.createElement('button');
       btn.className='btn btn-outline-dark'; btn.textContent=t; btn.onclick=()=>{ state.slot=t; toast('تم اختيار '+t); };
-      list.appendChild(btn);
+      listSlots.appendChild(btn);
     });
-    // Simple calendar (next 7 days)
+    // simple calendar (next 7 days)
     const calWrap=document.createElement('div'); calWrap.className='row g-2';
     for(let i=0;i<7;i++){
       const d=new Date(); d.setDate(d.getDate()+i);
@@ -881,7 +946,6 @@
     }
 
     /* Confirm */
-    const FREE_SHIP = 79;
     confirmBtn.onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
@@ -941,7 +1005,6 @@
     }
 
     /* Live countdown (offer/closing) */
-    // CONFIG: minutes from now
     function initCountdown(mins=45){
       const end = new Date(); end.setMinutes(end.getMinutes()+mins);
       const upd = ()=>{
@@ -972,6 +1035,140 @@
       appLoading.classList.remove('show');
     })();
   });
+  </script>
+
+  <!-- Reels module -->
+  <script>
+  (() => {
+    const reels = document.getElementById('reels');
+    const list  = document.getElementById('reelsList');
+    const open  = document.getElementById('openReels');
+    const close = document.getElementById('closeReels');
+    const toCart= document.getElementById('reelsToCart');
+
+    let unbinder = () => {};
+    let currentIdx = 0;
+
+    function bodyLock(lock){
+      document.documentElement.style.overflow = lock ? 'hidden' : '';
+      document.body.style.overflow = lock ? 'hidden' : '';
+    }
+
+    function reelNode(dish, idx){
+      const div = document.createElement('section');
+      div.className = 'reel';
+      div.setAttribute('data-idx', idx);
+
+      const media = document.createElement('div');
+      media.className = 'media';
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = dish.title || '';
+      if (dish.img && /^https?:\/\//.test(dish.img)) img.dataset.src = dish.img;
+
+      const glass = document.createElement('div');
+      glass.className = 'glass';
+      glass.innerHTML = `
+        <h3 class="title">${dish.title || '—'}</h3>
+        <div class="desc">${dish.desc || ''}</div>
+        <div class="tagbox">${(dish.tags||[]).slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      `;
+
+      const cta = document.createElement('div');
+      cta.className = 'cta';
+      const add = document.createElement('button');
+      add.className = 'btn btn-dark flex-fill';
+      add.type='button';
+      add.textContent = `أضف للسلة — ${new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'}).format(Number(dish.price||0))}`;
+      add.onclick = () => { addLine(dish,1); };
+
+      const more = document.createElement('button');
+      more.className = 'btn btn-outline-light';
+      more.type='button'; more.textContent = 'تفاصيل';
+      more.onclick = () => {};
+
+      cta.appendChild(add);
+      cta.appendChild(more);
+
+      media.appendChild(img);
+      div.appendChild(media);
+      div.appendChild(glass);
+      div.appendChild(cta);
+      return div;
+    }
+
+    function loadImgIn(el){
+      const img = el.querySelector('img[data-src]');
+      if(img && !img.src){ img.src = img.dataset.src; }
+    }
+
+    function preloadAround(idx){
+      const nodes = [...list.children];
+      const cur = nodes[idx]; if(cur) loadImgIn(cur);
+      const nxt = nodes[idx+1]; if(nxt) loadImgIn(nxt);
+      const prv = nodes[idx-1]; if(prv) loadImgIn(prv);
+    }
+
+    function scrollToIndex(i, smooth=true){
+      const h = list.clientHeight || window.innerHeight;
+      list.scrollTo({ top: i*h, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    function openReels(){
+      const q = (window.state?.q || '').toLowerCase();
+      const filtered = (window.state?.menu || []).filter(d => {
+        if(!q) return true;
+        return [d.title||'', d.desc||''].join(' ').toLowerCase().includes(q);
+      });
+      if(!filtered.length){ const t=document.createElement('div'); t.textContent='لا توجد أطباق مطابقة'; return; }
+
+      list.innerHTML = '';
+      filtered.forEach((d, i) => list.appendChild(reelNode(d, i)));
+      reels.classList.add('show'); reels.setAttribute('aria-hidden','false');
+      bodyLock(true);
+      list.focus({preventScroll:true});
+      currentIdx = 0;
+      preloadAround(currentIdx);
+
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if(e.isIntersecting){
+            const idx = Number(e.target.dataset.idx || 0);
+            currentIdx = idx;
+            preloadAround(idx);
+          }
+        });
+      }, { root: list, threshold: 0.6 });
+
+      [...list.children].forEach(n => io.observe(n));
+
+      const onKey = (ev) => {
+        if(ev.key === 'Escape'){ ev.preventDefault(); closeReels(); return; }
+        if(ev.key === 'ArrowDown' || ev.key === 'PageDown'){ ev.preventDefault(); scrollToIndex(Math.min(currentIdx+1, list.children.length-1)); }
+        if(ev.key === 'ArrowUp' || ev.key === 'PageUp'){ ev.preventDefault(); scrollToIndex(Math.max(currentIdx-1, 0)); }
+      };
+      const onResize = () => { scrollToIndex(currentIdx, false); };
+
+      document.addEventListener('keydown', onKey);
+      window.addEventListener('resize', onResize);
+
+      unbinder = () => {
+        document.removeEventListener('keydown', onKey);
+        window.removeEventListener('resize', onResize);
+        io.disconnect();
+      };
+    }
+
+    function closeReels(){
+      unbinder(); unbinder = () => {};
+      reels.classList.remove('show'); reels.setAttribute('aria-hidden','true');
+      bodyLock(false);
+    }
+
+    open?.addEventListener('click', openReels);
+    close?.addEventListener('click', closeReels);
+    toCart?.addEventListener('click', () => { closeReels(); document.getElementById('openCart').click(); });
+  })();
   </script>
 
   <!-- Theme color sync -->
