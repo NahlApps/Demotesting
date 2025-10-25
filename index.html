@@ -50,21 +50,23 @@
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
     /* Chips bar — ALWAYS visible (sticky), multi-row */
-    .chips-wrap{background:#fff;border-bottom:1px solid var(--rule)}
-    #chips{
-      position: sticky;
+    .chips-wrap{
+      position: sticky;                              /* <-- moved sticky to wrapper (cross-browser reliable) */
       top: calc(var(--topbar-h) + var(--stepper-h));
       z-index: 90;
       background:#fff;
-      padding-block:10px;
       border-bottom:1px solid var(--rule);
+      box-shadow: none;
+    }
+    body.scrolled .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
+    #chips{
       display:flex;
       flex-wrap:wrap;              /* allow multiple rows */
       gap:8px;
-      overflow:visible;
+      padding-block:10px;
       align-items:center;
+      overflow:visible;            /* prevent clipping of extra rows */
     }
-    body.scrolled #chips{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
     .chip{
       background:#F2F2F2;color:#111;border:1px solid var(--rule);
       border-radius:var(--radius-pill);padding:10px 14px;
@@ -165,7 +167,7 @@
   </div>
 
   <!-- Chips + Search (always visible, multi-row) -->
-  <div class="chips-wrap">
+  <div class="chips-wrap" id="chipsWrap">
     <div class="container">
       <div id="chips" aria-label="تصنيفات">
         <button class="chip active" data-target="#topOfMenu">الكل</button>
@@ -396,20 +398,19 @@
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
     /* Sticky helpers: measure heights (chips can wrap) */
-    const topbarEl = document.getElementById('topbar');
-    const stepperEl = document.getElementById('stepperWrap');
-    const chipsEl = document.getElementById('chips');
+    const topbarEl   = document.getElementById('topbar');
+    const stepperEl  = document.getElementById('stepperWrap');
+    const chipsWrap  = document.getElementById('chipsWrap');   // <-- measure wrapper (the sticky element)
     const setStickyVars = () => {
-      const topH = Math.round(topbarEl?.getBoundingClientRect().height || 56);
-      const stepH = Math.round(stepperEl?.getBoundingClientRect().height || 0);
-      const chipsH= Math.round(chipsEl?.getBoundingClientRect().height || 56);
+      const topH   = Math.round(topbarEl?.getBoundingClientRect().height || 56);
+      const stepH  = Math.round(stepperEl?.getBoundingClientRect().height || 0);
+      const chipsH = Math.round(chipsWrap?.getBoundingClientRect().height || 56);
       document.documentElement.style.setProperty('--topbar-h', topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
       document.documentElement.style.setProperty('--chips-h', chipsH + 'px');
     };
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
-    setStickyVars();
 
     /* Stepper guards */
     const steps=['menu','cart','data','thanks'];
@@ -473,7 +474,7 @@
       el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="28">لا صورة</text></svg>`);
     }
 
-    /* Render ONE-PAGE menu with sections (no sticky section header) */
+    /* Render one-page menu with sections (no sticky section header) */
     function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
       const groups = groupByCat(state.menu);
@@ -523,6 +524,9 @@
 
       emptyMsg.classList.toggle('d-none', totalMatches>0);
       clearFilters.classList.toggle('d-none', !state.q.trim());
+
+      // Important: after DOM changes, recalc sticky height (chips may wrap)
+      setStickyVars();
       setupScrollspy();
     }
 
@@ -708,7 +712,7 @@
       }catch{}
       state.menu=await fetchMenu();
       if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
-      renderSections(); bump(); setStep('menu'); setStickyVars();
+      renderSections(); setStickyVars(); bump(); setStep('menu');
       appLoading.classList.remove('show');
     })();
   });
