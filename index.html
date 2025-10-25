@@ -22,9 +22,9 @@
     :root{
       --bg:#FAFAFA; --ink:#0B0D13; --muted:#6B7280; --rule:#EAEAEA;
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
-      --topbar-h:56px;    /* updated by JS */
-      --stepper-h:44px;   /* updated by JS */
-      --chips-h:56px;     /* updated by JS (multi-row aware) */
+      --topbar-h:56px;     /* updated by JS */
+      --stepper-h:44px;    /* updated by JS */
+      --chips-h:56px;      /* updated by JS (multi-row aware) */
     }
     html,body{height:100%}
     html{scroll-behavior:smooth;}
@@ -51,9 +51,9 @@
 
     /* Chips bar — ALWAYS visible (fixed), multi-row */
     .chips-wrap{
-      position: fixed;                 /* fixed keeps it always visible */
+      position: fixed;                 /* fixed to viewport */
       inset-inline: 0;
-      top: calc(var(--topbar-h) + var(--stepper-h));
+      top: 0;                          /* JS will set the correct offset each time */
       z-index: 100;
       background:#fff;
       border-bottom:1px solid var(--rule);
@@ -73,10 +73,10 @@
     }
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
-    .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
+    .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff; width:100%}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Sections (no sticky heading in the middle) */
+    /* Sections */
     .menu-section{
       scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px);
       padding-top: 8px;
@@ -397,7 +397,7 @@
     const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers: measure heights (chips can wrap) */
+    /* Sticky helpers (chips fixed at top, we compute its top offset live) */
     const topbarEl   = document.getElementById('topbar');
     const stepperEl  = document.getElementById('stepperWrap');
     const chipsWrap  = document.getElementById('chipsWrap');
@@ -406,13 +406,20 @@
     const setStickyVars = () => {
       const topH   = Math.round(topbarEl?.getBoundingClientRect().height || 56);
       const stepH  = Math.round(stepperEl?.getBoundingClientRect().height || 0);
+      chipsWrap.style.top = (topH + stepH) + 'px';                 // << set real top
       const chipsH = Math.round(chipsWrap?.getBoundingClientRect().height || 56);
       document.documentElement.style.setProperty('--topbar-h', topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
       document.documentElement.style.setProperty('--chips-h', chipsH + 'px');
-      if(chipsSpacer) chipsSpacer.style.height = chipsH + 'px';  // keep layout from jumping
+      if(chipsSpacer) chipsSpacer.style.height = chipsH + 'px';
     };
-    window.addEventListener('resize', setStickyVars, {passive:true});
+    ['resize','scroll','orientationchange'].forEach(ev=>{
+      window.addEventListener(ev, setStickyVars, {passive:true});
+    });
+    document.addEventListener('shown.bs.tab', setStickyVars);
+    window.addEventListener('load', setStickyVars);
+
+    /* Header shadow on scroll */
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
 
     /* Stepper guards */
@@ -477,7 +484,7 @@
       el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="28">لا صورة</text></svg>`);
     }
 
-    /* Render one-page menu with sections (no sticky section header) */
+    /* Render one-page menu with sections */
     function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
       const groups = groupByCat(state.menu);
@@ -528,8 +535,7 @@
       emptyMsg.classList.toggle('d-none', totalMatches>0);
       clearFilters.classList.toggle('d-none', !state.q.trim());
 
-      // Important: after DOM changes, recalc fixed bar height (chips may wrap)
-      setStickyVars();
+      setStickyVars();   // recalc chips top/height if wrapping changed
       setupScrollspy();
     }
 
@@ -672,9 +678,11 @@
       document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
     }
 
-    confirmBtn.onclick=async()=>{
+    /* Confirm */
+    const confirmBtnEl=document.getElementById('confirmBtn');
+    confirmBtnEl.onclick=async()=>{
       const t=totals();
-      if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
+      if(t.count===0){ toast('السلة فارغة'); showTab('#tab-menu'); return; }
       if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
 
       let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
@@ -686,7 +694,7 @@
 
       const submitLoading=document.getElementById('submitLoading');
       submitLoading.classList.add('show');
-      confirmBtn.disabled=true; confirmBtn.classList.add('disabled');
+      confirmBtnEl.disabled=true; confirmBtnEl.classList.add('disabled');
 
       try{
         const res=await createOrder(payload);
@@ -694,11 +702,11 @@
           localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address}));
           state.cart={}; bump();
           renderThanks({ orderId:res.orderId, totals:res.totals||t.total, payload });
-          state.unlockThanks = true; safeGo('thanks');
+          state.unlockThanks = true; showTab('#tab-thanks');
         } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); }
       }catch{ toast('خطأ في الاتصال بالخدمة'); }
       finally{
-        confirmBtn.disabled=false; confirmBtn.classList.remove('disabled');
+        confirmBtnEl.disabled=false; confirmBtnEl.classList.remove('disabled');
         submitLoading.classList.remove('show');
       }
     };
