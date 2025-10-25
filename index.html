@@ -51,7 +51,7 @@
 
     /* Chips bar — ALWAYS visible (sticky), multi-row */
     .chips-wrap{
-      position: sticky;                              /* <-- moved sticky to wrapper (cross-browser reliable) */
+      position: sticky;
       top: calc(var(--topbar-h) + var(--stepper-h));
       z-index: 90;
       background:#fff;
@@ -125,6 +125,139 @@
     .overlay.show{display:flex}
     .overlay .box{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);min-width:220px}
     .overlay .msg{margin-top:.5rem;color:#555;font-weight:800}
+  </style>
+
+  <!-- === Color System Patch (Japanese-inspired gold/indigo) === -->
+  <style>
+    /* Light theme remap */
+    :root{
+      /* Brand & Accents */
+      --brand-50:#FFF8D9;
+      --brand-300:#F7DC72;
+      --brand-600:#F4CE14;  /* highlights / badges */
+      --brand-800:#B38705;  /* primary buttons */
+      --brand-900:#8A6F00;  /* hover/active */
+
+      --sakura-600:#E11D48; /* alert badge / cart ping */
+      --indigo-600:#223554; /* links/info */
+
+      /* Neutrals (slightly warm) */
+      --bg:#FAFAF9;
+      --surface:#FFFFFF;
+      --surface-2:#F5F5F4;
+      --ink-900:#0B0D13;
+      --ink-700:#2B2F36;
+      --rule:#E7E5E4;
+
+      /* States */
+      --success-600:#16A34A;
+      --warn-600:#F59E0B;
+      --error-600:#DC2626;
+      --info-600:#0369A1;
+
+      /* Elevation */
+      --shadow:0 10px 30px rgba(0,0,0,.06);
+    }
+
+    /* Base */
+    body{ background:var(--bg); color:var(--ink-900); }
+    .app-header,.stepper-wrap,.chips-wrap{ background:var(--surface); border-color:var(--rule); }
+
+    /* CTA remap */
+    .btn-dark,
+    .add-btn,
+    #optAddBtn,
+    #confirmBtn,
+    .mini-bar .btn,
+    #thBackMenu{
+      background:var(--brand-800)!important;
+      border-color:var(--brand-800)!important;
+      color:#fff!important;
+    }
+    .btn-dark:hover,
+    .add-btn:hover,
+    #optAddBtn:hover,
+    #confirmBtn:hover,
+    .mini-bar .btn:hover,
+    #thBackMenu:hover{
+      background:var(--brand-900)!important;
+      border-color:var(--brand-900)!important;
+    }
+
+    .btn-outline-dark,
+    #thBackCart{
+      color:var(--brand-800)!important;
+      border-color:var(--brand-300)!important;
+      background:transparent!important;
+    }
+    .btn-outline-dark:hover,
+    #thBackCart:hover{
+      background:var(--brand-50)!important;
+      border-color:var(--brand-600)!important;
+      color:var(--ink-900)!important;
+    }
+
+    /* Chips */
+    .chip{ background:var(--surface-2); border-color:var(--rule); color:var(--ink-900); }
+    .chip.active{ background:var(--brand-800); border-color:var(--brand-800); color:#fff; }
+    .pill-clear{ background:var(--surface); border-color:var(--brand-300); color:var(--brand-800); }
+
+    /* Segmented toggle */
+    .seg{ background:var(--surface-2); border-color:var(--rule); }
+    .seg button[aria-pressed="true"]{
+      background:var(--brand-800); border-color:var(--brand-800); color:#fff;
+    }
+
+    /* Badge & minibar */
+    .cart-badge{ background:var(--sakura-600); }
+    .mini-bar{
+      background:linear-gradient(0deg, rgba(0,0,0,.72), rgba(0,0,0,.72)), var(--ink-900);
+    }
+
+    /* Info/ETA */
+    #etaBadge{
+      background:color-mix(in oklab, var(--indigo-600) 14%, white);
+      color:var(--indigo-600);
+    }
+    .toast-msg{ background:var(--ink-900); }
+
+    /* Links */
+    a.link-dark{ color:var(--indigo-600) !important; }
+    a.link-dark:hover{ text-decoration:underline; }
+
+    /* Cards & tags */
+    .dish,.cart-card,.card-paper{ background:var(--surface); border-color:var(--rule); box-shadow:var(--shadow); }
+    .line{ border-bottom-color:var(--rule); }
+    .tag{ border-color:var(--rule); color:var(--ink-700); background:var(--surface); }
+
+    /* Inputs */
+    .searchbox,
+    .form-control,
+    .form-select{ border-color:var(--rule); }
+
+    /* Strong headings */
+    .sec-title,.brand{ color:var(--ink-900); }
+
+    /* Thanks */
+    #tab-thanks .badge{ background:var(--surface); border-color:var(--rule); color:var(--ink-900); }
+    .ticket#thTicket{ color:var(--brand-800); }
+
+    /* Dark mode */
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0D0F13;
+        --surface:#111318;
+        --surface-2:#1A1D23;
+        --ink-900:#F5F6F7;
+        --ink-700:#D6D8DC;
+        --rule:#252930;
+        --shadow:0 12px 34px rgba(0,0,0,.4);
+      }
+      .chip{ color:var(--ink-900); }
+      .chip.active{ color:#111; background:var(--brand-600); border-color:var(--brand-600); }
+      .btn-outline-dark{ color:var(--brand-600)!important; border-color:color-mix(in oklab, var(--brand-600) 40%, white); }
+      .btn-outline-dark:hover{ background:color-mix(in oklab, var(--brand-600) 12%, white); }
+    }
   </style>
 </head>
 <body>
@@ -666,7 +799,7 @@
       thTotal.textContent = typeof totals?.total === 'number' ? fmt.format(totals.total) : fmt.format(totals || 0);
       thType.textContent  = payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام';
       document.getElementById('copyTicket').onclick = ()=>copy(`تذكرة ${t4} • ${todayKey()}`);
-      document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
+      document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.text_content}\nالإجمالي: ${thTotal.textContent}`);
     }
 
     confirmBtn.onclick=async()=>{
@@ -716,6 +849,18 @@
       appLoading.classList.remove('show');
     })();
   });
+  </script>
+
+  <!-- Theme color sync for better PWA status bar look -->
+  <script>
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    function setThemeColorMeta(){
+      const el = document.querySelector('.mini-bar');
+      const cs = el ? getComputedStyle(el).backgroundColor : null;
+      if(themeMeta && cs) themeMeta.setAttribute('content', cs);
+    }
+    window.addEventListener('load', setThemeColorMeta, {once:true});
+    matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', setThemeColorMeta);
   </script>
 </body>
 </html>
