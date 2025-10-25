@@ -18,18 +18,19 @@
   <meta name="theme-color" content="#0A0A0A" />
   <meta name="description" content="Maison Hikari — اطلب الآن" />
 
-  <!-- Base Layout Tokens -->
+  <!-- Base Layout Tokens + MENU color system (with fallbacks) -->
   <style>
     :root{
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
       --topbar-h:56px; --stepper-h:44px; --chips-h:56px;
+
       /* Brand (Japanese-inspired) */
-      --brand-50:#FFF8D9;  /* soft gold wash */
+      --brand-50:#FFF8D9;
       --brand-200:#FAE79A;
       --brand-300:#F7DC72;
-      --brand-600:#F4CE14; /* bright gold accents */
-      --brand-800:#B38705; /* primary buttons */
-      --brand-900:#7D5F00; /* darker for text/price */
+      --brand-600:#F4CE14;
+      --brand-800:#B38705;
+      --brand-900:#7D5F00;
 
       --indigo-600:#223554; /* info/links */
       --sakura-600:#E11D48; /* alerts/badges */
@@ -50,26 +51,39 @@
       --info-600:#0369A1;
 
       /* Focus ring */
-      --focus: #F4CE14;
+      --focus:#F4CE14;
 
-      /* MENU-SPECIFIC PALETTE (harmonized) */
+      /* ===== MENU TOKENS — FALLBACKS (no color-mix) ===== */
       --menu-surface: var(--surface);
-      --menu-surface-alt: color-mix(in oklab, var(--brand-50) 16%, var(--surface)); /* subtle warmth */
+      --menu-surface-alt:#F5F1E4; /* approx warm wash */
       --menu-title: var(--ink-900);
-      --menu-desc: color-mix(in oklab, var(--ink-700) 72%, white);
+      --menu-desc:#4C515A;
       --menu-price: var(--brand-900);
-      --menu-chip-bg: color-mix(in oklab, var(--brand-50) 28%, var(--surface-2));
+      --menu-chip-bg:#F2EFE6;
       --menu-chip-fg: var(--ink-900);
-      --menu-chip-border: color-mix(in oklab, var(--brand-300) 42%, var(--rule));
+      --menu-chip-border:#E9E2BF;
       --menu-chip-active-bg: var(--brand-800);
-      --menu-chip-active-fg: #fff;
+      --menu-chip-active-fg:#fff;
       --menu-chip-active-border: var(--brand-800);
-      --menu-tag-bg: color-mix(in oklab, var(--indigo-600) 6%, var(--surface));
-      --menu-tag-fg: color-mix(in oklab, var(--ink-700) 86%, white);
-      --menu-tag-border: color-mix(in oklab, var(--indigo-600) 14%, var(--rule));
+      --menu-tag-bg:#F7F7FA;
+      --menu-tag-fg:#2B2F36;
+      --menu-tag-border:#E5E7EE;
       --menu-cta-bg: var(--brand-800);
-      --menu-cta-bg-hover: #8F6C03; /* accessible darken */
-      --menu-cta-fg: #fff;
+      --menu-cta-bg-hover:#8F6C03;
+      --menu-cta-fg:#fff;
+    }
+
+    /* Enhance tokens when color-mix is supported */
+    @supports (background: color-mix(in srgb, white 50%, black)) {
+      :root{
+        --menu-surface: var(--surface);
+        --menu-surface-alt: color-mix(in oklab, var(--brand-50) 16%, var(--surface));
+        --menu-desc: color-mix(in oklab, var(--ink-700) 72%, white);
+        --menu-chip-bg: color-mix(in oklab, var(--brand-50) 28%, var(--surface-2));
+        --menu-chip-border: color-mix(in oklab, var(--brand-300) 42%, var(--rule));
+        --menu-tag-bg: color-mix(in oklab, var(--indigo-600) 6%, var(--surface));
+        --menu-tag-border: color-mix(in oklab, var(--indigo-600) 14%, var(--rule));
+      }
     }
 
     html,body{height:100%}
@@ -84,7 +98,7 @@
     :where(a,button,[role="button"],input,select,textarea):focus-visible{
       outline: 2px solid var(--focus);
       outline-offset: 2px;
-      box-shadow: 0 0 0 4px color-mix(in oklab, var(--focus) 28%, transparent);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus) 28%, transparent);
     }
 
     /* Header */
@@ -102,12 +116,12 @@
     .step.done{color:var(--success-600)}.step.done .dot{border-color:var(--success-600);color:var(--success-600)}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* KPI tiles (kept) */
+    /* KPI tiles */
     .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .kpi{background:var(--menu-surface);border:1px solid var(--rule);border-radius:12px;padding:10px;text-align:center;box-shadow:var(--shadow)}
     .kpi .num{font-weight:900;font-size:1.25rem;line-height:1}
 
-    /* Chips/Search (MENU TUNED) */
+    /* Chips/Search (MENU tuned) */
     .chips-wrap{
       position: sticky; top: calc(var(--topbar-h) + var(--stepper-h)); z-index: 90;
       background:var(--menu-surface); border-bottom:1px solid var(--rule); box-shadow: none;
@@ -129,7 +143,7 @@
     .searchbox{border:1px solid var(--menu-chip-border);border-radius:var(--radius-pill);overflow:hidden;background:var(--surface)}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Sections (MENU TUNED) */
+    /* Sections */
     .menu-section{
       scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px);
       padding-top: 8px;
@@ -137,7 +151,7 @@
     .sec-title{
       margin:8px 0 12px 0;font-weight:900;color:var(--menu-title);
       position: relative; display: inline-block; padding-inline:8px; padding-block:2px;
-      background: linear-gradient(90deg, color-mix(in oklab, var(--brand-50) 60%, transparent), transparent 60%);
+      background: linear-gradient(90deg, rgba(244,206,20,.24), transparent 60%);
       border-radius: 6px;
     }
 
@@ -145,7 +159,7 @@
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-    /* Menu cards (MENU TUNED) */
+    /* Menu cards */
     .dish{
       background:var(--menu-surface);
       border:1px solid var(--rule);
@@ -173,17 +187,21 @@
     }
     .add-btn:hover{ background:var(--menu-cta-bg-hover); border-color:var(--menu-cta-bg-hover); }
 
-    /* Cart & forms (unchanged visual system) */
+    /* Cart & forms */
     .cart-card,.card-paper{background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow)}
     .line{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--rule)}
     .seg{display:inline-grid;grid-auto-flow:column;gap:8px;background:var(--surface-2);padding:6px;border-radius:999px;border:1px solid var(--rule)}
     .seg button{background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:11px 16px;min-height:46px;font-weight:900}
     .seg button[aria-pressed="true"]{background:var(--brand-800);color:#fff;border-color:var(--brand-800)}
-    #etaBadge{background:color-mix(in oklab, var(--indigo-600) 14%, white);color:var(--indigo-600);padding:4px 10px;border-radius:999px;font-weight:800}
+    #etaBadge{background:#E6F6FE;color:var(--info-600);padding:4px 10px;border-radius:999px;font-weight:800}
     .inp-wrap{position:relative}
     .inp-wrap .ico{position:absolute;inset-inline-start:12px;inset-block-start:50%;transform:translateY(-50%);color:#6b7280;pointer-events:none}
     .pad-icon{padding-inline-start:42px}
     .form-control,.form-select{min-height:56px;border-color:var(--rule)}
+
+    /* Keep intlTelInput numeric LTR inside RTL */
+    .iti{ direction: ltr; }
+    .iti input{ text-align: left; }
 
     /* Mini bar */
     .mini-bar{position:sticky;bottom:0;z-index:55;background:linear-gradient(0deg, rgba(0,0,0,.72), rgba(0,0,0,.72)), var(--ink-900);color:#fff;padding:10px 12px;border-top:1px solid rgba(255,255,255,.12);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
@@ -208,30 +226,31 @@
       @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.18)}100%{transform:scale(1)}}
     }
 
-    /* Dark Mode tuning (menu-safe) */
+    /* Dark Mode tuning */
     @media (prefers-color-scheme: dark){
       :root{
         --bg:#0D0F13; --surface:#111318; --surface-2:#1A1D23; --ink-900:#F5F6F7; --ink-700:#D6D8DC; --rule:#252930;
         --menu-surface: var(--surface);
-        --menu-surface-alt: color-mix(in oklab, #0D0F13 70%, black);
+        --menu-surface-alt:#0F1217;
         --menu-title: var(--ink-900);
-        --menu-desc: color-mix(in oklab, var(--ink-700) 85%, black);
-        --menu-price: color-mix(in oklab, var(--brand-600) 75%, white);
-        --menu-chip-bg: color-mix(in oklab, var(--brand-50) 6%, var(--surface-2));
+        --menu-desc:#C9CDD4;
+        --menu-price: #E3C84A;
+        --menu-chip-bg:#141922;
         --menu-chip-fg: var(--ink-900);
-        --menu-chip-border: color-mix(in oklab, var(--brand-300) 18%, var(--rule));
+        --menu-chip-border:#2B3040;
         --menu-chip-active-bg: var(--brand-600);
-        --menu-chip-active-fg: #111;
+        --menu-chip-active-fg:#111;
         --menu-chip-active-border: var(--brand-600);
-        --menu-tag-bg: color-mix(in oklab, var(--indigo-600) 30%, #0f1217);
-        --menu-tag-fg: #E9EBF0;
-        --menu-tag-border: color-mix(in oklab, var(--indigo-600) 38%, var(--rule));
+        --menu-tag-bg:#171C25;
+        --menu-tag-fg:#E9EBF0;
+        --menu-tag-border:#2A3040;
         --menu-cta-bg: var(--brand-600);
-        --menu-cta-bg-hover: color-mix(in oklab, var(--brand-600) 85%, #5b4a00);
-        --menu-cta-fg: #111;
+        --menu-cta-bg-hover:#715B00;
+        --menu-cta-fg:#111;
       }
       .chips-wrap{ background:var(--surface); }
-      .sec-title{ background: linear-gradient(90deg, color-mix(in oklab, var(--brand-600) 12%, transparent), transparent 60%); }
+      .sec-title{ background: linear-gradient(90deg, rgba(244,206,20,.12), transparent 60%); }
+      .offer-badge{ background:#1f2430 !important; color:#e9ebf0 !important; border-color:#2a3040 !important; }
     }
 
     /* Buttons using brand */
@@ -249,18 +268,18 @@
     .btn-outline-dark,
     #thBackCart{
       color:var(--brand-800)!important;
-      border-color:color-mix(in oklab, var(--brand-300) 60%, var(--rule))!important;
+      border-color:color-mix(in srgb, var(--brand-300) 60%, var(--rule))!important;
       background:transparent!important;
     }
     .btn-outline-dark:hover,
     #thBackCart:hover{
-      background:color-mix(in oklab, var(--brand-50) 55%, white)!important;
+      background:color-mix(in srgb, var(--brand-50) 55%, white)!important;
       border-color:var(--brand-600)!important;
       color:var(--ink-900)!important;
     }
   </style>
 
-  <!-- Reels View Styles (unchanged except snap) -->
+  <!-- Reels View Styles (one-by-one snap) -->
   <style>
     #reels { position: fixed; inset: 0; z-index: 1100; display: none; background: #000; color: #fff; }
     #reels.show { display: block; }
@@ -296,7 +315,7 @@
   <header class="app-header" id="topbar">
     <div class="container py-2 d-flex align-items-center justify-content-between gap-2">
       <div class="d-flex align-items-center gap-3">
-        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=120&auto=format&fit=crop" alt="" width="44" height="44" style="border-radius:12px;object-fit:cover" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=120&auto=format&fit=crop" alt="" width="44" height="44" style="border-radius:12px;object-fit:cover" loading="lazy" fetchpriority="high" decoding="async">
         <div>
           <div class="brand">Maison Hikari</div>
           <small class="text-secondary">الياباني المعاصر</small>
@@ -427,13 +446,13 @@
                 <label class="form-label fw-bold" for="custName">الاسم</label>
                 <div class="inp-wrap">
                   <i class="fa-regular fa-user ico"></i>
-                  <input id="custName" class="form-control pad-icon" placeholder="اسمك الكامل" autocomplete="name"/>
+                  <input id="custName" class="form-control pad-icon" placeholder="اسمك الكامل" autocomplete="name" required/>
                 </div>
                 <div id="err-name" class="text-danger small d-none mt-2">يرجى إدخال الاسم</div>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label fw-bold" for="custPhone">رقم الجوال</label>
-                <input id="custPhone" class="form-control" type="tel" placeholder="5XXXXXXXX" inputmode="tel" autocomplete="tel"/>
+                <input id="custPhone" class="form-control" type="tel" placeholder="5XXXXXXXX" inputmode="tel" autocomplete="tel" required/>
                 <div id="ok-phone" class="text-success small d-none mt-2">رقم صحيح ✅</div>
                 <div id="err-phone" class="text-danger small d-none mt-2">رقم غير صالح</div>
               </div>
@@ -530,8 +549,8 @@
     </div>
   </div>
 
-  <!-- Reels overlay -->
-  <div id="reels" aria-hidden="true" role="dialog" aria-label="استعراض الأطباق بشكل رييل">
+  <!-- Reels overlay (fixed a11y: aria-modal, focus trap) -->
+  <div id="reels" role="dialog" aria-modal="true" aria-label="استعراض الأطباق بشكل رييل" aria-hidden="true">
     <div id="reelsHeader" dir="rtl">
       <button id="closeReels" class="chip" type="button" aria-label="إغلاق">إغلاق</button>
       <span class="small text-white-50 me-auto ms-2">اسحب للأعلى/الأسفل</span>
@@ -543,7 +562,7 @@
   <!-- Templates -->
   <template id="dishTpl">
     <div class="dish reveal" data-cat="">
-      <img class="dish-img" alt="" width="1200" height="675" loading="lazy"/>
+      <img class="dish-img" alt="" width="1200" height="675" loading="lazy" decoding="async" fetchpriority="low"/>
       <div class="dish-body">
         <div class="d-flex align-items-center justify-content-between mb-1">
           <strong class="price"></strong>
@@ -577,16 +596,17 @@
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
 
-  <!-- App + Reels logic (unchanged except palette already applied via CSS) -->
+  <!-- App -->
   <script>
   const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxyGwCUJRwjVfJDtq5bxqN9Thm_KU4zOfNiNt0ENtW2jbDonr_yp3W2xDZCNXkmSHZNLw/exec';
   const FREE_SHIP = 79;
 
   window.addEventListener('DOMContentLoaded', () => {
     const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu', slot:'' };
-    window.state = state;
+    window.state = state; // expose for Reels
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
+    /* One-time rotate hint */
     try{
       if (matchMedia('(prefers-reduced-motion: no-preference)').matches && screen.orientation?.type.includes('portrait')) {
         if(!localStorage.getItem('seenRotate')){
@@ -596,6 +616,7 @@
       }
     }catch{}
 
+    /* Sticky helpers */
     const topbarEl   = document.getElementById('topbar');
     const stepperEl  = document.getElementById('stepperWrap');
     const chipsWrap  = document.getElementById('chipsWrap');
@@ -610,6 +631,7 @@
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
 
+    /* Stepper guards */
     const steps=['menu','cart','data','thanks'];
     function setStep(active){
       state.active=active;
@@ -623,11 +645,22 @@
     function showTab(href){ const a=document.querySelector(`[data-bs-toggle="tab"][href="${href}"]`); if(a) bootstrap.Tab.getOrCreateInstance(a).show(); }
     function cartCount(){ return Object.values(state.cart).reduce((a,b)=>a+b.qty,0); }
     function canGo(t){ if(t==='menu') return true; if(t==='cart'||t==='data') return cartCount()>0; if(t==='thanks') return state.unlockThanks; return false;}
-    function toast(msg){ const box=document.getElementById('toasts'); const el=document.createElement('div'); el.className='toast-msg'; el.textContent=msg; box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200); }
+
+    /* Toast + expose for Reels feedback */
+    function toast(msg){
+      const box=document.getElementById('toasts');
+      const el=document.createElement('div');
+      el.className='toast-msg'; el.textContent=msg;
+      box.appendChild(el);
+      setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200);
+    }
+    window.toast = toast;
+
     function safeGo(t){ if(!canGo(t)){ toast(t==='thanks'?'أكمل تأكيد الطلب أولاً':'أضِف عناصر للسلة أولاً'); showTab('#tab-'+state.active); return false;} showTab('#tab-'+t); return true; }
     document.addEventListener('shown.bs.tab', e=>{ const href=e.target?.getAttribute('href'); if(href==='#tab-menu') setStep('menu'); if(href==='#tab-cart') setStep('cart'); if(href==='#tab-data') setStep('data'); if(href==='#tab-thanks') setStep('thanks'); history.replaceState(null,'',href); setStickyVars(); });
     document.body.addEventListener('click', (e)=>{ const a=e.target.closest('a[href^="#tab-"],[data-go]'); if(!a) return; e.preventDefault(); const to=a.dataset.go||(a.getAttribute('href')||'').replace('#tab-',''); if(['menu','cart','data','thanks'].includes(to)) safeGo(to); });
 
+    /* DOM refs */
     const clearFilters=document.getElementById('clearFilters');
     const search=document.getElementById('q');
     const sectionsRoot=document.getElementById('menuSections');
@@ -644,11 +677,13 @@
     const cartTotal=document.getElementById('cartTotal');
     const offerBadge=document.getElementById('offerCountdown');
 
+    /* Menu fetch */
     async function fetchMenu(){
       try{ const r=await fetch(GAS_WEBAPP_URL+'?action=menu.list'); const j=await r.json(); return j.ok?(j.data||[]):[]; }
       catch{ return []; }
     }
 
+    /* Categories order */
     const ORDERED_CATS = [
       {key:'sushi',  label:'سوشي'},
       {key:'don',    label:'دون'},
@@ -664,10 +699,12 @@
       });
       return groups;
     }
+
     function imgFallback(el){
       el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="28">لا صورة</text></svg>`);
     }
 
+    /* Render sections */
     function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
       const groups = groupByCat(state.menu);
@@ -723,12 +760,14 @@
       revealObserve();
     }
 
+    /* Chips: click -> scroll */
     document.getElementById('chips').addEventListener('click',(e)=>{
       const b=e.target.closest('.chip[data-target]');
       if(!b) return;
       document.querySelector(b.dataset.target)?.scrollIntoView({behavior:'smooth', block:'start'});
     });
 
+    /* Scrollspy */
     let spyObserver=null;
     function setupScrollspy(){
       if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
@@ -749,6 +788,7 @@
       const top = document.getElementById('topOfMenu'); if(top) spyObserver.observe(top);
     }
 
+    /* Search */
     let t=null;
     search.addEventListener('input', e=>{
       clearTimeout(t);
@@ -760,13 +800,15 @@
       document.getElementById('topOfMenu').scrollIntoView({behavior:'smooth',block:'start'});
     });
 
+    /* Cart */
     function stableId(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36); }
     function cartArr(){ return Object.values(state.cart); }
     function totals(){ const arr=cartArr(); return {count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr}; }
     function bump(){
       const t=totals();
       badge.textContent=t.count; miniCount.textContent=`${t.count} عنصر`; miniTotal.textContent=fmt.format(t.total); cartTotal.textContent=fmt.format(t.total);
-      const need=Math.max(0, FREE_SHIP - t.total); miniHint.textContent = need>0 ? `تبقى ${need.toFixed(2)} ر.س للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
+      const need=Math.max(0, FREE_SHIP - t.total);
+      miniHint.textContent = need>0 ? `تبقى ${fmt.format(need)} للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
       localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
       const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
       renderCartList();
@@ -779,6 +821,9 @@
       else state.cart[key]={lineId:key, id:item.id, title:item.title, unitPrice:Number(item.price||0), qty};
       bump(); bumpBadge(); toast(`أُضيف ${item.title} ✅`);
     }
+    // expose for Reels
+    window.addLine = addLine;
+
     function renderCartList(){
       cartList.innerHTML='';
       const {arr}=totals();
@@ -797,6 +842,7 @@
     const saved=localStorage.getItem('hk_cart_v3'); if(saved){ try{ state.cart=JSON.parse(saved)||{}; }catch{} }
     document.getElementById('openCart').addEventListener('click', ()=>safeGo('cart'));
 
+    /* Data form */
     const segPick=document.getElementById('segPickup');
     const segDel=document.getElementById('segDelivery');
     const addrWrap=document.getElementById('addressWrap');
@@ -805,7 +851,14 @@
     const addrEl=document.getElementById('address');
     const notesEl=document.getElementById('notes');
     const confirmBtn=document.getElementById('confirmBtn');
-    const iti=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], utilsScript:'https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/utils.js', separateDialCode:true });
+
+    const iti=window.intlTelInput(phoneEl,{
+      initialCountry:'sa',
+      onlyCountries:['sa','ae','bh','kw','om','qa'],
+      separateDialCode:true
+      // utils are already included in intlTelInputWithUtils.js bundle
+    });
+
     function setType(delivery){ segPick.setAttribute('aria-pressed',String(!delivery)); segDel.setAttribute('aria-pressed',String(delivery)); addrWrap.style.display=delivery?'':'none'; if(delivery) setTimeout(()=>addrEl.focus(),80); }
     segPick.onclick=()=>setType(false); segDel.onclick=()=>setType(true); setType(false);
     notesEl.addEventListener('input', ()=>{ document.getElementById('notesCount').textContent=(notesEl.value||'').length; });
@@ -826,6 +879,7 @@
       addrEl.addEventListener(ev, validate);
     });
 
+    /* Time slots */
     const vL=document.getElementById('viewList'), vC=document.getElementById('viewCal');
     const listSlots=document.getElementById('slotList'), cal=document.getElementById('slotCal');
     [vL,vC].forEach(b=>b.onclick=()=>{
@@ -851,6 +905,7 @@
     }
     cal.appendChild(calWrap);
 
+    /* Thank you refs */
     const thOrderId=document.getElementById('thOrderId');
     const thTotal=document.getElementById('thTotal');
     const thType=document.getElementById('thType');
@@ -882,6 +937,7 @@
       document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
     }
 
+    /* Confirm */
     confirmBtn.onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
@@ -914,7 +970,9 @@
       }
     };
 
+    /* KPI counters */
     function initCounters(){
+      if (!matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
       const io=new IntersectionObserver(es=>{
         es.forEach(e=>{
           if(!e.isIntersecting) return;
@@ -929,6 +987,7 @@
     }
     initCounters();
 
+    /* Reveal on scroll */
     let ro=null;
     function revealObserve(){
       if(ro){ ro.disconnect(); ro=null; }
@@ -938,20 +997,27 @@
       document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
     }
 
+    /* Live countdown (auto-hide when finished) */
     function initCountdown(mins=45){
       const end = new Date(); end.setMinutes(end.getMinutes()+mins);
       const upd = ()=>{
         const s = Math.max(0, Math.floor((end - Date.now())/1000));
+        if (s === 0) {
+          offerBadge.classList.add('d-none');
+          clearInterval(iv);
+          return;
+        }
         const h = String(Math.floor(s/3600)).padStart(2,'0');
         const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
         const sec = String(s%60).padStart(2,'0');
-        offerBadge.textContent = s>0 ? `عرض السوشي الذهبي ينتهي خلال ${h}:${m}:${sec}` : 'انتهى العرض';
-        if(s<=0) clearInterval(iv);
+        offerBadge.classList.remove('d-none');
+        offerBadge.textContent = `عرض السوشي الذهبي ينتهي خلال ${h}:${m}:${sec}`;
       };
       upd(); const iv=setInterval(upd,1000);
     }
     initCountdown(45);
 
+    /* INIT */
     (async()=>{
       const appLoading=document.getElementById('appLoading');
       appLoading.classList.add('show');
@@ -969,38 +1035,76 @@
   });
   </script>
 
-  <!-- Reels one-by-one scroll module -->
+  <!-- Reels module (sanitized + one-by-one + a11y + no leaks) -->
   <script>
   (() => {
     const reels = document.getElementById('reels');
     const list  = document.getElementById('reelsList');
     const open  = document.getElementById('openReels');
-    const close = document.getElementById('closeReels');
+    const closeBtn = document.getElementById('closeReels');
     const toCart= document.getElementById('reelsToCart');
 
     let currentIdx = 0;
+    let lastFocused = null;
+    let resizeHandler = null;
 
-    function bodyLock(lock){ document.documentElement.style.overflow = document.body.style.overflow = lock ? 'hidden' : ''; }
+    const WHEEL_THRESHOLD = 8;  // ignore micro scrolls
+
+    function bodyLock(lock){
+      document.documentElement.style.overflow = document.body.style.overflow = lock ? 'hidden' : '';
+    }
+
+    /* build one reel card (text sanitized) */
     function reelNode(dish, idx){
       const div = document.createElement('section');
       div.className = 'reel'; div.dataset.idx = idx;
-      const media = document.createElement('div'); media.className='media';
-      const img = document.createElement('img'); img.loading='lazy'; img.alt=dish.title||''; if(dish.img && /^https?:\/\//.test(dish.img)) img.dataset.src=dish.img;
-      const glass = document.createElement('div'); glass.className='glass';
-      glass.innerHTML = `<h3 class="title">${dish.title||'—'}</h3><div class="desc">${dish.desc||''}</div><div class="tagbox">${(dish.tags||[]).slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
-      const cta = document.createElement('div'); cta.className='cta';
-      const add = document.createElement('button'); add.className='btn btn-dark flex-fill'; add.type='button'; add.textContent=`أضف للسلة — ${new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'}).format(Number(dish.price||0))}`; add.onclick=()=>addLine(dish,1);
+
+      const media = document.createElement('div');
+      media.className = 'media';
+      const img = document.createElement('img');
+      img.loading = 'lazy'; img.decoding='async'; img.alt = dish.title || '';
+      if (dish.img && /^https?:\/\//.test(dish.img)) img.dataset.src = dish.img;
+
+      const glass = document.createElement('div');
+      glass.className = 'glass';
+      const h3 = document.createElement('h3'); h3.className='title'; h3.textContent = dish.title || '—';
+      const dsc = document.createElement('div'); dsc.className='desc'; dsc.textContent = dish.desc || '';
+      const tagbox = document.createElement('div'); tagbox.className='tagbox';
+      (dish.tags||[]).slice(0,3).forEach(t => {
+        const span = document.createElement('span'); span.className='tag'; span.textContent = t;
+        tagbox.appendChild(span);
+      });
+      glass.append(h3, dsc, tagbox);
+
+      const cta = document.createElement('div'); cta.className = 'cta';
+      const add = document.createElement('button'); add.className='btn btn-dark flex-fill'; add.type='button';
+      add.textContent = `أضف للسلة — ${new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'}).format(Number(dish.price||0))}`;
+      add.onclick = () => window.addLine && window.addLine(dish, 1);
+
       const more = document.createElement('button'); more.className='btn btn-outline-light'; more.type='button'; more.textContent='تفاصيل';
-      cta.append(add,more); media.appendChild(img); div.append(media,glass,cta); return div;
+      cta.append(add, more);
+
+      media.appendChild(img);
+      div.append(media, glass, cta);
+      return div;
     }
+
     function loadImgIn(el){ const img=el.querySelector('img[data-src]'); if(img && !img.src) img.src=img.dataset.src; }
     function preloadAround(i){ const n=[...list.children]; [i-1,i,i+1].forEach(k=>n[k]&&loadImgIn(n[k])); }
     function scrollToIndex(i, smooth=true){ const h=list.clientHeight||window.innerHeight; list.scrollTo({top:i*h, behavior:smooth?'smooth':'auto'}); }
 
-    const idxObserver = new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ currentIdx = +e.target.dataset.idx||0; preloadAround(currentIdx); } }); },{root:list,threshold:.6});
+    const idxObserver = new IntersectionObserver(es=>{
+      es.forEach(e=>{
+        if(e.isIntersecting){
+          currentIdx = +e.target.dataset.idx||0;
+          preloadAround(currentIdx);
+        }
+      });
+    },{root:list,threshold:.6});
 
     let wheelLocked=false, wheelTimer=null;
     function onWheel(e){
+      if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return; // ignore tiny nudges
       e.preventDefault();
       if(wheelLocked) return;
       wheelLocked=true;
@@ -1020,31 +1124,68 @@
       if(next!==currentIdx) scrollToIndex(next,true);
     }
 
+    /* keyboard: arrows/PageUp/PageDown for one-step */
+    function onKeys(e){
+      if(!reels.classList.contains('show')) return;
+      if(['ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); step(1); }
+      else if(['ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); step(-1); }
+      else if(e.key==='Escape'){ closeReels(); }
+      else if(e.key==='Tab'){ trapFocus(e); }
+    }
+    function step(dir){
+      const max=list.children.length-1;
+      const next=Math.min(Math.max(currentIdx+dir,0),max);
+      if(next!==currentIdx) scrollToIndex(next,true);
+    }
+
+    /* Focus trap */
+    function trapFocus(e){
+      const focusables = reels.querySelectorAll('button, [href], input, textarea, [tabindex]:not([tabindex="-1"])');
+      if (!focusables.length) return;
+      const first = focusables[0], last = focusables[focusables.length-1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+
     function openReels(){
       const q=(window.state?.q||'').toLowerCase();
       const filtered=(window.state?.menu||[]).filter(d=>!q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q));
-      if(!filtered.length) return;
-      list.innerHTML=''; filtered.forEach((d,i)=>list.appendChild(reelNode(d,i)));
-      reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); bodyLock(true); list.focus({preventScroll:true});
+      if(!filtered.length){ window.toast && window.toast('لا توجد أطباق مطابقة لعرض الرييل'); return; }
+
+      list.innerHTML='';
+      filtered.forEach((d,i)=>list.appendChild(reelNode(d,i)));
+
+      reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); bodyLock(true);
+      lastFocused = document.activeElement;
+      list.focus({preventScroll:true});
       currentIdx=0; preloadAround(0);
+
       [...list.children].forEach(n=>idxObserver.observe(n));
       list.addEventListener('wheel', onWheel, {passive:false});
       list.addEventListener('touchstart', onTouchStart, {passive:true});
       list.addEventListener('touchend', onTouchEnd, {passive:true});
-      window.addEventListener('resize', ()=>scrollToIndex(currentIdx,false), {passive:true});
+      document.addEventListener('keydown', onKeys);
+
+      resizeHandler = () => scrollToIndex(currentIdx,false);
+      window.addEventListener('resize', resizeHandler, {passive:true});
     }
+
     function closeReels(){
       reels.classList.remove('show'); reels.setAttribute('aria-hidden','true'); bodyLock(false);
+
       idxObserver.disconnect();
       list.removeEventListener('wheel', onWheel);
       list.removeEventListener('touchstart', onTouchStart);
       list.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('keydown', onKeys);
+      if(resizeHandler){ window.removeEventListener('resize', resizeHandler); resizeHandler=null; }
+
+      lastFocused && lastFocused.focus();
     }
 
     open?.addEventListener('click', openReels);
-    document.getElementById('closeReels')?.addEventListener('click', closeReels);
+    closeBtn?.addEventListener('click', closeReels);
     toCart?.addEventListener('click', ()=>{ closeReels(); document.getElementById('openCart').click(); });
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && reels.classList.contains('show')) closeReels(); });
   })();
   </script>
 
