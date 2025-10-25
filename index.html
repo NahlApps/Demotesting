@@ -22,12 +22,10 @@
     :root{
       --bg:#FAFAFA; --ink:#0B0D13; --muted:#6B7280; --rule:#EAEAEA;
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
-      --topbar-h:56px;    /* updated by JS */
-      --stepper-h:44px;   /* updated by JS */
-      --chips-h:56px;     /* updated by JS (multi-row aware) */
+      --topbar-h:56px;     /* updated by JS */
+      --stepper-h:44px;    /* updated by JS (0 if stepper hidden) */
     }
     html,body{height:100%}
-    html{scroll-behavior:smooth;}
     body{
       font-family:'Cairo',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--ink); background:var(--bg); display:flex; flex-direction:column;
@@ -49,45 +47,32 @@
     .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips bar — always visible, multi-row, sticky under header+stepper */
-    .chips-wrap{background:#fff;border-bottom:1px solid var(--rule)}
-    #chips{
+    /* Chips + Search (sticky as a block, supports multi-row) */
+    .chips-wrap{
       position: sticky;
       top: calc(var(--topbar-h) + var(--stepper-h));
-      z-index: 90;
+      z-index: 66;
       background:#fff;
-      padding-block:10px;
       border-bottom:1px solid var(--rule);
-      display:flex;
-      flex-wrap:wrap;              /* allow multiple rows */
-      gap:8px;
-      overflow:visible;
-      align-items:center;
+      transition: box-shadow .18s ease;
     }
-    body.scrolled #chips{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
-    .chip{
-      background:#F2F2F2;color:#111;border:1px solid var(--rule);
-      border-radius:var(--radius-pill);padding:10px 14px;
-      font-weight:800;font-size:.95rem;min-height:44px;
-      transition:.18s; flex:0 0 auto;
+    body.scrolled .chips-wrap{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
+
+    #chips{
+      display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:10px 0;
     }
+    .chip{background:#F2F2F2;color:#111;border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:.18s}
     .chip.active{background:#111;color:#fff;border-color:#111}
     .pill-clear{background:#fff;border:1px dashed #bbb}
     .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
     .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Sections (no sticky section header) */
-    .menu-section{
-      scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px);
-      padding-top: 8px;
-    }
-    .sec-title{margin:8px 0 12px 0;font-weight:900}
-
+    /* Sections & menu cards */
+    main{flex:1 1 auto;display:flex;flex-direction:column}
+    .menu-sec-title{font-weight:900;margin:1.25rem 0 .5rem}
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-
-    /* Menu cards */
     .dish{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
     .dish-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#f3f4f6}
     .dish-body{padding:12px 12px 14px}
@@ -123,6 +108,9 @@
     .overlay.show{display:flex}
     .overlay .box{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);min-width:220px}
     .overlay .msg{margin-top:.5rem;color:#555;font-weight:800}
+
+    /* Ticket (thanks) */
+    .ticket{font-weight:900; letter-spacing:2px; font-size:1.35rem; background:#0A0A0A; color:#fff; padding:.4rem .8rem; border-radius:10px;}
   </style>
 </head>
 <body>
@@ -187,13 +175,28 @@
   </div>
 
   <!-- Content -->
-  <main id="topOfMenu">
+  <main>
     <div class="tab-content flex-1">
+
       <!-- MENU -->
       <section id="tab-menu" class="tab-pane fade show active">
-        <div class="container py-3" id="menuContainer">
-          <div id="menuSections"></div>
-          <p id="emptyMsg" class="text-secondary text-center my-5 d-none">لا توجد أطباق مطابقة — جرّب كلمة بحث مختلفة</p>
+        <div class="container py-3">
+          <!-- Top sentinel for "All" -->
+          <div id="topOfMenu"></div>
+
+          <!-- Sections will be filled by JS based on menu data -->
+          <h5 id="sec-sushi"  class="menu-sec-title">سوشي</h5>
+          <div class="menu-grid" data-sec="sushi"></div>
+
+          <h5 id="sec-don" class="menu-sec-title">دون</h5>
+          <div class="menu-grid" data-sec="don"></div>
+
+          <h5 id="sec-meat" class="menu-sec-title">لحوم</h5>
+          <div class="menu-grid" data-sec="meat"></div>
+
+          <h5 id="sec-drinks" class="menu-sec-title">مشروبات</h5>
+          <div class="menu-grid" data-sec="drinks"></div>
+
           <div style="height:18vh"></div>
         </div>
 
@@ -316,6 +319,7 @@
           </div>
         </div>
       </section>
+
     </div>
   </main>
 
@@ -395,30 +399,27 @@
     const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers: measure heights (chips can wrap to multiple rows) */
-    const topbarEl = document.getElementById('topbar');
+    /* Sticky helpers so chips block stays right under header/stepper */
+    const topbarEl  = document.getElementById('topbar');
     const stepperEl = document.getElementById('stepperWrap');
-    const chipsEl = document.getElementById('chips');
-    const setStickyVars = () => {
-      const topH = Math.round(topbarEl?.getBoundingClientRect().height || 56);
+    function setStickyVars(){
+      const topH  = Math.round(topbarEl?.getBoundingClientRect().height  || 56);
       const stepH = Math.round(stepperEl?.getBoundingClientRect().height || 0);
-      const chipsH= Math.round(chipsEl?.getBoundingClientRect().height || 56);
-      document.documentElement.style.setProperty('--topbar-h', topH + 'px');
+      document.documentElement.style.setProperty('--topbar-h',  topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
-      document.documentElement.style.setProperty('--chips-h', chipsH + 'px');
-    };
+    }
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
     setStickyVars();
 
-    /* Stepper guards */
+    /* Stepper FSM */
     const steps=['menu','cart','data','thanks'];
     function setStep(active){
       state.active=active;
       document.querySelectorAll('.stepper .step').forEach((el,idx)=>{
         const id=el.dataset.step;
         el.classList.remove('active','done'); if(id===active) el.classList.add('active');
-        const i=steps.indexOf(active); if(idx<i) el.classList.add('done');
+        if(idx<steps.indexOf(active)) el.classList.add('done');
       });
       setStickyVars();
     }
@@ -429,145 +430,118 @@
     function safeGo(t){ if(!canGo(t)){ toast(t==='thanks'?'أكمل تأكيد الطلب أولاً':'أضِف عناصر للسلة أولاً'); showTab('#tab-'+state.active); return false;} showTab('#tab-'+t); return true; }
     document.addEventListener('shown.bs.tab', e=>{ const href=e.target?.getAttribute('href'); if(href==='#tab-menu') setStep('menu'); if(href==='#tab-cart') setStep('cart'); if(href==='#tab-data') setStep('data'); if(href==='#tab-thanks') setStep('thanks'); history.replaceState(null,'',href); setStickyVars(); });
     document.body.addEventListener('click', (e)=>{ const a=e.target.closest('a[href^="#tab-"],[data-go]'); if(!a) return; e.preventDefault(); const to=a.dataset.go||(a.getAttribute('href')||'').replace('#tab-',''); if(['menu','cart','data','thanks'].includes(to)) safeGo(to); });
+    document.getElementById('openCart').addEventListener('click', ()=>safeGo('cart'));
+
+    /* Smooth anchor scroll for chips */
+    const chipsEl = document.getElementById('chips');
+    function stickyTotalHeight(){
+      const topH  = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h'))  || 0;
+      const stepH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stepper-h')) || 0;
+      const chipsH = document.querySelector('.chips-wrap')?.getBoundingClientRect().height || 0;
+      return topH + stepH + chipsH;
+    }
+    chipsEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip[data-target]');
+      if(!btn) return;
+      const sel = btn.dataset.target;
+      const target = document.querySelector(sel);
+      if(!target) return;
+      e.preventDefault();
+      chipsEl.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      const y = target.getBoundingClientRect().top + window.scrollY - stickyTotalHeight() - 8;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    });
 
     /* DOM refs */
-    const clearFilters=document.getElementById('clearFilters');
     const search=document.getElementById('q');
-    const sectionsRoot=document.getElementById('menuSections');
-    const emptyMsg=document.getElementById('emptyMsg');
-    const dishTpl=document.getElementById('dishTpl');
-    const cartList=document.getElementById('cartList');
-    const cartLineTpl=document.getElementById('cartLineTpl');
+    const clearFilters=document.getElementById('clearFilters');
+    const gridMap={
+      sushi:  document.querySelector('.menu-grid[data-sec="sushi"]'),
+      don:    document.querySelector('.menu-grid[data-sec="don"]'),
+      meat:   document.querySelector('.menu-grid[data-sec="meat"]'),
+      drinks: document.querySelector('.menu-grid[data-sec="drinks"]')
+    };
     const badge=document.getElementById('badge');
     const miniCount=document.getElementById('miniCount');
     const miniTotal=document.getElementById('miniTotal');
     const miniHint=document.getElementById('miniHint');
     const goCartBtn=document.getElementById('goCartBtn');
     const toDataBtn=document.getElementById('toDataBtn');
+    const cartList=document.getElementById('cartList');
     const cartTotal=document.getElementById('cartTotal');
+    const dishTpl=document.getElementById('dishTpl');
+    const cartLineTpl=document.getElementById('cartLineTpl');
 
-    /* Menu fetch */
+    /* Data */
     async function fetchMenu(){
       try{ const r=await fetch(GAS_WEBAPP_URL+'?action=menu.list'); const j=await r.json(); return j.ok?(j.data||[]):[]; }
       catch{ return []; }
     }
-
-    /* Categories order */
-    const ORDERED_CATS = [
-      {key:'sushi',  label:'سوشي'},
-      {key:'don',    label:'دون'},
-      {key:'meat',   label:'لحوم'},
-      {key:'drinks', label:'مشروبات'}
-    ];
-    function groupByCat(menu){
-      const groups = {};
-      menu.forEach(d=>{
-        const key = (d.cat||'').toLowerCase();
-        groups[key] = groups[key] || [];
-        groups[key].push(d);
-      });
-      return groups;
-    }
-
     function imgFallback(el){
       el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="28">لا صورة</text></svg>`);
     }
 
-    /* Render ONE-PAGE menu with sections (no sticky section header) */
-    function renderSections(){
-      const q=(state.q||'').trim().toLowerCase();
-      const groups = groupByCat(state.menu);
-      sectionsRoot.innerHTML='';
-      let totalMatches=0;
+    function renderSections(menu, q=''){
+      // clear
+      Object.values(gridMap).forEach(g=>g.innerHTML='');
 
-      ORDERED_CATS.forEach(({key,label})=>{
-        const items = (groups[key]||[]).filter(d=>{
-          const inTxt = !q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
-          return inTxt;
-        });
-        if(!items.length) return;
+      const norm = (s)=>String(s||'').toLowerCase();
+      const match = (d)=>!q || norm(d.title).includes(norm(q)) || norm(d.desc).includes(norm(q));
 
-        const sec = document.createElement('section');
-        sec.className = 'menu-section';
-        sec.id = 'sec-'+key;
+      const known = {sushi:[],don:[],meat:[],drinks:[]};
+      menu.forEach(d=>{
+        const cat = (d.cat||'').toLowerCase();
+        if(known[cat]!==undefined) known[cat].push(d);
+      });
 
-        // simple title (NOT sticky)
-        const title = document.createElement('h5');
-        title.className = 'sec-title';
-        title.textContent = label;
-        sec.appendChild(title);
-
-        const grid = document.createElement('div');
-        grid.className = 'menu-grid';
-
-        items.forEach(d=>{
+      Object.entries(known).forEach(([cat,list])=>{
+        const grid = gridMap[cat];
+        const filtered = list.filter(match);
+        if(!grid) return;
+        if(!filtered.length){
+          // hide section title if empty
+          const title = document.getElementById('sec-'+cat);
+          if(title) title.style.display='none';
+          grid.style.display='none';
+          return;
+        }
+        const title = document.getElementById('sec-'+cat);
+        if(title){ title.style.display=''; }
+        grid.style.display='';
+        filtered.forEach(d=>{
           const node=dishTpl.content.firstElementChild.cloneNode(true);
-          node.dataset.cat = key;
-
           const img=node.querySelector('.dish-img');
           img.alt=d.title||''; img.addEventListener('error',()=>imgFallback(img));
           if(d.img && /^https?:\/\//.test(d.img)) img.src=d.img; else imgFallback(img);
-
+          node.dataset.cat=d.cat||'';
           node.querySelector('.title').textContent=d.title||'—';
           node.querySelector('.desc').textContent=d.desc||'';
           node.querySelector('.price').textContent=fmt.format(Number(d.price||0));
           const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,2).forEach(t=>{ const s=document.createElement('span'); s.className='tag'; s.textContent=t; tags.appendChild(s); });
           node.querySelector('.add-btn').addEventListener('click', ()=> addLine(d,1));
-
-        grid.appendChild(node);
+          grid.appendChild(node);
         });
-
-        sec.appendChild(grid);
-        sectionsRoot.appendChild(sec);
-        totalMatches += items.length;
       });
 
-      emptyMsg.classList.toggle('d-none', totalMatches>0);
-      clearFilters.classList.toggle('d-none', !state.q.trim());
-      setupScrollspy();
-    }
-
-    /* Chips: scroll to target */
-    document.getElementById('chips').addEventListener('click',(e)=>{
-      const b=e.target.closest('.chip');
-      if(!b || !b.dataset.target) return;
-      const el = document.querySelector(b.dataset.target);
-      if(!el) return;
-      el.scrollIntoView({behavior:'smooth', block:'start'});
-    });
-
-    /* Scrollspy: highlight active chip by section visibility */
-    let spyObserver=null;
-    function setupScrollspy(){
-      if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
-      const chips = [...document.querySelectorAll('#chips .chip[data-target]')];
-
-      spyObserver = new IntersectionObserver((entries)=>{
-        const visible = entries
-          .filter(e=>e.isIntersecting)
-          .sort((a,b)=>b.intersectionRatio - a.intersectionRatio)[0];
-        if(!visible) return;
-        const id = '#'+visible.target.id;
-        chips.forEach(c=>c.classList.toggle('active', c.dataset.target===id || (id==='#topOfMenu' && c.dataset.target==='#topOfMenu')));
-      },{
-        rootMargin: '-40% 0px -50% 0px',
-        threshold: [0.2,0.4,0.6,0.8,1]
-      });
-
-      document.querySelectorAll('.menu-section').forEach(sec=>spyObserver.observe(sec));
-      const top = document.getElementById('topOfMenu'); if(top) spyObserver.observe(top);
+      // clear button visibility
+      document.getElementById('clearFilters').classList.toggle('d-none', !q);
     }
 
     /* Search */
-    let t=null;
-    search.addEventListener('input', e=>{
-      clearTimeout(t);
-      t=setTimeout(()=>{ state.q=e.target.value||''; renderSections(); }, 160);
+    let timer=null;
+    search.addEventListener('input',(e)=>{
+      clearTimeout(timer);
+      timer=setTimeout(()=>{ state.q=e.target.value.trim(); renderSections(state.menu, state.q); },160);
     });
     clearFilters.addEventListener('click', ()=>{
-      state.q=''; search.value='';
-      renderSections();
-      document.getElementById('topOfMenu').scrollIntoView({behavior:'smooth',block:'start'});
+      state.q=''; search.value=''; renderSections(state.menu, '');
+      // return chips active to "all"
+      chipsEl.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chipsEl.querySelector('.chip[data-target="#topOfMenu"]').classList.add('active');
+      // jump to top smoothly
+      const topY = document.getElementById('topOfMenu').getBoundingClientRect().top + window.scrollY - stickyTotalHeight() - 8;
+      window.scrollTo({ top: Math.max(0, topY), behavior: 'smooth' });
     });
 
     /* Cart */
@@ -583,7 +557,7 @@
       renderCartList();
     }
     function addLine(item, qty=1){
-      const key=stableId(JSON.stringify({id:item.id, price:item.price}));
+      const key=stableId(JSON.stringify({id:item.id||item.title, price:item.price}));
       const exist=state.cart[key];
       if(exist) exist.qty+=qty;
       else state.cart[key]={lineId:key, id:item.id, title:item.title, unitPrice:Number(item.price||0), qty};
@@ -605,7 +579,6 @@
       });
     }
     const saved=localStorage.getItem('hk_cart_v3'); if(saved){ try{ state.cart=JSON.parse(saved)||{}; }catch{} }
-    document.getElementById('openCart').addEventListener('click', ()=>safeGo('cart'));
 
     /* Data form */
     const segPick=document.getElementById('segPickup');
@@ -637,7 +610,7 @@
       addrEl.addEventListener(ev, validate);
     });
 
-    /* Thank you refs */
+    /* Thanks helpers */
     const thOrderId=document.getElementById('thOrderId');
     const thTotal=document.getElementById('thTotal');
     const thType=document.getElementById('thType');
@@ -669,7 +642,7 @@
       document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
     }
 
-    confirmBtn.onclick=async()=>{
+    document.getElementById('confirmBtn').onclick=async(e)=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
       if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
@@ -681,10 +654,9 @@
         items: t.arr.map(x=>({ id:x.id, title:x.title, qty:x.qty, price:x.unitPrice }))
       };
 
-      const submitLoading=document.getElementById('submitLoading');
-      submitLoading.classList.add('show');
-      confirmBtn.disabled=true; confirmBtn.classList.add('disabled');
-
+      const btn=e.currentTarget;
+      btn.disabled=true; btn.classList.add('disabled');
+      document.getElementById('submitLoading').classList.add('show');
       try{
         const res=await createOrder(payload);
         if(res && res.ok){
@@ -695,25 +667,26 @@
         } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); }
       }catch{ toast('خطأ في الاتصال بالخدمة'); }
       finally{
-        confirmBtn.disabled=false; confirmBtn.classList.remove('disabled');
-        submitLoading.classList.remove('show');
+        btn.disabled=false; btn.classList.remove('disabled');
+        document.getElementById('submitLoading').classList.remove('show');
       }
     };
 
     /* INIT */
     (async()=>{
-      const appLoading=document.getElementById('appLoading');
-      appLoading.classList.add('show');
+      document.getElementById('appLoading').classList.add('show');
       try{
         const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}');
         if(savedInfo.name) document.getElementById('custName').value=savedInfo.name;
         if(savedInfo.phone) document.getElementById('custPhone').value=savedInfo.phone;
         if(savedInfo.address){ document.getElementById('address').value=savedInfo.address; setType(true); }
       }catch{}
-      state.menu=await fetchMenu();
+      const menu = await fetchMenu();
+      state.menu = Array.isArray(menu) ? menu : [];
       if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
-      renderSections(); bump(); setStep('menu'); setStickyVars();
-      appLoading.classList.remove('show');
+      renderSections(state.menu, state.q);
+      bump(); setStep('menu'); setStickyVars();
+      document.getElementById('appLoading').classList.remove('show');
     })();
   });
   </script>
