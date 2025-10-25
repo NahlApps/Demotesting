@@ -24,8 +24,10 @@
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.08);
       --topbar-h:56px;    /* updated by JS */
       --stepper-h:44px;   /* updated by JS */
+      --chips-h:56px;     /* approx chips bar height */
     }
     html,body{height:100%}
+    html{scroll-behavior:smooth;}
     body{
       font-family:'Cairo',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--ink); background:var(--bg); display:flex; flex-direction:column;
@@ -47,14 +49,8 @@
     .step.done{color:#16a34a}.step.done .dot{border-color:#16a34a;color:#16a34a}
     .step .sep{width:24px;height:2px;background:#e5e7eb}
 
-    /* Chips & search wrapper (not sticky) */
+    /* Chips + search wrapper */
     .chips-wrap{background:#fff;border-bottom:1px solid var(--rule)}
-    .chip{background:#F2F2F2;color:#111;border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:.18s}
-    .chip.active{background:#111;color:#fff;border-color:#111}
-    .pill-clear{background:#fff;border:1px dashed #bbb}
-    .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
-    .searchbox input{border:0;padding:12px 16px;min-height:46px}
-
     /* >>> Freeze ONLY the #chips row below the header while scrolling <<< */
     #chips{
       position: sticky;
@@ -65,12 +61,31 @@
       border-bottom: 1px solid var(--rule);
     }
     body.scrolled #chips{ box-shadow:0 6px 16px rgba(0,0,0,.06); }
+    .chip{background:#F2F2F2;color:#111;border:1px solid var(--rule);border-radius:var(--radius-pill);padding:10px 14px;font-weight:800;font-size:.95rem;min-height:44px;transition:.18s}
+    .chip.active{background:#111;color:#fff;border-color:#111}
+    .pill-clear{background:#fff;border:1px dashed #bbb}
+    .searchbox{border:1px solid var(--rule);border-radius:var(--radius-pill);overflow:hidden;background:#fff}
+    .searchbox input{border:0;padding:12px 16px;min-height:46px}
 
-    /* Menu cards */
-    main{flex:1 1 auto;display:flex;flex-direction:column}
+    /* Sections for scrollspy */
+    .menu-section{
+      scroll-margin-top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h) + 12px); /* prevent hiding under sticky bars */
+      padding-top: 8px;
+    }
+    .menu-head{
+      position: sticky;
+      top: calc(var(--topbar-h) + var(--stepper-h) + var(--chips-h));
+      z-index: 10;
+      background: #fff;
+      padding: 8px 0;
+      border-top: 1px solid transparent;
+    }
+    .menu-head h5{margin:0;font-weight:900}
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+    /* Menu cards */
     .dish{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
     .dish-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#f3f4f6}
     .dish-body{padding:12px 12px 14px}
@@ -147,15 +162,16 @@
     </div>
   </div>
 
-  <!-- Chips + Search -->
+  <!-- Chips + Search (sticky bar) -->
   <div class="chips-wrap">
     <div class="container">
       <div id="chips" class="d-flex flex-wrap gap-2 align-items-center" aria-label="تصنيفات">
-        <button class="chip active" data-cat="all">الكل</button>
-        <button class="chip" data-cat="sushi">سوشي</button>
-        <button class="chip" data-cat="don">دون</button>
-        <button class="chip" data-cat="meat">لحوم</button>
-        <button class="chip" data-cat="drinks">مشروبات</button>
+        <!-- chips now SCROLL to sections -->
+        <button class="chip active" data-target="#topOfMenu">الكل</button>
+        <button class="chip" data-target="#sec-sushi">سوشي</button>
+        <button class="chip" data-target="#sec-don">دون</button>
+        <button class="chip" data-target="#sec-meat">لحوم</button>
+        <button class="chip" data-target="#sec-drinks">مشروبات</button>
         <button id="clearFilters" class="chip pill-clear d-none" type="button">مسح التصفية</button>
 
         <div class="ms-auto" style="min-width:260px;flex:1 1 260px">
@@ -169,12 +185,14 @@
   </div>
 
   <!-- Content -->
-  <main>
+  <main id="topOfMenu">
     <div class="tab-content flex-1">
       <!-- MENU -->
       <section id="tab-menu" class="tab-pane fade show active">
-        <div class="container py-3">
-          <div id="grid" class="menu-grid" aria-live="polite"></div>
+        <div class="container py-3" id="menuContainer">
+          <!-- Sections will be rendered here -->
+          <div id="menuSections"></div>
+          <p id="emptyMsg" class="text-secondary text-center my-5 d-none">لا توجد أطباق مطابقة — جرّب كلمة بحث مختلفة</p>
           <div style="height:18vh"></div>
         </div>
 
@@ -373,17 +391,20 @@
   const FREE_SHIP = 79;
 
   window.addEventListener('DOMContentLoaded', () => {
-    const state = { q:'', cat:'all', cart:{}, menu:[], unlockThanks:false, active:'menu' };
+    const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers so #chips knows where to stick */
+    /* Sticky helpers so bars know where to stick */
     const topbarEl = document.getElementById('topbar');
     const stepperEl = document.getElementById('stepperWrap');
+    const chipsEl = document.getElementById('chips');
     const setStickyVars = () => {
       const topH = Math.round(topbarEl?.getBoundingClientRect().height || 56);
       const stepH = Math.round(stepperEl?.getBoundingClientRect().height || 0);
+      const chipsH= Math.round(chipsEl?.getBoundingClientRect().height || 56);
       document.documentElement.style.setProperty('--topbar-h', topH + 'px');
       document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
+      document.documentElement.style.setProperty('--chips-h', chipsH + 'px');
     };
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
@@ -409,10 +430,10 @@
     document.body.addEventListener('click', (e)=>{ const a=e.target.closest('a[href^="#tab-"],[data-go]'); if(!a) return; e.preventDefault(); const to=a.dataset.go||(a.getAttribute('href')||'').replace('#tab-',''); if(['menu','cart','data','thanks'].includes(to)) safeGo(to); });
 
     /* DOM refs */
-    const chips=document.getElementById('chips');
     const clearFilters=document.getElementById('clearFilters');
     const search=document.getElementById('q');
-    const grid=document.getElementById('grid');
+    const sectionsRoot=document.getElementById('menuSections');
+    const emptyMsg=document.getElementById('emptyMsg');
     const dishTpl=document.getElementById('dishTpl');
     const cartList=document.getElementById('cartList');
     const cartLineTpl=document.getElementById('cartLineTpl');
@@ -422,7 +443,6 @@
     const miniHint=document.getElementById('miniHint');
     const goCartBtn=document.getElementById('goCartBtn');
     const toDataBtn=document.getElementById('toDataBtn');
-    const openCartBtn=document.getElementById('openCart');
     const cartTotal=document.getElementById('cartTotal');
 
     /* Menu fetch */
@@ -431,40 +451,134 @@
       catch{ return []; }
     }
 
-    /* Grid rendering */
+    /* Build sections map from menu */
+    const ORDERED_CATS = [
+      {key:'sushi',  label:'سوشي'},
+      {key:'don',    label:'دون'},
+      {key:'meat',   label:'لحوم'},
+      {key:'drinks', label:'مشروبات'}
+    ];
+    function groupByCat(menu){
+      const groups = {};
+      menu.forEach(d=>{
+        const key = (d.cat||'').toLowerCase();
+        groups[key] = groups[key] || [];
+        groups[key].push(d);
+      });
+      return groups;
+    }
+
     function imgFallback(el){
       el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="Arial" font-size="28">لا صورة</text></svg>`);
     }
-    function renderGrid(){
-      grid.innerHTML='';
+
+    /* Render ONE-PAGE menu with sections */
+    function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
-      const list=state.menu.filter(d=>{
-        const inCat = (state.cat==='all'||(d.cat||'')===state.cat);
-        const inTxt = !q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
-        return inCat && inTxt;
+      const groups = groupByCat(state.menu);
+      sectionsRoot.innerHTML='';
+      let totalMatches=0;
+
+      ORDERED_CATS.forEach(({key,label})=>{
+        const items = (groups[key]||[]).filter(d=>{
+          const inTxt = !q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
+          return inTxt;
+        });
+        if(!items.length) return;
+
+        // Section wrapper
+        const sec = document.createElement('section');
+        sec.className = 'menu-section';
+        sec.id = 'sec-'+key;
+
+        // Sticky heading inside section (nice context on long scroll)
+        const head = document.createElement('div');
+        head.className = 'menu-head';
+        head.innerHTML = `<h5>${label}</h5>`;
+        sec.appendChild(head);
+
+        // Grid
+        const grid = document.createElement('div');
+        grid.className = 'menu-grid';
+
+        items.forEach(d=>{
+          const node=dishTpl.content.firstElementChild.cloneNode(true);
+          node.dataset.cat = key;
+
+          const img=node.querySelector('.dish-img');
+          img.alt=d.title||''; img.addEventListener('error',()=>imgFallback(img));
+          if(d.img && /^https?:\/\//.test(d.img)) img.src=d.img; else imgFallback(img);
+
+          node.querySelector('.title').textContent=d.title||'—';
+          node.querySelector('.desc').textContent=d.desc||'';
+          node.querySelector('.price').textContent=fmt.format(Number(d.price||0));
+          const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,2).forEach(t=>{ const s=document.createElement('span'); s.className='tag'; s.textContent=t; tags.appendChild(s); });
+          node.querySelector('.add-btn').addEventListener('click', ()=> addLine(d,1));
+
+          grid.appendChild(node);
+        });
+
+        sec.appendChild(grid);
+        sectionsRoot.appendChild(sec);
+        totalMatches += items.length;
       });
-      if(!list.length){
-        const p=document.createElement('p'); p.className='text-secondary text-center my-5'; p.textContent='لا توجد أطباق مطابقة — جرّب تصنيف آخر أو كلمة مختلفة'; grid.appendChild(p);
-        return;
-      }
-      list.forEach(d=>{
-        const node=dishTpl.content.firstElementChild.cloneNode(true);
-        const img=node.querySelector('.dish-img');
-        img.alt=d.title||''; img.addEventListener('error',()=>imgFallback(img)); if(d.img && /^https?:\/\//.test(d.img)) img.src=d.img; else imgFallback(img);
-        node.querySelector('.title').textContent=d.title||'—';
-        node.querySelector('.desc').textContent=d.desc||'';
-        node.querySelector('.price').textContent=fmt.format(Number(d.price||0));
-        const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,2).forEach(t=>{ const s=document.createElement('span'); s.className='tag'; s.textContent=t; tags.appendChild(s); });
-        node.querySelector('.add-btn').addEventListener('click', ()=> addLine(d,1));
-        grid.appendChild(node);
-      });
-      clearFilters.classList.toggle('d-none', state.cat==='all' && !state.q.trim());
+
+      // No matches UI
+      emptyMsg.classList.toggle('d-none', totalMatches>0);
+      // Show/hide clear filter based on query
+      clearFilters.classList.toggle('d-none', !state.q.trim());
+
+      // Refresh scrollspy observers after re-render
+      setupScrollspy();
     }
 
-    /* Filters */
-    chips.addEventListener('click', (e)=>{ const b=e.target.closest('.chip'); if(!b||b.id==='clearFilters') return; document.querySelectorAll('#chips .chip').forEach(x=>x.classList.remove('active')); b.classList.add('active'); state.cat=b.dataset.cat; renderGrid(); });
-    clearFilters.addEventListener('click', ()=>{ state.q=''; search.value=''; state.cat='all'; document.querySelector('#chips .chip[data-cat="all"]').classList.add('active'); renderGrid(); });
-    let t=null; search.addEventListener('input', e=>{ clearTimeout(t); t=setTimeout(()=>{ state.q=e.target.value; renderGrid(); },160); });
+    /* Chips: scroll to target */
+    document.getElementById('chips').addEventListener('click',(e)=>{
+      const b=e.target.closest('.chip');
+      if(!b || !b.dataset.target) return;
+      const to = b.dataset.target;
+      const el = document.querySelector(to);
+      if(!el) return;
+      el.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+
+    /* Scrollspy: highlight active chip by section visibility */
+    let spyObserver=null;
+    function setupScrollspy(){
+      if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
+      const chips = [...document.querySelectorAll('#chips .chip[data-target]')];
+      const map = Object.fromEntries(chips.map(c=>[c.dataset.target, c]));
+
+      spyObserver = new IntersectionObserver((entries)=>{
+        const visible = entries
+          .filter(e=>e.isIntersecting)
+          .sort((a,b)=>b.intersectionRatio - a.intersectionRatio)[0];
+        if(!visible) return;
+        const id = '#'+visible.target.id;
+        chips.forEach(c=>c.classList.toggle('active', c.dataset.target===id || (id && c.dataset.target==='#topOfMenu' && id==='#topOfMenu')));
+      },{
+        rootMargin: '-40% 0px -50% 0px',
+        threshold: [0.2,0.4,0.6,0.8,1]
+      });
+
+      // Observe each section; also observe the top anchor to activate "الكل" when above first section
+      document.querySelectorAll('.menu-section').forEach(sec=>spyObserver.observe(sec));
+      const top = document.getElementById('topOfMenu');
+      if(top) spyObserver.observe(top);
+    }
+
+    /* Search */
+    let t=null;
+    document.getElementById('q').addEventListener('input', e=>{
+      clearTimeout(t);
+      t=setTimeout(()=>{ state.q=e.target.value||''; renderSections(); }, 160);
+    });
+    clearFilters.addEventListener('click', ()=>{
+      state.q=''; document.getElementById('q').value='';
+      renderSections();
+      // Scroll up a bit so "الكل" becomes active visually
+      document.getElementById('topOfMenu').scrollIntoView({behavior:'smooth',block:'start'});
+    });
 
     /* Cart */
     function stableId(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36); }
@@ -565,7 +679,7 @@
       document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
     }
 
-    document.getElementById('confirmBtn').onclick=async()=>{
+    confirmBtn.onclick=async()=>{
       const t=totals();
       if(t.count===0){ toast('السلة فارغة'); safeGo('menu'); return; }
       if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
@@ -579,7 +693,7 @@
 
       const submitLoading=document.getElementById('submitLoading');
       submitLoading.classList.add('show');
-      const btn=e.target; btn.disabled=true; btn.classList.add('disabled');
+      confirmBtn.disabled=true; confirmBtn.classList.add('disabled');
 
       try{
         const res=await createOrder(payload);
@@ -591,7 +705,7 @@
         } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); }
       }catch{ toast('خطأ في الاتصال بالخدمة'); }
       finally{
-        btn.disabled=false; btn.classList.remove('disabled');
+        confirmBtn.disabled=false; confirmBtn.classList.remove('disabled');
         submitLoading.classList.remove('show');
       }
     };
@@ -608,7 +722,7 @@
       }catch{}
       state.menu=await fetchMenu();
       if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
-      renderGrid(); bump(); setStep('menu'); setStickyVars();
+      renderSections(); bump(); setStep('menu'); setStickyVars();
       appLoading.classList.remove('show');
     })();
   });
