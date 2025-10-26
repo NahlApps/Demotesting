@@ -140,9 +140,7 @@
       box-shadow:0 8px 24px rgba(0,0,0,.35);
       animation: fadeSlide .18s ease;
     }
-    #chipsAffix .container{ /* keep same inner spacing when fixed */
-      padding-top: 6px; padding-bottom: 6px;
-    }
+    #chipsAffix .container{ padding-top: 6px; padding-bottom: 6px; }
     @keyframes fadeSlide{ from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none} }
 
     /* Sections */
@@ -181,7 +179,6 @@
       border-radius:999px; padding:4px 8px; font-size:.8rem;
     }
     .add-wrap{margin-top:8px}
-    /* Primary CTA = gold (dark text for contrast) */
     .add-btn{
       width:100%;min-height:46px;border-radius:999px;
       border:1px solid var(--gold);
@@ -279,7 +276,6 @@
     .reel .tag{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:4px 8px; font-size:.8rem; }
     .reel .cta{ position:absolute; inset-inline:12px; inset-block-end:12px; z-index:2; display:flex; gap:8px; }
     .reel .cta .btn{ border-radius:999px; font-weight:900; min-height:46px; }
-    /* Reels loading indicator */
     #reelsLoading{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3; background:linear-gradient(180deg, rgba(0,0,0,.5), rgba(0,0,0,.35)); }
     #reelsLoading[hidden]{ display:none; }
   </style>
@@ -628,17 +624,17 @@
       box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200);
     }
 
-    /* Build fixed chips clone & affix toggling (DIFFERENT METHOD) */
+    /* Build fixed chips clone & affix toggling */
     const sentinel = document.getElementById('chipsSentinel');
     function buildAffix(){
-      chipsAffix.innerHTML = ''; // fresh
+      chipsAffix.innerHTML = '';
       const wrap = document.createElement('div');
       wrap.className = 'container';
       const clone = document.getElementById('chips').cloneNode(true);
       clone.id = 'chipsClone';
-      // Remove duplicate IDs from the clone
-      clone.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
-      // Make clone search input mirror the main one
+      clone.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id')); // avoid duplicate IDs
+
+      // Sync search values
       const mainSearch = document.getElementById('q');
       const cloneSearch = clone.querySelector('input[data-role="menu-search"]');
       const mainBox = document.querySelector('.chips-wrap .searchbox');
@@ -652,28 +648,25 @@
           }
         });
       }
-      // Search toggle sync (open/close both boxes)
-      const setSearchOpen = (open) => {
-        [mainBox, cloneBox].forEach(box=>{
-          if(!box) return;
-          box.classList.toggle('open', open);
-          const inp=box.querySelector('input[data-role="menu-search"]');
-          if(open && inp) setTimeout(()=>inp.focus(),10);
-        });
-      };
+      // Search toggle sync
       clone.querySelectorAll('.js-search-toggle').forEach(btn=>{
         btn.addEventListener('click',(e)=>{ e.preventDefault();
           const open = !cloneBox.classList.contains('open');
-          setSearchOpen(open);
+          [mainBox, cloneBox].forEach(box=>{
+            if(!box) return;
+            box.classList.toggle('open', open);
+            const inp=box.querySelector('input[data-role="menu-search"]');
+            if(open && inp) setTimeout(()=>inp.focus(),10);
+          });
         });
       });
 
-      // Clear buttons (both bars)
+      // Clear filters sync
       clone.querySelectorAll('.js-clear-filters').forEach(btn=>{
         btn.addEventListener('click',(e)=>{ e.preventDefault(); clearAll(); });
       });
 
-      // Chips click in the clone
+      // Chips click (clone)
       clone.addEventListener('click', (e)=>{
         const b=e.target.closest('.chip[data-target]');
         if(!b) return;
@@ -681,7 +674,7 @@
         scrollToSelector(b.dataset.target);
       });
 
-      // Open reels from clone => trigger main button (which is wired in reels module)
+      // Open reels from clone
       clone.querySelector('.js-open-reels')?.addEventListener('click', ()=>{
         document.querySelector('#openReels')?.click();
       });
@@ -699,7 +692,7 @@
       if(io) io.disconnect();
       const {topH} = currentOffsets();
       io = new IntersectionObserver(([entry])=>{
-        const show = entry.intersectionRatio === 0; // sentinel went above viewport
+        const show = entry.intersectionRatio === 0;
         chipsAffix.classList.toggle('visible', show);
         chipsAffix.setAttribute('aria-hidden', String(!show));
         setStickyVars();
@@ -729,7 +722,6 @@
     document.querySelectorAll('.js-search-toggle').forEach(btn=>{
       btn.addEventListener('click',(e)=>{ e.preventDefault();
         const open = !searchBoxMain.classList.contains('open');
-        // also toggle clone (if exists)
         const cloneBox = chipsAffix.querySelector('.searchbox');
         [searchBoxMain, cloneBox].forEach(box=>{
           if(!box) return;
@@ -777,6 +769,172 @@
       document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
     }
 
+    /* ---- OPTIONS MODAL LOGIC (always show after selecting an item) ---- */
+    const optModalEl = document.getElementById('optModal');
+    const optModal   = bootstrap.Modal.getOrCreateInstance(optModalEl);
+    const optTitle   = document.getElementById('optTitle');
+    const optSummary = document.getElementById('optSummary');
+    const optForm    = document.getElementById('optForm');
+    const optMinus   = document.getElementById('optMinus');
+    const optPlus    = document.getElementById('optPlus');
+    const optQty     = document.getElementById('optQty');
+    const optPrice   = document.getElementById('optPrice');
+    const optNotes   = document.getElementById('optNotes');
+    const optAddBtn  = document.getElementById('optAddBtn');
+
+    let currentDish = null;
+
+    function dishOptionGroups(d){
+      // Supports d.options or d.opts (array of groups)
+      // Group shape: { id, title, type: 'single'|'multi', required?:bool, items:[{id,label,price}] }
+      const g = d?.options || d?.opts || [];
+      if (Array.isArray(g)) return g.filter(Boolean);
+      return []; // fallback: no groups
+    }
+
+    function formatPrice(n){ return fmt.format(Number(n||0)); }
+
+    function renderOptionGroups(d){
+      optForm.innerHTML = '';
+      const groups = dishOptionGroups(d);
+      if(!groups.length){
+        const hint=document.createElement('div');
+        hint.className='small';
+        hint.style.color='#4a4741';
+        hint.textContent='لا توجد إضافات — يمكنك تغيير الكمية وكتابة ملاحظة إن رغبت.';
+        optForm.appendChild(hint);
+        return;
+      }
+
+      groups.forEach((g,gi)=>{
+        const fs=document.createElement('fieldset');
+        fs.className='vstack gap-2';
+        const legend=document.createElement('legend');
+        legend.className='fw-bold';
+        legend.textContent = (g.title || 'اختيار') + (g.required?' *':'');
+        fs.appendChild(legend);
+
+        const type=(g.type||'single').toLowerCase();
+        const name = 'opt_'+(g.id||('g'+gi));
+
+        (g.items||[]).forEach((it,ii)=>{
+          const id = `${name}_${ii}`;
+          const row=document.createElement('div');
+          row.className='form-check d-flex align-items-center justify-content-between border rounded-3 px-3 py-2';
+          row.style.borderColor='var(--border-on-light)';
+
+          const left=document.createElement('div');
+          left.className='d-flex align-items-center gap-2';
+
+          const input=document.createElement('input');
+          input.className='form-check-input';
+          input.type= type==='multi' ? 'checkbox' : 'radio';
+          input.name=name;
+          input.id=id;
+          input.value= it.id || (''+ii);
+          input.dataset.price = Number(it.price||0);
+          input.dataset.label = it.label || it.title || ('خيار '+(ii+1));
+
+          if(type!=='multi' && ii===0) input.checked=true; // default first for radio
+
+          const label=document.createElement('label');
+          label.className='form-check-label';
+          label.htmlFor=id;
+          label.textContent=input.dataset.label;
+
+          left.append(input,label);
+
+          const price=document.createElement('span');
+          price.className='small';
+          price.style.color='#141414';
+          const addp = Number(it.price||0);
+          price.textContent = addp>0 ? ('+'+formatPrice(addp)) : 'مجاني';
+
+          row.append(left,price);
+          fs.appendChild(row);
+        });
+
+        optForm.appendChild(fs);
+      });
+    }
+
+    function selectedOptions(){
+      const inputs=[...optForm.querySelectorAll('input[type="checkbox"],input[type="radio"]')];
+      const chosen = inputs.filter(i=>i.checked).map(i=>({
+        id: i.value,
+        label: i.dataset.label,
+        price: Number(i.dataset.price||0)
+      }));
+      return chosen;
+    }
+
+    function calcUnitPrice(d){
+      const base = Number(d?.price||0);
+      const add  = selectedOptions().reduce((s,o)=>s+(o.price||0),0);
+      return base + add;
+    }
+
+    function updateOptPrice(){
+      if(!currentDish) return;
+      const unit = calcUnitPrice(currentDish);
+      const qty  = Math.max(1, Number(optQty.value||1));
+      optPrice.textContent = formatPrice(unit * qty);
+    }
+
+    function openOptions(dish){
+      currentDish = dish;
+      optTitle.textContent = dish.title || 'خيارات إضافية';
+      optSummary.textContent = `السعر الأساسي: ${formatPrice(Number(dish.price||0))}`;
+      optNotes.value = '';
+      optQty.value = 1;
+
+      renderOptionGroups(dish);
+      // Recalculate on any change
+      optForm.addEventListener('change', updateOptPrice, {once:false});
+      updateOptPrice();
+
+      optModal.show();
+    }
+    window.openOptions = openOptions; // also used by Reels
+
+    optMinus.addEventListener('click', ()=>{ const v=Math.max(1,Number(optQty.value||1)-1); optQty.value=v; updateOptPrice(); });
+    optPlus .addEventListener('click', ()=>{ const v=Math.max(1,Number(optQty.value||1)+1); optQty.value=v; updateOptPrice(); });
+    optQty  .addEventListener('input', ()=>{ if(Number(optQty.value)<1) optQty.value=1; updateOptPrice(); });
+
+    function addConfiguredLine(dish, qty, chosen, notes){
+      const unit = Number(dish.price||0) + chosen.reduce((s,o)=>s+(o.price||0),0);
+      const optText = chosen.length ? ' — ' + chosen.map(o=>o.label).join('، ') : '';
+      const title = (dish.title||'—') + optText + (notes?` (${notes})`:'');
+
+      const key=stableId(JSON.stringify({
+        id:dish.id, unit, opts:chosen.map(o=>o.id), notes:notes||''
+      }));
+      const exist=state.cart[key];
+      if(exist) exist.qty+=qty;
+      else state.cart[key]={lineId:key, id:dish.id, title, unitPrice:unit, qty, notes:notes||''};
+
+      bump(); bumpBadge(); toast(`أُضيف ${dish.title} ✅`);
+    }
+
+    optAddBtn.addEventListener('click', ()=>{
+      if(!currentDish) return;
+      optAddBtn.disabled=true; optAddBtn.classList.add('btn-loading');
+      const prev=optAddBtn.innerHTML;
+      optAddBtn.innerHTML=`جاري الإضافة <span class="spinner-border" role="status" aria-hidden="true"></span>`;
+
+      const qty = Math.max(1, Number(optQty.value||1));
+      const chosen = selectedOptions();
+      const notes = optNotes.value.trim();
+
+      addConfiguredLine(currentDish, qty, chosen, notes);
+
+      setTimeout(()=>{
+        optModal.hide();
+        optAddBtn.disabled=false; optAddBtn.classList.remove('btn-loading'); optAddBtn.innerHTML=prev;
+      }, 350);
+    });
+    /* ---- /OPTIONS MODAL LOGIC ---- */
+
     /* Render sections */
     function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
@@ -815,7 +973,9 @@
           node.querySelector('.desc').textContent=d.desc||'';
           const pEl=node.querySelector('.price'); pEl.textContent=fmt.format(Number(d.price||0)); pEl.style.color='var(--gold)';
           const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,3).forEach(t=>{ const s=document.createElement('span'); s.className='tag'; s.textContent=t; tags.appendChild(s); });
-          node.querySelector('.add-btn').addEventListener('click', (ev)=> addLine(d,1,ev.currentTarget));
+
+          // OPEN OPTIONS ON CLICK (always show the window)
+          node.querySelector('.add-btn').addEventListener('click', (ev)=> openOptions(d));
 
           grid.appendChild(node);
         });
@@ -882,7 +1042,6 @@
     searchMain.addEventListener('input', e=>{
       clearTimeout(t);
       const val=e.target.value;
-      // mirror to affix input if present
       const aff = chipsAffix.querySelector('input[data-role="menu-search"]');
       if(aff && aff.value!==val) aff.value = val;
       t=setTimeout(()=> onSearchInput(val), 160);
@@ -910,27 +1069,6 @@
       renderCartList();
     }
     function bumpBadge(){ badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
-
-    /* Add to cart with inline spinner */
-    function addLine(item, qty=1, btn){
-      const restoreBtn = ()=>{
-        if(btn){
-          btn.disabled=false; btn.classList.remove('btn-loading');
-          btn.innerHTML = 'أضف للسلة';
-        }
-      };
-      if(btn){
-        btn.disabled=true; btn.classList.add('btn-loading');
-        btn.innerHTML = `جاري الإضافة <span class="spinner-border" role="status" aria-hidden="true"></span>`;
-      }
-      const key=stableId(JSON.stringify({id:item.id, price:item.price}));
-      const exist=state.cart[key];
-      if(exist) exist.qty+=qty;
-      else state.cart[key]={lineId:key, id:item.id, title:item.title, unitPrice:Number(item.price||0), qty};
-      bump(); bumpBadge(); toast(`أُضيف ${item.title} ✅`);
-      setTimeout(restoreBtn, 450);
-    }
-    window.addLine = addLine;
 
     function renderCartList(){
       cartList.innerHTML='';
@@ -1062,17 +1200,6 @@
       bump();
       appLoading.classList.remove('show');
     })();
-
-    /* Optional: modal "optAddBtn" inline spinner (UX polish) */
-    const optAddBtn = document.getElementById('optAddBtn');
-    if(optAddBtn){
-      optAddBtn.addEventListener('click', ()=>{
-        const prev=optAddBtn.innerHTML;
-        optAddBtn.disabled=true; optAddBtn.classList.add('btn-loading');
-        optAddBtn.innerHTML=`جاري الإضافة <span class="spinner-border" role="status" aria-hidden="true"></span>`;
-        setTimeout(()=>{ optAddBtn.disabled=false; optAddBtn.classList.remove('btn-loading'); optAddBtn.innerHTML=prev; }, 500);
-      });
-    }
   });
   </script>
 
@@ -1115,7 +1242,8 @@
       const cta = document.createElement('div'); cta.className = 'cta';
       const add = document.createElement('button'); add.className='btn btn-dark flex-fill'; add.type='button';
       add.textContent = `أضف للسلة — ${new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'}).format(Number(dish.price||0))}`;
-      add.onclick = () => window.addLine && window.addLine(dish, 1);
+      // OPEN OPTIONS from Reels too
+      add.onclick = () => window.openOptions && window.openOptions(dish);
 
       const more = document.createElement('button'); more.className='btn btn-outline-light'; more.type='button'; more.textContent='تفاصيل';
       cta.append(add, more);
@@ -1186,7 +1314,6 @@
       list.focus({preventScroll:true});
       currentIdx=0; preloadAround(0);
 
-      // hide spinner once first image is loaded or after a short fallback delay
       const firstImg = list.querySelector('img[data-src]') || list.querySelector('img');
       let done=false;
       const hideLoader = ()=>{ if(done) return; done=true; reelsLoading.hidden=true; };
@@ -1218,11 +1345,9 @@
     }
 
     open?.addEventListener('click', openReels);
-    // Also support any dynamically added "js-open-reels" buttons (e.g., in fixed chips)
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.js-open-reels');
       if(!btn) return;
-      // If it's the main button, let the existing handler run.
       if(btn.id === 'openReels') return;
       e.preventDefault();
       openReels();
