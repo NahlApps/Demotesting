@@ -25,7 +25,7 @@
 
   <style>
     :root{
-      --charcoal:#141414; --porcelain:#F3F3F3; --ink-dark:#D4AF37; --ink:#111;
+      --charcoal:#141414; --porcelain:#F3F3F3; --ink-dark:#EDEBE6; --ink:#111;
       --gold:#D4AF37; --rule-dark:rgba(255,255,255,.12); --rule:rgba(0,0,0,.12);
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.25);
       --topbar-h:56px; --chips-h:0px; --safe-btm: env(safe-area-inset-bottom, 0px);
@@ -41,8 +41,14 @@
     /* Header */
     .app-header{position:sticky;top:0;z-index:70;background:#181818;border-bottom:1px solid var(--rule-dark);backdrop-filter:saturate(1.05) blur(6px)}
     .brand{font-weight:900}
-    .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--rule-dark);background:transparent;color:#fff}
+    .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--rule-dark);background:transparent;color:#fff;display:inline-grid;place-items:center}
     .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--gold);color:#141414;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+
+    /* Cart motion */
+    @keyframes cart-bump { 0%{transform:scale(1)} 30%{transform:scale(1.18)} 55%{transform:scale(.96)} 100%{transform:scale(1)} }
+    @keyframes badge-pop { 0%{transform:translateY(0) scale(1)} 20%{transform:translateY(-2px) scale(1.15)} 100%{transform:translateY(0) scale(1)} }
+    .cart-btn.bump { animation: cart-bump .45s cubic-bezier(.2,.8,.2,1); }
+    .cart-badge.flash { animation: badge-pop .8s cubic-bezier(.2,.8,.2,1); }
 
     /* Chips (sticky) */
     .chips-wrap{
@@ -497,6 +503,7 @@
 
     /* Tabs */
     const tabs=['menu','cart','data','thanks'];
+    function cartCount(){ return Object.values(state.cart).reduce((a,b)=>a+b.qty,0); }
     function canGo(t){ if(t==='menu') return true; if(t==='cart'||t==='data') return cartCount()>0; if(t==='thanks') return state.unlockThanks; return false;}
     function switchTab(to){
       if(!tabs.includes(to)) return;
@@ -530,6 +537,7 @@
     const goCartBtn=document.getElementById('goCartBtn');
     const toDataBtn=document.getElementById('toDataBtn');
     const cartTotal=document.getElementById('cartTotal');
+    const cartBtn=document.getElementById('openCart');
 
     /* Fetch Menu with fallbacks */
     async function fetchMenu(){
@@ -610,7 +618,7 @@
             const opts = OPTIONS_MAP[d.id];
             if (opts && opts.groups?.length){
               openOptions({ ...d, options: opts });
-            } else { addLine(d,1); }
+            } else { addLine(d,1); toast('added to cart'); }
           });
 
           grid.appendChild(node);
@@ -626,7 +634,7 @@
       setStickyVars();
     }
 
-    /* Chips & scrollspy */
+    /* Chips & scroll */
     chips.addEventListener('click',(e)=>{
       const b=e.target.closest('.chip[data-target]'); if(!b) return;
       document.querySelector(b.dataset.target)?.scrollIntoView({behavior:'smooth', block:'start'});
@@ -646,7 +654,7 @@
       document.getElementById('topOfMenu').scrollIntoView({behavior:'smooth',block:'start'});
     });
 
-    /* Cart */
+    /* Cart + motion */
     function stableId(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36); }
     function cartArr(){ return Object.values(state.cart); }
     function totals(){ const arr=cartArr(); return {count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr}; }
@@ -659,13 +667,20 @@
       const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
       renderCartList();
     }
+    function bumpCart(){
+      // restart CSS animations by toggling classes
+      cartBtn.classList.remove('bump'); badge.classList.remove('flash');
+      void cartBtn.offsetWidth; void badge.offsetWidth;
+      cartBtn.classList.add('bump'); badge.classList.add('flash');
+    }
     function addLine(item, qty=1, optionsPkg){
       const key=stableId(JSON.stringify({id:item.id, price:item.price, opt:optionsPkg||null}));
       const exist=state.cart[key];
       const unit = Number(item.price||0) + Number(optionsPkg?.delta||0);
       if(exist) exist.qty+=qty;
       else state.cart[key]={lineId:key, id:item.id, title:item.title, unitPrice:unit, qty, optionsText:optionsPkg?.summary||''};
-      bump(); // toast is shown by callers (Arabic / English, context-specific)
+      bump();
+      bumpCart(); // <— animate cart icon & badge on every add
     }
     function renderCartList(){
       cartList.innerHTML='';
@@ -690,7 +705,7 @@
       box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2000);
     }
 
-    /* ===== Options Modal Wiring (works over Reel) ===== */
+    /* ===== Options Modal Wiring ===== */
     const optModal = new bootstrap.Modal(document.getElementById('optModal'));
     const optForm  = document.getElementById('optForm');
     const optPriceEl=document.getElementById('optPrice');
@@ -767,7 +782,7 @@
       optQtyEl.value=1; document.getElementById('optNotes').value='';
       buildOptionsUI(item.options.groups);
       updateOptPrice();
-      optModal.show(); // appears above Reel
+      optModal.show();
     }
     document.getElementById('optAddBtn').onclick=()=>{
       if(!currentItem) return;
@@ -775,11 +790,11 @@
       const qty=Math.max(1, Number(optQtyEl.value||1));
       const notes=(document.getElementById('optNotes').value||'').trim();
       addLine(currentItem, qty, {delta, summary, result, notes});
-      toast('added to cart');        // <— explicit English toast in Reel/Options add
+      toast('added to cart');
       optModal.hide();
     };
 
-    /* Data form (short) */
+    /* Data form */
     const nameEl=document.getElementById('custName');
     const phoneEl=document.getElementById('custPhone');
     const notesEl=document.getElementById('notes');
@@ -853,7 +868,7 @@
       }
     };
 
-    /* ===== Reel (Options integrated + "added to cart" message) ===== */
+    /* ===== Reel (with options + toasts) ===== */
     const reels = document.getElementById('reels');
     const reelsList = document.getElementById('reelsList');
     const openReelsBtn = document.getElementById('openReels');
@@ -903,7 +918,6 @@
       const optionsBtn=document.createElement('button'); optionsBtn.className='btn btn-outline-light'; optionsBtn.type='button'; optionsBtn.textContent='الخيارات';
       optionsBtn.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); if (!tryOpenOptionsFor(d)) { addLine(d,1); toast('added to cart'); } });
 
-      // Tap image: open options if exist, else toggle UI
       media.addEventListener('click', (e)=>{ e.stopPropagation();
         if(!tryOpenOptionsFor(d)) reels.classList.toggle('ui-hidden');
       });
@@ -1021,8 +1035,6 @@
       renderSections(); bump(); setStickyVars();
       document.getElementById('appLoading').classList.remove('show');
     })();
-
-    function cartCount(){ return Object.values(state.cart).reduce((a,b)=>a+b.qty,0); }
   });
   </script>
 </body>
