@@ -8,7 +8,6 @@
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <!-- Didact Gothic (Latin), Cairo (Arabic fallback). "Perandory" assumed self-hosted by you. -->
   <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 
@@ -19,265 +18,120 @@
   <meta name="theme-color" content="#141414" />
   <meta name="description" content="Maison Hikari — اطلب الآن" />
 
-  <!-- Luxury / Fine Dining Palette -->
   <style>
     :root{
-      /* Core tokens */
-      --charcoal:#141414;     /* 60% — base */
-      --porcelain:#adadad;    /* 30% — surfaces */
-      --gold:#D4AF37;         /* 10% — CTAs, price */
-      --ink-on-dark:#EDEBE6;  /* text on charcoal */
-      --ink-on-light:#1A1A1A; /* text on porcelain */
-
-      /* borders & depth */
-      --border-on-dark: rgba(237,235,230,.15); /* subtle on dark */
-      --border-on-light: rgba(20,20,20,.12);   /* subtle on light */
-
+      --charcoal:#141414; --porcelain:#adadad; --gold:#D4AF37;
+      --ink-on-dark:#EDEBE6; --ink-on-light:#1A1A1A;
+      --border-on-dark: rgba(237,235,230,.15); --border-on-light: rgba(20,20,20,.12);
       --radius:14px; --radius-pill:999px; --shadow:0 10px 30px rgba(0,0,0,.25);
-      --topbar-h:56px; --stepper-h:0px; --chips-h:0px;
-
+      --topbar-h:56px; --chips-h:0px;
       --focus: var(--gold);
     }
-
     html,body{height:100%}
     html{scroll-behavior:smooth;}
     body{
       font-family:'Cairo','Didact Gothic','Perandory',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      color:var(--ink-on-dark);
-      background:var(--charcoal);
-      display:flex; flex-direction:column;
-      -webkit-tap-highlight-color:transparent;
+      color:var(--ink-on-dark); background:var(--charcoal);
+      display:flex; flex-direction:column; -webkit-tap-highlight-color:transparent;
     }
-
-    /* Helpers */
-    .text-gold{ color:var(--gold)!important; }
-    .spinner-gold .spinner-border{ color:var(--gold)!important; }
-    .btn .spinner-border{ width:1rem;height:1rem;border-width:.2em; margin-inline-start:.5rem; }
-    .btn-loading[disabled]{ opacity:.85; }
-
-    /* Focus ring */
     :where(a,button,[role="button"],input,select,textarea):focus-visible{
-      outline: 2px solid var(--focus);
-      outline-offset: 2px;
-      box-shadow: 0 0 0 4px rgba(212,175,55,.25);
+      outline:2px solid var(--focus); outline-offset:2px; box-shadow:0 0 0 4px rgba(212,175,55,.25);
     }
 
-    /* Header (dark chrome) */
-    .app-header{
-      position:sticky;top:0;z-index:70;
-      background:color-mix(in srgb, var(--charcoal) 88%, black);
-      border-bottom:1px solid var(--border-on-dark);
-      backdrop-filter:saturate(1.05) blur(6px)
-    }
-    .brand{
-      font-family:'Perandory','Didact Gothic','Cairo',sans-serif;
-      font-weight:900; letter-spacing:.3px; color:var(--ink-on-dark)
-    }
-    .cart-btn{
-      position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);
-      border:1px solid var(--border-on-dark);
-      background:transparent; color:var(--ink-on-dark)
-    }
-    .cart-badge{
-      position:absolute;top:-6px;inset-inline-start:-6px;
-      background:var(--gold); color:#141414;
-      border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;
-      box-shadow:0 6px 16px rgba(0,0,0,.4)
-    }
+    /* Header */
+    .app-header{position:sticky;top:0;z-index:70;background:color-mix(in srgb, var(--charcoal) 88%, black);border-bottom:1px solid var(--border-on-dark);backdrop-filter:saturate(1.05) blur(6px)}
+    .brand{font-family:'Perandory','Didact Gothic','Cairo',sans-serif;font-weight:900;letter-spacing:.3px;color:var(--ink-on-dark)}
+    .cart-btn{position:relative;min-width:44px;min-height:44px;border-radius:var(--radius-pill);border:1px solid var(--border-on-dark);background:transparent;color:var(--ink-on-dark)}
+    .cart-badge{position:absolute;top:-6px;inset-inline-start:-6px;background:var(--gold);color:#141414;border-radius:999px;font-size:.75rem;padding:2px 7px;font-weight:900;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+    @media (prefers-reduced-motion:no-preference){ .cart-badge.bump{ animation:bump .4s } @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.18)}100%{transform:scale(1)}} }
 
-    /* Chips/Search strip (NORMAL in-flow bar) */
-    .chips-wrap{
-      /* DIFFERENT METHOD: not sticky anymore; we use a fixed clone (#chipsAffix) */
-      position: static;
-      background:color-mix(in srgb, var(--charcoal) 86%, black);
-      border-bottom:1px solid var(--border-on-dark);
-      box-shadow: none;
-    }
-    body.scrolled .chips-wrap{ box-shadow:0 8px 24px rgba(0,0,0,.35); }
-    #chips{ display:flex; flex-wrap:wrap; gap:8px; padding-block:10px; align-items:center; overflow:visible; }
-    .chip{
-      background:var(--porcelain); color:var(--ink-on-light);
-      border:1px solid var(--border-on-light);
-      border-radius:var(--radius-pill); padding:10px 14px; min-height:44px;
-      font-weight:800; font-size:.95rem; transition:.18s; flex:0 0 auto;
-    }
-    .chip:hover{ filter: saturate(1.02) brightness(1.02); }
-    .chip.active{
-      background:var(--gold); color:#141414;
-      border-color:color-mix(in srgb, var(--gold) 70%, #000);
-    }
-    .pill-clear{ background:transparent; border:1px dashed var(--border-on-dark); color:var(--ink-on-dark); }
+    /* Chips strip in flow (we'll affix a clone on scroll) */
+    .chips-wrap{background:color-mix(in srgb, var(--charcoal) 86%, black);border-bottom:1px solid var(--border-on-dark)}
+    #chips{display:flex;flex-wrap:wrap;gap:8px;padding-block:10px;align-items:center}
+    .chip{background:var(--porcelain);color:var(--ink-on-light);border:1px solid var(--border-on-light);border-radius:var(--radius-pill);padding:10px 14px;min-height:44px;font-weight:800;font-size:.95rem;transition:.18s}
+    .chip:hover{filter:saturate(1.02) brightness(1.02)}
+    .chip.active{background:var(--gold);color:#141414;border-color:color-mix(in srgb, var(--gold) 70%, #000)}
+    .pill-clear{background:transparent;border:1px dashed var(--border-on-dark);color:var(--ink-on-dark)}
+    .search-wrap{margin-inline-start:auto}
+    .searchbox{display:flex;align-items:center;gap:6px;border:1px solid var(--border-on-dark);border-radius:var(--radius-pill);background:color-mix(in srgb, var(--charcoal) 70%, #000);padding-inline:8px;transition:.18s;color:var(--ink-on-dark)}
+    .searchbox .btn{min-width:36px;color:var(--ink-on-dark)}
+    .searchbox input{border:0;min-height:46px;color:var(--ink-on-dark);background:transparent;width:0;min-width:0;padding:0;opacity:0;pointer-events:none;transition:.18s}
+    .searchbox.open{box-shadow:0 8px 28px rgba(0,0,0,.45)}
+    .searchbox.open input{width:66vw;opacity:1;pointer-events:auto;padding:12px 16px}
+    @media (min-width:768px){.searchbox.open input{width:320px}}
 
-    /* Search — icon-only until opened */
-    .search-wrap { margin-inline-start:auto; }
-    .searchbox{
-      display:flex; align-items:center; gap:6px;
-      border:1px solid var(--border-on-dark); border-radius:var(--radius-pill);
-      background:color-mix(in srgb, var(--charcoal) 70%, #000);
-      padding-inline:8px; transition:.18s; color:var(--ink-on-dark);
-    }
-    .searchbox .btn{ min-width:36px; color:var(--ink-on-dark); }
-    .searchbox input{
-      border:0; min-height:46px; color:var(--ink-on-dark); background:transparent;
-      width:0; min-width:0; padding:0; opacity:0; pointer-events:none; transition:.18s;
-    }
-    .searchbox.open{ box-shadow:0 8px 28px rgba(0,0,0,.45); }
-    .searchbox.open input{ width:66vw; opacity:1; pointer-events:auto; padding:12px 16px; }
-    @media (min-width:768px){ .searchbox.open input{ width:320px; } }
-
-    /* Fixed AFFIX clone — appears when original chips scrolled away */
-    #chipsAffix{
-      position: fixed;
-      inset-inline: 0;
-      top: var(--topbar-h);
-      z-index: 90;
-      background:color-mix(in srgb, var(--charcoal) 86%, black);
-      border-bottom:1px solid var(--border-on-dark);
-      display: none; /* toggled via JS */
-    }
-    #chipsAffix.visible{
-      display: block;
-      box-shadow:0 8px 24px rgba(0,0,0,.35);
-      animation: fadeSlide .18s ease;
-    }
-    #chipsAffix .container{ padding-top: 6px; padding-bottom: 6px; }
-    @keyframes fadeSlide{ from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none} }
+    /* Affixed clone */
+    #chipsAffix{position:fixed;inset-inline:0;top:var(--topbar-h);z-index:90;background:color-mix(in srgb, var(--charcoal) 86%, black);border-bottom:1px solid var(--border-on-dark);display:none}
+    #chipsAffix.visible{display:block;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:fadeSlide .18s ease}
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 
     /* Sections */
-    .menu-section{
-      scroll-margin-top: calc(var(--topbar-h) + var(--chips-h) + 12px);
-      padding-top: 8px;
-    }
-    .sec-title{
-      margin:12px 0 12px 0;font-weight:900;color:var(--ink-on-dark);
-      position: relative; display: inline-block; padding-inline:8px; padding-block:2px;
-      background: linear-gradient(90deg, color-mix(in srgb, var(--gold) 35%, transparent), transparent 60%);
-      border-radius: 6px;
-    }
+    .menu-section{scroll-margin-top:calc(var(--topbar-h) + var(--chips-h) + 12px);padding-top:8px}
+    .sec-title{margin:12px 0;font-weight:900;color:var(--ink-on-dark);position:relative;display:inline-block;padding-inline:8px;padding-block:2px;background:linear-gradient(90deg, color-mix(in srgb, var(--gold) 35%, transparent), transparent 60%);border-radius:6px}
 
     .menu-grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
     @media(min-width:640px){.menu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(min-width:992px){.menu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-    /* Menu cards (light surfaces) */
-    .dish{
-      background:var(--porcelain);
-      border:1px solid var(--border-on-light);
-      border-radius:var(--radius);
-      overflow:hidden; box-shadow:var(--shadow);
-      display:flex; flex-direction:column; color:var(--ink-on-light);
-    }
+    .dish{background:var(--porcelain);color:var(--ink-on-light);border:1px solid var(--border-on-light);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
     .dish-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#e9e6df}
     .dish-body{padding:12px 12px 14px}
     .dish h6{font-family:'Perandory','Didact Gothic','Cairo',sans-serif;font-weight:900;margin:0 0 4px;color:var(--ink-on-light)}
     .desc{color:rgba(26,26,26,.72)}
     .price{font-weight:900;color:var(--gold)}
     .tags{display:flex;flex-wrap:wrap;gap:6px}
-    .tag{
-      background:#EFECE6; color:#2b2b2b;
-      border:1px solid var(--border-on-light);
-      border-radius:999px; padding:4px 8px; font-size:.8rem;
-    }
+    .tag{background:#EFECE6;color:#2b2b2b;border:1px solid var(--border-on-light);border-radius:999px;padding:4px 8px;font-size:.8rem}
     .add-wrap{margin-top:8px}
-    .add-btn{
-      width:100%;min-height:46px;border-radius:999px;
-      border:1px solid var(--gold);
-      background:var(--gold); color:#141414; font-weight:900;
-    }
-    .add-btn:hover{
-      background:color-mix(in srgb, var(--gold) 85%, #000 15%);
-      border-color:color-mix(in srgb, var(--gold) 85%, #000 15%);
-    }
+    .add-btn{width:100%;min-height:46px;border-radius:999px;border:1px solid var(--gold);background:var(--gold);color:#141414;font-weight:900}
+    .add-btn:hover{background:color-mix(in srgb, var(--gold) 85%, #000 15%);border-color:color-mix(in srgb, var(--gold) 85%, #000 15%)}
 
-    /* Cart & forms (light cards on dark stage) */
-    .cart-card,.card-paper{
-      background:var(--porcelain);
-      color:var(--ink-on-light);
-      border:1px solid var(--border-on-light);
-      border-radius:var(--radius); box-shadow:var(--shadow)
-    }
+    .cart-card,.card-paper{background:var(--porcelain);color:var(--ink-on-light);border:1px solid var(--border-on-light);border-radius:var(--radius);box-shadow:var(--shadow)}
     .line{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--border-on-light)}
     .seg{display:inline-grid;grid-auto-flow:column;gap:8px;background:#EFECE6;padding:6px;border-radius:999px;border:1px solid var(--border-on-light)}
     .seg button{background:#fff;border:1px solid var(--border-on-light);border-radius:999px;padding:11px 16px;min-height:46px;font-weight:900;color:#1a1a1a}
     .seg button[aria-pressed="true"]{background:var(--gold);color:#141414;border-color:var(--gold)}
     #etaBadge{background:color-mix(in srgb, var(--gold) 18%, #fff);color:#141414;padding:4px 10px;border-radius:999px;font-weight:800;border:1px solid var(--gold)}
-    .inp-wrap{position:relative}
-    .inp-wrap .ico{position:absolute;inset-inline-start:12px;inset-block-start:50%;transform:translateY(-50%);color:#6b6760;pointer-events:none}
+    .inp-wrap{position:relative}.inp-wrap .ico{position:absolute;inset-inline-start:12px;inset-block-start:50%;transform:translateY(-50%);color:#6b6760;pointer-events:none}
     .pad-icon{padding-inline-start:42px}
     .form-control,.form-select{min-height:56px;border-color:var(--border-on-light);color:#1a1a1a}
-    .iti{ direction: ltr; } .iti input{ text-align: left; } /* keep LTR numbers inside RTL */
+    .iti{direction:ltr}.iti input{text-align:left}
 
-    /* Mini bar (dark) */
-    .mini-bar{
-      position:sticky;bottom:0;z-index:55;
-      background:var(--charcoal);color:var(--ink-on-dark);
-      padding:10px 12px;border-top:1px solid var(--border-on-dark);
-      padding-bottom:calc(14px + env(safe-area-inset-bottom))
-    }
+    .mini-bar{position:sticky;bottom:0;z-index:55;background:var(--charcoal);color:var(--ink-on-dark);padding:10px 12px;border-top:1px solid var(--border-on-dark);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
     .mini-btn{min-height:52px;border-radius:999px;font-weight:900}
 
-    /* Toast (dark) */
     #toasts{position:fixed;inset-block-start:14px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px}
     .toast-msg{background:#171717;color:var(--ink-on-dark);padding:10px 14px;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,.5);font-weight:800;border:1px solid var(--border-on-dark)}
 
-    /* Overlays */
-    #appLoading,#submitLoading{
-      position:fixed; inset:0; z-index:999; display:none; align-items:center; justify-content:center; text-align:center;
-      background:rgba(20,20,20,.9); backdrop-filter:blur(6px); color:var(--ink-on-dark)
-    }
+    #appLoading,#submitLoading{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;text-align:center;background:rgba(20,20,20,.9);backdrop-filter:blur(6px);color:var(--ink-on-dark)}
     .overlay.show{display:flex}
     .overlay .box{background:var(--porcelain);color:var(--ink-on-light);border:1px solid var(--border-on-light);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);min-width:220px}
     .overlay .msg{margin-top:.5rem;color:#2b2b2b;font-weight:800}
 
-    /* Motion */
-    @media (prefers-reduced-motion:no-preference){
-      .cart-badge.bump{ animation:bump .4s; }
-      .add-btn:active{ transform: translateY(1px) scale(.98); }
-      .reveal{opacity:0; transform:translateY(12px); transition:.4s ease;}
-      .reveal.in{opacity:1; transform:none;}
-      @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.18)}100%{transform:scale(1)}}
-    }
-
-    /* Buttons map: "dark" => GOLD; outline => charcoal */
-    .btn-dark, #optAddBtn,#confirmBtn,#thBackMenu{
-      background:var(--gold)!important; border-color:var(--gold)!important; color:#141414!important;
-    }
-    .btn-dark:hover, #optAddBtn:hover,#confirmBtn:hover,#thBackMenu:hover{
-      background:color-mix(in srgb, var(--gold) 85%, #000 15%)!important;
-      border-color:color-mix(in srgb, var(--gold) 85%, #000 15%)!important;
-      color:#141414!important;
-    }
-    .btn-outline-dark, #thBackCart{
-      color:var(--ink-on-light)!important;
-      border-color:var(--border-on-light)!important;
-      background:transparent!important;
-    }
-    .btn-outline-dark:hover, #thBackCart:hover{
-      background:#EFECE6!important;
-      border-color:var(--gold)!important;
-      color:#141414!important;
-    }
+    .btn-dark,#optAddBtn,#confirmBtn,#thBackMenu{background:var(--gold)!important;border-color:var(--gold)!important;color:#141414!important}
+    .btn-dark:hover,#optAddBtn:hover,#confirmBtn:hover,#thBackMenu:hover{background:color-mix(in srgb, var(--gold) 85%, #000 15%)!important;border-color:color-mix(in srgb, var(--gold) 85%, #000 15%)!important;color:#141414!important}
+    .btn-outline-dark,#thBackCart{color:var(--ink-on-light)!important;border-color:var(--border-on-light)!important;background:transparent!important}
+    .btn-outline-dark:hover,#thBackCart:hover{background:#EFECE6!important;border-color:var(--gold)!important;color:#141414!important}
   </style>
 
-  <!-- Reels View Styles (snap) -->
+  <!-- Reels (optional) -->
   <style>
-    #reels { position: fixed; inset: 0; z-index: 1100; display: none; background: #000; color: #fff; }
-    #reels.show { display: block; }
-    #reelsHeader{ position: absolute; inset-inline: 0; inset-block-start: 0; display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: linear-gradient(180deg, rgba(0,0,0,.6), rgba(0,0,0,0)); pointer-events: none; z-index: 2; }
-    #reelsHeader .btn, #reelsHeader .chip { pointer-events: auto; }
-    .reels-list{ height: 100vh; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; outline: none; touch-action: pan-y; }
-    .reel{ position: relative; height: 100vh; display: grid; grid-template-rows: 1fr auto; isolation: isolate; scroll-snap-align: start; scroll-snap-stop: always; }
-    .reel .media{ position: relative; background:#000; min-height:0; display:grid; place-items:center; }
-    .reel img{ width:100%; height:100%; object-fit:cover; background:#111; }
-    .reel .glass{ position:absolute; inset-inline:0; inset-block-end:0; padding:14px 12px 18px; background:linear-gradient(0deg, rgba(0,0,0,.65), rgba(0,0,0,0)); color:#fff; z-index:1; }
-    .reel .title{ font-family:'Perandory','Didact Gothic','Cairo',sans-serif; font-weight:900; margin:0 0 6px; }
-    .reel .desc{ opacity:.9; font-size:.95rem; }
-    .reel .tagbox{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
-    .reel .tag{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:4px 8px; font-size:.8rem; }
-    .reel .cta{ position:absolute; inset-inline:12px; inset-block-end:12px; z-index:2; display:flex; gap:8px; }
-    .reel .cta .btn{ border-radius:999px; font-weight:900; min-height:46px; }
-    #reelsLoading{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3; background:linear-gradient(180deg, rgba(0,0,0,.5), rgba(0,0,0,.35)); }
-    #reelsLoading[hidden]{ display:none; }
+    #reels{position:fixed;inset:0;z-index:1100;display:none;background:#000;color:#fff}
+    #reels.show{display:block}
+    #reelsHeader{position:absolute;inset-inline:0;inset-block-start:0;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,0));pointer-events:none;z-index:2}
+    #reelsHeader .btn,#reelsHeader .chip{pointer-events:auto}
+    .reels-list{height:100vh;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;outline:none;touch-action:pan-y}
+    .reel{position:relative;height:100vh;display:grid;grid-template-rows:1fr auto;isolation:isolate;scroll-snap-align:start;scroll-snap-stop:always}
+    .reel .media{position:relative;background:#000;min-height:0;display:grid;place-items:center}
+    .reel img{width:100%;height:100%;object-fit:cover;background:#111}
+    .reel .glass{position:absolute;inset-inline:0;inset-block-end:0;padding:14px 12px 18px;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,0));color:#fff;z-index:1}
+    .reel .title{font-family:'Perandory','Didact Gothic','Cairo',sans-serif;font-weight:900;margin:0 0 6px}
+    .reel .desc{opacity:.9;font-size:.95rem}
+    .reel .tagbox{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .reel .tag{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);color:#fff;border-radius:999px;padding:4px 8px;font-size:.8rem}
+    .reel .cta{position:absolute;inset-inline:12px;inset-block-end:12px;z-index:2;display:flex;gap:8px}
+    .reel .cta .btn{border-radius:999px;font-weight:900;min-height:46px}
+    #reelsLoading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.35))}
+    #reelsLoading[hidden]{display:none}
   </style>
 </head>
 <body>
@@ -306,14 +160,14 @@
           <small class="text-secondary" style="color:#c9c6bf !important">الياباني المعاصر</small>
         </div>
       </div>
-      <button id="openCart" class="cart-btn px-3" aria-label="السلة (الخطوة 2)">
+      <button id="openCart" class="cart-btn px-3" aria-label="السلة">
         <i class="fa-solid fa-bag-shopping"></i>
         <span id="badge" class="cart-badge" aria-live="polite">0</span>
       </button>
     </div>
   </header>
 
-  <!-- Chips + Search (in normal flow) -->
+  <!-- Chips + Search (in flow) -->
   <div class="chips-wrap" id="chipsWrap" hidden aria-hidden="true">
     <div class="container">
       <div id="chips" aria-label="تصنيفات">
@@ -322,23 +176,20 @@
         <button class="chip" data-target="#sec-don">دون</button>
         <button class="chip" data-target="#sec-meat">لحوم</button>
         <button class="chip" data-target="#sec-drinks">مشروبات</button>
-
         <div class="search-wrap">
           <div class="searchbox d-flex" role="search" aria-label="بحث">
             <button class="btn js-search-toggle" aria-label="بحث"><i class="fa-solid fa-magnifying-glass"></i></button>
             <input id="q" data-role="menu-search" type="search" class="form-control" placeholder="ابحث عن طبق … (سالمون، واجيو…)" autocomplete="off" aria-label="بحث"/>
           </div>
         </div>
-
         <button id="openReels" class="chip js-open-reels" type="button" aria-haspopup="dialog">عرض رييل</button>
         <button class="chip pill-clear js-clear-filters d-none" type="button">مسح التصفية</button>
       </div>
     </div>
   </div>
 
-  <!-- Fixed clone that appears when chipsWrap scrolls away -->
+  <!-- Affixed clone + sentinel -->
   <div id="chipsAffix" aria-hidden="true"></div>
-  <!-- Sentinel to trigger affix visibility -->
   <div id="chipsSentinel"></div>
 
   <!-- Content -->
@@ -512,7 +363,6 @@
       <span class="small text-white-50 me-auto ms-2">اسحب للأعلى/الأسفل</span>
       <button id="reelsToCart" class="chip" type="button" aria-label="فتح السلة">السلة</button>
     </div>
-    <!-- Reels loading spinner -->
     <div id="reelsLoading">
       <div class="spinner-border text-gold" role="status" aria-label="جارِ التحميل"></div>
     </div>
@@ -562,150 +412,185 @@
   const FREE_SHIP = 79;
 
   window.addEventListener('DOMContentLoaded', () => {
-    const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu', slot:'' };
-    window.state = state;
+    const state = { q:'', cart:{}, menu:[], unlockThanks:false, active:'menu' };
     const fmt = new Intl.NumberFormat('ar-SA', { style:'currency', currency:'SAR' });
 
-    /* Sticky helpers (chips height aware) */
-    const topbarEl   = document.getElementById('topbar');
-    const chipsWrap  = document.getElementById('chipsWrap');
-    const chipsAffix = document.getElementById('chipsAffix');
-    function measure(el){ return Math.round(el?.getBoundingClientRect().height ?? 0); }
-    function setStickyVars() {
-      const topH   = measure(topbarEl);
-      const stepH  = 0;
-      const h = chipsAffix.classList.contains('visible')
-                  ? measure(chipsAffix)
-                  : (!chipsWrap.hidden ? measure(chipsWrap) : 0);
-      document.documentElement.style.setProperty('--topbar-h',  topH + 'px');
-      document.documentElement.style.setProperty('--stepper-h', stepH + 'px');
-      document.documentElement.style.setProperty('--chips-h',   h + 'px');
+    /* ===== Helpers ===== */
+    const topbarEl=document.getElementById('topbar'), chipsWrap=document.getElementById('chipsWrap'), chipsAffix=document.getElementById('chipsAffix');
+    function measure(el){return Math.round(el?.getBoundingClientRect().height||0)}
+    function setStickyVars(){
+      const h = chipsAffix.classList.contains('visible') ? measure(chipsAffix) : (!chipsWrap.hidden?measure(chipsWrap):0);
+      document.documentElement.style.setProperty('--topbar-h', measure(topbarEl)+'px');
+      document.documentElement.style.setProperty('--chips-h', h+'px');
     }
     window.addEventListener('resize', setStickyVars, {passive:true});
     window.addEventListener('scroll', ()=>document.body.classList.toggle('scrolled', window.scrollY>6), {passive:true});
 
-    /* Simple tab switcher (no BS tabs for clarity) */
-    const tabs=['menu','cart','data','thanks'];
+    function toast(msg){const box=document.getElementById('toasts');const el=document.createElement('div');el.className='toast-msg';el.textContent=msg;box.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-6px)';setTimeout(()=>el.remove(),180);},2200)}
+    function cartCount(){return Object.values(state.cart).reduce((a,b)=>a+b.qty,0)}
+    function bumpBadge(){const b=document.getElementById('badge');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}
+
+    /* ===== Chips visible only on Menu + affix clone ===== */
     function setStep(active){
       state.active=active;
-      const onMenu = active === 'menu';
-      chipsWrap.hidden = !onMenu;
-      chipsWrap.setAttribute('aria-hidden', String(!onMenu));
-      if(onMenu) chipsWrap.removeAttribute('inert'); else chipsWrap.setAttribute('inert','');
-      document.body.classList.toggle('on-menu', onMenu);
+      const onMenu = active==='menu';
+      chipsWrap.hidden=!onMenu; chipsWrap.setAttribute('aria-hidden', String(!onMenu));
+      onMenu ? chipsWrap.removeAttribute('inert') : chipsWrap.setAttribute('inert','');
       setStickyVars();
     }
-    function canGo(t){ if(t==='menu') return true; if(t==='cart'||t==='data') return cartCount()>0; if(t==='thanks') return state.unlockThanks; return false;}
     function switchTab(to){
+      const tabs=['menu','cart','data','thanks'];
       if(!tabs.includes(to)) return;
-      if(!canGo(to)){
-        toast(to==='thanks'?'أكمل تأكيد الطلب أولاً':'أضِف عناصر للسلة أولاً');
-        return;
-      }
+      if((to==='cart'||to==='data') && cartCount()===0){ toast('أضِف عناصر للسلة أولاً'); return; }
+      if(to==='thanks' && !state.unlockThanks){ toast('أكمل تأكيد الطلب أولاً'); return; }
       document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('show','active'));
-      const pane=document.getElementById('tab-'+to);
-      pane?.classList.add('show','active');
-      setStep(to);
-      history.replaceState(null,'','#tab-'+to);
-      setStickyVars();
+      document.getElementById('tab-'+to)?.classList.add('show','active');
+      setStep(to); history.replaceState(null,'','#tab-'+to); setStickyVars();
     }
-    document.body.addEventListener('click', (e)=>{
-      const a=e.target.closest('a[href^="#tab-"],[data-go]');
-      if(!a) return;
-      e.preventDefault();
-      const to=a.dataset.go||(a.getAttribute('href')||'').replace('#tab-','');
-      switchTab(to);
-    });
+    document.body.addEventListener('click',(e)=>{const a=e.target.closest('a[href^="#tab-"],[data-go]');if(!a) return;e.preventDefault();switchTab(a.dataset.go||(a.getAttribute('href')||'').replace('#tab-',''));});
     document.getElementById('openCart').addEventListener('click', ()=>switchTab('cart'));
 
-    function cartCount(){ return Object.values(state.cart).reduce((a,b)=>a+b.qty,0); }
-    function toast(msg){
-      const box=document.getElementById('toasts'); const el=document.createElement('div'); el.className='toast-msg'; el.textContent=msg;
-      box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200);
-    }
-
-    /* Build fixed chips clone & affix toggling */
-    const sentinel = document.getElementById('chipsSentinel');
+    const sentinel=document.getElementById('chipsSentinel');
     function buildAffix(){
-      chipsAffix.innerHTML = '';
-      const wrap = document.createElement('div');
-      wrap.className = 'container';
-      const clone = document.getElementById('chips').cloneNode(true);
-      clone.id = 'chipsClone';
-      clone.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id')); // avoid duplicate IDs
-
-      // Sync search values
-      const mainSearch = document.getElementById('q');
-      const cloneSearch = clone.querySelector('input[data-role="menu-search"]');
-      const mainBox = document.querySelector('.chips-wrap .searchbox');
-      const cloneBox = clone.querySelector('.searchbox');
-      if (cloneSearch && mainSearch){
-        cloneSearch.value = mainSearch.value;
-        cloneSearch.addEventListener('input', (e)=>{
-          if(mainSearch.value !== e.target.value){
-            mainSearch.value = e.target.value;
-            mainSearch.dispatchEvent(new Event('input', {bubbles:true}));
-          }
-        });
-      }
-      // Search toggle sync
-      clone.querySelectorAll('.js-search-toggle').forEach(btn=>{
-        btn.addEventListener('click',(e)=>{ e.preventDefault();
-          const open = !cloneBox.classList.contains('open');
-          [mainBox, cloneBox].forEach(box=>{
-            if(!box) return;
-            box.classList.toggle('open', open);
-            const inp=box.querySelector('input[data-role="menu-search"]');
-            if(open && inp) setTimeout(()=>inp.focus(),10);
-          });
-        });
-      });
-
+      chipsAffix.innerHTML='';
+      const wrap=document.createElement('div'); wrap.className='container';
+      const clone=document.getElementById('chips').cloneNode(true);
+      clone.id='chipsClone'; clone.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+      // Wire clone chips clicks
+      clone.addEventListener('click',(e)=>{const b=e.target.closest('.chip[data-target]');if(!b) return;e.preventDefault(); scrollToSelector(b.dataset.target);});
+      // Sync search value + toggle between bars
+      const mainBox=document.querySelector('.chips-wrap .searchbox'); const cloneBox=clone.querySelector('.searchbox');
+      const mainInput=document.querySelector('.chips-wrap [data-role="menu-search"]'); const cloneInput=clone.querySelector('[data-role="menu-search"]');
+      if(cloneInput && mainInput){ cloneInput.value=mainInput.value; cloneInput.addEventListener('input',e=>{ if(mainInput.value!==e.target.value){ mainInput.value=e.target.value; mainInput.dispatchEvent(new Event('input',{bubbles:true})); } });}
+      clone.querySelectorAll('.js-search-toggle').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault();const open=!cloneBox.classList.contains('open');[mainBox,cloneBox].forEach(b=>{b.classList.toggle('open',open);const i=b.querySelector('[data-role="menu-search"]'); if(open&&i) setTimeout(()=>i.focus(),10);});}));
       // Clear filters sync
-      clone.querySelectorAll('.js-clear-filters').forEach(btn=>{
-        btn.addEventListener('click',(e)=>{ e.preventDefault(); clearAll(); });
-      });
-
-      // Chips click (clone)
-      clone.addEventListener('click', (e)=>{
-        const b=e.target.closest('.chip[data-target]');
-        if(!b) return;
-        e.preventDefault();
-        scrollToSelector(b.dataset.target);
-      });
-
-      // Open reels from clone
-      clone.querySelector('.js-open-reels')?.addEventListener('click', ()=>{
-        document.querySelector('#openReels')?.click();
-      });
-
-      wrap.appendChild(clone);
-      chipsAffix.appendChild(wrap);
-    }
-
-    function currentOffsets(){
-      const topH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h')) || 0;
-      return {topH};
+      clone.querySelectorAll('.js-clear-filters').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault(); clearAll();}));
+      // Reels
+      clone.querySelector('.js-open-reels')?.addEventListener('click', ()=>document.getElementById('openReels')?.click());
+      wrap.appendChild(clone); chipsAffix.appendChild(wrap);
     }
     let io=null;
-    function rebuildObserver(){
+    function observeAffix(){
       if(io) io.disconnect();
-      const {topH} = currentOffsets();
-      io = new IntersectionObserver(([entry])=>{
-        const show = entry.intersectionRatio === 0;
+      io=new IntersectionObserver(([entry])=>{
+        const show = entry.intersectionRatio===0;
         chipsAffix.classList.toggle('visible', show);
         chipsAffix.setAttribute('aria-hidden', String(!show));
         setStickyVars();
-      }, { rootMargin:`-${Math.round(topH)}px 0px 0px 0px`, threshold:[0,1] });
+      },{rootMargin:`-${measure(topbarEl)}px 0px 0px 0px`,threshold:[0,1]});
       io.observe(sentinel);
     }
 
-    /* DOM refs for menu & cart */
+    /* ===== Menu & Options (from SHEET) ===== */
+
+    // NORMALIZE options from Google Sheet:
+    // Supported in each menu row under any of these columns: options | opts | Options | options_raw
+    // 1) JSON string:
+    //    [{"title":"الحجم","type":"single","required":true,"items":[{"label":"صغير","price":0},{"label":"كبير","price":5}]}]
+    // 2) DSL string (groups separated by ; or newline):
+    //    الحجم|single|required|صغير:0, كبير:5; الإضافات|multi|واسابي:0, أفوكادو:4
+    function parseOptionsRaw(raw){
+      try{
+        if(!raw) return [];
+        if(Array.isArray(raw)) return normalizeGroups(raw);
+        if(typeof raw==='object') return normalizeGroups(raw.options||raw.groups||[]);
+        const text = String(raw).trim();
+        if(!text) return [];
+        if(/^(\[|\{)/.test(text)){ const j=JSON.parse(text); return Array.isArray(j)?normalizeGroups(j):normalizeGroups(j.options||j.groups||[]); }
+        return parseDSL(text);
+      }catch{ return []; }
+    }
+    function normalizeGroups(arr){
+      const out=[];
+      (arr||[]).forEach((g,gi)=>{
+        if(!g) return;
+        const items = (g.items||g.choices||[]).map((it,ii)=>({
+          id: it.id ?? String(ii),
+          label: it.label ?? it.title ?? ('خيار '+(ii+1)),
+          price: Number(it.price ?? it.add ?? 0)
+        }));
+        out.push({
+          id: g.id ?? ('g'+gi),
+          title: g.title ?? g.name ?? 'اختيار',
+          type: (g.type||'single').toLowerCase()==='multi' ? 'multi' : 'single',
+          required: !!g.required,
+          items
+        });
+      });
+      return out;
+    }
+    function parseDSL(text){
+      const lines = text.split(/\n|;/).map(s=>s.trim()).filter(Boolean);
+      const groups=[];
+      for(let li=0; li<lines.length; li++){
+        const line = lines[li];
+        const parts = line.split('|').map(s=>s.trim()).filter(Boolean);
+        if(parts.length===0) continue;
+        const g={ id:'g'+li, title:parts[0]||'اختيار', type:'single', required:false, items:[] };
+        // read flags
+        for(let i=1;i<parts.length;i++){
+          const tk = parts[i];
+          if(/^(single|multi)$/i.test(tk)) g.type = tk.toLowerCase()==='multi'?'multi':'single';
+          else if(/^\*|required|إلزامي/i.test(tk)) g.required = true;
+          else if(/:/.test(tk) || /=/.test(tk)){ // items segment
+            const seg = parts.slice(i).join('|'); // join rest
+            seg.split(/,|،/).forEach((pair,ii)=>{
+              const [labelRaw, priceRaw] = pair.split(/:|=/).map(s=> (s??'').trim());
+              if(!labelRaw) return;
+              const price = Number((priceRaw||'0').replace(/[^\d.\-]/g,'') || 0);
+              g.items.push({ id:String(ii), label:labelRaw, price:isNaN(price)?0:price });
+            });
+            break;
+          }
+        }
+        groups.push(g);
+      }
+      return groups;
+    }
+
+    async function fetchMenu(){
+      try{
+        const r=await fetch(GAS_WEBAPP_URL+'?action=menu.list');
+        const j=await r.json();
+        const data = j.ok?(j.data||[]):[];
+        // attach parsed options for each row from possible columns
+        return data.map((row,idx)=>{
+          const raw = row.options ?? row.opts ?? row.Options ?? row.options_raw ?? row.OPTIONS ?? '';
+          const groups = parseOptionsRaw(raw);
+          return { ...row, id: row.id ?? ('item_'+idx), _opts: groups };
+        });
+      }catch{ return []; }
+    }
+    // Optional: if you keep options in a separate sheet keyed by item id, enable this:
+    async function fetchOptionsMap(){ // returns Map<itemId, groups[]>
+      try{
+        const r=await fetch(GAS_WEBAPP_URL+'?action=options.list');
+        const j=await r.json();
+        if(!j.ok) return new Map();
+        const map=new Map();
+        (j.data||[]).forEach(row=>{
+          const id = String(row.itemId ?? row.id ?? '').trim();
+          if(!id) return;
+          const groups = parseOptionsRaw(row.options ?? row.opts ?? row.Options ?? row.options_raw);
+          if(groups.length) map.set(id, groups);
+        });
+        return map;
+      }catch{ return new Map(); }
+    }
+
+    function dishOptionGroups(d){
+      // prefer parsed groups from current row, then from joined optionsMap, then fallback
+      return Array.isArray(d._opts) && d._opts.length ? d._opts
+           : Array.isArray(d.options) ? normalizeGroups(d.options)
+           : Array.isArray(d.opts) ? normalizeGroups(d.opts)
+           : [];
+    }
+
+    /* ===== Render menu ===== */
+    const ORDERED_CATS=[{key:'sushi',label:'سوشي'},{key:'don',label:'دون'},{key:'meat',label:'لحوم'},{key:'drinks',label:'مشروبات'}];
     const sectionsRoot=document.getElementById('menuSections');
-    const emptyMsg=document.getElementById('emptyMsg');
     const dishTpl=document.getElementById('dishTpl');
-    const cartList=document.getElementById('cartList');
-    const cartLineTpl=document.getElementById('cartLineTpl');
+    const emptyMsg=document.getElementById('emptyMsg');
     const badge=document.getElementById('badge');
     const miniCount=document.getElementById('miniCount');
     const miniTotal=document.getElementById('miniTotal');
@@ -713,658 +598,256 @@
     const goCartBtn=document.getElementById('goCartBtn');
     const toDataBtn=document.getElementById('toDataBtn');
     const cartTotal=document.getElementById('cartTotal');
-    const confirmBtn=document.getElementById('confirmBtn');
-    const searchMain=document.getElementById('q');
-    const clearBtns=()=>[...document.querySelectorAll('.js-clear-filters')];
+    const cartList=document.getElementById('cartList');
+    function fmtSAR(n){return fmt.format(Number(n||0))}
+    function imgFallback(el){el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#e9e6df"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#8b877e" font-family="Arial" font-size="28">لا صورة</text></svg>`)}
 
-    /* Search toggle on main bar */
-    const searchBoxMain=document.querySelector('.chips-wrap .searchbox');
-    document.querySelectorAll('.js-search-toggle').forEach(btn=>{
-      btn.addEventListener('click',(e)=>{ e.preventDefault();
-        const open = !searchBoxMain.classList.contains('open');
-        const cloneBox = chipsAffix.querySelector('.searchbox');
-        [searchBoxMain, cloneBox].forEach(box=>{
-          if(!box) return;
-          box.classList.toggle('open', open);
-          const inp=box.querySelector('input[data-role="menu-search"]');
-          if(open && inp) setTimeout(()=>inp.focus(),10);
-        });
-      });
-    });
-
-    /* Fetch Menu */
-    async function fetchMenu(){
-      try{ const r=await fetch(GAS_WEBAPP_URL+'?action=menu.list'); const j=await r.json(); return j.ok?(j.data||[]):[]; }
-      catch{ return []; }
-    }
-
-    /* Categories order */
-    const ORDERED_CATS = [
-      {key:'sushi',  label:'سوشي'},
-      {key:'don',    label:'دون'},
-      {key:'meat',   label:'لحوم'},
-      {key:'drinks', label:'مشروبات'}
-    ];
-    function groupByCat(menu){
-      const groups = {};
-      menu.forEach(d=>{
-        const key = (d.cat||'').toLowerCase();
-        groups[key] = groups[key] || [];
-        groups[key].push(d);
-      });
-      return groups;
-    }
-
-    function imgFallback(el){
-      el.src='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><rect width="100%" height="100%" fill="#e9e6df"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#8b877e" font-family="Arial" font-size="28">لا صورة</text></svg>`);
-    }
-
-    /* Reveal on scroll */
-    let ro=null;
     function revealObserve(){
-      if(ro){ ro.disconnect(); ro=null; }
-      ro=new IntersectionObserver(es=>{
-        es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); ro.unobserve(e.target); }});
-      },{threshold:.2});
+      const ro=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in'); ro.unobserve(e.target);}})},{threshold:.2});
       document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
     }
+    function groupByCat(menu){const g={};menu.forEach(d=>{const k=(d.cat||'').toLowerCase();(g[k]=g[k]||[]).push(d)});return g}
 
-    /* ---- OPTIONS MODAL LOGIC (always show after selecting an item) ---- */
-    const optModalEl = document.getElementById('optModal');
-    const optModal   = bootstrap.Modal.getOrCreateInstance(optModalEl);
-    const optTitle   = document.getElementById('optTitle');
-    const optSummary = document.getElementById('optSummary');
-    const optForm    = document.getElementById('optForm');
-    const optMinus   = document.getElementById('optMinus');
-    const optPlus    = document.getElementById('optPlus');
-    const optQty     = document.getElementById('optQty');
-    const optPrice   = document.getElementById('optPrice');
-    const optNotes   = document.getElementById('optNotes');
-    const optAddBtn  = document.getElementById('optAddBtn');
-
-    let currentDish = null;
-
-    function dishOptionGroups(d){
-      // Supports d.options or d.opts (array of groups)
-      // Group shape: { id, title, type: 'single'|'multi', required?:bool, items:[{id,label,price}] }
-      const g = d?.options || d?.opts || [];
-      if (Array.isArray(g)) return g.filter(Boolean);
-      return []; // fallback: no groups
-    }
-
-    function formatPrice(n){ return fmt.format(Number(n||0)); }
+    // OPTIONS MODAL
+    const optModalEl=document.getElementById('optModal');
+    const optModal=bootstrap.Modal.getOrCreateInstance(optModalEl);
+    const optTitle=document.getElementById('optTitle');
+    const optSummary=document.getElementById('optSummary');
+    const optForm=document.getElementById('optForm');
+    const optMinus=document.getElementById('optMinus');
+    const optPlus=document.getElementById('optPlus');
+    const optQty=document.getElementById('optQty');
+    const optPrice=document.getElementById('optPrice');
+    const optNotes=document.getElementById('optNotes');
+    const optAddBtn=document.getElementById('optAddBtn');
+    let currentDish=null;
 
     function renderOptionGroups(d){
-      optForm.innerHTML = '';
+      optForm.innerHTML='';
       const groups = dishOptionGroups(d);
       if(!groups.length){
-        const hint=document.createElement('div');
-        hint.className='small';
-        hint.style.color='#4a4741';
-        hint.textContent='لا توجد إضافات — يمكنك تغيير الكمية وكتابة ملاحظة إن رغبت.';
-        optForm.appendChild(hint);
-        return;
+        const hint=document.createElement('div');hint.className='small';hint.style.color='#4a4741';hint.textContent='لا توجد إضافات — يمكنك تغيير الكمية وكتابة ملاحظة إن رغبت.';optForm.appendChild(hint);return;
       }
-
       groups.forEach((g,gi)=>{
-        const fs=document.createElement('fieldset');
-        fs.className='vstack gap-2';
-        const legend=document.createElement('legend');
-        legend.className='fw-bold';
-        legend.textContent = (g.title || 'اختيار') + (g.required?' *':'');
-        fs.appendChild(legend);
-
-        const type=(g.type||'single').toLowerCase();
-        const name = 'opt_'+(g.id||('g'+gi));
-
+        const fs=document.createElement('fieldset'); fs.className='vstack gap-2'; fs.dataset.required = g.required ? '1':'0';
+        const legend=document.createElement('legend'); legend.className='fw-bold'; legend.textContent=(g.title||'اختيار')+(g.required?' *':''); fs.appendChild(legend);
+        const name='opt_'+(g.id||('g'+gi));
         (g.items||[]).forEach((it,ii)=>{
           const id = `${name}_${ii}`;
-          const row=document.createElement('div');
-          row.className='form-check d-flex align-items-center justify-content-between border rounded-3 px-3 py-2';
-          row.style.borderColor='var(--border-on-light)';
-
-          const left=document.createElement('div');
-          left.className='d-flex align-items-center gap-2';
-
-          const input=document.createElement('input');
-          input.className='form-check-input';
-          input.type= type==='multi' ? 'checkbox' : 'radio';
-          input.name=name;
-          input.id=id;
-          input.value= it.id || (''+ii);
-          input.dataset.price = Number(it.price||0);
-          input.dataset.label = it.label || it.title || ('خيار '+(ii+1));
-
-          if(type!=='multi' && ii===0) input.checked=true; // default first for radio
-
-          const label=document.createElement('label');
-          label.className='form-check-label';
-          label.htmlFor=id;
-          label.textContent=input.dataset.label;
-
+          const row=document.createElement('div'); row.className='form-check d-flex align-items-center justify-content-between border rounded-3 px-3 py-2'; row.style.borderColor='var(--border-on-light)';
+          const left=document.createElement('div'); left.className='d-flex align-items-center gap-2';
+          const input=document.createElement('input'); input.className='form-check-input'; input.type=g.type==='multi'?'checkbox':'radio'; input.name=name; input.id=id; input.value=it.id??String(ii); input.dataset.price=Number(it.price||0); input.dataset.label=it.label||it.title||('خيار '+(ii+1));
+          if(g.type!=='multi' && ii===0) input.checked=true;
+          const label=document.createElement('label'); label.className='form-check-label'; label.htmlFor=id; label.textContent=input.dataset.label;
           left.append(input,label);
-
-          const price=document.createElement('span');
-          price.className='small';
-          price.style.color='#141414';
-          const addp = Number(it.price||0);
-          price.textContent = addp>0 ? ('+'+formatPrice(addp)) : 'مجاني';
-
-          row.append(left,price);
-          fs.appendChild(row);
+          const price=document.createElement('span'); price.className='small'; price.style.color='#141414'; const p=Number(it.price||0); price.textContent=p>0?('+'+fmtSAR(p)):'مجاني';
+          row.append(left,price); fs.appendChild(row);
         });
-
         optForm.appendChild(fs);
       });
     }
-
     function selectedOptions(){
-      const inputs=[...optForm.querySelectorAll('input[type="checkbox"],input[type="radio"]')];
-      const chosen = inputs.filter(i=>i.checked).map(i=>({
-        id: i.value,
-        label: i.dataset.label,
-        price: Number(i.dataset.price||0)
-      }));
-      return chosen;
+      return [...optForm.querySelectorAll('input[type="checkbox"],input[type="radio"]')].filter(i=>i.checked).map(i=>({id:i.value,label:i.dataset.label,price:Number(i.dataset.price||0),name:i.name}));
     }
-
-    function calcUnitPrice(d){
-      const base = Number(d?.price||0);
-      const add  = selectedOptions().reduce((s,o)=>s+(o.price||0),0);
-      return base + add;
+    function validateRequired(){
+      const sets=[...optForm.querySelectorAll('fieldset[data-required="1"]')];
+      for(const fs of sets){
+        const any=fs.querySelector('input:checked'); if(any) continue;
+        toast('اختر خياراً مطلوباً'); const focusEl=fs.querySelector('input'); if(focusEl) focusEl.focus(); return false;
+      }
+      return true;
     }
-
-    function updateOptPrice(){
+    function calcUnitPrice(d){return Number(d?.price||0)+selectedOptions().reduce((s,o)=>s+(o.price||0),0)}
+    function updateOptPrice(){ if(!currentDish) return; const unit=calcUnitPrice(currentDish); const qty=Math.max(1,Number(optQty.value||1)); optPrice.textContent=fmtSAR(unit*qty);}
+    function openOptions(d){
+      currentDish=d; optTitle.textContent=d.title||'خيارات إضافية'; optSummary.textContent=`السعر الأساسي: ${fmtSAR(Number(d.price||0))}`; optNotes.value=''; optQty.value=1;
+      renderOptionGroups(d); optForm.addEventListener('change', updateOptPrice, {once:false}); updateOptPrice(); optModal.show();
+    }
+    optMinus.addEventListener('click',()=>{optQty.value=Math.max(1,Number(optQty.value||1)-1);updateOptPrice()});
+    optPlus.addEventListener('click',()=>{optQty.value=Math.max(1,Number(optQty.value||1)+1);updateOptPrice()});
+    optQty.addEventListener('input',()=>{if(Number(optQty.value)<1) optQty.value=1; updateOptPrice()});
+    optAddBtn.addEventListener('click',()=>{
       if(!currentDish) return;
-      const unit = calcUnitPrice(currentDish);
-      const qty  = Math.max(1, Number(optQty.value||1));
-      optPrice.textContent = formatPrice(unit * qty);
-    }
-
-    function openOptions(dish){
-      currentDish = dish;
-      optTitle.textContent = dish.title || 'خيارات إضافية';
-      optSummary.textContent = `السعر الأساسي: ${formatPrice(Number(dish.price||0))}`;
-      optNotes.value = '';
-      optQty.value = 1;
-
-      renderOptionGroups(dish);
-      // Recalculate on any change
-      optForm.addEventListener('change', updateOptPrice, {once:false});
-      updateOptPrice();
-
-      optModal.show();
-    }
-    window.openOptions = openOptions; // also used by Reels
-
-    optMinus.addEventListener('click', ()=>{ const v=Math.max(1,Number(optQty.value||1)-1); optQty.value=v; updateOptPrice(); });
-    optPlus .addEventListener('click', ()=>{ const v=Math.max(1,Number(optQty.value||1)+1); optQty.value=v; updateOptPrice(); });
-    optQty  .addEventListener('input', ()=>{ if(Number(optQty.value)<1) optQty.value=1; updateOptPrice(); });
-
-    function addConfiguredLine(dish, qty, chosen, notes){
-      const unit = Number(dish.price||0) + chosen.reduce((s,o)=>s+(o.price||0),0);
-      const optText = chosen.length ? ' — ' + chosen.map(o=>o.label).join('، ') : '';
-      const title = (dish.title||'—') + optText + (notes?` (${notes})`:'');
-
-      const key=stableId(JSON.stringify({
-        id:dish.id, unit, opts:chosen.map(o=>o.id), notes:notes||''
-      }));
-      const exist=state.cart[key];
-      if(exist) exist.qty+=qty;
-      else state.cart[key]={lineId:key, id:dish.id, title, unitPrice:unit, qty, notes:notes||''};
-
-      bump(); bumpBadge(); toast(`أُضيف ${dish.title} ✅`);
-    }
-
-    optAddBtn.addEventListener('click', ()=>{
-      if(!currentDish) return;
-      optAddBtn.disabled=true; optAddBtn.classList.add('btn-loading');
-      const prev=optAddBtn.innerHTML;
-      optAddBtn.innerHTML=`جاري الإضافة <span class="spinner-border" role="status" aria-hidden="true"></span>`;
-
-      const qty = Math.max(1, Number(optQty.value||1));
-      const chosen = selectedOptions();
-      const notes = optNotes.value.trim();
-
+      if(!validateRequired()) return;
+      const chosen=selectedOptions(); const notes=optNotes.value.trim(); const qty=Math.max(1,Number(optQty.value||1));
       addConfiguredLine(currentDish, qty, chosen, notes);
-
-      setTimeout(()=>{
-        optModal.hide();
-        optAddBtn.disabled=false; optAddBtn.classList.remove('btn-loading'); optAddBtn.innerHTML=prev;
-      }, 350);
+      optModal.hide();
     });
-    /* ---- /OPTIONS MODAL LOGIC ---- */
 
-    /* Render sections */
     function renderSections(){
       const q=(state.q||'').trim().toLowerCase();
-      const groups = groupByCat(state.menu);
-      sectionsRoot.innerHTML='';
-      let totalMatches=0;
-
+      const groups=groupByCat(state.menu); sectionsRoot.innerHTML=''; let totalMatches=0;
       ORDERED_CATS.forEach(({key,label})=>{
-        const items = (groups[key] || []).filter(d=>{
-          const inTxt = !q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q);
-          return inTxt;
-        });
+        const items=(groups[key]||[]).filter(d=>!q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q));
         if(!items.length) return;
-
-        const sec = document.createElement('section');
-        sec.className = 'menu-section';
-        sec.id = 'sec-'+key;
-
-        const title = document.createElement('h5');
-        title.className = 'sec-title';
-        title.textContent = label;
-        sec.appendChild(title);
-
-        const grid = document.createElement('div');
-        grid.className = 'menu-grid';
-
+        const sec=document.createElement('section'); sec.className='menu-section'; sec.id='sec-'+key;
+        const title=document.createElement('h5'); title.className='sec-title'; title.textContent=label; sec.appendChild(title);
+        const grid=document.createElement('div'); grid.className='menu-grid';
         items.forEach(d=>{
-          const node=dishTpl.content.firstElementChild.cloneNode(true);
-          node.dataset.cat = key;
-
-          const img=node.querySelector('.dish-img');
-          img.alt=d.title||''; img.addEventListener('error',()=>imgFallback(img));
-          if(d.img && /^https?:\/\//.test(d.img)) img.src=d.img; else imgFallback(img);
-
+          const node=dishTpl.content.firstElementChild.cloneNode(true); node.dataset.cat=key;
+          const img=node.querySelector('.dish-img'); img.alt=d.title||''; img.addEventListener('error',()=>imgFallback(img)); if(d.img && /^https?:\/\//.test(d.img)) img.src=d.img; else imgFallback(img);
           node.querySelector('.title').textContent=d.title||'—';
           node.querySelector('.desc').textContent=d.desc||'';
-          const pEl=node.querySelector('.price'); pEl.textContent=fmt.format(Number(d.price||0)); pEl.style.color='var(--gold)';
-          const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,3).forEach(t=>{ const s=document.createElement('span'); s.className='tag'; s.textContent=t; tags.appendChild(s); });
-
-          // OPEN OPTIONS ON CLICK (always show the window)
-          node.querySelector('.add-btn').addEventListener('click', (ev)=> openOptions(d));
-
+          node.querySelector('.price').textContent=fmtSAR(Number(d.price||0));
+          const tags=node.querySelector('.tags'); (d.tags||[]).slice(0,3).forEach(t=>{const s=document.createElement('span');s.className='tag';s.textContent=t;tags.appendChild(s);});
+          // Always open options (taken from sheet) when adding
+          node.querySelector('.add-btn').addEventListener('click',()=>openOptions(d));
           grid.appendChild(node);
         });
-
-        sec.appendChild(grid);
-        sectionsRoot.appendChild(sec);
-        totalMatches += items.length;
+        sec.appendChild(grid); sectionsRoot.appendChild(sec); totalMatches+=items.length;
       });
-
       emptyMsg.classList.toggle('d-none', totalMatches>0);
-      clearBtns().forEach(btn=>btn.classList.toggle('d-none', !state.q.trim()));
-
-      setupScrollspy();
-      revealObserve();
-      setStickyVars();
+      document.querySelectorAll('.js-clear-filters').forEach(btn=>btn.classList.toggle('d-none', !(state.q||'').trim()));
+      setupScrollspy(); revealObserve(); setStickyVars();
     }
 
-    /* Chips: click -> scroll (main bar) */
-    document.getElementById('chips').addEventListener('click',(e)=>{
-      const b=e.target.closest('.chip[data-target]');
-      if(!b) return;
-      e.preventDefault();
-      scrollToSelector(b.dataset.target);
-    });
+    /* Chips: click -> smooth scroll */
+    function totalFixedHeight(){return (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h'))||0)+(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chips-h'))||0)}
+    function scrollToSelector(sel){const t=document.querySelector(sel); if(!t) return; const y=t.getBoundingClientRect().top+window.scrollY-totalFixedHeight()-8; window.scrollTo({top:Math.max(0,y),behavior:'smooth'})}
+    document.getElementById('chips').addEventListener('click',(e)=>{const b=e.target.closest('.chip[data-target]'); if(!b) return; e.preventDefault(); scrollToSelector(b.dataset.target);});
 
-    function totalFixedHeight(){
-      const topH  = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h'))  || 0;
-      const chipsH= parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--chips-h'))   || 0;
-      return topH + chipsH;
-    }
-    function scrollToSelector(sel){
-      const target = document.querySelector(sel);
-      if(!target) return;
-      const y = target.getBoundingClientRect().top + window.scrollY - totalFixedHeight() - 8;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-    }
-
-    /* Scrollspy for chips (update active in BOTH bars) */
-    let spyObserver=null;
+    /* Scrollspy */
+    let spy=null;
     function setupScrollspy(){
-      if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
-      const allChips = [...document.querySelectorAll('#chips .chip[data-target], #chipsAffix .chip[data-target]')];
-      spyObserver = new IntersectionObserver((entries)=>{
-        const first = entries.filter(e=>e.isIntersecting)
-                             .sort((a,b)=>b.intersectionRatio - a.intersectionRatio)[0];
-        if(!first) return;
-        const id = '#'+first.target.id;
-        allChips.forEach(c=>c.classList.toggle('active', c.dataset.target===id || (id==='#topOfMenu' && c.dataset.target==='#topOfMenu')));
-      },{
-        rootMargin: '-40% 0px -50% 0px',
-        threshold: [0.2,0.4,0.6,0.8,1]
-      });
-      document.querySelectorAll('.menu-section').forEach(sec=>spyObserver.observe(sec));
-      const top = document.getElementById('topOfMenu'); if(top) spyObserver.observe(top);
+      if(spy){spy.disconnect(); spy=null;}
+      const chips=[...document.querySelectorAll('#chips .chip[data-target], #chipsAffix .chip[data-target]')];
+      spy=new IntersectionObserver((entries)=>{
+        const first=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+        if(!first) return; const id='#'+first.target.id;
+        chips.forEach(c=>c.classList.toggle('active', c.dataset.target===id || (id==='#topOfMenu' && c.dataset.target==='#topOfMenu')));
+      },{rootMargin:'-40% 0px -50% 0px',threshold:[0.2,0.4,0.6,0.8,1]});
+      document.querySelectorAll('.menu-section').forEach(sec=>spy.observe(sec));
+      const top=document.getElementById('topOfMenu'); if(top) spy.observe(top);
     }
 
-    /* Search logic */
+    /* Search */
+    const mainBox=document.querySelector('.chips-wrap .searchbox');
+    document.querySelectorAll('.js-search-toggle').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault();const open=!mainBox.classList.contains('open');const cloneBox=chipsAffix.querySelector('.searchbox');[mainBox,cloneBox].forEach(b=>{b.classList.toggle('open',open);const i=b?.querySelector('[data-role="menu-search"]'); if(open&&i) setTimeout(()=>i.focus(),10);});}));
+    const mainInput=document.querySelector('.chips-wrap [data-role="menu-search"]');
     let t=null;
-    function onSearchInput(val){
-      state.q = val || '';
-      renderSections();
-    }
-    // main input
-    searchMain.addEventListener('input', e=>{
-      clearTimeout(t);
-      const val=e.target.value;
-      const aff = chipsAffix.querySelector('input[data-role="menu-search"]');
-      if(aff && aff.value!==val) aff.value = val;
-      t=setTimeout(()=> onSearchInput(val), 160);
-    });
-    function clearAll(){
-      state.q=''; searchMain.value='';
-      const aff = chipsAffix.querySelector('input[data-role="menu-search"]');
-      if(aff) aff.value='';
-      renderSections();
-      document.getElementById('topOfMenu').scrollIntoView({behavior:'smooth',block:'start'});
-    }
-    clearBtns().forEach(btn=>btn.addEventListener('click', (e)=>{ e.preventDefault(); clearAll(); }));
+    function onSearch(val){state.q=val||''; renderSections();}
+    mainInput.addEventListener('input',e=>{clearTimeout(t); const val=e.target.value; const aff=chipsAffix.querySelector('[data-role="menu-search"]'); if(aff && aff.value!==val) aff.value=val; t=setTimeout(()=>onSearch(val),160)});
+    function clearAll(){state.q=''; mainInput.value=''; const aff=chipsAffix.querySelector('[data-role="menu-search"]'); if(aff) aff.value=''; renderSections(); document.getElementById('topOfMenu').scrollIntoView({behavior:'smooth',block:'start'});}
+    document.querySelectorAll('.js-clear-filters').forEach(btn=>btn.addEventListener('click',(e)=>{e.preventDefault(); clearAll();}));
 
     /* Cart */
-    function stableId(str){ let h=0; for(let i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36); }
-    function cartArr(){ return Object.values(state.cart); }
-    function totals(){ const arr=cartArr(); return {count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr}; }
+    function stableId(str){let h=0; for(let i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i); h|=0;} return 'l_'+Math.abs(h).toString(36)}
+    function cartArr(){return Object.values(state.cart)}
+    function totals(){const arr=cartArr(); return {count:arr.reduce((a,b)=>a+b.qty,0), total:arr.reduce((a,b)=>a+b.qty*b.unitPrice,0), arr}}
     function bump(){
-      const t=totals();
-      badge.textContent=t.count; miniCount.textContent=`${t.count} عنصر`; miniTotal.textContent=fmt.format(t.total); cartTotal.textContent=fmt.format(t.total);
-      const need=Math.max(0, FREE_SHIP - t.total);
-      miniHint.textContent = need>0 ? `تبقى ${fmt.format(need)} للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
+      const t=totals(); badge.textContent=t.count; miniCount.textContent=`${t.count} عنصر`; miniTotal.textContent=fmtSAR(t.total); cartTotal.textContent=fmtSAR(t.total);
+      const need=Math.max(0, FREE_SHIP - t.total); miniHint.textContent = need>0 ? `تبقى ${fmtSAR(need)} للتوصيل المجاني 🎁` : `🎁 حصلت على توصيل مجاني`;
       localStorage.setItem('hk_cart_v3', JSON.stringify(state.cart));
       const has=t.count>0; goCartBtn.classList.toggle('disabled',!has); goCartBtn.setAttribute('aria-disabled',String(!has)); toDataBtn.classList.toggle('disabled',!has); toDataBtn.setAttribute('aria-disabled',String(!has));
       renderCartList();
     }
-    function bumpBadge(){ badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
-
+    function addConfiguredLine(dish, qty, chosen, notes){
+      const unit = Number(dish.price||0) + (chosen||[]).reduce((s,o)=>s+(Number(o.price)||0),0);
+      const optText = (chosen||[]).length ? ' — '+chosen.map(o=>o.label).join('، ') : '';
+      const title = (dish.title||'—') + optText + (notes?` (${notes})`:'');
+      const key=stableId(JSON.stringify({id:dish.id, unit, opts:(chosen||[]).map(o=>o.id), notes:notes||''}));
+      const ex=state.cart[key]; if(ex) ex.qty+=qty; else state.cart[key]={lineId:key,id:dish.id,title,unitPrice:unit,qty,notes:notes||''};
+      bump(); bumpBadge(); toast(`أُضيف ${dish.title} ✅`);
+    }
     function renderCartList(){
-      cartList.innerHTML='';
-      const {arr}=totals();
+      cartList.innerHTML=''; const {arr}=totals();
       if(!arr.length){ const p=document.createElement('p'); p.className='text-secondary text-center my-4'; p.style.color='#4a4741'; p.textContent='السلة فارغة'; cartList.appendChild(p); return; }
       arr.forEach(it=>{
         const row=cartLineTpl.content.firstElementChild.cloneNode(true);
         row.querySelector('.name').textContent=it.title;
         row.querySelector('.unit').textContent=Number(it.unitPrice||0).toFixed(2);
         row.querySelector('.qty').textContent=it.qty;
-        row.querySelector('.total').textContent=fmt.format(it.qty*it.unitPrice);
-        row.querySelector('.minus').addEventListener('click', ()=>{ if(state.cart[it.lineId].qty>1) state.cart[it.lineId].qty--; else delete state.cart[it.lineId]; bump(); });
-        row.querySelector('.plus').addEventListener('click',  ()=>{ state.cart[it.lineId].qty++; bump(); });
+        row.querySelector('.total').textContent=fmtSAR(it.qty*it.unitPrice);
+        row.querySelector('.minus').addEventListener('click',()=>{ if(state.cart[it.lineId].qty>1) state.cart[it.lineId].qty--; else delete state.cart[it.lineId]; bump(); });
+        row.querySelector('.plus').addEventListener('click',()=>{ state.cart[it.lineId].qty++; bump(); });
         cartList.appendChild(row);
       });
     }
-    const saved=localStorage.getItem('hk_cart_v3'); if(saved){ try{ state.cart=JSON.parse(saved)||{}; }catch{} }
+    const saved=localStorage.getItem('hk_cart_v3'); if(saved){try{state.cart=JSON.parse(saved)||{}}catch{}}
 
-    /* Data form */
-    const segPick=document.getElementById('segPickup');
-    const segDel=document.getElementById('segDelivery');
-    const addrWrap=document.getElementById('addressWrap');
-    const nameEl=document.getElementById('custName');
-    const phoneEl=document.getElementById('custPhone');
-    const addrEl=document.getElementById('address');
-    const notesEl=document.getElementById('notes');
-
+    /* Data form + confirm */
+    const segPick=document.getElementById('segPickup'), segDel=document.getElementById('segDelivery'), addrWrap=document.getElementById('addressWrap');
+    const nameEl=document.getElementById('custName'), phoneEl=document.getElementById('custPhone'), addrEl=document.getElementById('address'), notesEl=document.getElementById('notes'), confirmBtn=document.getElementById('confirmBtn');
     const iti=window.intlTelInput(phoneEl,{ initialCountry:'sa', onlyCountries:['sa','ae','bh','kw','om','qa'], separateDialCode:true });
-
-    function setType(delivery){ segPick.setAttribute('aria-pressed',String(!delivery)); segDel.setAttribute('aria-pressed',String(delivery)); addrWrap.style.display=delivery?'':'none'; if(delivery) setTimeout(()=>addrEl.focus(),80); }
+    function setType(delivery){segPick.setAttribute('aria-pressed',String(!delivery));segDel.setAttribute('aria-pressed',String(delivery));addrWrap.style.display=delivery?'':'none'; if(delivery) setTimeout(()=>addrEl.focus(),80)}
     segPick.onclick=()=>setType(false); segDel.onclick=()=>setType(true); setType(false);
-    notesEl.addEventListener('input', ()=>{ document.getElementById('notesCount').textContent=(notesEl.value||'').length; });
+    notesEl.addEventListener('input',()=>{document.getElementById('notesCount').textContent=(notesEl.value||'').length});
     function validate(){
-      const nameOk=(nameEl.value||'').trim().length>1;
-      let phoneOk=false; try{ phoneOk=iti.isValidNumber(); }catch(_){ phoneOk=(phoneEl.value||'').trim().length>=8; }
-      const delivery=segDel.getAttribute('aria-pressed')==='true';
-      const addressOk=!delivery || (addrEl.value||'').trim().length>3;
+      const nameOk=(nameEl.value||'').trim().length>1; let phoneOk=false; try{phoneOk=iti.isValidNumber();}catch{phoneOk=(phoneEl.value||'').trim().length>=8}
+      const delivery=segDel.getAttribute('aria-pressed')==='true'; const addressOk=!delivery || (addrEl.value||'').trim().length>3;
       document.getElementById('err-name').classList.toggle('d-none',nameOk);
       document.getElementById('ok-phone').classList.toggle('d-none',!phoneOk);
       document.getElementById('err-phone').classList.toggle('d-none',phoneOk);
       document.getElementById('err-address').classList.toggle('d-none',addressOk);
       return nameOk && phoneOk && addressOk;
     }
-    ['input','blur'].forEach(ev=>{
-      nameEl.addEventListener(ev, validate);
-      phoneEl.addEventListener(ev, ()=>setTimeout(validate, ev==='blur'?0:120));
-      addrEl.addEventListener(ev, validate);
-    });
+    ['input','blur'].forEach(ev=>{nameEl.addEventListener(ev,validate);phoneEl.addEventListener(ev,()=>setTimeout(validate,ev==='blur'?0:120));addrEl.addEventListener(ev,validate);});
 
-    /* Confirm & Thanks */
     async function createOrder(payload){
       const r=await fetch(GAS_WEBAPP_URL+'?action=order.create',{ method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
       return r.json();
     }
-    const thOrderId=document.getElementById('thOrderId');
-    const thTotal=document.getElementById('thTotal');
-    const thType=document.getElementById('thType');
-    const thTicket=document.getElementById('thTicket');
-    const thDate=document.getElementById('thDate');
-
-    function todayKey(){
-      const d=new Date(); const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const day=String(d.getDate()).padStart(2,'0');
-      return `${y}-${m}-${day}`;
-    }
-    function nextDailyTicketLocal(){
-      const key=todayKey(); const savedDay=localStorage.getItem('hk_ticket_day'); let seq=Number(localStorage.getItem('hk_ticket_seq')||0);
-      if(savedDay!==key) seq=0; seq=(seq%9999)+1; localStorage.setItem('hk_ticket_day',key); localStorage.setItem('hk_ticket_seq',String(seq)); return String(seq).padStart(4,'0');
-    }
-    function setThankDate(){ const d=new Date(); thDate.textContent=d.toLocaleDateString('ar-SA',{ weekday:'short', year:'numeric', month:'2-digit', day:'2-digit'}); }
-    async function copy(text){ try{ await navigator.clipboard.writeText(text); toast('تم النسخ ✅'); }catch{ toast('تعذّر النسخ'); } }
-
-    function renderThanks({orderId, totals, payload}){
-      const t4 = nextDailyTicketLocal(); thTicket.textContent=t4; setThankDate();
-      thOrderId.textContent = orderId || '—';
-      thTotal.textContent = typeof totals?.total === 'number' ? fmt.format(totals.total) : fmt.format(totals || 0);
-      thType.textContent  = payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام';
-      document.getElementById('copyTicket').onclick = ()=>copy(`تذكرة ${t4} • ${todayKey()}`);
-      document.getElementById('copySummary').onclick = ()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`);
-    }
+    const thOrderId=document.getElementById('thOrderId'), thTotal=document.getElementById('thTotal'), thType=document.getElementById('thType'), thTicket=document.getElementById('thTicket'), thDate=document.getElementById('thDate');
+    function todayKey(){const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+    function nextDailyTicketLocal(){const key=todayKey(); const savedDay=localStorage.getItem('hk_ticket_day'); let seq=Number(localStorage.getItem('hk_ticket_seq')||0); if(savedDay!==key) seq=0; seq=(seq%9999)+1; localStorage.setItem('hk_ticket_day',key); localStorage.setItem('hk_ticket_seq',String(seq)); return String(seq).padStart(4,'0')}
+    function setThankDate(){ const d=new Date(); thDate.textContent=d.toLocaleDateString('ar-SA',{weekday:'short',year:'numeric',month:'2-digit',day:'2-digit'})}
+    async function copy(text){ try{await navigator.clipboard.writeText(text); toast('تم النسخ ✅')}catch{toast('تعذّر النسخ')} }
+    function renderThanks({orderId, totals, payload}){const t4=nextDailyTicketLocal(); thTicket.textContent=t4; setThankDate(); thOrderId.textContent=orderId||'—'; thTotal.textContent=typeof totals?.total==='number'?fmtSAR(totals.total):fmtSAR(totals||0); thType.textContent=payload.type==='delivery'?'نوع الطلب: توصيل':'نوع الطلب: استلام'; document.getElementById('copyTicket').onclick=()=>copy(`تذكرة ${t4} • ${todayKey()}`); document.getElementById('copySummary').onclick=()=>copy(`طلب Maison Hikari\nتذكرة: ${t4}\n${thType.textContent}\nالإجمالي: ${thTotal.textContent}`)}
 
     const submitLoading=document.getElementById('submitLoading');
-
     confirmBtn.onclick=async()=>{
-      const t=totals();
-      if(t.count===0){ toast('السلة فارغة'); switchTab('menu'); return; }
-      if(!validate()){ window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return; }
-
-      let phone=phoneEl.value.trim(); try{ phone=iti.getNumber(); }catch(_){}
-      const payload={
-        type: segDel.getAttribute('aria-pressed')==='true'?'delivery':'pickup',
-        name: nameEl.value.trim(), phone, address: addrEl.value.trim(), notes: notesEl.value.trim(),
-        items: t.arr.map(x=>({ id:x.id, title:x.title, qty:x.qty, price:x.unitPrice }))
-      };
-
-      const prevHTML = confirmBtn.innerHTML;
-      confirmBtn.disabled=true; confirmBtn.classList.add('btn-loading');
-      confirmBtn.innerHTML = `جارٍ التأكيد <span class="spinner-border" role="status" aria-hidden="true"></span>`;
+      const t=totals(); if(t.count===0){toast('السلة فارغة'); switchTab('menu'); return;}
+      if(!validate()){window.scrollTo({top:0,behavior:'smooth'}); toast('أكمل البيانات المطلوبة'); return;}
+      let phone=phoneEl.value.trim(); try{phone=iti.getNumber();}catch{}
+      const payload={ type: segDel.getAttribute('aria-pressed')==='true'?'delivery':'pickup', name:nameEl.value.trim(), phone, address:addrEl.value.trim(), notes:notesEl.value.trim(), items:t.arr.map(x=>({id:x.id,title:x.title,qty:x.qty,price:x.unitPrice})) };
+      const prevHTML=confirmBtn.innerHTML; confirmBtn.disabled=true; confirmBtn.classList.add('btn-loading'); confirmBtn.innerHTML=`جارٍ التأكيد <span class="spinner-border" role="status" aria-hidden="true"></span>`;
       submitLoading.classList.add('show');
-      try{
-        const res=await createOrder(payload);
-        if(res && res.ok){
-          localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address}));
-          state.cart={}; bump();
-          renderThanks({ orderId:res.orderId, totals:res.totals||t.total, payload });
-          state.unlockThanks = true; switchTab('thanks');
-        } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); }
-      }catch{ toast('خطأ في الاتصال بالخدمة'); }
-      finally{
-        confirmBtn.disabled=false; confirmBtn.classList.remove('btn-loading');
-        confirmBtn.innerHTML = prevHTML;
-        submitLoading.classList.remove('show');
-      }
+      try{ const res=await createOrder(payload); if(res && res.ok){ localStorage.setItem('hk_user_v1', JSON.stringify({name:payload.name, phone:phoneEl.value, address:payload.address})); state.cart={}; bump(); renderThanks({orderId:res.orderId, totals:res.totals||t.total, payload}); state.unlockThanks=true; switchTab('thanks'); } else { toast('تعذر إرسال الطلب، حاول لاحقًا'); } }
+      catch{ toast('خطأ في الاتصال بالخدمة'); }
+      finally{ confirmBtn.disabled=false; confirmBtn.classList.remove('btn-loading'); confirmBtn.innerHTML=prevHTML; submitLoading.classList.remove('show'); }
     };
 
     /* INIT */
     (async()=>{
-      const appLoading=document.getElementById('appLoading');
-      appLoading.classList.add('show');
-      try{
-        const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}');
-        if(savedInfo.name) document.getElementById('custName').value=savedInfo.name;
-        if(savedInfo.phone) document.getElementById('custPhone').value=savedInfo.phone;
-        if(savedInfo.address){ document.getElementById('address').value=savedInfo.address; setType(true); }
-      }catch{}
-      state.menu=await fetchMenu();
+      const appLoading=document.getElementById('appLoading'); appLoading.classList.add('show');
+      try{ const savedInfo=JSON.parse(localStorage.getItem('hk_user_v1')||'{}'); if(savedInfo.name) document.getElementById('custName').value=savedInfo.name; if(savedInfo.phone) document.getElementById('custPhone').value=savedInfo.phone; if(savedInfo.address){ document.getElementById('address').value=savedInfo.address; setType(true);} }catch{}
+      // Load menu + (optional) separate options sheet and merge
+      const [menu, optMap] = await Promise.all([fetchMenu(), fetchOptionsMap()]);
+      if(optMap && optMap.size){ menu.forEach(d=>{ const g=optMap.get(String(d.id)); if(g && g.length) d._opts=g; }); }
+      state.menu = menu;
       if(!state.menu.length) setTimeout(()=>toast('لم يتم إعداد القائمة من الخلفية بعد'),600);
-      renderSections(); setStep('menu');
-      buildAffix(); setStickyVars(); rebuildObserver();
-      bump();
-      appLoading.classList.remove('show');
+
+      // Show menu
+      renderSections(); setStep('menu'); buildAffix(); observeAffix(); bump(); appLoading.classList.remove('show');
     })();
-  });
-  </script>
 
-  <!-- Reels module (snap + a11y + spinner) -->
-  <script>
-  (() => {
-    const reels = document.getElementById('reels');
-    const list  = document.getElementById('reelsList');
-    const open  = document.getElementById('openReels');
-    const closeBtn = document.getElementById('closeReels');
-    const toCart= document.getElementById('reelsToCart');
-    const reelsLoading = document.getElementById('reelsLoading');
-
-    let currentIdx = 0;
-    let resizeHandler = null;
-
-    const WHEEL_THRESHOLD = 8;
-
-    function reelNode(dish, idx){
-      const div = document.createElement('section');
-      div.className = 'reel'; div.dataset.idx = idx;
-
-      const media = document.createElement('div');
-      media.className = 'media';
-      const img = document.createElement('img');
-      img.loading = 'lazy'; img.decoding='async'; img.alt = dish.title || '';
-      if (dish.img && /^https?:\/\//.test(dish.img)) img.dataset.src = dish.img;
-
-      const glass = document.createElement('div');
-      glass.className = 'glass';
-      const h3 = document.createElement('h3'); h3.className='title'; h3.textContent = dish.title || '—';
-      const dsc = document.createElement('div'); dsc.className='desc'; dsc.textContent = dish.desc || '';
-      const tagbox = document.createElement('div'); tagbox.className='tagbox';
-      (dish.tags||[]).slice(0,3).forEach(t => {
-        const span = document.createElement('span'); span.className='tag'; span.textContent = t;
-        tagbox.appendChild(span);
-      });
-      glass.append(h3, dsc, tagbox);
-
-      const cta = document.createElement('div'); cta.className = 'cta';
-      const add = document.createElement('button'); add.className='btn btn-dark flex-fill'; add.type='button';
-      add.textContent = `أضف للسلة — ${new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'}).format(Number(dish.price||0))}`;
-      // OPEN OPTIONS from Reels too
-      add.onclick = () => window.openOptions && window.openOptions(dish);
-
-      const more = document.createElement('button'); more.className='btn btn-outline-light'; more.type='button'; more.textContent='تفاصيل';
-      cta.append(add, more);
-
-      media.appendChild(img);
-      div.append(media, glass, cta);
-      return div;
-    }
-
-    function loadImgIn(el){ const img=el.querySelector('img[data-src]'); if(img && !img.src) img.src=img.dataset.src; }
-    function preloadAround(i){ const n=[...list.children]; [i-1,i,i+1].forEach(k=>n[k]&&loadImgIn(n[k])); }
-    function scrollToIndex(i, smooth=true){ const h=list.clientHeight||window.innerHeight; list.scrollTo({top:i*h, behavior:smooth?'smooth':'auto'}); }
-
-    const idxObserver = new IntersectionObserver(es=>{
-      es.forEach(e=>{
-        if(e.isIntersecting){
-          currentIdx = +e.target.dataset.idx||0;
-          preloadAround(currentIdx);
-        }
-      });
-    },{root:list,threshold:.6});
-
-    let wheelLocked=false, wheelTimer=null;
-    function onWheel(e){
-      if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
-      e.preventDefault();
-      if(wheelLocked) return;
-      wheelLocked=true;
-      const dir = e.deltaY>0?1:-1, max=list.children.length-1;
-      const next = Math.min(Math.max(currentIdx+dir,0),max);
-      if(next!==currentIdx) scrollToIndex(next,true);
-      clearTimeout(wheelTimer); wheelTimer=setTimeout(()=>wheelLocked=false,300);
-    }
-    let touchStartY=null; const SWIPE=28;
-    function onTouchStart(e){ touchStartY = e.touches?.[0]?.clientY??null; }
-    function onTouchEnd(e){
-      if(touchStartY==null) return;
-      const endY=e.changedTouches?.[0]?.clientY??touchStartY; const dy=touchStartY-endY; touchStartY=null;
-      if(Math.abs(dy)<SWIPE) return scrollToIndex(currentIdx,true);
-      const dir=dy>0?1:-1, max=list.children.length-1;
-      const next=Math.min(Math.max(currentIdx+dir,0),max);
-      if(next!==currentIdx) scrollToIndex(next,true);
-    }
-
-    function onKeys(e){
-      if(!reels.classList.contains('show')) return;
-      if(['ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); step(1); }
-      else if(['ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); step(-1); }
-      else if(e.key==='Escape'){ closeReels(); }
-    }
-    function step(dir){
-      const max=list.children.length-1;
-      const next=Math.min(Math.max(currentIdx+dir,0),max);
-      if(next!==currentIdx) scrollToIndex(next,true);
-    }
-
-    function openReels(){
-      const q=(window.state?.q||'').toLowerCase();
-      const filtered=(window.state?.menu||[]).filter(d=>!q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q));
-      if(!filtered.length){ window.toast && window.toast('لا توجد أطباق مطابقة لعرض الرييل'); return; }
-
-      list.innerHTML='';
-      reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
-      reelsLoading.hidden=false;
-
-      filtered.forEach((d,i)=>list.appendChild(reelNode(d,i)));
-
-      list.focus({preventScroll:true});
-      currentIdx=0; preloadAround(0);
-
-      const firstImg = list.querySelector('img[data-src]') || list.querySelector('img');
-      let done=false;
-      const hideLoader = ()=>{ if(done) return; done=true; reelsLoading.hidden=true; };
-      if(firstImg){
-        firstImg.addEventListener('load', hideLoader, {once:true});
-        firstImg.addEventListener('error', hideLoader, {once:true});
+    /* Reels quick module (open) */
+    (function(){
+      const reels=document.getElementById('reels'), list=document.getElementById('reelsList'), open=document.getElementById('openReels'), closeBtn=document.getElementById('closeReels'), toCart=document.getElementById('reelsToCart'), reelsLoading=document.getElementById('reelsLoading');
+      function reelNode(d){
+        const div=document.createElement('section'); div.className='reel';
+        const media=document.createElement('div'); media.className='media';
+        const img=document.createElement('img'); img.loading='lazy'; img.decoding='async'; img.alt=d.title||''; if(d.img && /^https?:\/\//.test(d.img)) img.dataset.src=d.img; media.appendChild(img);
+        const glass=document.createElement('div'); glass.className='glass'; const h3=document.createElement('h3'); h3.className='title'; h3.textContent=d.title||'—'; const dsc=document.createElement('div'); dsc.className='desc'; dsc.textContent=d.desc||''; const tagbox=document.createElement('div'); tagbox.className='tagbox'; (d.tags||[]).slice(0,3).forEach(t=>{const s=document.createElement('span');s.className='tag';s.textContent=t;tagbox.appendChild(s)}); glass.append(h3,dsc,tagbox);
+        const cta=document.createElement('div'); cta.className='cta'; const add=document.createElement('button'); add.className='btn btn-dark flex-fill'; add.type='button'; add.textContent=`أضف — ${fmtSAR(Number(d.price||0))}`; add.onclick=()=>openOptions(d); const more=document.createElement('button'); more.className='btn btn-outline-light'; more.type='button'; more.textContent='تفاصيل'; cta.append(add,more);
+        div.append(media,glass,cta); return div;
       }
-      setTimeout(hideLoader, 900);
+      function loadImgIn(el){const img=el.querySelector('img[data-src]'); if(img && !img.src) img.src=img.dataset.src;}
+      let idxObs=null; function openReels(){
+        const q=(state.q||'').toLowerCase(); const filtered=(state.menu||[]).filter(d=>!q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q));
+        if(!filtered.length){ toast('لا توجد أطباق مطابقة لعرض الرييل'); return; }
+        list.innerHTML=''; reels.classList.add('show'); reels.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; reelsLoading.hidden=false;
+        filtered.forEach(d=>list.appendChild(reelNode(d)));
+        const firstImg=list.querySelector('img[data-src]')||list.querySelector('img'); let done=false; const hide=()=>{if(done) return; done=true; reelsLoading.hidden=true}; if(firstImg){firstImg.addEventListener('load',hide,{once:true}); firstImg.addEventListener('error',hide,{once:true});} setTimeout(hide,900);
+        idxObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting) loadImgIn(e.target);})},{root:list,threshold:.6}); [...list.children].forEach(n=>idxObs.observe(n));
+      }
+      function closeReels(){reels.classList.remove('show'); reels.setAttribute('aria-hidden','true'); document.body.style.overflow=''; reelsLoading.hidden=true; if(idxObs){idxObs.disconnect(); idxObs=null;}}
+      open?.addEventListener('click', openReels); closeBtn?.addEventListener('click', closeReels); toCart?.addEventListener('click', ()=>{closeReels(); document.getElementById('openCart').click();});
+    })();
 
-      [...list.children].forEach(n=>idxObserver.observe(n));
-      list.addEventListener('wheel', onWheel, {passive:false});
-      list.addEventListener('touchstart', onTouchStart, {passive:true});
-      list.addEventListener('touchend', onTouchEnd, {passive:true});
-      document.addEventListener('keydown', onKeys);
-
-      resizeHandler = () => scrollToIndex(currentIdx,false);
-      window.addEventListener('resize', resizeHandler, {passive:true});
-    }
-
-    function closeReels(){
-      reels.classList.remove('show'); reels.setAttribute('aria-hidden','true'); document.body.style.overflow='';
-      reelsLoading.hidden=true;
-      idxObserver.disconnect();
-      list.removeEventListener('wheel', onWheel);
-      list.removeEventListener('touchstart', onTouchStart);
-      list.removeEventListener('touchend', onTouchEnd);
-      document.removeEventListener('keydown', onKeys);
-      if(resizeHandler){ window.removeEventListener('resize', resizeHandler); resizeHandler=null; }
-    }
-
-    open?.addEventListener('click', openReels);
-    document.addEventListener('click', (e)=>{
-      const btn = e.target.closest('.js-open-reels');
-      if(!btn) return;
-      if(btn.id === 'openReels') return;
-      e.preventDefault();
-      openReels();
-    });
-    closeBtn?.addEventListener('click', closeReels);
-    toCart?.addEventListener('click', ()=>{ closeReels(); document.getElementById('openCart').click(); });
-  })();
-  </script>
-
-  <!-- Theme color sync -->
-  <script>
-    const themeMeta = document.querySelector('meta[name="theme-color"]');
-    function setThemeColorMeta(){
-      const cs = getComputedStyle(document.documentElement).getPropertyValue('--charcoal').trim();
-      if(themeMeta && cs) themeMeta.setAttribute('content', cs);
-    }
-    window.addEventListener('load', setThemeColorMeta, {once:true});
+    /* Theme meta sync */
+    const themeMeta=document.querySelector('meta[name="theme-color"]'); function setThemeColorMeta(){const cs=getComputedStyle(document.documentElement).getPropertyValue('--charcoal').trim(); if(themeMeta && cs) themeMeta.setAttribute('content', cs);} window.addEventListener('load', setThemeColorMeta, {once:true});
+  });
   </script>
 </body>
 </html>
