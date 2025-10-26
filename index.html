@@ -98,60 +98,75 @@
     .overlay .box{background:#fff;color:#111;border:1px solid var(--rule);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);min-width:220px}
     .overlay .msg{margin-top:.5rem;color:#444;font-weight:800}
 
-    /* ===== Reel overlay (full-page) ===== */
+    /* ===== Reel overlay (full-page, improved) ===== */
     #reels { position: fixed; inset: 0; z-index: 1100; display: none; background: #000; color: #fff; }
     #reels.show { display: block; }
-    /* header floats above with gradient; fades when UI is hidden */
+
+    /* Header overlay + index */
     #reelsHeader{
       position: fixed; inset-inline: 0; inset-block-start: 0;
       display:flex; align-items:center; gap:8px; padding:10px 12px;
       background: linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,0));
-      z-index: 2; transition: opacity .2s ease;
+      z-index: 5; transition: opacity .2s ease;
     }
+    #reelIndex{
+      margin-inline-start:auto;
+      background: rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.25);
+      padding:.3rem .55rem; border-radius:999px; font-weight:800; font-size:.85rem;
+    }
+
     .reels-list{
-      height: 100dvh; /* dynamic viewport for mobile toolbars */
-      overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory;
+      height: 100dvh; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch; outline: none; touch-action: pan-y;
     }
     .reel{
       position: relative; height: 100dvh;
-      display: grid; grid-template-rows: 1fr; /* media fills; overlays are absolute */
+      display: grid; grid-template-rows: 1fr;
       scroll-snap-align: start; scroll-snap-stop: always; isolation: isolate;
     }
     .reel .media{
       position:absolute; inset:0; display:grid; place-items:center; background:#000; min-height:0;
     }
     .reel .media img{
-      width: 100vw; height: 100dvh;
-      object-fit: cover; /* full-page cover */
-      background:#000;
-      will-change: transform;
+      width: 100vw; height: 100dvh; object-fit: cover; background:#000;
+      will-change: transform; transform: translateZ(0);
     }
-    /* Glass text block */
+
+    /* Bottom glass info */
     .reel .glass{
       position:absolute; inset-inline:0; inset-block-end:0;
-      padding:16px 14px calc(18px + var(--safe-btm));
-      background:linear-gradient(0deg, rgba(0,0,0,.65), rgba(0,0,0,0) 60%);
-      color:#fff; z-index:1; transition: opacity .2s ease;
+      padding:18px 14px calc(22px + var(--safe-btm));
+      background:linear-gradient(0deg, rgba(0,0,0,.68), rgba(0,0,0,0) 60%);
+      color:#fff; z-index:3; transition: opacity .2s ease;
     }
     .reel .title{ font-weight:900; margin:0 0 6px; }
     .reel .desc{ opacity:.9; font-size:.95rem; }
     .reel .tagbox{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
     .reel .tag{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18); color:#fff; border-radius:999px; padding:4px 8px; font-size:.8rem; }
 
-    /* CTA bar (stays above safe area) */
+    /* CTA bar */
     .reel .cta{
       position:fixed; inset-inline:12px; inset-block-end:calc(12px + var(--safe-btm));
-      z-index:3; display:flex; gap:8px; transition: opacity .2s ease;
+      z-index:4; display:flex; gap:8px; transition: opacity .2s ease;
     }
     .reel .cta .btn{ border-radius:999px; font-weight:900; min-height:46px; }
-    .reel .cta .btn-primary{
-      background:var(--gold); border-color:var(--gold); color:#141414;
-    }
+    .reel .cta .btn-primary{ background:var(--gold); border-color:var(--gold); color:#141414; }
     .reel .cta .btn-outline-light{ border-color:rgba(255,255,255,.6) }
 
-    /* UI hide state on tap */
+    /* Side progress line */
+    #reelProgress{
+      position: fixed; inset-inline-start:10px; inset-block:60px 60px; width:3px; z-index:5; pointer-events:none; opacity:.9;
+      display:flex; flex-direction:column; gap:6px;
+    }
+    #reelProgress .bar{
+      flex:1 1 0; background:rgba(255,255,255,.25); border-radius:12px; overflow:hidden;
+    }
+    #reelProgress .bar > span{ display:block; width:100%; height:0%; background:#fff; transition:height .25s; }
+
+    /* UI hide state */
     #reels.ui-hidden #reelsHeader,
+    #reels.ui-hidden #reelProgress,
     #reels.ui-hidden .reel .glass,
     #reels.ui-hidden .reel .cta{ opacity:0; pointer-events:none; }
 
@@ -378,9 +393,11 @@
   <div id="reels" role="dialog" aria-modal="true" aria-label="استعراض الأطباق بشكل رييل" aria-hidden="true">
     <div id="reelsHeader" dir="rtl">
       <button id="closeReels" class="chip" type="button" aria-label="إغلاق">إغلاق</button>
-      <span class="small text-white-50 me-auto ms-2">اسحب للأعلى/الأسفل • اضغط على الصورة لإخفاء الواجهة</span>
+      <span class="small text-white-50 me-auto ms-2">اسحب للأعلى/الأسفل • اضغط لإخفاء الواجهة</span>
+      <span id="reelIndex">1 / 1</span>
       <button id="reelsToCart" class="chip" type="button" aria-label="فتح السلة">السلة</button>
     </div>
+    <div id="reelProgress" aria-hidden="true"></div>
     <div class="reels-list" id="reelsList" tabindex="0" aria-live="polite"></div>
   </div>
 
@@ -632,11 +649,10 @@
 
       emptyMsg.classList.toggle('d-none', totalMatches>0);
       clearFilters.classList.toggle('d-none', !state.q.trim());
-
       setStickyVars();
     }
 
-    /* Chips click -> scroll */
+    /* Chips click -> scroll + active spy */
     chips.addEventListener('click',(e)=>{
       const b=e.target.closest('.chip[data-target]');
       if(!b) return;
@@ -644,6 +660,21 @@
       chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
       b.classList.add('active');
     });
+    let spyObserver=null;
+    function setupScrollspy(){
+      if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
+      const chipMap=[...chips.querySelectorAll('.chip[data-target]')];
+      const sections=['#topOfMenu','#sec-sushi','#sec-don','#sec-meat','#sec-drinks']
+        .map(sel=>document.querySelector(sel)).filter(Boolean);
+      spyObserver = new IntersectionObserver((entries)=>{
+        const top = entries.filter(e=>e.isIntersecting)
+                           .sort((a,b)=>a.boundingClientRect.top - b.boundingClientRect.top)[0];
+        if(!top) return;
+        const id = '#'+top.target.id;
+        chipMap.forEach(c=>c.classList.toggle('active', c.dataset.target===id));
+      },{root:null, rootMargin:'-40% 0px -50% 0px', threshold:[0.25,0.6]});
+      sections.forEach(sec=>spyObserver.observe(sec));
+    }
 
     /* Search */
     let t=null;
@@ -865,24 +896,39 @@
       }
     };
 
-    /* ===== Reel (full-page cover + options) ===== */
+    /* ===== Reel (improved) ===== */
     const reels = document.getElementById('reels');
     const reelsList = document.getElementById('reelsList');
     const openReelsBtn = document.getElementById('openReels');
     const closeReelsBtn= document.getElementById('closeReels');
     const reelsToCart  = document.getElementById('reelsToCart');
+    const reelIndexEl  = document.getElementById('reelIndex');
+    const reelProgress = document.getElementById('reelProgress');
+
+    let currentIdx = 0;
+    let wheelLocked=false, wheelTimer=null;
+    let touchStartY=null;
+    const SWIPE=28, WHEEL_THRESHOLD=8;
 
     function filteredMenu(){
       const q=(state.q||'').toLowerCase();
       return state.menu.filter(d=>!q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q));
     }
+
+    function tryOpenOptionsFor(d){
+      const opts = OPTIONS_MAP[d.id];
+      if (opts && opts.groups?.length) { openOptions({ ...d, options: opts }); return true; }
+      return false;
+    }
+
     function reelNode(d, idx){
       const div = document.createElement('section');
       div.className='reel'; div.dataset.idx=idx;
 
       const media=document.createElement('div'); media.className='media';
       const img=document.createElement('img'); img.alt=d.title||''; img.loading='eager';
-      if(d.img && /^https?:\/\//.test(d.img)) img.src=d.img; else imgFallback(img);
+      if(d.img && /^https?:\/\//.test(d.img)) img.dataset.src=d.img; else img.src=''; // lazy via IO
+
       media.appendChild(img);
 
       const glass=document.createElement('div'); glass.className='glass';
@@ -897,45 +943,135 @@
       add.textContent=`أضف — ${new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'}).format(Number(d.price||0))}`;
       const optionsBtn=document.createElement('button'); optionsBtn.className='btn btn-outline-light'; optionsBtn.type='button'; optionsBtn.textContent='الخيارات';
 
-      // Open options if available; else fall back to add
-      const tryOpenOptions = () => {
-        const opts = OPTIONS_MAP[d.id];
-        if (opts && opts.groups?.length) { openOptions({ ...d, options: opts }); return true; }
-        return false;
-      };
-      add.onclick = () => { if (!tryOpenOptions()) addLine(d,1); };
-      optionsBtn.onclick = () => { if (!tryOpenOptions()) addLine(d,1); };
+      add.onclick = () => { if (!tryOpenOptionsFor(d)) addLine(d,1); };
+      optionsBtn.onclick = () => { if (!tryOpenOptionsFor(d)) addLine(d,1); };
 
-      // Also allow tapping the image to show options if present (nice UX)
-      media.addEventListener('click', tryOpenOptions);
+      media.addEventListener('click', ()=>{ if(!tryOpenOptionsFor(d)) reels.classList.toggle('ui-hidden'); });
 
       cta.append(add, optionsBtn);
-
       div.append(media, glass, cta);
       return div;
     }
+
+    function setReelIndex(i, total){
+      reelIndexEl.textContent = `${i+1} / ${total}`;
+      // progress columns
+      reelProgress.innerHTML='';
+      for(let k=0;k<total;k++){
+        const bar=document.createElement('div'); bar.className='bar';
+        const fill=document.createElement('span');
+        fill.style.height = k < i ? '100%' : (k===i ? '25%' : '0%');
+        bar.appendChild(fill);
+        reelProgress.appendChild(bar);
+      }
+    }
+
+    function loadImgIn(el){
+      const img=el.querySelector('img[data-src]');
+      if(img && !img.src){ img.src=img.dataset.src; }
+    }
+    function preloadAround(i){
+      const n=[...reelsList.children];
+      [i-1,i,i+1].forEach(k=>n[k]&&loadImgIn(n[k]));
+    }
+    function scrollToIndex(i, smooth=true){
+      const h=reelsList.clientHeight||window.innerHeight;
+      reelsList.scrollTo({top:i*h, behavior:smooth?'smooth':'auto'});
+    }
+
+    // IO for index / lazy load
+    const idxObserver = new IntersectionObserver(es=>{
+      const vis = es.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(!vis) return;
+      currentIdx = +vis.target.dataset.idx||0;
+      setReelIndex(currentIdx, reelsList.children.length);
+      preloadAround(currentIdx);
+    },{root:reelsList,threshold:.6});
+
+    function onWheel(e){
+      if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
+      e.preventDefault();
+      if(wheelLocked) return;
+      wheelLocked=true;
+      const dir = e.deltaY>0?1:-1, max=reelsList.children.length-1;
+      const next = Math.min(Math.max(currentIdx+dir,0),max);
+      if(next!==currentIdx) scrollToIndex(next,true);
+      clearTimeout(wheelTimer); wheelTimer=setTimeout(()=>wheelLocked=false,280);
+    }
+    function onTouchStart(e){ touchStartY = e.touches?.[0]?.clientY??null; }
+    function onTouchEnd(e){
+      if(touchStartY==null) return;
+      const endY=e.changedTouches?.[0]?.clientY??touchStartY; const dy=touchStartY-endY; touchStartY=null;
+      if(Math.abs(dy)<SWIPE){ scrollToIndex(currentIdx,true); return; }
+      const dir=dy>0?1:-1, max=reelsList.children.length-1;
+      const next=Math.min(Math.max(currentIdx+dir,0),max);
+      if(next!==currentIdx) scrollToIndex(next,true);
+    }
+
+    // Auto-hide UI after idle
+    let uiTimer=null;
+    function pokeUI(){
+      clearTimeout(uiTimer);
+      reels.classList.remove('ui-hidden');
+      uiTimer=setTimeout(()=>reels.classList.add('ui-hidden'), 2200);
+    }
+
     function openReels(){
       const items=filteredMenu();
       if(!items.length){ toast('لا توجد عناصر لعرضها في الرييل'); return; }
+
       reelsList.innerHTML='';
       items.forEach((d,i)=>reelsList.appendChild(reelNode(d,i)));
+      [...reelsList.children].forEach(n=>idxObserver.observe(n));
+
+      // lazy load first + neighbors
+      loadImgIn(reelsList.children[0]);
+      preloadAround(0);
+      setReelIndex(0, reelsList.children.length);
+
       reels.classList.add('show'); reels.setAttribute('aria-hidden','false');
       document.body.style.overflow='hidden';
       reelsList.scrollTop=0; reelsList.focus({preventScroll:true});
+
+      reelsList.addEventListener('wheel', onWheel, {passive:false});
+      reelsList.addEventListener('touchstart', onTouchStart, {passive:true});
+      reelsList.addEventListener('touchend', onTouchEnd, {passive:true});
+      document.addEventListener('mousemove', pokeUI, {passive:true});
+      document.addEventListener('keydown', onKeys);
+
+      pokeUI();
     }
     function closeReels(){
       reels.classList.remove('show','ui-hidden'); reels.setAttribute('aria-hidden','true');
       document.body.style.overflow='';
+      reelsList.removeEventListener('wheel', onWheel);
+      reelsList.removeEventListener('touchstart', onTouchStart);
+      reelsList.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('mousemove', pokeUI);
+      document.removeEventListener('keydown', onKeys);
+      idxObserver.disconnect();
+      clearTimeout(uiTimer);
+    }
+    function onKeys(e){
+      if(!reels.classList.contains('show')) return;
+      if(['ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); step(1); }
+      else if(['ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); step(-1); }
+      else if(e.key==='Escape'){ closeReels(); }
+    }
+    function step(dir){
+      const max=reelsList.children.length-1;
+      const next=Math.min(Math.max(currentIdx+dir,0),max);
+      if(next!==currentIdx) scrollToIndex(next,true);
+      pokeUI();
     }
     openReelsBtn?.addEventListener('click', openReels);
     closeReelsBtn?.addEventListener('click', closeReels);
     reelsToCart?.addEventListener('click', ()=>{ closeReels(); document.getElementById('openCart').click(); });
-
-    // Tap anywhere on reels (outside buttons) to toggle UI visibility
     reels.addEventListener('click', (e)=>{
       const isButton = e.target.closest('button,.btn,.chip');
       if(isButton) return;
       reels.classList.toggle('ui-hidden');
+      pokeUI();
     });
 
     /* INIT */
@@ -943,7 +1079,7 @@
       document.getElementById('appLoading').classList.add('show');
       state.menu = await fetchMenu();
       state.menu = state.menu.map(it => (OPTIONS_MAP[it.id] ? {...it, options: OPTIONS_MAP[it.id]} : it));
-      renderSections(); bump(); setStickyVars();
+      renderSections(); setupScrollspy(); bump(); setStickyVars();
       document.getElementById('appLoading').classList.remove('show');
     })();
 
