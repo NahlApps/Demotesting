@@ -141,6 +141,11 @@
     .reel .cta .btn-primary{ background:var(--gold); border-color:var(--gold); color:#141414; }
     .reel .cta .btn-outline-light{ border-color:rgba(255,255,255,.6) }
 
+    /* Hide chrome when idle */
+    #reels.ui-hidden #reelsHeader,
+    #reels.ui-hidden .glass,
+    #reels.ui-hidden .cta{ opacity:0; pointer-events:none; }
+
     #reelProgress{
       position: fixed; inset-inline-start:10px; inset-block:60px 60px; width:3px; z-index:5; pointer-events:none; opacity:.9;
       display:flex; flex-direction:column; gap:6px;
@@ -340,7 +345,7 @@
     </div>
   </footer>
 
-  <!-- Options Modal (z-index raised above Reel) -->
+  <!-- Options Modal (above Reel) -->
   <div class="modal fade" id="optModal" tabindex="-1" aria-labelledby="optTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -603,7 +608,7 @@
 
           node.querySelector('.add-btn').addEventListener('click', ()=>{
             const opts = OPTIONS_MAP[d.id];
-            if (opts && Array.isArray(opts.groups) && opts.groups.length){
+            if (opts && opts.groups?.length){
               openOptions({ ...d, options: opts });
             } else { addLine(d,1); }
           });
@@ -628,21 +633,6 @@
       chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
       b.classList.add('active');
     });
-    let spyObserver=null;
-    function setupScrollspy(){
-      if(spyObserver){ spyObserver.disconnect(); spyObserver=null; }
-      const chipMap=[...chips.querySelectorAll('.chip[data-target]')];
-      const sections=['#topOfMenu','#sec-sushi','#sec-don','#sec-meat','#sec-drinks']
-        .map(sel=>document.querySelector(sel)).filter(Boolean);
-      spyObserver = new IntersectionObserver((entries)=>{
-        const top = entries.filter(e=>e.isIntersecting)
-                           .sort((a,b)=>a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if(!top) return;
-        const id = '#'+top.target.id;
-        chipMap.forEach(c=>c.classList.toggle('active', c.dataset.target===id));
-      },{root:null, rootMargin:'-40% 0px -50% 0px', threshold:[0.25,0.6]});
-      sections.forEach(sec=>spyObserver.observe(sec));
-    }
 
     /* Search */
     let t=null;
@@ -675,7 +665,7 @@
       const unit = Number(item.price||0) + Number(optionsPkg?.delta||0);
       if(exist) exist.qty+=qty;
       else state.cart[key]={lineId:key, id:item.id, title:item.title, unitPrice:unit, qty, optionsText:optionsPkg?.summary||''};
-      bump(); toast(`أُضيف ${item.title} ✅`);
+      bump(); // toast is shown by callers (Arabic / English, context-specific)
     }
     function renderCartList(){
       cartList.innerHTML='';
@@ -697,7 +687,7 @@
     /* Toast */
     function toast(msg){
       const box=document.getElementById('toasts'); const el=document.createElement('div'); el.className='toast-msg'; el.textContent=msg;
-      box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2200);
+      box.appendChild(el); setTimeout(()=>{el.style.opacity='0'; el.style.transform='translateY(-6px)'; setTimeout(()=>el.remove(),180);},2000);
     }
 
     /* ===== Options Modal Wiring (works over Reel) ===== */
@@ -777,7 +767,7 @@
       optQtyEl.value=1; document.getElementById('optNotes').value='';
       buildOptionsUI(item.options.groups);
       updateOptPrice();
-      optModal.show(); // z-index ensures it appears above Reel
+      optModal.show(); // appears above Reel
     }
     document.getElementById('optAddBtn').onclick=()=>{
       if(!currentItem) return;
@@ -785,10 +775,11 @@
       const qty=Math.max(1, Number(optQtyEl.value||1));
       const notes=(document.getElementById('optNotes').value||'').trim();
       addLine(currentItem, qty, {delta, summary, result, notes});
+      toast('added to cart');        // <— explicit English toast in Reel/Options add
       optModal.hide();
     };
 
-    /* Data form */
+    /* Data form (short) */
     const nameEl=document.getElementById('custName');
     const phoneEl=document.getElementById('custPhone');
     const notesEl=document.getElementById('notes');
@@ -862,7 +853,7 @@
       }
     };
 
-    /* ===== Reel (Options integrated) ===== */
+    /* ===== Reel (Options integrated + "added to cart" message) ===== */
     const reels = document.getElementById('reels');
     const reelsList = document.getElementById('reelsList');
     const openReelsBtn = document.getElementById('openReels');
@@ -881,7 +872,7 @@
       return state.menu.filter(d=>!q || [d.title||'',d.desc||''].join(' ').toLowerCase().includes(q));
     }
     function tryOpenOptionsFor(d){
-      const opts = OPTIONS_MAP[d.id];
+      const opts = d.options || OPTIONS_MAP[d.id];
       if (opts && opts.groups?.length) { openOptions({ ...d, options: opts }); return true; }
       return false;
     }
@@ -892,7 +883,6 @@
       const media=document.createElement('div'); media.className='media';
       const img=document.createElement('img'); img.alt=d.title||''; img.loading='eager';
       if(d.img && /^https?:\/\//.test(d.img)) img.dataset.src=d.img; else img.src='';
-
       media.appendChild(img);
 
       const glass=document.createElement('div'); glass.className='glass';
@@ -903,16 +893,20 @@
       glass.append(title, desc, tagbox);
 
       const cta=document.createElement('div'); cta.className='cta';
+
       const add=document.createElement('button'); add.className='btn btn-primary flex-fill'; add.type='button';
       add.textContent=`أضف — ${new Intl.NumberFormat('ar-SA',{style:'currency',currency:'SAR'}).format(Number(d.price||0))}`;
-      const optionsBtn=document.createElement('button'); optionsBtn.className='btn btn-outline-light'; optionsBtn.type='button'; optionsBtn.textContent='الخيارات';
+      add.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation();
+        if (!tryOpenOptionsFor(d)) { addLine(d,1); toast('added to cart'); }
+      });
 
-      // OPEN OPTIONS if available (guaranteed to work over Reel due to z-index fix)
-      add.onclick = () => { if (!tryOpenOptionsFor(d)) addLine(d,1); };
-      optionsBtn.onclick = () => { if (!tryOpenOptionsFor(d)) addLine(d,1); };
+      const optionsBtn=document.createElement('button'); optionsBtn.className='btn btn-outline-light'; optionsBtn.type='button'; optionsBtn.textContent='الخيارات';
+      optionsBtn.addEventListener('click',(e)=>{ e.preventDefault(); e.stopPropagation(); if (!tryOpenOptionsFor(d)) { addLine(d,1); toast('added to cart'); } });
 
       // Tap image: open options if exist, else toggle UI
-      media.addEventListener('click', ()=>{ if(!tryOpenOptionsFor(d)) reels.classList.toggle('ui-hidden'); });
+      media.addEventListener('click', (e)=>{ e.stopPropagation();
+        if(!tryOpenOptionsFor(d)) reels.classList.toggle('ui-hidden');
+      });
 
       cta.append(add, optionsBtn);
       div.append(media, glass, cta);
@@ -1024,7 +1018,7 @@
       document.getElementById('appLoading').classList.add('show');
       state.menu = await fetchMenu();
       state.menu = state.menu.map(it => (OPTIONS_MAP[it.id] ? {...it, options: OPTIONS_MAP[it.id]} : it));
-      renderSections(); setupScrollspy(); bump(); setStickyVars();
+      renderSections(); bump(); setStickyVars();
       document.getElementById('appLoading').classList.remove('show');
     })();
 
