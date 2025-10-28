@@ -161,9 +161,7 @@
     <!-- Quick tags -->
     <section class="card">
       <h2 class="section" data-i18n="highlights">ما الذي أعجبك؟</h2>
-      <div class="chips" id="chipsRow">
-        <!-- chips are declared in JS via CONFIG.tags -->
-      </div>
+      <div class="chips" id="chipsRow"></div>
       <p class="help" data-i18n="chips_help">انقر للإضافة أو الإزالة • Tap to add/remove</p>
     </section>
 
@@ -173,15 +171,11 @@
       <div class="row cols-2">
         <div>
           <label class="lbl" for="serviceSelect" data-i18n="service_received">الخدمة</label>
-          <select id="serviceSelect">
-            <!-- options injected from CONFIG.services -->
-          </select>
+          <select id="serviceSelect"></select>
         </div>
         <div>
           <label class="lbl" for="vehicleSize" data-i18n="vehicle_size">حجم المركبة</label>
-          <select id="vehicleSize">
-            <!-- options injected from CONFIG.vehicleSizes -->
-          </select>
+          <select id="vehicleSize"></select>
         </div>
       </div>
       <div class="row" style="margin-top:12px">
@@ -280,7 +274,8 @@
      ***********************/
     const CONFIG = {
       PLACE_ID: "REPLACE_WITH_GOOGLE_PLACE_ID", // e.g. ChIJN1t_tDeuEmsRUsoyG83frY4
-      GAS_ENDPOINT: "https://script.google.com/macros/s/AKfycbxOiEhHT_3undWEM5yy8SnZs6kqqMS5LSptMklZNuH1eaKJ0ixeZZhaAR2efSCYqTmELQ/exec", // e.g. https://script.google.com/macros/s/XXXXX/exec?action=review.save
+      GAS_ENDPOINT: "https://script.google.com/macros/s/AKfycbxOiEhHT_3undWEM5yy8SnZs6kqqMS5LSptMklZNuH1eaKJ0ixeZZhaAR2efSCYqTmELQ/exec",
+      REVIEWS_TOKEN: "REPLACE_WITH_SHARED_TOKEN", // Optional: must match REVIEWS_TOKEN in Script Properties
       SHEET_ID: "1aMo-5XuQcloEQUlfhQRR1JRwvCWHKgJ2XhEkgf4-zJc",
       SHEET_NAME: "Reviews",
       // UI data
@@ -490,7 +485,7 @@
           quality: Number($('#qQuality').value),
           speed: Number($('#qSpeed').value),
           staff: Number($('#qStaff').value),
-          value: Number($('#qValue').value),
+          value: Number($('#qValue').value)
         },
         wouldReturn: $$('input[name="return"]').find(r => r.checked)?.value || 'yes',
         nps: Number($('#nps').value || 0),
@@ -504,21 +499,30 @@
       return payload;
     }
 
+    /** =========================
+     * SAVE WITHOUT PREFLIGHT
+     * ========================= */
     async function saveToGAS(payload){
-      // If not configured, mock success
+      // Mock if not configured
       if (!CONFIG.GAS_ENDPOINT || CONFIG.GAS_ENDPOINT.startsWith("REPLACE_")) {
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 300));
         return { ok: true, mock: true };
       }
-      const url = CONFIG.GAS_ENDPOINT + (CONFIG.GAS_ENDPOINT.includes('?') ? '&' : '?') + 'action=review.save';
+
+      // Build URL (attach token in query)
+      const url = CONFIG.GAS_ENDPOINT + (CONFIG.GAS_ENDPOINT.includes('?') ? '&' : '?') +
+        'action=review.save' +
+        (CONFIG.REVIEWS_TOKEN ? '&token=' + encodeURIComponent(CONFIG.REVIEWS_TOKEN) : '');
+
+      // Send as x-www-form-urlencoded to avoid CORS preflight
+      const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
+
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        mode: 'cors',
-        redirect: 'follow',
-        cache: 'no-cache'
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body
       });
+
       if (!res.ok) throw new Error('Network error: ' + res.status);
       let json; try { json = await res.json(); } catch(e){ json = { ok:false, parseError:true }; }
       return json;
@@ -547,8 +551,9 @@
             const u = buildGoogleReviewURL();
             if (u) window.open(u, '_blank', 'noopener');
           }
-          // Optional: reset basic fields
-          $('input[name="rating"]:checked')?.checked && ($('input[name="rating"]:checked').checked = false);
+          // Reset basics
+          const checked = $('input[name="rating"]:checked');
+          if (checked) checked.checked = false;
           $('#reviewText').value = '';
           $$('.chip.active').forEach(ch => ch.classList.remove('active'));
         } else {
@@ -589,32 +594,6 @@
       $('#btnSubmit').addEventListener('click', () => onSubmit(true));
       $('#btnGoogle').addEventListener('click', openGoogleOnly);
     })();
-
-      async function saveToGAS(payload){
-    // 1) Guard
-    if (!CONFIG.GAS_ENDPOINT || CONFIG.GAS_ENDPOINT.startsWith("REPLACE_")) {
-      await new Promise(r => setTimeout(r, 300));
-      return { ok: true, mock: true };
-    }
-
-    // 2) Build URL (no mode:'cors', no custom headers beyond urlencoded)
-    const url = CONFIG.GAS_ENDPOINT + (CONFIG.GAS_ENDPOINT.includes('?') ? '&' : '?') +
-      'action=review.save' +
-      (CONFIG.REVIEWS_TOKEN ? '&token=' + encodeURIComponent(CONFIG.REVIEWS_TOKEN) : '');
-
-    // 3) Send as x-www-form-urlencoded to avoid preflight
-    const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-      body
-    });
-
-    if (!res.ok) throw new Error('Network error: ' + res.status);
-    let json; try { json = await res.json(); } catch(e){ json = { ok:false, parseError:true }; }
-    return json;
-  }
   </script>
 </body>
 </html>
