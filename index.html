@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#2563eb"/>
   <title>Nahl • Rate Experience</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -10,49 +11,81 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
 
   <style>
-    :root {
-      --bg: #f4f6f8; --card: #ffffff; --text: #1f2937; --muted: #6b7280;
-      --primary: #2563eb; --primary-600: #1d4ed8; --accent: #F4CE14;
-      --border: #e5e7eb; --chip:#eef2ff; --chip-text:#1e40af;
-      --shadow: 0 8px 24px rgba(0,0,0,.08); --radius: 16px;
+    :root{
+      --bg:#f4f6f8; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --primary:#2563eb; --primary-600:#1d4ed8; --accent:#F4CE14;
+      --border:#e5e7eb; --chip:#eef2ff; --chip-text:#1e40af;
+      --danger:#ef4444; --success:#16a34a; --focus:rgba(37,99,235,.35);
+      --shadow:0 8px 24px rgba(0,0,0,.08); --radius:16px;
     }
-    [dir="ltr"] body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
-    [dir="rtl"] body { font-family: Cairo, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
-    *{ box-sizing: border-box; } body{ margin:0; background:var(--bg); color:var(--text); }
-    .wrap{ max-width:760px; margin:0 auto; padding:20px 16px 64px; }
-    header.site{ display:flex; align-items:center; gap:12px; padding:16px; margin:8px 0 16px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); }
-    .brand{ width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,var(--accent),#ffd95c); display:grid; place-items:center; font-weight:800; color:#111827; }
-    .title{ font-size:18px; font-weight:800; } .subtitle{ color:var(--muted); font-size:13px; }
-    .card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; margin:12px 0; }
-    h2.section{ font-size:16px; margin:0 0 10px; }
-    label.lbl{ display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
-    .help{ font-size:12px; color:var(--muted); }
-    textarea, input[type="number"]{ width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:#fff; font-size:14px; outline:none; }
-    textarea:focus, input:focus{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12); }
-    textarea{ min-height:110px; resize:vertical; }
-    .stars{ display:inline-flex; flex-direction:row-reverse; gap:6px; }
-    .stars input{ display:none; }
-    .stars label{ cursor:pointer; font-size:28px; line-height:1; color:#c7ced9; transition:transform .05s ease; }
-    .stars label:hover, .stars label:hover ~ label{ color:#ffd95c; transform:scale(1.02); }
-    .stars input:checked ~ label{ color:#f7c948; }
-    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
-    .chip{ background:var(--chip); color:var(--chip-text); border:1px dashed #c7d2fe; padding:6px 10px; border-radius:999px; font-size:13px; cursor:pointer; user-select:none; }
-    .chip.active{ background:#dbeafe; border-style:solid; }
-    .row{ display:grid; gap:12px; }
-    @media (min-width:640px){ .row.cols-2{ grid-template-columns:1fr 1fr; } }
-    .likert{ display:grid; gap:6px; }
-    .btns{ display:flex; gap:10px; flex-wrap:wrap; }
-    .btn{ border:1px solid transparent; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; font-size:14px; }
-    .btn.primary{ background:var(--primary); color:#fff; } .btn.primary:hover{ background:var(--primary-600); }
-    .toast{ position:fixed; inset-inline:16px; bottom:16px; z-index:50; display:none; padding:12px 14px; border-radius:12px; border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow); font-size:14px; }
-    .toast.show{ display:block; }
-    .toast.ok{ border-color:#bbf7d0; } .toast.err{ border-color:#fecaca; }
-    footer.note{ text-align:center; color:#6b7280; font-size:12px; margin-top:18px; }
+    [dir="ltr"] body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    [dir="rtl"] body{font-family:Cairo,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
+
+    .wrap{max-width:760px;margin:0 auto;padding:20px 16px calc(88px + env(safe-area-inset-bottom))}
+    header.site{display:flex;align-items:center;gap:12px;padding:16px;margin:8px 0 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .brand{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ffd95c);display:grid;place-items:center;font-weight:800;color:#111827}
+    .title{font-size:18px;font-weight:800}
+    .subtitle{color:var(--muted);font-size:13px}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:12px 0}
+    h2.section{font-size:16px;margin:0 0 10px}
+    label.lbl{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+    .help{font-size:12px;color:var(--muted)}
+    textarea,input[type="number"],input[type="text"]{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:15px;outline:none}
+    textarea:focus,input:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--focus)}
+    textarea{min-height:120px;resize:vertical}
+
+    /* Accessible hidden (not display:none so radios stay focusable) */
+    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* Stars */
+    fieldset.rating-fieldset{border:0;padding:0;margin:0}
+    .stars{display:inline-flex;flex-direction:row-reverse;gap:6px}
+    .stars input{position:absolute;opacity:0}
+    .stars label{cursor:pointer;font-size:32px;line-height:1;color:#c7ced9;transition:transform .05s ease}
+    .stars input:focus-visible + label{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px}
+    .stars label:hover,.stars label:hover ~ label{color:#ffd95c;transform:scale(1.04)}
+    .stars input:checked ~ label{color:#f7c948}
+
+    .chips{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{background:var(--chip);color:var(--chip-text);border:1px dashed #c7d2fe;padding:10px 14px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none}
+    .chip:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+    .chip.active{background:#dbeafe;border-style:solid}
+
+    .row{display:grid;gap:12px}
+    @media (min-width:640px){.row.cols-2{grid-template-columns:1fr 1fr}}
+    .likert{display:grid;gap:6px}
+    .likert output{font-variant-numeric:tabular-nums;font-weight:700}
+
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{border:1px solid transparent;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:800;font-size:14px;min-height:48px}
+    .btn.primary{background:var(--primary);color:#fff}
+    .btn.primary:hover{background:var(--primary-600)}
+    .btn.ghost{background:transparent;border-color:var(--border)}
+
+    /* Sticky action bar for mobile */
+    .actionbar{position:fixed;left:0;right:0;bottom:0;z-index:60;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top, rgba(255,255,255,.98), rgba(255,255,255,.92));border-top:1px solid var(--border);backdrop-filter:saturate(1.2) blur(6px)}
+
+    .toast{position:fixed;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;display:none;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card);box-shadow:var(--shadow);font-size:14px}
+    .toast.show{display:block}
+    .toast.ok{border-color:#bbf7d0}
+    .toast.err{border-color:#fecaca}
+
+    footer.note{text-align:center;color:#6b7280;font-size:12px;margin-top:18px}
+
+    /* Reveal animations (respects reduced motion) */
+    @media (prefers-reduced-motion:no-preference){
+      .reveal{opacity:0;transform:translateY(8px)}
+      .reveal.show{opacity:1;transform:none;transition:opacity .45s ease, transform .45s ease}
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header class="site">
+    <header class="site reveal">
       <div class="brand" aria-hidden="true">N</div>
       <div>
         <div class="title" data-i18n="app_title">قيّم تجربتك</div>
@@ -60,187 +93,239 @@
       </div>
     </header>
 
-    <!-- Overall rating -->
-    <section class="card">
-      <h2 class="section" data-i18n="overall_rating">التقييم العام</h2>
-      <div class="stars" role="radiogroup" aria-label="Rating">
-        <input type="radio" id="star5" name="rating" value="5"><label for="star5" aria-label="5">★</label>
-        <input type="radio" id="star4" name="rating" value="4"><label for="star4" aria-label="4">★</label>
-        <input type="radio" id="star3" name="rating" value="3"><label for="star3" aria-label="3">★</label>
-        <input type="radio" id="star2" name="rating" value="2"><label for="star2" aria-label="2">★</label>
-        <input type="radio" id="star1" name="rating" value="1"><label for="star1" aria-label="1">★</label>
-      </div>
-      <p class="help">اختر من نجمة إلى خمس نجوم • Choose 1–5 stars</p>
-      <label class="lbl" for="reviewText">اكتب رأيك</label>
-      <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review"></textarea>
-    </section>
+    <form id="rateForm" novalidate>
+      <!-- Overall rating -->
+      <section class="card reveal">
+        <fieldset class="rating-fieldset" aria-required="true">
+          <legend class="section" id="ratingLegend" data-i18n="overall_rating">التقييم العام</legend>
+          <div class="stars" role="radiogroup" aria-labelledby="ratingLegend">
+            <input class="sr-only" type="radio" id="star5" name="rating" value="5" required>
+            <label for="star5" aria-label="5">★</label>
+            <input class="sr-only" type="radio" id="star4" name="rating" value="4">
+            <label for="star4" aria-label="4">★</label>
+            <input class="sr-only" type="radio" id="star3" name="rating" value="3">
+            <label for="star3" aria-label="3">★</label>
+            <input class="sr-only" type="radio" id="star2" name="rating" value="2">
+            <label for="star2" aria-label="2">★</label>
+            <input class="sr-only" type="radio" id="star1" name="rating" value="1">
+            <label for="star1" aria-label="1">★</label>
+          </div>
+        </fieldset>
+        <label class="lbl" for="reviewText">اكتب رأيك</label>
+        <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review" required></textarea>
+        <p class="help">اختر من نجمة إلى خمس نجوم • Choose 1–5 stars</p>
+      </section>
 
-    <!-- Quick tags -->
-    <section class="card">
-      <h2 class="section">ما الذي أعجبك؟</h2>
-      <div class="chips" id="chipsRow"></div>
-      <p class="help">انقر للإضافة أو الإزالة • Tap to add/remove</p>
-    </section>
+      <!-- Quick tags -->
+      <section class="card reveal">
+        <h2 class="section">ما الذي أعجبك؟</h2>
+        <div class="chips" id="chipsRow"></div>
+        <p class="help">انقر للإضافة أو الإزالة • Tap to add/remove</p>
+      </section>
 
-    <!-- Satisfaction details -->
-    <section class="card">
-      <h2 class="section">تفاصيل الرضا</h2>
-      <div class="row cols-2">
-        <div class="likert">
-          <label class="lbl" for="qQuality">جودة التنظيف</label>
-          <input id="qQuality" type="range" min="1" max="5" step="1" value="4" />
-          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
-        </div>
-        <div class="likert">
-          <label class="lbl" for="qSpeed">سرعة الخدمة</label>
-          <input id="qSpeed" type="range" min="1" max="5" step="1" value="4" />
-          <span class="help">1 بطيئة جدًا ← 5 سريعة جدًا</span>
-        </div>
-        <div class="likert">
-          <label class="lbl" for="qStaff">احترافية الموظفين</label>
-          <input id="qStaff" type="range" min="1" max="5" step="1" value="4" />
-          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
-        </div>
-        <div class="likert">
-          <label class="lbl" for="qValue">القيمة مقابل السعر</label>
-          <input id="qValue" type="range" min="1" max="5" step="1" value="4" />
-          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Loyalty -->
-    <section class="card">
-      <h2 class="section">الولاء</h2>
-      <div class="row cols-2">
-        <div>
-          <label class="lbl">هل ستعود مرة أخرى؟</label>
-          <div class="chips" role="radiogroup">
-            <label class="chip"><input type="radio" name="return" value="yes" checked style="margin-inline-end:.5rem"> نعم</label>
-            <label class="chip"><input type="radio" name="return" value="no" style="margin-inline-end:.5rem"> لا</label>
+      <!-- Satisfaction details -->
+      <section class="card reveal">
+        <h2 class="section">تفاصيل الرضا</h2>
+        <div class="row cols-2">
+          <div class="likert">
+            <label class="lbl" for="qQuality">جودة التنظيف</label>
+            <input id="qQuality" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
+            <output>4</output>
+            <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+          </div>
+          <div class="likert">
+            <label class="lbl" for="qSpeed">سرعة الخدمة</label>
+            <input id="qSpeed" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
+            <output>4</output>
+            <span class="help">1 بطيئة جدًا ← 5 سريعة جدًا</span>
+          </div>
+          <div class="likert">
+            <label class="lbl" for="qStaff">احترافية الموظفين</label>
+            <input id="qStaff" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
+            <output>4</output>
+            <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+          </div>
+          <div class="likert">
+            <label class="lbl" for="qValue">القيمة مقابل السعر</label>
+            <input id="qValue" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
+            <output>4</output>
+            <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
           </div>
         </div>
-        <div>
-          <label class="lbl" for="nps">التوصية بنا (0–10)</label>
-          <input id="nps" type="number" min="0" max="10" value="9" />
-          <span class="help">0 لن أوصي إطلاقًا ← 10 أوصي بقوة</span>
+      </section>
+
+      <!-- Loyalty -->
+      <section class="card reveal">
+        <h2 class="section">الولاء</h2>
+        <div class="row cols-2">
+          <div>
+            <label class="lbl">هل ستعود مرة أخرى؟</label>
+            <div class="chips" role="radiogroup">
+              <label class="chip"><input type="radio" name="return" value="yes" checked style="margin-inline-end:.5rem"> نعم</label>
+              <label class="chip"><input type="radio" name="return" value="no" style="margin-inline-end:.5rem"> لا</label>
+            </div>
+          </div>
+          <div>
+            <label class="lbl" for="nps">التوصية بنا (0–10)</label>
+            <input id="nps" type="number" inputmode="numeric" min="0" max="10" step="1" value="9" required/>
+            <span class="help">0 لن أوصي إطلاقًا ← 10 أوصي بقوة</span>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Actions -->
-    <section class="card">
-      <h2 class="section">الإرسال</h2>
-      <p class="help">سيتم حفظ تقييمك لدينا فقط.</p>
-      <div class="btns">
-        <button id="btnSubmit" class="btn primary">حفظ التقييم</button>
-      </div>
-    </section>
+      <!-- Actions (in-card for desktop) -->
+      <section class="card reveal hide-on-mobile" id="inlineAction">
+        <h2 class="section">الإرسال</h2>
+        <p class="help">سيتم حفظ تقييمك لدينا فقط.</p>
+        <div class="btns">
+          <button id="btnSubmitTop" class="btn primary" type="submit">حفظ التقييم</button>
+          <button type="button" class="btn ghost" id="btnReset">إعادة تعيين</button>
+        </div>
+      </section>
+    </form>
 
-    <footer class="note"><span>تصميم نحل • يعمل دون مكتبات خارجية</span></footer>
+    <footer class="note reveal"><span>تصميم نحل • WCAG 2.2 جاهز • يعمل دون مكتبات خارجية</span></footer>
   </div>
 
+  <!-- Sticky action bar (mobile-first) -->
+  <div class="actionbar" id="actionbar">
+    <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto">
+      <div class="help" id="validityHint">أكمل الحقول المطلوبة ثم اضغط حفظ</div>
+      <div class="btns" style="margin-inline-start:auto">
+        <button id="btnSubmit" class="btn primary" type="button">حفظ التقييم</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast & Done -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="doneView" class="card" style="display:none; margin:16px;max-width:760px;margin-inline:auto">
+    <h2 class="section">شكرًا لك! ✅</h2>
+    <p class="help">تم استلام تقييمك. نقدر وقتك.</p>
+    <div class="btns">
+      <button class="btn" id="btnAnother">إرسال تقييم آخر</button>
+    </div>
+  </div>
 
   <script>
     const DEBUG=false;
-    const CONFIG = {
-      tags: [
-        { ar:"السرعة", en:"Speed" },
-        { ar:"الجودة", en:"Quality" },
-        { ar:"السعر",  en:"Price" },
-        { ar:"الموظفون", en:"Staff" },
-        { ar:"دقة الوصول", en:"Punctual (Mobile)" },
-        { ar:"نظافة الأدوات", en:"Clean tools" },
-        { ar:"الحفاظ على الطلاء", en:"Gentle on paint" }
+    const CONFIG={
+      tags:[
+        {ar:"السرعة",en:"Speed"},
+        {ar:"الجودة",en:"Quality"},
+        {ar:"السعر",en:"Price"},
+        {ar:"الموظفون",en:"Staff"},
+        {ar:"دقة الوصول",en:"Punctual (Mobile)"},
+        {ar:"نظافة الأدوات",en:"Clean tools"},
+        {ar:"الحفاظ على الطلاء",en:"Gentle on paint"}
       ]
     };
 
-    const $  = (s,r=document)=>r.querySelector(s);
-    const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
-    function showToast(msg, ok=true){ const t=$('#toast'); if(!t) return; t.textContent=msg; t.className='toast show '+(ok?'ok':'err'); setTimeout(()=>t.classList.remove('show'), 2500); }
+    const $=(s,r=document)=>r.querySelector(s);
+    const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    function showToast(msg,ok=true){const t=$('#toast');if(!t)return;t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2500)}
+
+    // IntersectionObserver reveal
+    const io=new IntersectionObserver((entries)=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.05});
 
     function hydrateTags(){
-      const row = $('#chipsRow'); row.innerHTML='';
-      CONFIG.tags.forEach((t, i) => {
+      const row=$('#chipsRow');row.innerHTML='';
+      CONFIG.tags.forEach(t=>{
         const b=document.createElement('button');
-        b.type='button'; b.className='chip'; b.textContent=t.ar;
-        b.addEventListener('click',()=> b.classList.toggle('active'));
+        b.type='button';b.className='chip';b.setAttribute('aria-pressed','false');b.textContent=t.ar;
+        b.addEventListener('click',()=>{const on=b.classList.toggle('active');b.setAttribute('aria-pressed',on?'true':'false')});
         row.appendChild(b);
       });
     }
 
-    function getRating(){ const r=$$('input[name="rating"]').find(i=>i.checked); return r?Number(r.value):0; }
-    function getParam(name){ const u=new URL(window.location.href); return u.searchParams.get(name); }
+    function getRating(){const r=$$('input[name="rating"]').find(i=>i.checked);return r?Number(r.value):0}
+    function getParam(name){const u=new URL(window.location.href);return u.searchParams.get(name)}
 
     function collectPayload(){
-      const chips = $$('.chip.active').map(ch => ch.textContent);
-      return {
-        bookingId: getParam('bookingId') || '',
-        ts: new Date().toISOString(),
-        lang: document.documentElement.lang || 'ar',
-        rating: getRating(),
-        reviewText: $('#reviewText').value.trim(),
-        tags: chips,
-        q: {
-          quality: Number($('#qQuality').value || 0),
-          speed:   Number($('#qSpeed').value || 0),
-          staff:   Number($('#qStaff').value || 0),
-          value:   Number($('#qValue').value || 0)
-        },
-        wouldReturn: $$('input[name="return"]').find(r=>r.checked)?.value || 'yes',
-        nps: Number($('#nps').value || 0),
-        client: { ua: navigator.userAgent }
-      };
-    }
-
-    async function saveToServer(payload){
-      // Same-origin proxy expected at /api/gas-proxy → forwards to GAS (action=review.save)
-      const res = await fetch('/api/gas-proxy', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      const txt = await res.text();
-      let json; try { json = JSON.parse(txt); } catch { json = { ok:false, error:'bad_json', raw:txt?.slice(0,500)||'' }; }
-      return { status: res.status, ...json };
-    }
-
-    function validate(){
-      const bid = getParam('bookingId');
-      if (!bid){ showToast('خطأ: رابط غير صحيح (بدون bookingId).', false); return false; }
-      const rating = getRating();
-      if (!rating){ showToast('الرجاء اختيار التقييم بالنجوم', false); return false; }
-      const text = $('#reviewText').value.trim();
-      if (!text){ showToast('الرجاء كتابة التقييم النصي', false); return false; }
-      return true;
-    }
-
-    async function onSubmit(){
-      if (!validate()) return;
-      const btn=$('#btnSubmit'); btn.disabled=true; btn.textContent='جارٍ الحفظ…';
-      try{
-        const result = await saveToServer(collectPayload());
-        if (result.ok){
-          showToast('تم الحفظ بنجاح', true);
-          $('input[name="rating"]:checked')?.checked && ($('input[name="rating"]:checked').checked = false);
-          $('#reviewText').value=''; $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
-        } else {
-          const msg = 'تعذّر الحفظ' + (result.error ? ` • ${result.error}` : '');
-          showToast(msg, false);
-          if (DEBUG) console.error(result);
-        }
-      } catch(err){
-        if (DEBUG) console.error(err);
-        showToast('تعذّر الحفظ، حاول مرة أخرى', false);
-      } finally {
-        btn.disabled=false; btn.textContent='حفظ التقييم';
+      const chips=$$('.chip.active').map(ch=>ch.textContent);
+      return{
+        bookingId:getParam('bookingId')||'',
+        ts:new Date().toISOString(),
+        lang:document.documentElement.lang||'ar',
+        rating:getRating(),
+        reviewText:$('#reviewText').value.trim(),
+        tags:chips,
+        q:{quality:Number($('#qQuality').value||0),speed:Number($('#qSpeed').value||0),staff:Number($('#qStaff').value||0),value:Number($('#qValue').value||0)},
+        wouldReturn:$$('input[name="return"]').find(r=>r.checked)?.value||'yes',
+        nps:Number($('#nps').value||0),
+        client:{ua:navigator.userAgent}
       }
     }
 
+    async function saveToServer(payload){
+      const res=await fetch('/api/gas-proxy',{method:'POST',headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},body:JSON.stringify({action:'review.save',data:payload})});
+      const json=await res.json().catch(()=>({}));
+      return{status:res.status,...json}
+    }
+
+    function validate(){
+      const form=$('#rateForm');
+      if(!getParam('bookingId')){showToast('خطأ: رابط غير صحيح (بدون bookingId).',false);return false}
+      if(!form.checkValidity()){showToast('الرجاء إكمال الحقول المطلوبة',false);return false}
+      if(!getRating()){showToast('الرجاء اختيار التقييم بالنجوم',false);return false}
+      const text=$('#reviewText').value.trim();if(!text){showToast('الرجاء كتابة التقييم النصي',false);return false}
+      const nps=Number($('#nps').value||0);if(Number.isNaN(nps)||nps<0||nps>10){showToast('قيمة NPS يجب أن تكون بين 0 و 10',false);return false}
+      return true
+    }
+
+    function updateValidityHint(){
+      const ok = validateSoft();
+      $('#validityHint').textContent = ok ? 'جاهز للإرسال' : 'أكمل الحقول المطلوبة ثم اضغط حفظ';
+    }
+    function validateSoft(){
+      const hasRating=!!getRating();
+      const hasText=$('#reviewText').value.trim().length>0;
+      const nps=$('#nps').value;
+      return hasRating && hasText && nps!=='';
+    }
+
+    async function onSubmit(){
+      if(!validate())return;
+      const btn=$('#btnSubmit');const btnTop=$('#btnSubmitTop');
+      [btn,btnTop].forEach(b=>{if(b){b.disabled=true;b.textContent='جارٍ الحفظ…'}});
+      try{
+        const result=await saveToServer(collectPayload());
+        if(result.ok){
+          showToast('تم الحفظ بنجاح',true);
+          document.querySelector('.wrap').style.display='none';
+          $('#actionbar').style.display='none';
+          $('#doneView').style.display='block';
+        }else{
+          showToast('تعذّر الحفظ • '+(result.error||'خطأ غير معروف'),false);
+          if(DEBUG)console.error(result)
+        }
+      }catch(err){
+        if(DEBUG)console.error(err);
+        showToast(navigator.onLine?'تعذّر الحفظ، حاول مرة أخرى':'لا يوجد اتصال بالإنترنت',false)
+      }finally{
+        [btn,btnTop].forEach(b=>{if(b){b.disabled=false;b.textContent='حفظ التقييم'}})
+      }
+    }
+
+    function resetForm(){
+      $('#rateForm').reset();
+      $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
+      updateValidityHint();
+    }
+
     (function init(){
+      // Reveal
+      $$('.reveal').forEach(el=>io.observe(el));
+      // Chips
       hydrateTags();
-      $('#btnSubmit').addEventListener('click', onSubmit);
+      // Actions
+      $('#btnSubmit').addEventListener('click',onSubmit);
+      $('#rateForm').addEventListener('submit',e=>{e.preventDefault();onSubmit()});
+      $('#btnReset')?.addEventListener('click',resetForm);
+      $('#btnAnother').addEventListener('click',()=>location.reload());
+      // Soft validity tracking
+      ['input','change','keyup'].forEach(ev=>document.addEventListener(ev,updateValidityHint,true));
+      updateValidityHint();
     })();
   </script>
 </body>
