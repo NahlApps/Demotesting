@@ -1,26 +1,46 @@
 // app/api/gas-proxy/route.js
-// Same-origin proxy → forwards to GAS Web App and returns JSON with proper CORS.
-// Avoids browser CORS limitations by doing server-to-server to Google.
-// Set environment variables in your hosting platform:
-//
-// GAS_EXEC_URL   = https://script.google.com/macros/s/AKfy.../exec
-// REVIEWS_TOKEN  = your-long-random-token (must match GAS Script Property; optional)
-// ALLOWED_ORIGIN = https://demotesting.nahl.app  (or your domain)
-
-export const runtime = "node"; // or "edge" if preferred
+export const runtime = "node";
+export const dynamic = "force-dynamic";
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "https://demotesting.nahl.app";
-const GAS_EXEC_URL   = process.env.GAS_EXEC_URL;
-const REVIEWS_TOKEN  = process.env.REVIEWS_TOKEN || "";
+const GAS_EXEC_URL   = process.env.GAS_EXEC_URL;          // e.g. https://script.google.com/macros/s/AKfy.../exec
+const REVIEWS_TOKEN  = process.env.REVIEWS_TOKEN || "";   // must match GAS (optional)
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-  "Access-Control-Allow-Methods": "POST,OPTIONS",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: corsHeaders });
+}
+
+// Health: GET /api/gas-proxy?health=1 → ينادي GAS ?action=health
+export async function GET(request) {
+  try {
+    const urlObj = new URL(request.url);
+    if (urlObj.searchParams.get("health") !== "1") {
+      return new Response(JSON.stringify({ ok:false, error:"not_found" }), {
+        status: 404, headers: { ...corsHeaders, "Content-Type":"application/json" }
+      });
+    }
+    if (!GAS_EXEC_URL) {
+      return new Response(JSON.stringify({ ok:false, error:"missing_GAS_EXEC_URL" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type":"application/json" }
+      });
+    }
+    const pingUrl = GAS_EXEC_URL + (GAS_EXEC_URL.includes("?") ? "&" : "?") + "action=health";
+    const r = await fetch(pingUrl, { method: "GET" });
+    const text = await r.text();
+    return new Response(text, {
+      status: r.status, headers: { ...corsHeaders, "Content-Type":"application/json" }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ ok:false, error:"proxy_failed", detail:String(err) }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type":"application/json" }
+    });
+  }
 }
 
 export async function POST(request) {
@@ -33,7 +53,7 @@ export async function POST(request) {
 
     const payload = await request.json();
 
-    // Forward to GAS as x-www-form-urlencoded (no preflight on their side)
+    // Forward to GAS as x-www-form-urlencoded (avoids their preflight)
     const params = new URLSearchParams();
     params.set("data", JSON.stringify(payload));
     const url = GAS_EXEC_URL +
@@ -47,6 +67,7 @@ export async function POST(request) {
       body: params.toString()
     });
 
+    // Pass-through (even لو ok:false) مع Content-Type json
     const text = await r.text();
     return new Response(text, {
       status: r.status,
