@@ -208,8 +208,11 @@
   </div>
 
   <script>
-    const DEBUG=false;
-    const CONFIG={
+  (function(){
+    'use strict';
+
+    var DEBUG=false;
+    var CONFIG={
       tags:[
         {ar:"السرعة",en:"Speed"},
         {ar:"الجودة",en:"Quality"},
@@ -221,8 +224,7 @@
       ]
     };
 
-    // i18n strings
-    const I18N={
+    var I18N={
       ar:{
         app_title:"قيّم تجربتك",
         app_subtitle:"استبيان رضا الخدمة • Service satisfaction survey",
@@ -303,212 +305,192 @@
       }
     };
 
-    function t(key){const lang=document.documentElement.lang||'ar';return (I18N[lang]&&I18N[lang][key])||key}
+    function $(s,r){return (r||document).querySelector(s)}
+    function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+
+    function showToast(msg, ok){
+      if(ok===void 0) ok=true;
+      var t=$('#toast'); if(!t) return;
+      t.textContent=msg; t.className='toast show '+(ok?'ok':'err');
+      setTimeout(function(){ t.classList.remove('show') }, 2500);
+    }
+
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('show') });
+    }, {threshold:0.05});
+
+    function hydrateTags(){
+      var row=$('#chipsRow'); if(!row) return; row.innerHTML='';
+      var lang=document.documentElement.lang||'ar';
+      CONFIG.tags.forEach(function(t){
+        var b=document.createElement('button');
+        b.type='button'; b.className='chip'; b.setAttribute('aria-pressed','false'); b.textContent=(lang==='en'?t.en:t.ar);
+        b.addEventListener('click', function(){
+          var on=b.classList.toggle('active');
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        row.appendChild(b);
+      });
+    }
+
+    function getRating(){ var r=$$('input[name="rating"]').find(function(i){return i.checked}); return r?Number(r.value):0 }
+    function getParam(name){ var u=new URL(window.location.href); return u.searchParams.get(name) }
+
+    function collectPayload(){
+      var chips=$$('.chip.active').map(function(ch){return ch.textContent});
+      return {
+        bookingId: getParam('bookingId') || '',
+        ts: new Date().toISOString(),
+        lang: document.documentElement.lang || 'ar',
+        rating: getRating(),
+        reviewText: ($('#reviewText') && $('#reviewText').value ? $('#reviewText').value.trim() : ''),
+        tags: chips,
+        q: {
+          quality: Number($('#qQuality') && $('#qQuality').value || 0),
+          speed:   Number($('#qSpeed') && $('#qSpeed').value || 0),
+          staff:   Number($('#qStaff') && $('#qStaff').value || 0),
+          value:   Number($('#qValue') && $('#qValue').value || 0)
+        },
+        wouldReturn: (function(){ var r=$$('input[name="return"]').find(function(i){return i.checked}); return r ? r.value : 'yes' })(),
+        nps: Number($('#nps') && $('#nps').value || 0),
+        client: { ua: navigator.userAgent }
+      };
+    }
+
+    function saveToServer(payload){
+      return fetch('/api/gas-proxy', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
+        body: JSON.stringify({ action:'review.save', data: payload })
+      }).then(function(res){
+        return res.json().catch(function(){ return {} }).then(function(json){ return { status: res.status, ok: json.ok, error: json.error, id: json.id } });
+      });
+    }
+
+    function validate(){
+      var form=$('#rateForm');
+      if(!getParam('bookingId')){ showToast(t('error_bad_link'), false); return false }
+      if(form && !form.checkValidity()){ showToast(t('complete_required'), false); return false }
+      if(!getRating()){ showToast(t('error_no_rating'), false); return false }
+      var text = $('#reviewText') && $('#reviewText').value ? $('#reviewText').value.trim() : '';
+      if(!text){ showToast(t('error_no_text'), false); return false }
+      var nps = Number($('#nps') && $('#nps').value || 0);
+      if(isNaN(nps) || nps<0 || nps>10){ showToast(t('error_bad_nps'), false); return false }
+      return true;
+    }
+
+    function validateSoft(){
+      var hasRating = !!getRating();
+      var txt = $('#reviewText') && $('#reviewText').value ? $('#reviewText').value.trim() : '';
+      var nps = $('#nps') && $('#nps').value;
+      return hasRating && txt.length>0 && nps!=='';
+    }
+
+    function updateValidityHint(){
+      var ok = validateSoft();
+      var v = $('#validityHint'); if(v){ v.textContent = ok ? t('ready_to_send') : t('complete_required') }
+    }
+
+    function onSubmit(){
+      if(!validate()) return;
+      var btn=$('#btnSubmit'); var btnTop=$('#btnSubmitTop');
+      [btn,btnTop].forEach(function(b){ if(b){ b.disabled=true; b.textContent=t('saving') } });
+      saveToServer(collectPayload()).then(function(result){
+        if(result && result.ok){
+          showToast(t('saved_success'), true);
+          var w=document.querySelector('.wrap'); if(w) w.style.display='none';
+          var ab=$('#actionbar'); if(ab) ab.style.display='none';
+          var dv=$('#doneView'); if(dv) dv.style.display='block';
+        } else {
+          showToast(t('save_failed') + ' • ' + (result && result.error ? result.error : 'Unknown error'), false);
+          if(DEBUG) console.error(result);
+        }
+      }).catch(function(err){
+        if(DEBUG) console.error(err);
+        showToast(navigator.onLine ? t('save_failed') : t('offline'), false);
+      }).finally(function(){
+        [btn,btnTop].forEach(function(b){ if(b){ b.disabled=false; b.textContent=t('save_rating') } });
+      });
+    }
+
+    function resetForm(){
+      var f=$('#rateForm'); if(f) f.reset();
+      $$('.chip.active').forEach(function(ch){ ch.classList.remove('active') });
+      updateValidityHint();
+    }
+
+    function t(key){ var lang=document.documentElement.lang||'ar'; return (I18N[lang] && I18N[lang][key]) || key }
 
     function applyI18n(lang){
       document.documentElement.lang=lang;
       document.documentElement.dir=(lang==='ar')?'rtl':'ltr';
-      $('.title').textContent=t('app_title');
-      $('.subtitle').textContent=t('app_subtitle');
-      $('#ratingLegend').textContent=t('overall_rating');
-      $('label[for="reviewText"]').textContent=t('write_review');
-      $('#reviewText').placeholder=t('review_placeholder');
-      // Quick tags section
-      const tagsSec=$('#chipsRow')?.closest('section');
-      if(tagsSec){tagsSec.querySelector('h2.section').textContent=t('what_you_liked');tagsSec.querySelector('.help').textContent=t('tap_to_toggle')}
-      // Satisfaction
-      const satSec=$$('#rateForm .card').find(s=>s.querySelector('.likert'));
-      if(satSec){satSec.querySelector('h2.section').textContent=t('satisfaction_details')}
-      $('label[for="qQuality"]').textContent=t('q_quality');
-      $('label[for="qSpeed"]').textContent=t('q_speed');
-      $('label[for="qStaff"]').textContent=t('q_staff');
-      $('label[for="qValue"]').textContent=t('q_value');
-      $('#qQuality').parentElement.querySelector('.help').textContent=t('help_quality');
-      $('#qSpeed').parentElement.querySelector('.help').textContent=t('help_speed');
-      $('#qStaff').parentElement.querySelector('.help').textContent=t('help_quality');
-      $('#qValue').parentElement.querySelector('.help').textContent=t('help_quality');
-      // Loyalty
-      const loyaltySec=$$('#rateForm .card').find(s=>s.querySelector('input[name="return"]'));
-      if(loyaltySec){
-        loyaltySec.querySelector('h2.section').textContent=t('loyalty');
-        loyaltySec.querySelector('.lbl').textContent=t('return_again');
-        const yesLab=$('input[name="return"][value="yes"]').parentElement; yesLab.lastChild.nodeValue=' '+t('yes');
-        const noLab=$('input[name="return"][value="no"]').parentElement; noLab.lastChild.nodeValue=' '+t('no');
-        $('label[for="nps"]').textContent=t('nps_label');
-        $('#nps').parentElement.querySelector('.help').textContent=t('nps_help');
+      var el;
+      el=$('.title'); if(el) el.textContent=t('app_title');
+      el=$('.subtitle'); if(el) el.textContent=t('app_subtitle');
+      el=$('#ratingLegend'); if(el) el.textContent=t('overall_rating');
+      el=$('label[for="reviewText"]'); if(el) el.textContent=t('write_review');
+      el=$('#reviewText'); if(el) el.placeholder=t('review_placeholder');
+      var tagsSec = $('#chipsRow'); if(tagsSec){ var s = tagsSec.closest('section'); if(s){ var h=s.querySelector('h2.section'); if(h) h.textContent=t('what_you_liked'); var hp=s.querySelector('.help'); if(hp) hp.textContent=t('tap_to_toggle') } }
+      el=$('h2.section'); // not changing the first, handled above
+      var satCard = (function(){ var cards=$$('#rateForm .card'); for(var i=0;i<cards.length;i++){ if(cards[i].querySelector('.likert')) return cards[i]; } return null })();
+      if(satCard){ var h2=satCard.querySelector('h2.section'); if(h2) h2.textContent=t('satisfaction_details'); }
+      el=$('label[for="qQuality"]'); if(el) el.textContent=t('q_quality');
+      el=$('label[for="qSpeed"]'); if(el) el.textContent=t('q_speed');
+      el=$('label[for="qStaff"]'); if(el) el.textContent=t('q_staff');
+      el=$('label[for="qValue"]'); if(el) el.textContent=t('q_value');
+      var q;
+      q=$('#qQuality'); if(q && q.parentElement){ var hp1=q.parentElement.querySelector('.help'); if(hp1) hp1.textContent=t('help_quality') }
+      q=$('#qSpeed'); if(q && q.parentElement){ var hp2=q.parentElement.querySelector('.help'); if(hp2) hp2.textContent=t('help_speed') }
+      q=$('#qStaff'); if(q && q.parentElement){ var hp3=q.parentElement.querySelector('.help'); if(hp3) hp3.textContent=t('help_quality') }
+      q=$('#qValue'); if(q && q.parentElement){ var hp4=q.parentElement.querySelector('.help'); if(hp4) hp4.textContent=t('help_quality') }
+      var loyalty = (function(){ var cards=$$('#rateForm .card'); for(var i=0;i<cards.length;i++){ if(cards[i].querySelector('input[name="return"]')) return cards[i]; } return null })();
+      if(loyalty){
+        var h=loyalty.querySelector('h2.section'); if(h) h.textContent=t('loyalty');
+        el=loyalty.querySelector('.lbl'); if(el) el.textContent=t('return_again');
+        var yesInp=$('input[name="return"][value="yes"]'); if(yesInp && yesInp.parentElement){ yesInp.parentElement.lastChild.nodeValue=' '+t('yes') }
+        var noInp=$('input[name="return"][value="no"]'); if(noInp && noInp.parentElement){ noInp.parentElement.lastChild.nodeValue=' '+t('no') }
+        el=$('label[for="nps"]'); if(el) el.textContent=t('nps_label');
+        var npsHelp=$('#nps') && $('#nps').parentElement ? $('#nps').parentElement.querySelector('.help') : null; if(npsHelp) npsHelp.textContent=t('nps_help');
       }
-      // Submit (inline card)
-      const inline=$('#inlineAction');
-      if(inline){
-        inline.querySelector('h2.section').textContent=t('submit_section');
-        inline.querySelector('.help').textContent=t('submit_note');
-        $('#btnSubmitTop').textContent=t('save_rating');
-        $('#btnReset').textContent=t('reset');
+      var inline=$('#inlineAction'); if(inline){
+        var sh=inline.querySelector('h2.section'); if(sh) sh.textContent=t('submit_section');
+        var sp=inline.querySelector('.help'); if(sp) sp.textContent=t('submit_note');
+        el=$('#btnSubmitTop'); if(el) el.textContent=t('save_rating');
+        el=$('#btnReset'); if(el) el.textContent=t('reset');
       }
-      // Actionbar + buttons
-      $('#validityHint').textContent=t('complete_required');
-      $('#btnSubmit').textContent=t('save_rating');
-      // Done view
-      $('#doneView h2.section').textContent=t('thanks_title');
-      $('#doneView .help').textContent=t('thanks_body');
-      $('#btnAnother').textContent=t('send_another');
-      // Chips rehydrate for current language
+      el=$('#validityHint'); if(el) el.textContent=t('complete_required');
+      el=$('#btnSubmit'); if(el) el.textContent=t('save_rating');
+      var dv=$('#doneView'); if(dv){ var h2=dv.querySelector('h2.section'); if(h2) h2.textContent=t('thanks_title'); var hp=dv.querySelector('.help'); if(hp) hp.textContent=t('thanks_body'); }
+      el=$('#btnAnother'); if(el) el.textContent=t('send_another');
       hydrateTags();
-      // Toggle label
-      const langBtn=$('#langToggle'); if(langBtn){langBtn.textContent=(lang==='ar'?'EN':'AR')}
+      var langBtn=$('#langToggle'); if(langBtn){ langBtn.textContent = (lang==='ar'?'EN':'AR') }
     }
 
     function setTheme(theme){
-      const root=document.documentElement;
-      if(theme==='dark'){root.setAttribute('data-theme','dark')} else {root.removeAttribute('data-theme')}
-      const thBtn=$('#themeToggle'); if(thBtn){thBtn.textContent=(theme==='dark'?'☀️':'🌙')}
+      var root=document.documentElement;
+      if(theme==='dark'){ root.setAttribute('data-theme','dark') } else { root.removeAttribute('data-theme') }
+      var thBtn=$('#themeToggle'); if(thBtn){ thBtn.textContent=(theme==='dark'?'☀️':'🌙') }
     }
 
-    const $=(s,r=document)=>r.querySelector(s);
-    const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-    function showToast(msg,ok=true){const t=$('#toast');if(!t)return;t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2500)}
+    // INIT
+    $$('.reveal').forEach(function(el){ io.observe(el) });
+    hydrateTags();
+    var storedTheme=localStorage.getItem('nahl.rate.theme');
+    var prefersDark = false; try{ prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches }catch(e){}
+    setTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
+    var storedLang=localStorage.getItem('nahl.rate.lang');
+    var initialLang = storedLang || (document.documentElement.lang || 'ar');
+    applyI18n(initialLang);
 
-    // IntersectionObserver reveal
-    const io=new IntersectionObserver((entries)=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.05});
-
-    function hydrateTags(){
-      const row=$('#chipsRow');row.innerHTML='';
-      const lang=document.documentElement.lang||'ar';
-      CONFIG.tags.forEach(t=>{
-        const b=document.createElement('button');
-        b.type='button';b.className='chip';b.setAttribute('aria-pressed','false');b.textContent=(lang==='en'?t.en:t.ar);
-        b.addEventListener('click',()=>{const on=b.classList.toggle('active');b.setAttribute('aria-pressed',on?'true':'false')});
-        row.appendChild(b);
-      });
-    });
-        row.appendChild(b);
-      });
-    }
-
-    function getRating(){const r=$$('input[name="rating"]').find(i=>i.checked);return r?Number(r.value):0}
-    function getParam(name){const u=new URL(window.location.href);return u.searchParams.get(name)}
-
-    function collectPayload(){
-      const chips=$$('.chip.active').map(ch=>ch.textContent);
-      return{
-        bookingId:getParam('bookingId')||'',
-        ts:new Date().toISOString(),
-        lang:document.documentElement.lang||'ar',
-        rating:getRating(),
-        reviewText:$('#reviewText').value.trim(),
-        tags:chips,
-        q:{quality:Number($('#qQuality').value||0),speed:Number($('#qSpeed').value||0),staff:Number($('#qStaff').value||0),value:Number($('#qValue').value||0)},
-        wouldReturn:$$('input[name="return"]').find(r=>r.checked)?.value||'yes',
-        nps:Number($('#nps').value||0),
-        client:{ua:navigator.userAgent}
-      }
-    }
-
-    async function saveToServer(payload){
-      const res=await fetch('/api/gas-proxy',{method:'POST',headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},body:JSON.stringify({action:'review.save',data:payload})});
-      const json=await res.json().catch(()=>({}));
-      return{status:res.status,...json}
-    }
-
-    function validate(){
-      const form=$('#rateForm');
-      if(!getParam('bookingId')){showToast(t('error_bad_link'),false);return false}
-      if(!form.checkValidity()){showToast(t('complete_required'),false);return false}
-      if(!getRating()){showToast(t('error_no_rating'),false);return false}
-      const text=$('#reviewText').value.trim(); if(!text){showToast(t('error_no_text'),false);return false}
-      const nps=Number($('#nps').value||0); if(Number.isNaN(nps)||nps<0||nps>10){showToast(t('error_bad_nps'),false);return false}
-      return true
-    }
-      if(!form.checkValidity()){showToast('الرجاء إكمال الحقول المطلوبة',false);return false}
-      if(!getRating()){showToast('الرجاء اختيار التقييم بالنجوم',false);return false}
-      const text=$('#reviewText').value.trim();if(!text){showToast('الرجاء كتابة التقييم النصي',false);return false}
-      const nps=Number($('#nps').value||0);if(Number.isNaN(nps)||nps<0||nps>10){showToast('قيمة NPS يجب أن تكون بين 0 و 10',false);return false}
-      return true
-    }
-
-    function updateValidityHint(){
-      const ok=validateSoft();
-      $('#validityHint').textContent = ok ? t('ready_to_send') : t('complete_required');
-    }
-    function validateSoft(){
-      const hasRating=!!getRating();
-      const hasText=$('#reviewText').value.trim().length>0;
-      const nps=$('#nps').value;
-      return hasRating && hasText && nps!=='';
-    }
-
-    async function onSubmit(){
-      if(!validate())return;
-      const btn=$('#btnSubmit'); const btnTop=$('#btnSubmitTop');
-      [btn,btnTop].forEach(b=>{if(b){b.disabled=true; b.textContent=t('saving')}});
-      try{
-        const result=await saveToServer(collectPayload());
-        if(result.ok){
-          showToast(t('saved_success'),true);
-          document.querySelector('.wrap').style.display='none';
-          $('#actionbar').style.display='none';
-          $('#doneView').style.display='block';
-        }else{
-          showToast(t('save_failed')+' • '+(result.error||'Unknown error'),false);
-          if(DEBUG)console.error(result);
-        }
-      }catch(err){
-        if(DEBUG)console.error(err);
-        showToast(navigator.onLine?t('save_failed'):t('offline'),false);
-      }finally{
-        [btn,btnTop].forEach(b=>{if(b){b.disabled=false; b.textContent=t('save_rating')}});
-      }
-    }});
-      try{
-        const result=await saveToServer(collectPayload());
-        if(result.ok){
-          showToast('تم الحفظ بنجاح',true);
-          document.querySelector('.wrap').style.display='none';
-          $('#actionbar').style.display='none';
-          $('#doneView').style.display='block';
-        }else{
-          showToast('تعذّر الحفظ • '+(result.error||'خطأ غير معروف'),false);
-          if(DEBUG)console.error(result)
-        }
-      }catch(err){
-        if(DEBUG)console.error(err);
-        showToast(navigator.onLine?'تعذّر الحفظ، حاول مرة أخرى':'لا يوجد اتصال بالإنترنت',false)
-      }finally{
-        [btn,btnTop].forEach(b=>{if(b){b.disabled=false;b.textContent='حفظ التقييم'}})
-      }
-    }
-
-    function resetForm(){
-      $('#rateForm').reset();
-      $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
-      updateValidityHint();
-    }
-
-    (function init(){
-      // Reveal
-      $$('.reveal').forEach(el=>io.observe(el));
-      // Chips
-      hydrateTags();
-      // Theme default
-      const storedTheme=localStorage.getItem('nahl.rate.theme');
-      const prefersDark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(storedTheme || (prefersDark?'dark':'light'));
-      // Lang default
-      const storedLang=localStorage.getItem('nahl.rate.lang');
-      const initialLang = storedLang || document.documentElement.lang || 'ar';
-      applyI18n(initialLang);
-      // Actions
-      $('#btnSubmit').addEventListener('click',onSubmit);
-      $('#rateForm').addEventListener('submit',e=>{e.preventDefault();onSubmit()});
-      $('#btnReset')?.addEventListener('click',()=>{resetForm();showToast('↺')});
-      $('#btnAnother').addEventListener('click',()=>location.reload());
-      // Toggles
-      $('#langToggle').addEventListener('click',()=>{const next=(document.documentElement.lang==='ar'?'en':'ar'); localStorage.setItem('nahl.rate.lang',next); applyI18n(next)});
-      $('#themeToggle').addEventListener('click',()=>{const isDark=document.documentElement.getAttribute('data-theme')==='dark'; const next=isDark?'light':'dark'; localStorage.setItem('nahl.rate.theme',next); setTheme(next)});
-      // Soft validity tracking
-      ['input','change','keyup'].forEach(ev=>document.addEventListener(ev,updateValidityHint,true));
-      updateValidityHint();
-    })();
-  </script>
+    var btnSubmit=$('#btnSubmit'); if(btnSubmit) btnSubmit.addEventListener('click', onSubmit);
+    var form=$('#rateForm'); if(form) form.addEventListener('submit', function(e){ e.preventDefault(); onSubmit() });
+    var btnReset=$('#btnReset'); if(btnReset) btnReset.addEventListener('click', function(){ resetForm(); showToast('↺') });
+    var btnAnother=$('#btnAnother'); if(btnAnother) btnAnother.addEventListener('click', function(){ location.reload() });
+    var langToggle=$('#langToggle'); if(langToggle) langToggle.addEventListener('click', function(){ var next=(document.documentElement.lang==='ar'?'en':'ar'); localStorage.setItem('nahl.rate.lang', next); applyI18n(next) });
+    var themeToggle=$('#themeToggle'); if(themeToggle) themeToggle.addEventListener('click', function(){ var isDark=document.documentElement.getAttribute('data-theme')==='dark'; var next=isDark?'light':'dark'; localStorage.setItem('nahl.rate.theme', next); setTheme(next) });
+    ['input','change','keyup'].forEach(function(ev){ document.addEventListener(ev, updateValidityHint, true) });
+    updateValidityHint();
+  })();
+</script>
 </body>
 </html>
