@@ -12,14 +12,13 @@
 
   <style>
     :root {
-      /* Nahl design tokens */
       --bg: #f4f6f8;
       --card: #ffffff;
       --text: #1f2937;
       --muted: #6b7280;
-      --primary: #2563eb;         /* primary blue */
+      --primary: #2563eb;
       --primary-600: #1d4ed8;
-      --accent: #F4CE14;           /* Nahl yellow */
+      --accent: #F4CE14;
       --success: #16a34a;
       --danger: #dc2626;
       --border: #e5e7eb;
@@ -28,36 +27,18 @@
       --shadow: 0 8px 24px rgba(0,0,0,.08);
       --radius: 16px;
     }
-
     [dir="ltr"] body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
     [dir="rtl"] body { font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-
     * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--text);
-      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-    }
+    body { margin: 0; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 20px 16px 64px; }
 
-    .wrap {
-      max-width: 760px; margin: 0 auto; padding: 20px 16px 64px;
-    }
-
-    header.site {
-      display: flex; align-items: center; gap: 12px;
-      padding: 16px; margin: 8px 0 16px; background: var(--card);
-      border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
-    }
-    .brand {
-      width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #ffd95c);
-      display: grid; place-items: center; font-weight: 800; color: #111827;
-    }
+    header.site { display: flex; align-items: center; gap: 12px; padding: 16px; margin: 8px 0 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .brand { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #ffd95c); display: grid; place-items: center; font-weight: 800; color: #111827; }
     .title { font-size: 18px; font-weight: 800; }
     .subtitle { color: var(--muted); font-size: 13px; }
 
-    .card {
-      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-      box-shadow: var(--shadow); padding: 16px; margin: 12px 0;
-    }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin: 12px 0; }
     h2.section { font-size: 16px; margin: 0 0 10px; }
     .row { display: grid; gap: 12px; }
     @media (min-width: 640px) { .row.cols-2 { grid-template-columns: 1fr 1fr; } }
@@ -72,16 +53,12 @@
     textarea:focus, select:focus, input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
     textarea { min-height: 110px; resize: vertical; }
 
-    /* Stars */
     .stars { display: inline-flex; flex-direction: row-reverse; gap: 6px; }
     .stars input { display: none; }
-    .stars label {
-      cursor: pointer; font-size: 28px; line-height: 1; color: #c7ced9; transition: transform .05s ease;
-    }
+    .stars label { cursor: pointer; font-size: 28px; line-height: 1; color: #c7ced9; transition: transform .05s ease; }
     .stars label:hover, .stars label:hover ~ label { color: #ffd95c; transform: scale(1.02); }
     .stars input:checked ~ label { color: #f7c948; }
 
-    /* Chips */
     .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip {
       background: var(--chip); color: var(--chip-text); border: 1px dashed #c7d2fe;
@@ -91,37 +68,25 @@
     .chip.active { background: #dbeafe; border-style: solid; }
     .chip:active { transform: translateY(1px); }
 
-    /* Range (Likert) */
     .likert { display: grid; gap: 6px; }
     .likert input[type="range"] { width: 100%; }
 
-    /* Toggles & Radios */
     .radio-row, .toggle-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .radio { padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; cursor: pointer; }
     .radio input { margin-inline-end: .5rem; }
 
-    /* Buttons */
     .btns { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn {
-      border: 1px solid transparent; padding: 12px 16px; border-radius: 12px; cursor: pointer;
-      font-weight: 700; font-size: 14px;
-    }
+    .btn { border: 1px solid transparent; padding: 12px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 14px; }
     .btn.primary { background: var(--primary); color: #fff; }
     .btn.primary:hover { background: var(--primary-600); }
     .btn.ghost { background: #fff; color: var(--text); border-color: var(--border); }
     .btn.ghost:hover { border-color: var(--primary); }
 
-    /* Toast */
-    .toast {
-      position: fixed; inset-inline: 16px; bottom: 16px; z-index: 50;
-      display: none; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--card);
-      box-shadow: var(--shadow); font-size: 14px;
-    }
+    .toast { position: fixed; inset-inline: 16px; bottom: 16px; z-index: 50; display: none; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); font-size: 14px; }
     .toast.show { display: block; }
     .toast.ok { border-color: #bbf7d0; }
     .toast.err { border-color: #fecaca; }
 
-    /* Footer note */
     footer.note { text-align: center; color: var(--muted); font-size: 12px; margin-top: 18px; }
     .lang-switch { margin-inline-start: auto; display:flex; gap:8px; align-items:center; }
     .lang-switch button { font-size: 12px; padding: 6px 10px; border-radius: 999px; border:1px solid var(--border); background:#fff; cursor:pointer; }
@@ -130,7 +95,6 @@
 </head>
 <body>
   <div class="wrap">
-    <!-- Header -->
     <header class="site">
       <div class="brand" aria-hidden="true">N</div>
       <div>
@@ -143,7 +107,6 @@
       </div>
     </header>
 
-    <!-- Rating -->
     <section class="card">
       <h2 class="section" data-i18n="overall_rating">التقييم العام</h2>
       <div class="stars" role="radiogroup" aria-label="Rating">
@@ -158,14 +121,12 @@
       <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review"></textarea>
     </section>
 
-    <!-- Quick tags -->
     <section class="card">
       <h2 class="section" data-i18n="highlights">ما الذي أعجبك؟</h2>
       <div class="chips" id="chipsRow"></div>
       <p class="help" data-i18n="chips_help">انقر للإضافة أو الإزالة • Tap to add/remove</p>
     </section>
 
-    <!-- Service context -->
     <section class="card">
       <h2 class="section" data-i18n="service_context">تفاصيل الخدمة</h2>
       <div class="row cols-2">
@@ -186,7 +147,6 @@
       </div>
     </section>
 
-    <!-- Satisfaction details -->
     <section class="card">
       <h2 class="section" data-i18n="details_title">تفاصيل الرضا</h2>
       <div class="row cols-2">
@@ -213,7 +173,6 @@
       </div>
     </section>
 
-    <!-- Would return + NPS -->
     <section class="card">
       <h2 class="section" data-i18n="loyalty_title">الولاء</h2>
       <div class="row cols-2">
@@ -232,7 +191,6 @@
       </div>
     </section>
 
-    <!-- Optional contact -->
     <section class="card">
       <h2 class="section" data-i18n="followup_title">متابعة اختيارية</h2>
       <div class="row cols-2">
@@ -250,7 +208,6 @@
       </div>
     </section>
 
-    <!-- Actions -->
     <section class="card">
       <h2 class="section" data-i18n="actions_title">الإرسال</h2>
       <p class="help" data-i18n="actions_help">سيتم حفظ تقييمك لدينا، ثم فتح نافذة Google لكتابة التقييم العام.</p>
@@ -260,25 +217,15 @@
       </div>
     </section>
 
-    <footer class="note">
-      <span data-i18n="footer_note">تصميم نحل • Nahl design • يعمل دون مكتبات خارجية</span>
-    </footer>
+    <footer class="note"><span data-i18n="footer_note">تصميم نحل • Nahl design • يعمل دون مكتبات خارجية</span></footer>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-    /***********************
-     * CONFIG (edit these)
-     ***********************/
     const CONFIG = {
       PLACE_ID: "REPLACE_WITH_GOOGLE_PLACE_ID", // e.g. ChIJN1t_tDeuEmsRUsoyG83frY4
-      GAS_ENDPOINT: "https://script.google.com/macros/s/AKfycbxOiEhHT_3undWEM5yy8SnZs6kqqMS5LSptMklZNuH1eaKJ0ixeZZhaAR2efSCYqTmELQ/exec",
-      REVIEWS_TOKEN: "REPLACE_WITH_SHARED_TOKEN", // Optional: must match REVIEWS_TOKEN in Script Properties
-      SHEET_ID: "1aMo-5XuQcloEQUlfhQRR1JRwvCWHKgJ2XhEkgf4-zJc",
-      SHEET_NAME: "Reviews",
-      // UI data
+      defaultLang: "ar",
       tags: [
         { ar: "السرعة", en: "Speed" },
         { ar: "الجودة", en: "Quality" },
@@ -303,160 +250,58 @@
         { ar: "كبير", en: "Large" },
         { ar: "دفع رباعي", en: "SUV" },
         { ar: "فان", en: "Van" }
-      ],
-      defaultLang: "ar" // "ar" or "en"
+      ]
     };
 
-    /***********************
-     * i18n strings
-     ***********************/
     const I18N = {
-      ar: {
-        app_title: "قيّم تجربتك",
-        app_subtitle: "تقييم يشبه تجربة خرائط Google • Google-style rating",
-        overall_rating: "التقييم العام",
-        rating_help: "اختر من نجمة إلى خمس نجوم • Choose 1–5 stars",
-        write_review: "اكتب رأيك",
-        highlights: "ما الذي أعجبك؟",
-        chips_help: "انقر للإضافة أو الإزالة • Tap to add/remove",
-        service_context: "تفاصيل الخدمة",
-        service_received: "الخدمة",
-        vehicle_size: "حجم المركبة",
-        visit_date: "تاريخ الزيارة",
-        details_title: "تفاصيل الرضا",
-        q_quality: "جودة التنظيف",
-        q_speed: "سرعة الخدمة",
-        q_staff: "احترافية الموظفين",
-        q_value: "القيمة مقابل السعر",
-        scale_1_5: "1 سيئة جدًا ← 5 ممتازة",
-        loyalty_title: "الولاء",
-        would_return: "هل ستعود مرة أخرى؟",
-        yes: "نعم",
-        no: "لا",
-        nps_label: "التوصية بنا (0–10)",
-        nps_help: "0 لن أوصي إطلاقًا ← 10 أوصي بقوة",
-        followup_title: "متابعة اختيارية",
-        name: "الاسم",
-        phone: "الهاتف",
-        allow_contact: "أوافق على التواصل معي بشأن تقييمي",
-        actions_title: "الإرسال",
-        actions_help: "سيتم حفظ تقييمك لدينا، ثم فتح نافذة Google لكتابة التقييم العام.",
-        btn_submit: "حفظ & فتح Google",
-        btn_google_only: "فتح Google فقط",
-        footer_note: "تصميم نحل • Nahl design • يعمل دون مكتبات خارجية",
-        toast_saved: "تم الحفظ بنجاح",
-        toast_error: "تعذّر الحفظ، حاول مرة أخرى",
-        toast_missing_rating: "الرجاء اختيار التقييم بالنجوم",
-        toast_missing_text: "الرجاء كتابة التقييم النصي"
+      ar: { app_title:"قيّم تجربتك", app_subtitle:"تقييم يشبه تجربة خرائط Google • Google-style rating",
+        overall_rating:"التقييم العام", rating_help:"اختر من نجمة إلى خمس نجوم • Choose 1–5 stars",
+        write_review:"اكتب رأيك", highlights:"ما الذي أعجبك؟", chips_help:"انقر للإضافة أو الإزالة • Tap to add/remove",
+        service_context:"تفاصيل الخدمة", service_received:"الخدمة", vehicle_size:"حجم المركبة", visit_date:"تاريخ الزيارة",
+        details_title:"تفاصيل الرضا", q_quality:"جودة التنظيف", q_speed:"سرعة الخدمة", q_staff:"احترافية الموظفين", q_value:"القيمة مقابل السعر",
+        scale_1_5:"1 سيئة جدًا ← 5 ممتازة", loyalty_title:"الولاء", would_return:"هل ستعود مرة أخرى؟",
+        yes:"نعم", no:"لا", nps_label:"التوصية بنا (0–10)", nps_help:"0 لن أوصي إطلاقًا ← 10 أوصي بقوة",
+        followup_title:"متابعة اختيارية", name:"الاسم", phone:"الهاتف", allow_contact:"أوافق على التواصل معي بشأن تقييمي",
+        actions_title:"الإرسال", actions_help:"سيتم حفظ تقييمك لدينا، ثم فتح نافذة Google لكتابة التقييم العام.",
+        btn_submit:"حفظ & فتح Google", btn_google_only:"فتح Google فقط", footer_note:"تصميم نحل • Nahl design • يعمل دون مكتبات خارجية",
+        toast_saved:"تم الحفظ بنجاح", toast_error:"تعذّر الحفظ، حاول مرة أخرى", toast_missing_rating:"الرجاء اختيار التقييم بالنجوم",
+        toast_missing_text:"الرجاء كتابة التقييم النصي"
       },
-      en: {
-        app_title: "Rate your experience",
-        app_subtitle: "Google-style review flow",
-        overall_rating: "Overall rating",
-        rating_help: "Choose 1–5 stars",
-        write_review: "Write a review",
-        highlights: "What stood out?",
-        chips_help: "Tap to add/remove",
-        service_context: "Service details",
-        service_received: "Service received",
-        vehicle_size: "Vehicle size",
-        visit_date: "Visit date",
-        details_title: "Satisfaction details",
-        q_quality: "Quality of cleaning",
-        q_speed: "Speed of service",
-        q_staff: "Staff professionalism",
-        q_value: "Value for money",
-        scale_1_5: "1 Very poor ← 5 Excellent",
-        loyalty_title: "Loyalty",
-        would_return: "Would you visit again?",
-        yes: "Yes",
-        no: "No",
-        nps_label: "Recommend us (0–10)",
-        nps_help: "0 Not at all likely ← 10 Extremely likely",
-        followup_title: "Optional follow-up",
-        name: "Name",
-        phone: "Phone",
-        allow_contact: "I agree to be contacted about my review",
-        actions_title: "Submit",
-        actions_help: "We’ll save your review, then open Google’s review dialog.",
-        btn_submit: "Save & Open Google",
-        btn_google_only: "Open Google only",
-        footer_note: "Nahl design • No external libraries",
-        toast_saved: "Saved successfully",
-        toast_error: "Save failed, please try again",
-        toast_missing_rating: "Please choose a star rating",
-        toast_missing_text: "Please write your review text"
+      en: { app_title:"Rate your experience", app_subtitle:"Google-style review flow",
+        overall_rating:"Overall rating", rating_help:"Choose 1–5 stars", write_review:"Write a review",
+        highlights:"What stood out?", chips_help:"Tap to add/remove", service_context:"Service details",
+        service_received:"Service received", vehicle_size:"Vehicle size", visit_date:"Visit date",
+        details_title:"Satisfaction details", q_quality:"Quality of cleaning", q_speed:"Speed of service",
+        q_staff:"Staff professionalism", q_value:"Value for money", scale_1_5:"1 Very poor ← 5 Excellent",
+        loyalty_title:"Loyalty", would_return:"Would you visit again?", yes:"Yes", no:"No",
+        nps_label:"Recommend us (0–10)", nps_help:"0 Not at all likely ← 10 Extremely likely",
+        followup_title:"Optional follow-up", name:"Name", phone:"Phone", allow_contact:"I agree to be contacted about my review",
+        actions_title:"Submit", actions_help:"We’ll save your review, then open Google’s review dialog.",
+        btn_submit:"Save & Open Google", btn_google_only:"Open Google only", footer_note:"Nahl design • No external libraries",
+        toast_saved:"Saved successfully", toast_error:"Save failed, please try again",
+        toast_missing_rating:"Please choose a star rating", toast_missing_text:"Please write your review text"
       }
     };
 
-    /***********************
-     * Helpers
-     ***********************/
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-    function showToast(msg, ok=true) {
-      const t = $('#toast');
-      t.textContent = msg;
-      t.className = 'toast show ' + (ok ? 'ok' : 'err');
-      setTimeout(()=> t.classList.remove('show'), 2500);
-    }
-
-    function getRating(){
-      const r = $$('input[name="rating"]').find(i => i.checked);
-      return r ? Number(r.value) : 0;
-    }
+    function showToast(msg, ok=true){ const t=$('#toast'); t.textContent=msg; t.className='toast show '+(ok?'ok':'err'); setTimeout(()=>t.classList.remove('show'),2500); }
+    function getRating(){ const r=$$('input[name="rating"]').find(i=>i.checked); return r?Number(r.value):0; }
 
     function setLang(lang){
-      const dir = (lang === 'ar') ? 'rtl' : 'ltr';
-      document.documentElement.lang = lang;
-      document.documentElement.dir = dir;
-      // swap button active state
-      $('#btnAr').classList.toggle('active', lang==='ar');
-      $('#btnEn').classList.toggle('active', lang==='en');
-      // translate UI
-      const dict = I18N[lang];
-      $$('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) el.textContent = dict[key];
-      });
-      // update select/options & chips texts
+      const dir=(lang==='ar')?'rtl':'ltr';
+      document.documentElement.lang=lang; document.documentElement.dir=dir;
+      $('#btnAr').classList.toggle('active', lang==='ar'); $('#btnEn').classList.toggle('active', lang==='en');
+      const dict=I18N[lang]; $$('[data-i18n]').forEach(el=>{ const k=el.getAttribute('data-i18n'); if (dict[k]) el.textContent=dict[k]; });
       hydrateOptions(lang);
     }
 
     function hydrateOptions(lang){
-      // chips
-      const chipsRow = $('#chipsRow');
-      chipsRow.innerHTML = '';
-      CONFIG.tags.forEach((t, idx) => {
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'chip';
-        chip.dataset.key = String(idx);
-        chip.textContent = t[lang];
-        chip.addEventListener('click', () => chip.classList.toggle('active'));
-        chipsRow.appendChild(chip);
-      });
-
-      // service select
-      const svc = $('#serviceSelect');
-      svc.innerHTML = '';
-      CONFIG.services.forEach((o,i) => {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = o[lang];
-        svc.appendChild(opt);
-      });
-
-      // vehicle size
-      const vs = $('#vehicleSize');
-      vs.innerHTML = '';
-      CONFIG.vehicleSizes.forEach((o,i) => {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = o[lang];
-        vs.appendChild(opt);
-      });
+      const chipsRow=$('#chipsRow'); chipsRow.innerHTML='';
+      CONFIG.tags.forEach((t,idx)=>{ const b=document.createElement('button'); b.type='button'; b.className='chip'; b.dataset.key=String(idx); b.textContent=t[lang]; b.addEventListener('click',()=>b.classList.toggle('active')); chipsRow.appendChild(b); });
+      const svc=$('#serviceSelect'); svc.innerHTML=''; CONFIG.services.forEach((o,i)=>{ const opt=document.createElement('option'); opt.value=i; opt.textContent=o[lang]; svc.appendChild(opt); });
+      const vs=$('#vehicleSize'); vs.innerHTML=''; CONFIG.vehicleSizes.forEach((o,i)=>{ const opt=document.createElement('option'); opt.value=i; opt.textContent=o[lang]; vs.appendChild(opt); });
     }
 
     function buildGoogleReviewURL(){
@@ -465,66 +310,38 @@
     }
 
     function collectPayload(){
-      const lang = document.documentElement.lang || CONFIG.defaultLang;
-      const rating = getRating();
-      const text = $('#reviewText').value.trim();
-      const chips = $$('.chip.active').map(ch => ch.textContent);
-      const serviceIdx = $('#serviceSelect').value;
-      const sizeIdx = $('#vehicleSize').value;
-      const payload = {
-        ts: new Date().toISOString(),
+      const lang=document.documentElement.lang || CONFIG.defaultLang;
+      const rating=getRating();
+      const text=$('#reviewText').value.trim();
+      const chips=$$('.chip.active').map(ch=>ch.textContent);
+      const serviceIdx=$('#serviceSelect').value;
+      const sizeIdx=$('#vehicleSize').value;
+      return {
+        ts:new Date().toISOString(),
         lang,
         placeId: CONFIG.PLACE_ID,
         rating,
-        reviewText: text,
-        tags: chips,
+        reviewText:text,
+        tags:chips,
         service: CONFIG.services[serviceIdx] ? CONFIG.services[serviceIdx][lang] : '',
         vehicleSize: CONFIG.vehicleSizes[sizeIdx] ? CONFIG.vehicleSizes[sizeIdx][lang] : '',
         visitDate: $('#visitDate').value || null,
-        q: {
-          quality: Number($('#qQuality').value),
-          speed: Number($('#qSpeed').value),
-          staff: Number($('#qStaff').value),
-          value: Number($('#qValue').value)
-        },
-        wouldReturn: $$('input[name="return"]').find(r => r.checked)?.value || 'yes',
+        q:{ quality:Number($('#qQuality').value), speed:Number($('#qSpeed').value), staff:Number($('#qStaff').value), value:Number($('#qValue').value) },
+        wouldReturn: $$('input[name="return"]').find(r=>r.checked)?.value || 'yes',
         nps: Number($('#nps').value || 0),
-        contact: {
-          name: $('#contactName').value.trim(),
-          phone: $('#contactPhone').value.trim(),
-          allow: $('#allowContact').checked
-        },
-        sheet: { id: CONFIG.SHEET_ID, name: CONFIG.SHEET_NAME }
+        contact:{ name:$('#contactName').value.trim(), phone:$('#contactPhone').value.trim(), allow:$('#allowContact').checked }
       };
-      return payload;
     }
 
-    /** =========================
-     * SAVE WITHOUT PREFLIGHT
-     * ========================= */
+    // === Same-origin proxy call (no CORS issues) ===
     async function saveToGAS(payload){
-      // Mock if not configured
-      if (!CONFIG.GAS_ENDPOINT || CONFIG.GAS_ENDPOINT.startsWith("REPLACE_")) {
-        await new Promise(r => setTimeout(r, 300));
-        return { ok: true, mock: true };
-      }
-
-      // Build URL (attach token in query)
-      const url = CONFIG.GAS_ENDPOINT + (CONFIG.GAS_ENDPOINT.includes('?') ? '&' : '?') +
-        'action=review.save' +
-        (CONFIG.REVIEWS_TOKEN ? '&token=' + encodeURIComponent(CONFIG.REVIEWS_TOKEN) : '');
-
-      // Send as x-www-form-urlencoded to avoid CORS preflight
-      const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
-
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body
+      const res = await fetch("/api/gas-proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
-
-      if (!res.ok) throw new Error('Network error: ' + res.status);
-      let json; try { json = await res.json(); } catch(e){ json = { ok:false, parseError:true }; }
+      if (!res.ok) throw new Error("Network error: " + res.status);
+      let json; try { json=await res.json(); } catch(e){ json={ ok:false, parseError:true }; }
       return json;
     }
 
@@ -538,61 +355,41 @@
 
     async function onSubmit(openGoogleAfter=true){
       if (!validate()) return;
-      const btn = $('#btnSubmit');
-      const googleOnlyBtn = $('#btnGoogle');
-      btn.disabled = true; googleOnlyBtn.disabled = true;
-      btn.textContent = document.documentElement.lang === 'ar' ? 'جارٍ الحفظ…' : 'Saving…';
+      const btn=$('#btnSubmit'); const googleOnlyBtn=$('#btnGoogle');
+      btn.disabled=true; googleOnlyBtn.disabled=true;
+      btn.textContent = document.documentElement.lang==='ar' ? 'جارٍ الحفظ…' : 'Saving…';
       try{
         const payload = collectPayload();
         const result = await saveToGAS(payload);
         if (result && result.ok){
           showToast(I18N[document.documentElement.lang].toast_saved, true);
-          if (openGoogleAfter){
-            const u = buildGoogleReviewURL();
-            if (u) window.open(u, '_blank', 'noopener');
-          }
-          // Reset basics
-          const checked = $('input[name="rating"]:checked');
-          if (checked) checked.checked = false;
-          $('#reviewText').value = '';
-          $$('.chip.active').forEach(ch => ch.classList.remove('active'));
+          if (openGoogleAfter){ const u=buildGoogleReviewURL(); if (u) window.open(u,'_blank','noopener'); }
+          const checked=$('input[name="rating"]:checked'); if (checked) checked.checked=false;
+          $('#reviewText').value=''; $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
         } else {
           showToast(I18N[document.documentElement.lang].toast_error, false);
         }
       } catch(err){
-        console.error(err);
-        showToast(I18N[document.documentElement.lang].toast_error, false);
+        console.error(err); showToast(I18N[document.documentElement.lang].toast_error, false);
       } finally {
-        btn.disabled = false; googleOnlyBtn.disabled = false;
+        btn.disabled=false; googleOnlyBtn.disabled=false;
         btn.textContent = I18N[document.documentElement.lang].btn_submit;
       }
     }
 
     function openGoogleOnly(){
-      const u = buildGoogleReviewURL();
-      if (u) window.open(u, '_blank', 'noopener');
+      const u=buildGoogleReviewURL();
+      if (u) window.open(u,'_blank','noopener');
       else showToast('Missing PLACE_ID', false);
     }
 
-    /***********************
-     * Init
-     ***********************/
     (function init(){
-      // language switch
-      $('#btnAr').addEventListener('click', () => setLang('ar'));
-      $('#btnEn').addEventListener('click', () => setLang('en'));
-
-      // hydrate static controls (chips/selects)
-      hydrateOptions(CONFIG.defaultLang);
-      setLang(CONFIG.defaultLang);
-
-      // default visit date = today
-      const today = new Date(); const d = today.toISOString().slice(0,10);
-      $('#visitDate').value = d;
-
-      // actions
-      $('#btnSubmit').addEventListener('click', () => onSubmit(true));
-      $('#btnGoogle').addEventListener('click', openGoogleOnly);
+      $('#btnAr').addEventListener('click',()=>setLang('ar'));
+      $('#btnEn').addEventListener('click',()=>setLang('en'));
+      hydrateOptions(CONFIG.defaultLang); setLang(CONFIG.defaultLang);
+      const today=new Date(); $('#visitDate').value=today.toISOString().slice(0,10);
+      $('#btnSubmit').addEventListener('click',()=>onSubmit(true));
+      $('#btnGoogle').addEventListener('click',openGoogleOnly);
     })();
   </script>
 </body>
