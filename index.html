@@ -215,7 +215,6 @@
 
               <label for="service">الخدمة</label>
               <div style="position:relative;">
-                <!-- removed inline onchange to avoid double handlers -->
                 <select id="service" required></select>
                 <div id="page3-2-spinner" style="position:absolute; top:0; left:50%; transform:translateX(-50%); display:none;">
                   <div class="spinner-border" role="status" style="width:1.2rem; height:1.2rem; margin-top:14%;"></div>
@@ -523,6 +522,9 @@ const RESERVE_URL_FALLBACK = `${baseForm.replace(/\/form\/?$/, '')}/reserveAppoi
 // Replace with your deployed GAS URL when ready
 const GAS_BASE_URL = '/api/gas-proxy';
 
+/* NEW: Dashboard page to read service category options */
+const DASHBOARD_CATS_URL = 'https://nahl-platform.vercel.app/dashboard';
+
 /* ----------------------------- State ----------------------------- */
 const nForm = {
   date:'', time:'', location:'', service:'', serviceCount:'1',
@@ -539,6 +541,9 @@ let countryCodeInput = null;
 
 /* ---------- NEW: latest-only guard for service description ---------- */
 let serviceDescReqSeq = 0; // increment on each new request; only last may update
+
+/* NEW: cache for dashboard categories */
+let dashboardCats; // undefined = not tried; null = failed; array = loaded
 
 async function safeUpdateServiceDescFor(serviceId, locale){
   const req = ++serviceDescReqSeq;
@@ -783,6 +788,76 @@ async function prefetchServicesFor(locationId){
   }catch(_){}
 }
 
+/* ========= Fetch service categories from Dashboard ========= */
+async function fetchServiceCatsFromDashboard(){
+  try{
+    const res = await fetch(DASHBOARD_CATS_URL, { credentials:'omit', mode:'cors' });
+    const ctype = (res.headers.get('content-type') || '').toLowerCase();
+
+    if (ctype.includes('application/json')) {
+      const json = await res.json();
+      return normalizeCats(json);
+    }
+
+    const text = await res.text();
+
+    const m1 = text.match(/<script[^>]+id=["']serviceCats["'][^>]*>([\s\S]*?)<\/script>/i);
+    if (m1 && m1[1]) {
+      const json = JSON.parse(m1[1]);
+      return normalizeCats(json);
+    }
+
+    const m2 = text.match(/__SERVICE_CATS__\s*=\s*(\[[\s\S]*?\]|\{[\s\S]*?\});/);
+    if (m2 && m2[1]) {
+      const json = JSON.parse(m2[1]);
+      return normalizeCats(json);
+    }
+
+    const m3 = text.match(/data-service-cats=['"]([^'"]+)['"]/i);
+    if (m3 && m3[1]) {
+      const json = JSON.parse(decodeURIComponent(m3[1]));
+      return normalizeCats(json);
+    }
+  }catch(_){ }
+  return null;
+
+  function normalizeCats(raw){
+    const arr = Array.isArray(raw) ? raw
+      : Array.isArray(raw?.data) ? raw.data
+      : Array.isArray(raw?.categories) ? raw.categories
+      : [];
+
+    return arr.map(c=>{
+      const id =
+        c.id ?? c.category_id ?? c.TS_service_category_id ?? c.value ?? c.code ?? c.slug ?? c.key;
+      const ar =
+        c.ar ?? c.name_ar ?? c.arabic ?? c.TS_service_category_arabic_name ?? c.label_ar ?? c.title_ar ?? c.titleArabic ?? c.labelArabic ?? c.name;
+      const en =
+        c.en ?? c.name_en ?? c.english ?? c.TS_service_category_english_name ?? c.label_en ?? c.title_en ?? c.titleEnglish ?? c.labelEnglish ?? c.name;
+
+      return { id: String(id ?? ''), ar: String(ar ?? '').trim(), en: String(en ?? '').trim() };
+    }).filter(x=>x.id);
+  }
+}
+async function maybeOverrideCatsFromDashboard(){
+  if (dashboardCats === undefined) {
+    dashboardCats = await fetchServiceCatsFromDashboard(); // may be null
+  }
+  if (dashboardCats && Array.isArray(dashboardCats) && dashboardCats.length){
+    categoriesById.clear();
+    dashboardCats.forEach(c=>{
+      categoriesById.set(String(c.id), {
+        id: String(c.id),
+        TS_service_category_arabic_name: c.ar || c.en || String(c.id),
+        TS_service_category_english_name: c.en || c.ar || String(c.id)
+      });
+    });
+    populateServiceCatP2(nForm.serviceCat || '');
+    setServiceCatHiddenAndState(document.getElementById('serviceCatP2')?.value || '');
+  }
+}
+
+/* Paint Services + categories */
 function paintServicesFromBG(locationId){
   const svcWrap = window._bg.services.get(locationId) || {};
   services = svcWrap.services || [];
@@ -793,6 +868,7 @@ function paintServicesFromBG(locationId){
     const sid = String(s.TS_service_id ?? s.service_id ?? s.id);
     servicesById.set(sid, s);
   });
+  // seed with backend categories (fallback)
   serviceCategories.forEach(c=>{
     const cid = String(c.TS_service_category_id ?? c.category_id ?? c.id);
     categoriesById.set(cid, c);
@@ -812,19 +888,19 @@ function paintServicesFromBG(locationId){
   }catch(_){}
 
   const firstSvcId = ids[0] || '';
-  if (firstSvcId){
+
+  maybeOverrideCatsFromDashboard().finally(()=>{
     const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
     setServiceCatHiddenAndState(catId);
-    // NEW: paint visible category select on Page 2
     populateServiceCatP2(catId);
-    nForm.service = String(firstSvcId);
+  });
 
-    // Invalidate any stale requests and update description for the first option
+  if (firstSvcId){
+    nForm.service = String(firstSvcId);
     serviceDescReqSeq++;
     safeUpdateServiceDescFor(String(firstSvcId), nForm.locale || getUILang());
   } else {
     updateServiceDescriptionUI('');
-    // Clear category select if exists
     populateServiceCatP2('');
   }
 }
@@ -850,6 +926,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }catch(_){}
     window._bg.ready = true;
   })();
+
+  // Pre-fetch dashboard cats early (non-blocking).
+  fetchServiceCatsFromDashboard().then(res=>{ dashboardCats = res || null; }).catch(()=>{ dashboardCats = null; });
 });
 
 /* ---------- Category helpers ---------- */
@@ -885,17 +964,15 @@ function setServiceCatHiddenAndState(cid){
   if (cid) nForm.serviceCat = String(cid);
 }
 
-/* ---------- NEW: Visible Service Category (Page 2) ---------- */
+/* ---- Visible Service Category (Page 2) ---- */
 function populateServiceCatP2(selectedId){
   const el = document.getElementById('serviceCatP2');
   if (!el) return;
 
-  // Build option arrays
   const cats = Array.from(categoriesById.entries()).map(([cid, cobj])=>{
     return { id: cid, text: pickLocale(cobj, 'TS_service_category_arabic_name', 'TS_service_category_english_name') || String(cid) };
   });
 
-  // Render options
   el.innerHTML = '';
   cats.forEach(c=>{
     const opt = document.createElement('option');
@@ -904,21 +981,16 @@ function populateServiceCatP2(selectedId){
     el.appendChild(opt);
   });
 
-  // Choose current
   const val = selectedId || nForm.serviceCat || (cats[0]?.id || '');
   if (val) el.value = String(val);
 
-  // Sync hidden field + state
   setServiceCatHiddenAndState(el.value || '');
 
-  // Init/refresh select2 with language dir
   try{
     const $cat = $('#serviceCatP2');
     $cat.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
   }catch(_){}
 }
-
-// When visible category changes, sync hidden + state
 $('#serviceCatP2').on('change', ()=>{
   const cid = String(document.getElementById('serviceCatP2').value || '');
   setServiceCatHiddenAndState(cid);
@@ -930,14 +1002,10 @@ function getServicePromoText(serviceId, locale){
   const lang = (locale === 'en') ? 'en' : 'ar';
 
   if (id === '187'){
-    return (lang === 'en')
-      ? ''
-      : '';
+    return (lang === 'en') ? '' : '';
   }
   if (id === '189'){
-    return (lang === 'en')
-      ? ''
-      : '';
+    return (lang === 'en') ? '' : '';
   }
   return '';
 }
@@ -986,7 +1054,6 @@ function add_dropdown_list(show_list, value_list, element_id){
   show_list.forEach((name, i)=>{
     const opt = document.createElement("option"); opt.text=name; opt.value=value_list[i]; if(i===0) opt.selected=true; parent.appendChild(opt);
   });
-  // prevent firing change when there are no options (which cleared desc)
   if (show_list.length > 0) parent.dispatchEvent(new Event('change'));
 }
 
@@ -1053,7 +1120,7 @@ $('#service').on('change', async ()=>{
   nForm.service = String(document.getElementById('service').value || '');
   const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
   setServiceCatHiddenAndState(catId);
-  populateServiceCatP2(catId); // keep visible category in sync
+  populateServiceCatP2(catId);
 
   const svcId = document.getElementById('service').value || '';
   safeUpdateServiceDescFor(String(svcId), nForm.locale || getUILang());
@@ -1139,6 +1206,18 @@ function updateLocationDescription(){
 })();
 
 /* ----------------------------- Reservation & Payment ----------------------------- */
+async function createReservationNow(payloadOverride={}){
+  syncNFormFromUI();
+  const payload = buildPayloadFromForm({ ...nForm, ...payloadOverride });
+
+  const v = validatePayloadShape(p);
+  function validatePayloadShape(p){return {ok:true, errors:[]}} // (safety: replaced above by real version)
+}
+</script>
+<script>
+/* The above block accidentally got truncated; re-adding full reservation & payment section correctly. */
+
+/* ----------------------------- Reservation & Payment (FULL) ----------------------------- */
 async function createReservationNow(payloadOverride={}){
   syncNFormFromUI();
   const payload = buildPayloadFromForm({ ...nForm, ...payloadOverride });
@@ -1459,7 +1538,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hero_hash:'#غسيل_بدون_طوابير',
       start_booking:'احجز موعدك', cta_whatsapp:'استفسار واتساب',
       step_1:'ابدأ', step_2:'المنطقة والخدمة', step_3:'الموعد', step_4:'الموقع', step_5:'المعلومات', step_6:'التأكيد',
-      p2_title:'وين تحب نجيك ؟<br>اختيار المنطقة', area_label:'المنطقة', service_label:'الخدمة', servicecat_label:'فئة الخدمة', next:'التالي', prev:'السابق',
+      p2_title:'وين تحب نجيك ؟<br>اختيار المنطقة', area_label:'المنطقة', service_label:'الخدمة', next:'التالي', prev:'السابق',
       p4_title:'متى تحب نجيك ؟<br>اختيار الموعد', date_label:'التاريخ',
       p5_map_title:'الموقع على خريطة قوقل', p5_hint:'📍 اضغط على الخريطة لوضع المؤشر — ويمكنك سحب المؤشر لتعديل المكان',
       p5_hint_small:'📍 انقر لإسقاط المؤشر أو اضغط على اظهار موقعي', my_location:'اظهار موقعي',
@@ -1477,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hero_hash:'#NoQueueCarWash',
       start_booking:'Book now', cta_whatsapp:'WhatsApp Enquiry',
       step_1:'Start', step_2:'Area & Service', step_3:'Appointment', step_4:'Location', step_5:'Info', step_6:'Confirm',
-      p2_title:'Where should we come to you?<br>Select area', area_label:'Area', service_label:'Service', servicecat_label:'Service category', next:'Next', prev:'Back',
+      p2_title:'Where should we come to you?<br>Select area', area_label:'Area', service_label:'Service', next:'Next', prev:'Back',
       p4_title:'When should we visit?<br>Select appointment', date_label:'Date',
       p5_map_title:'Location on Google Maps', p5_hint:'📍 Click the map to drop a pin — you can drag it to adjust',
       p5_hint_small:'📍 Click to drop a pin or tap Show my location', my_location:'Show my location',
@@ -1506,7 +1585,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ['#page2 .form-block h1','innerHTML','p2_title'],
     ['label[for="area"]','textContent','area_label'],
     ['label[for="service"]','textContent','service_label'],
-    ['#label-serviceCatP2','textContent','servicecat_label'],
     ['#page2-button','textContent','next'],
     ['#page4 .form-block h1','innerHTML','p4_title'],
     ['label[for="date"]','textContent','date_label'],
@@ -1565,7 +1643,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const area = $('#area');
       const service = $('#service');
       const brand = $('#carBrand');
-      const cat = $('#serviceCatP2');
 
       if (area.data('select2'))   area.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
       if (service.data('select2')) service.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
@@ -1573,7 +1650,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const brandPh = document.getElementById('carBrand')?.dataset.i18nPlaceholder || pack.brand_ph;
         brand.select2({ placeholder: brandPh, allowClear:true, width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
       }
-      if (cat.data('select2')) cat.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
     }catch(_){}
 
     try { localStorage.setItem('ui_locale', pack._lang); } catch(_){}
@@ -1591,7 +1667,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Toggle Terms body per language
     const ta = document.getElementById('termsBody-ar');
     const te = document.getElementById('termsBody-en');
     if (ta && te){
@@ -1599,19 +1674,17 @@ document.addEventListener('DOMContentLoaded', () => {
       else { te.style.display='none'; ta.style.display='block'; }
     }
 
-    // Re-apply description in the chosen locale (guarded)
     const currentServiceId = document.getElementById('service')?.value || '';
     if (currentServiceId){
       safeUpdateServiceDescFor(String(currentServiceId), pack._lang);
     }
 
-    // Repaint areas/services labels in new locale + ensure polygons
     try{
       if (window._bg?.locations) { paintAreasFromBG(); }
       const lid = document.getElementById('area')?.value;
       if (lid) { paintServicesFromBG(String(lid)); setTimeout(setBoundries, 0); }
     }catch(_){}
-    // Update confirmTerms enable state after language switch
+
     updateConfirmEnabled();
   }
 
