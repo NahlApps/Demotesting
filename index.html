@@ -221,6 +221,149 @@
       ]
     };
 
+    // i18n strings
+    const I18N={
+      ar:{
+        app_title:"قيّم تجربتك",
+        app_subtitle:"استبيان رضا الخدمة • Service satisfaction survey",
+        overall_rating:"التقييم العام",
+        write_review:"اكتب رأيك",
+        review_placeholder:"اكتب رأيك هنا…",
+        what_you_liked:"ما الذي أعجبك؟",
+        tap_to_toggle:"انقر للإضافة أو الإزالة",
+        satisfaction_details:"تفاصيل الرضا",
+        q_quality:"جودة التنظيف",
+        q_speed:"سرعة الخدمة",
+        q_staff:"احترافية الموظفين",
+        q_value:"القيمة مقابل السعر",
+        help_quality:"1 سيئة جدًا ← 5 ممتازة",
+        help_speed:"1 بطيئة جدًا ← 5 سريعة جدًا",
+        loyalty:"الولاء",
+        return_again:"هل ستعود مرة أخرى؟",
+        yes:"نعم",
+        no:"لا",
+        nps_label:"التوصية بنا (0–10)",
+        nps_help:"0 لن أوصي إطلاقًا ← 10 أوصي بقوة",
+        submit_section:"الإرسال",
+        submit_note:"سيتم حفظ تقييمك لدينا فقط.",
+        save_rating:"حفظ التقييم",
+        reset:"إعادة تعيين",
+        complete_required:"أكمل الحقول المطلوبة ثم اضغط حفظ",
+        ready_to_send:"جاهز للإرسال",
+        thanks_title:"شكرًا لك! ✅",
+        thanks_body:"تم استلام تقييمك. نقدر وقتك.",
+        send_another:"إرسال تقييم آخر",
+        saving:"جارٍ الحفظ…",
+        saved_success:"تم الحفظ بنجاح",
+        save_failed:"تعذّر الحفظ",
+        offline:"لا يوجد اتصال بالإنترنت",
+        error_bad_link:"خطأ: رابط غير صحيح (بدون bookingId).",
+        error_no_rating:"الرجاء اختيار التقييم بالنجوم",
+        error_no_text:"الرجاء كتابة التقييم النصي",
+        error_bad_nps:"قيمة NPS يجب أن تكون بين 0 و 10"
+      },
+      en:{
+        app_title:"Rate your experience",
+        app_subtitle:"Service satisfaction survey",
+        overall_rating:"Overall rating",
+        write_review:"Write your review",
+        review_placeholder:"Type your review here…",
+        what_you_liked:"What did you like?",
+        tap_to_toggle:"Tap to add/remove",
+        satisfaction_details:"Satisfaction details",
+        q_quality:"Cleaning quality",
+        q_speed:"Service speed",
+        q_staff:"Staff professionalism",
+        q_value:"Value for money",
+        help_quality:"1 Very poor ← 5 Excellent",
+        help_speed:"1 Very slow ← 5 Very fast",
+        loyalty:"Loyalty",
+        return_again:"Would you return?",
+        yes:"Yes",
+        no:"No",
+        nps_label:"Recommend us (0–10)",
+        nps_help:"0 Wouldn’t recommend ← 10 Highly recommend",
+        submit_section:"Submit",
+        submit_note:"Your rating is saved privately.",
+        save_rating:"Save rating",
+        reset:"Reset",
+        complete_required:"Complete required fields, then Save",
+        ready_to_send:"Ready to send",
+        thanks_title:"Thank you! ✅",
+        thanks_body:"We received your feedback. We appreciate your time.",
+        send_another:"Send another rating",
+        saving:"Saving…",
+        saved_success:"Saved successfully",
+        save_failed:"Save failed",
+        offline:"You’re offline",
+        error_bad_link:"Invalid link (missing bookingId).",
+        error_no_rating:"Please select a star rating",
+        error_no_text:"Please write your review",
+        error_bad_nps:"NPS must be between 0 and 10"
+      }
+    };
+
+    function t(key){const lang=document.documentElement.lang||'ar';return (I18N[lang]&&I18N[lang][key])||key}
+
+    function applyI18n(lang){
+      document.documentElement.lang=lang;
+      document.documentElement.dir=(lang==='ar')?'rtl':'ltr';
+      $('.title').textContent=t('app_title');
+      $('.subtitle').textContent=t('app_subtitle');
+      $('#ratingLegend').textContent=t('overall_rating');
+      $('label[for="reviewText"]').textContent=t('write_review');
+      $('#reviewText').placeholder=t('review_placeholder');
+      // Quick tags section
+      const tagsSec=$('#chipsRow')?.closest('section');
+      if(tagsSec){tagsSec.querySelector('h2.section').textContent=t('what_you_liked');tagsSec.querySelector('.help').textContent=t('tap_to_toggle')}
+      // Satisfaction
+      const satSec=$$('#rateForm .card').find(s=>s.querySelector('.likert'));
+      if(satSec){satSec.querySelector('h2.section').textContent=t('satisfaction_details')}
+      $('label[for="qQuality"]').textContent=t('q_quality');
+      $('label[for="qSpeed"]').textContent=t('q_speed');
+      $('label[for="qStaff"]').textContent=t('q_staff');
+      $('label[for="qValue"]').textContent=t('q_value');
+      $('#qQuality').parentElement.querySelector('.help').textContent=t('help_quality');
+      $('#qSpeed').parentElement.querySelector('.help').textContent=t('help_speed');
+      $('#qStaff').parentElement.querySelector('.help').textContent=t('help_quality');
+      $('#qValue').parentElement.querySelector('.help').textContent=t('help_quality');
+      // Loyalty
+      const loyaltySec=$$('#rateForm .card').find(s=>s.querySelector('input[name="return"]'));
+      if(loyaltySec){
+        loyaltySec.querySelector('h2.section').textContent=t('loyalty');
+        loyaltySec.querySelector('.lbl').textContent=t('return_again');
+        const yesLab=$('input[name="return"][value="yes"]').parentElement; yesLab.lastChild.nodeValue=' '+t('yes');
+        const noLab=$('input[name="return"][value="no"]').parentElement; noLab.lastChild.nodeValue=' '+t('no');
+        $('label[for="nps"]').textContent=t('nps_label');
+        $('#nps').parentElement.querySelector('.help').textContent=t('nps_help');
+      }
+      // Submit (inline card)
+      const inline=$('#inlineAction');
+      if(inline){
+        inline.querySelector('h2.section').textContent=t('submit_section');
+        inline.querySelector('.help').textContent=t('submit_note');
+        $('#btnSubmitTop').textContent=t('save_rating');
+        $('#btnReset').textContent=t('reset');
+      }
+      // Actionbar + buttons
+      $('#validityHint').textContent=t('complete_required');
+      $('#btnSubmit').textContent=t('save_rating');
+      // Done view
+      $('#doneView h2.section').textContent=t('thanks_title');
+      $('#doneView .help').textContent=t('thanks_body');
+      $('#btnAnother').textContent=t('send_another');
+      // Chips rehydrate for current language
+      hydrateTags();
+      // Toggle label
+      const langBtn=$('#langToggle'); if(langBtn){langBtn.textContent=(lang==='ar'?'EN':'AR')}
+    }
+
+    function setTheme(theme){
+      const root=document.documentElement;
+      if(theme==='dark'){root.setAttribute('data-theme','dark')} else {root.removeAttribute('data-theme')}
+      const thBtn=$('#themeToggle'); if(thBtn){thBtn.textContent=(theme==='dark'?'☀️':'🌙')}
+    }
+
     const $=(s,r=document)=>r.querySelector(s);
     const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
     function showToast(msg,ok=true){const t=$('#toast');if(!t)return;t.textContent=msg;t.className='toast show '+(ok?'ok':'err');setTimeout(()=>t.classList.remove('show'),2500)}
@@ -230,10 +373,14 @@
 
     function hydrateTags(){
       const row=$('#chipsRow');row.innerHTML='';
+      const lang=document.documentElement.lang||'ar';
       CONFIG.tags.forEach(t=>{
         const b=document.createElement('button');
-        b.type='button';b.className='chip';b.setAttribute('aria-pressed','false');b.textContent=t.ar;
+        b.type='button';b.className='chip';b.setAttribute('aria-pressed','false');b.textContent=(lang==='en'?t.en:t.ar);
         b.addEventListener('click',()=>{const on=b.classList.toggle('active');b.setAttribute('aria-pressed',on?'true':'false')});
+        row.appendChild(b);
+      });
+    });
         row.appendChild(b);
       });
     }
@@ -265,7 +412,13 @@
 
     function validate(){
       const form=$('#rateForm');
-      if(!getParam('bookingId')){showToast('خطأ: رابط غير صحيح (بدون bookingId).',false);return false}
+      if(!getParam('bookingId')){showToast(t('error_bad_link'),false);return false}
+      if(!form.checkValidity()){showToast(t('complete_required'),false);return false}
+      if(!getRating()){showToast(t('error_no_rating'),false);return false}
+      const text=$('#reviewText').value.trim(); if(!text){showToast(t('error_no_text'),false);return false}
+      const nps=Number($('#nps').value||0); if(Number.isNaN(nps)||nps<0||nps>10){showToast(t('error_bad_nps'),false);return false}
+      return true
+    }
       if(!form.checkValidity()){showToast('الرجاء إكمال الحقول المطلوبة',false);return false}
       if(!getRating()){showToast('الرجاء اختيار التقييم بالنجوم',false);return false}
       const text=$('#reviewText').value.trim();if(!text){showToast('الرجاء كتابة التقييم النصي',false);return false}
@@ -274,8 +427,8 @@
     }
 
     function updateValidityHint(){
-      const ok = validateSoft();
-      $('#validityHint').textContent = ok ? 'جاهز للإرسال' : 'أكمل الحقول المطلوبة ثم اضغط حفظ';
+      const ok=validateSoft();
+      $('#validityHint').textContent = ok ? t('ready_to_send') : t('complete_required');
     }
     function validateSoft(){
       const hasRating=!!getRating();
@@ -286,8 +439,26 @@
 
     async function onSubmit(){
       if(!validate())return;
-      const btn=$('#btnSubmit');const btnTop=$('#btnSubmitTop');
-      [btn,btnTop].forEach(b=>{if(b){b.disabled=true;b.textContent='جارٍ الحفظ…'}});
+      const btn=$('#btnSubmit'); const btnTop=$('#btnSubmitTop');
+      [btn,btnTop].forEach(b=>{if(b){b.disabled=true; b.textContent=t('saving')}});
+      try{
+        const result=await saveToServer(collectPayload());
+        if(result.ok){
+          showToast(t('saved_success'),true);
+          document.querySelector('.wrap').style.display='none';
+          $('#actionbar').style.display='none';
+          $('#doneView').style.display='block';
+        }else{
+          showToast(t('save_failed')+' • '+(result.error||'Unknown error'),false);
+          if(DEBUG)console.error(result);
+        }
+      }catch(err){
+        if(DEBUG)console.error(err);
+        showToast(navigator.onLine?t('save_failed'):t('offline'),false);
+      }finally{
+        [btn,btnTop].forEach(b=>{if(b){b.disabled=false; b.textContent=t('save_rating')}});
+      }
+    }});
       try{
         const result=await saveToServer(collectPayload());
         if(result.ok){
@@ -318,11 +489,22 @@
       $$('.reveal').forEach(el=>io.observe(el));
       // Chips
       hydrateTags();
+      // Theme default
+      const storedTheme=localStorage.getItem('nahl.rate.theme');
+      const prefersDark=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(storedTheme || (prefersDark?'dark':'light'));
+      // Lang default
+      const storedLang=localStorage.getItem('nahl.rate.lang');
+      const initialLang = storedLang || document.documentElement.lang || 'ar';
+      applyI18n(initialLang);
       // Actions
       $('#btnSubmit').addEventListener('click',onSubmit);
       $('#rateForm').addEventListener('submit',e=>{e.preventDefault();onSubmit()});
-      $('#btnReset')?.addEventListener('click',resetForm);
+      $('#btnReset')?.addEventListener('click',()=>{resetForm();showToast('↺')});
       $('#btnAnother').addEventListener('click',()=>location.reload());
+      // Toggles
+      $('#langToggle').addEventListener('click',()=>{const next=(document.documentElement.lang==='ar'?'en':'ar'); localStorage.setItem('nahl.rate.lang',next); applyI18n(next)});
+      $('#themeToggle').addEventListener('click',()=>{const isDark=document.documentElement.getAttribute('data-theme')==='dark'; const next=isDark?'light':'dark'; localStorage.setItem('nahl.rate.theme',next); setTheme(next)});
       // Soft validity tracking
       ['input','change','keyup'].forEach(ev=>document.addEventListener(ev,updateValidityHint,true));
       updateValidityHint();
