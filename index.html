@@ -554,26 +554,33 @@
     // ضع هنا Web App URL الخاص بمشروع Google Apps Script الذي يحفظ الحجوزات في الشيت:
     const GAS_URL1 = "https://script.google.com/macros/s/AKfycbytJRuJ30MAMMI2C6M0jSklYJ7s47rtkh_hb2gs-MC2dVNCNaKX8MNlKootwduTJcQgRQ/exec"; // TODO: استبدل YOUR_EXEC_ID_HERE
 
-    async function recordNFormToGAS(nForm){
-      try{
-        const url = `${GAS_URL1}?action=booking.record`;
-        const payload = { ...nForm, traceId: nForm.otpTraceId || nForm.traceId || '' };
-        const res = await fetch(url, {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json;charset=UTF-8' },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json().catch(()=>({}));
-        if(!res.ok || !data?.ok){
-          console.warn('GAS_URL1 save failed', res.status, data);
-          return { ok:false, status:res.status, data };
-        }
-        return { ok:true, data };
-      }catch(err){
-        console.warn('GAS_URL1 save error', err);
-        return { ok:false, error:String(err) };
-      }
+async function recordNFormToGAS(nForm){
+  try{
+    const url = `${GAS_URL1}?action=booking.record`;
+    // Use text/plain so the browser doesn't preflight (GAS can still JSON.parse it)
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=UTF-8' }, // ✅ no preflight
+      body: JSON.stringify({
+        ...nForm,
+        // (optional) add a client traceId to help idempotency
+        traceId: nForm.otpTraceId || (crypto?.randomUUID?.() || String(Date.now()))
+      }),
+      // keep it simple: no credentials, no extra headers
+    });
+    // You can still read JSON normally:
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok || !data?.ok){
+      console.warn('GAS_URL1 save failed', res.status, data);
+      return { ok:false, status:res.status, data };
     }
+    return { ok:true, data };
+  }catch(err){
+    console.warn('GAS_URL1 save error', err);
+    return { ok:false, error:String(err) };
+  }
+}
+
 
     /* ---------- Vercel Reserve API (unchanged) ---------- */
     const APP_ID='1d25f58a-e1d7-4524-b7da-08e640dbf434';
