@@ -589,6 +589,32 @@
       $('#btnSubmit').addEventListener('click', () => onSubmit(true));
       $('#btnGoogle').addEventListener('click', openGoogleOnly);
     })();
+
+      async function saveToGAS(payload){
+    // 1) Guard
+    if (!CONFIG.GAS_ENDPOINT || CONFIG.GAS_ENDPOINT.startsWith("REPLACE_")) {
+      await new Promise(r => setTimeout(r, 300));
+      return { ok: true, mock: true };
+    }
+
+    // 2) Build URL (no mode:'cors', no custom headers beyond urlencoded)
+    const url = CONFIG.GAS_ENDPOINT + (CONFIG.GAS_ENDPOINT.includes('?') ? '&' : '?') +
+      'action=review.save' +
+      (CONFIG.REVIEWS_TOKEN ? '&token=' + encodeURIComponent(CONFIG.REVIEWS_TOKEN) : '');
+
+    // 3) Send as x-www-form-urlencoded to avoid preflight
+    const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body
+    });
+
+    if (!res.ok) throw new Error('Network error: ' + res.status);
+    let json; try { json = await res.json(); } catch(e){ json = { ok:false, parseError:true }; }
+    return json;
+  }
   </script>
 </body>
 </html>
