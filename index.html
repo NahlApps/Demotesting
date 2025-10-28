@@ -1617,99 +1617,130 @@ function formatDayNameBoth(dtISO) {
 
 
 /* ---------- Size Chips Filter (AR/EN) ---------- */
-// let sizeFilter = 'all'; // 'all' | 'small' | 'mid' | 'big'
+let sizeFilter = 'all'; // 'all' | 'small' | 'mid' | 'big'
 
-// const SIZE_KEYWORDS = {
-//   ar: {
-//     small: ['صغير','صغيرة','صغيره'],
-//     mid:   ['وسط','متوسط'],
-//     big:   ['كبير','كبيرة','كبيره']
-//   },
-//   en: {
-//     small: ['small','sm'],
-//     mid:   ['mid','medium','md'],
-//     big:   ['big','large','lg','xl']
-//   }
-// };
+const SIZE_KEYWORDS = {
+  ar: {
+    small: ['صغير','صغيرة','صغيره'],
+    mid:   ['وسط','متوسط'],
+    big:   ['كبير','كبيرة','كبيره']
+  },
+  en: {
+    small: ['small','sm'],
+    mid:   ['mid','medium','md'],
+    big:   ['big','large','lg','xl']
+  }
+};
 
-// function textMatchesSize(text, lang, key){
-//   if (key === 'all') return true;
-//   const kw = (SIZE_KEYWORDS[lang] && SIZE_KEYWORDS[lang][key]) || [];
-//   const t = String(text||'').toLowerCase();
-//   return kw.some(k => t.includes(k.toLowerCase()));
-// }
+function textMatchesSize(text, lang, key){
+  if (key === 'all') return true;
+  const kw = (SIZE_KEYWORDS[lang] && SIZE_KEYWORDS[lang][key]) || [];
+  const t = String(text||'').toLowerCase();
+  return kw.some(k => t.includes(k.toLowerCase()));
+}
 
-// function filterServicesArrayBySize(arr){
-//   const lang = getUILang();
-//   if (sizeFilter === 'all') return arr.slice();
-//   return arr.filter(svc => {
-//     const nm = pickLocale(svc, 'TS_service_arabic_name', 'TS_service_english_name');
-//     return textMatchesSize(nm, lang, sizeFilter);
-//   });
-// }
+function filterServicesArrayBySize(arr){
+  const lang = getUILang();
+  if (sizeFilter === 'all') return arr.slice();
+  return (arr || []).filter(svc => {
+    const nm = pickLocale(svc, 'TS_service_arabic_name', 'TS_service_english_name');
+    return textMatchesSize(nm, lang, sizeFilter);
+  });
+}
 
-// /* Rebuild the #service select with the current filter, keep a sane selection, reinit Select2, and update desc + appointments */
-// function applyServiceFilter(){
-//   const filtered = filterServicesArrayBySize(services);
-//   const sorted   = filtered.slice().sort((a,b)=> (Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
-//   const names    = sorted.map(s => pickLocale(s, 'TS_service_arabic_name', 'TS_service_english_name'));
-//   const ids      = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+/* Rebuild the #service select with the current filter, preserve selection, reinit Select2, update cat/desc, and refresh appointments */
+function applyServiceFilter(){
+  if (!Array.isArray(services)) services = [];
+  const prevSelected = String(document.getElementById('service')?.value || '');
 
-//   const $service = $('#service');
-//   // destroy select2 safely (if present) before changing options
-//   try{ if ($service.data('select2')) $service.select2('destroy'); }catch(_){}
+  const filtered = filterServicesArrayBySize(services);
+  const sorted   = filtered.slice().sort((a,b)=> (Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+  const names    = sorted.map(s => pickLocale(s, 'TS_service_arabic_name', 'TS_service_english_name'));
+  const ids      = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
 
-//   add_dropdown_list(names, ids, 'service'); // this dispatches a change event
+  const $service = $('#service');
+  // destroy select2 safely (if present) before changing options
+  try{ if ($service.data('select2')) $service.select2('destroy'); }catch(_){}
 
-//   // If no results after filter, clear desc and times
-//   if (!ids.length){
-//     updateServiceDescriptionUI('');
-//     const tc = document.getElementById('time-container');
-//     if (tc) tc.innerHTML = `<div style="grid-column:1/-1;justify-self:center;">${getUILang()==='en'?'No services match this filter':'لا توجد خدمات مطابقة للتصفية'}</div>`;
-//   }
+  add_dropdown_list(names, ids, 'service'); // this dispatches a change event
 
-//   // Re-init Select2 with correct direction
-//   try{
-//     $service.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
-//   }catch(_){}
+  // Try to keep previous selection if still visible
+  if (prevSelected && ids.includes(prevSelected)) {
+    document.getElementById('service').value = prevSelected;
+  } else if (ids.length) {
+    document.getElementById('service').value = ids[0];
+  }
 
-//   // If page 4 visible, refresh appointments for the filtered selection
-//   const p4=document.getElementById('page4');
-//   if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
-// }
+  // No results → clear desc & times message
+  if (!ids.length){
+    updateServiceDescriptionUI('');
+    const tc = document.getElementById('time-container');
+    if (tc) tc.innerHTML = `<div style="grid-column:1/-1;justify-self:center;">${getUILang()==='en'?'No services match this filter':'لا توجد خدمات مطابقة للتصفية'}</div>`;
+  }
 
-// /* Wire chips clicks */
-// document.addEventListener('DOMContentLoaded', () => {
-//   const bar = document.getElementById('serviceSizeFilter');
-//   if (!bar) return;
-//   bar.addEventListener('click', (e)=>{
-//     const btn = e.target.closest('.chip-toggle');
-//     if (!btn) return;
-//     const key = btn.dataset.key;
-//     if (!key || key === sizeFilter) return;
+  // Re-init Select2 with correct direction
+  try{
+    $service.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
+  }catch(_){}
 
-//     // toggle UI state
-//     bar.querySelectorAll('.chip-toggle').forEach(b=>{
-//       b.classList.toggle('is-active', b === btn);
-//       b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
-//     });
-//     sizeFilter = key;
-//     applyServiceFilter();
-//   });
-// });
+  // Update hidden category + service description for the currently selected service
+  const currentId = document.getElementById('service')?.value || '';
+  if (currentId){
+    const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+    setServiceCatHiddenAndState(catId);
+    nForm.service = String(currentId);
+    // refresh description (guarded latest-only)
+    serviceDescReqSeq++;
+    safeUpdateServiceDescFor(String(currentId), nForm.locale || getUILang());
+  } else {
+    updateServiceDescriptionUI('');
+  }
 
-// /* Update chip labels on language switch */
-// function updateSizeChipsLabels(lang){
-//   const bar = document.getElementById('serviceSizeFilter');
-//   if (!bar) return;
-//   const t = (lang==='en')
-//     ? { all:'All', small:'Small', mid:'Mid', big:'Big' }
-//     : { all:'الكل', small:'صغير', mid:'وسط', big:'كبير' };
-//   bar.querySelector('[data-key="all"]')  ?.textContent = t.all;
-//   bar.querySelector('[data-key="small"]')?.textContent = t.small;
-//   bar.querySelector('[data-key="mid"]')  ?.textContent = t.mid;
-//   bar.querySelector('[data-key="big"]')  ?.textContent = t.big;
-// }
+  // If page 4 visible, refresh appointments for the filtered selection
+  const p4 = document.getElementById('page4');
+  if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
+}
+
+/* Wire chips clicks */
+document.addEventListener('DOMContentLoaded', () => {
+  const bar = document.getElementById('serviceSizeFilter');
+  if (!bar) return;
+  bar.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.chip-toggle');
+    if (!btn) return;
+    const key = btn.dataset.key;
+    if (!key || key === sizeFilter) return;
+
+    // toggle UI state
+    bar.querySelectorAll('.chip-toggle').forEach(b=>{
+      const active = (b === btn);
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    sizeFilter = key;
+    applyServiceFilter();
+  });
+});
+
+/* Update chip labels on language switch */
+function updateSizeChipsLabels(lang){
+  const bar = document.getElementById('serviceSizeFilter');
+  if (!bar) return;
+  const t = (lang==='en')
+    ? { all:'All', small:'Small', mid:'Mid', big:'Big' }
+    : { all:'الكل', small:'صغير', mid:'وسط', big:'كبير' };
+  const map = {
+    all:   bar.querySelector('[data-key="all"]'),
+    small: bar.querySelector('[data-key="small"]'),
+    mid:   bar.querySelector('[data-key="mid"]'),
+    big:   bar.querySelector('[data-key="big"]')
+  };
+  if (map.all)   map.all.textContent   = t.all;
+  if (map.small) map.small.textContent = t.small;
+  if (map.mid)   map.mid.textContent   = t.mid;
+  if (map.big)   map.big.textContent   = t.big;
+}
+
   
 </script>
 
