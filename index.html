@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <meta name="theme-color" content="#2563eb"/>
   <title>Nahl • Rate Experience</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -12,80 +11,164 @@
 
   <style>
     :root{
-      --bg:#f4f6f8; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --bg:#f4f6f8; --card:#fff; --text:#1f2937; --muted:#6b7280;
       --primary:#2563eb; --primary-600:#1d4ed8; --accent:#F4CE14;
       --border:#e5e7eb; --chip:#eef2ff; --chip-text:#1e40af;
-      --danger:#ef4444; --success:#16a34a; --focus:rgba(37,99,235,.35);
       --shadow:0 8px 24px rgba(0,0,0,.08); --radius:16px;
+      --bar-h:68px;
     }
-    [dir="ltr"] body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    [dir="rtl"] body{font-family:Cairo,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    @media (prefers-color-scheme:dark){
+      :root{
+        --bg:#0f172a; --card:#0b1222; --text:#e5e7eb; --muted:#9aa4b2;
+        --border:#1f2a44; --chip:#0f1a33; --chip-text:#c7d2fe;
+        --shadow:0 10px 28px rgba(0,0,0,.35);
+      }
+    }
+    [dir="ltr"] body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    [dir="rtl"] body{font-family:Cairo,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 
-    .wrap{max-width:760px;margin:0 auto;padding:20px 16px calc(88px + env(safe-area-inset-bottom))}
-    header.site{display:flex;align-items:center;gap:12px;padding:16px;margin:8px 0 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .brand{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ffd95c);display:grid;place-items:center;font-weight:800;color:#111827}
+    .wrap{max-width:760px;margin:0 auto;
+      padding:20px 16px calc(96px + env(safe-area-inset-bottom));
+    }
+    header.site{
+      display:flex;align-items:center;gap:12px;padding:16px;margin:8px 0 16px;
+      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .brand{
+      width:44px;height:44px;border-radius:12px;
+      background:conic-gradient(from 210deg,var(--accent),#ffd95c 40%,#fff59d 70%,var(--accent));
+      display:grid;place-items:center;font-weight:800;color:#111827;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);
+    }
     .title{font-size:18px;font-weight:800}
     .subtitle{color:var(--muted);font-size:13px}
 
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:12px 0}
+    .card{
+      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:16px;margin:12px 0; position:relative; overflow:hidden;
+    }
+    .card::before{
+      content:""; position:absolute; inset-inline:0; top:0; height:4px;
+      background:linear-gradient(90deg,var(--primary),var(--accent));
+      opacity:.12;
+    }
     h2.section{font-size:16px;margin:0 0 10px}
-    label.lbl{display:block;font-size:13px;font-weight:700;margin-bottom:6px}
+    label.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
     .help{font-size:12px;color:var(--muted)}
-    textarea,input[type="number"],input[type="text"]{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:15px;outline:none}
-    textarea:focus,input:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--focus)}
+
+    textarea, input[type="number"]{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
+      background:#fff; font-size:14px; outline:none;
+    }
+    @media (prefers-color-scheme:dark){
+      textarea, input[type="number"]{background:#0e1a31;color:var(--text)}
+    }
+    textarea:focus, input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.14)}
     textarea{min-height:120px;resize:vertical}
-
-    /* Accessible hidden (not display:none so radios stay focusable) */
-    .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-
-    /* Stars */
-    fieldset.rating-fieldset{border:0;padding:0;margin:0}
-    .stars{display:inline-flex;flex-direction:row-reverse;gap:6px}
-    .stars input{position:absolute;opacity:0}
-    .stars label{cursor:pointer;font-size:32px;line-height:1;color:#c7ced9;transition:transform .05s ease}
-    .stars input:focus-visible + label{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px}
-    .stars label:hover,.stars label:hover ~ label{color:#ffd95c;transform:scale(1.04)}
-    .stars input:checked ~ label{color:#f7c948}
-
-    .chips{display:flex;flex-wrap:wrap;gap:10px}
-    .chip{background:var(--chip);color:var(--chip-text);border:1px dashed #c7d2fe;padding:10px 14px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none}
-    .chip:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
-    .chip.active{background:#dbeafe;border-style:solid}
 
     .row{display:grid;gap:12px}
     @media (min-width:640px){.row.cols-2{grid-template-columns:1fr 1fr}}
-    .likert{display:grid;gap:6px}
-    .likert output{font-variant-numeric:tabular-nums;font-weight:700}
 
-    .btns{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{border:1px solid transparent;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:800;font-size:14px;min-height:48px}
-    .btn.primary{background:var(--primary);color:#fff}
-    .btn.primary:hover{background:var(--primary-600)}
-    .btn.ghost{background:transparent;border-color:var(--border)}
-
-    /* Sticky action bar for mobile */
-    .actionbar{position:fixed;left:0;right:0;bottom:0;z-index:60;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top, rgba(255,255,255,.98), rgba(255,255,255,.92));border-top:1px solid var(--border);backdrop-filter:saturate(1.2) blur(6px)}
-
-    .toast{position:fixed;inset-inline:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;display:none;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card);box-shadow:var(--shadow);font-size:14px}
-    .toast.show{display:block}
-    .toast.ok{border-color:#bbf7d0}
-    .toast.err{border-color:#fecaca}
-
-    footer.note{text-align:center;color:#6b7280;font-size:12px;margin-top:18px}
-
-    /* Reveal animations (respects reduced motion) */
-    @media (prefers-reduced-motion:no-preference){
-      .reveal{opacity:0;transform:translateY(8px)}
-      .reveal.show{opacity:1;transform:none;transition:opacity .45s ease, transform .45s ease}
+    /* Stars (accessible without altering JS) */
+    .stars{display:inline-flex;flex-direction:row-reverse;gap:6px}
+    .stars input{
+      position:absolute; opacity:0; width:1px; height:1px; pointer-events:none;
     }
+    .stars label{
+      cursor:pointer;font-size:32px;line-height:1;color:#c7ced9;transition:transform .05s ease, color .15s ease;
+      filter:drop-shadow(0 1px 0 rgba(0,0,0,.06));
+    }
+    .stars label:hover, .stars label:hover ~ label{color:#ffd95c; transform:scale(1.02)}
+    .stars input:checked ~ label{color:#f7c948}
+    .stars input:focus-visible + label{outline:2px solid var(--primary); outline-offset:2px; border-radius:6px}
+
+    /* Chips */
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{
+      background:var(--chip); color:var(--chip-text); border:1px dashed #c7d2fe;
+      padding:10px 14px; border-radius:999px; font-size:14px; cursor:pointer; user-select:none;
+      transition:transform .06s ease,border-color .2s ease,background .2s ease;
+    }
+    .chip:focus-visible{outline:2px solid var(--primary); outline-offset:2px}
+    .chip:hover{transform:translateY(-1px)}
+    .chip.active{background:#dbeafe; border-style:solid}
+    @media (prefers-color-scheme:dark){
+      .chip{border-color:#31406b}
+      .chip.active{background:#132248}
+    }
+
+    /* Range inputs */
+    input[type="range"]{
+      -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px;
+      background:linear-gradient(90deg, var(--primary) 0%, var(--primary) 50%, #e5e7eb 50%, #e5e7eb 100%);
+      background-size:0% 100%,100% 100%; background-repeat:no-repeat; /* static fallback */
+      outline:none; border:none;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:50%;
+      background:#fff; border:2px solid var(--primary); box-shadow:var(--shadow);
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--primary)
+    }
+
+    /* Buttons */
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      border:1px solid transparent; padding:12px 16px; border-radius:12px; cursor:pointer;
+      font-weight:700; font-size:14px; min-height:44px;
+      background:transparent; color:var(--text);
+    }
+    .btn.primary{background:var(--primary); color:#fff}
+    .btn.primary:hover{background:var(--primary-600)}
+    .btn.primary:disabled{opacity:.7;cursor:not-allowed}
+
+    /* Sticky submit bar (mobile-friendly) */
+    .action-bar{
+      position:fixed; inset-inline:0; bottom:0; z-index:60;
+      background:rgba(255,255,255,.8); backdrop-filter:blur(10px);
+      box-shadow:0 -8px 24px rgba(0,0,0,.08); border-top:1px solid var(--border);
+      padding:8px 16px calc(8px + env(safe-area-inset-bottom));
+      display:flex; justify-content:center;
+    }
+    @media (prefers-color-scheme:dark){
+      .action-bar{background:rgba(10,16,32,.7)}
+    }
+    .action-bar .inner{width:min(760px,100%); display:flex; gap:10px}
+    .action-bar .btn{flex:1}
+
+    /* Toast */
+    .toast{
+      position:fixed; inset-inline:16px;
+      bottom:calc(16px + var(--bar-h) + env(safe-area-inset-bottom));
+      z-index:70; display:none; padding:12px 14px; border-radius:12px;
+      border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow); font-size:14px;
+    }
+    .toast.show{display:block}
+    .toast.ok{border-color:#bbf7d0} .toast.err{border-color:#fecaca}
+
+    footer.note{text-align:center; color:var(--muted); font-size:12px; margin-top:18px}
+
+    /* Motion polish */
+    @media (prefers-reduced-motion:no-preference){
+      .card{animation:fadeUp .35s ease both}
+      .card:nth-of-type(1){animation-delay:.02s}
+      .card:nth-of-type(2){animation-delay:.04s}
+      .card:nth-of-type(3){animation-delay:.06s}
+      .card:nth-of-type(4){animation-delay:.08s}
+      .card:nth-of-type(5){animation-delay:.10s}
+      .toast.show{animation:slideIn .25s ease both}
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header class="site reveal">
+    <header class="site">
       <div class="brand" aria-hidden="true">N</div>
       <div>
         <div class="title" data-i18n="app_title">قيّم تجربتك</div>
@@ -93,404 +176,193 @@
       </div>
     </header>
 
-    <form id="rateForm" novalidate>
-      <!-- Overall rating -->
-      <section class="card reveal">
-        <fieldset class="rating-fieldset" aria-required="true">
-          <legend class="section" id="ratingLegend" data-i18n="overall_rating">التقييم العام</legend>
-          <div class="stars" role="radiogroup" aria-labelledby="ratingLegend">
-            <input class="sr-only" type="radio" id="star5" name="rating" value="5" required>
-            <label for="star5" aria-label="5">★</label>
-            <input class="sr-only" type="radio" id="star4" name="rating" value="4">
-            <label for="star4" aria-label="4">★</label>
-            <input class="sr-only" type="radio" id="star3" name="rating" value="3">
-            <label for="star3" aria-label="3">★</label>
-            <input class="sr-only" type="radio" id="star2" name="rating" value="2">
-            <label for="star2" aria-label="2">★</label>
-            <input class="sr-only" type="radio" id="star1" name="rating" value="1">
-            <label for="star1" aria-label="1">★</label>
-          </div>
-        </fieldset>
-        <label class="lbl" for="reviewText">اكتب رأيك</label>
-        <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review" required></textarea>
-        <p class="help">اختر من نجمة إلى خمس نجوم • Choose 1–5 stars</p>
-      </section>
-
-      <!-- Quick tags -->
-      <section class="card reveal">
-        <h2 class="section">ما الذي أعجبك؟</h2>
-        <div class="chips" id="chipsRow"></div>
-        <p class="help">انقر للإضافة أو الإزالة • Tap to add/remove</p>
-      </section>
-
-      <!-- Satisfaction details -->
-      <section class="card reveal">
-        <h2 class="section">تفاصيل الرضا</h2>
-        <div class="row cols-2">
-          <div class="likert">
-            <label class="lbl" for="qQuality">جودة التنظيف</label>
-            <input id="qQuality" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
-            <output>4</output>
-            <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
-          </div>
-          <div class="likert">
-            <label class="lbl" for="qSpeed">سرعة الخدمة</label>
-            <input id="qSpeed" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
-            <output>4</output>
-            <span class="help">1 بطيئة جدًا ← 5 سريعة جدًا</span>
-          </div>
-          <div class="likert">
-            <label class="lbl" for="qStaff">احترافية الموظفين</label>
-            <input id="qStaff" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
-            <output>4</output>
-            <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
-          </div>
-          <div class="likert">
-            <label class="lbl" for="qValue">القيمة مقابل السعر</label>
-            <input id="qValue" type="range" min="1" max="5" step="1" value="4" oninput="this.nextElementSibling.value=this.value"/>
-            <output>4</output>
-            <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Loyalty -->
-      <section class="card reveal">
-        <h2 class="section">الولاء</h2>
-        <div class="row cols-2">
-          <div>
-            <label class="lbl">هل ستعود مرة أخرى؟</label>
-            <div class="chips" role="radiogroup">
-              <label class="chip"><input type="radio" name="return" value="yes" checked style="margin-inline-end:.5rem"> نعم</label>
-              <label class="chip"><input type="radio" name="return" value="no" style="margin-inline-end:.5rem"> لا</label>
-            </div>
-          </div>
-          <div>
-            <label class="lbl" for="nps">التوصية بنا (0–10)</label>
-            <input id="nps" type="number" inputmode="numeric" min="0" max="10" step="1" value="9" required/>
-            <span class="help">0 لن أوصي إطلاقًا ← 10 أوصي بقوة</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Actions (in-card for desktop) -->
-      <section class="card reveal hide-on-mobile" id="inlineAction">
-        <h2 class="section">الإرسال</h2>
-        <p class="help">سيتم حفظ تقييمك لدينا فقط.</p>
-        <div class="btns">
-          <button id="btnSubmitTop" class="btn primary" type="submit">حفظ التقييم</button>
-          <button type="button" class="btn ghost" id="btnReset">إعادة تعيين</button>
-        </div>
-      </section>
-    </form>
-
-    <footer class="note reveal"><span>تصميم نحل • WCAG 2.2 جاهز • يعمل دون مكتبات خارجية</span></footer>
-  </div>
-
-  <!-- Sticky action bar (mobile-first) -->
-  <div class="actionbar" id="actionbar">
-    <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto">
-      <div class="help" id="validityHint">أكمل الحقول المطلوبة ثم اضغط حفظ</div>
-      <div class="btns" style="margin-inline-start:auto">
-        <button id="btnSubmit" class="btn primary" type="button">حفظ التقييم</button>
+    <!-- Overall rating -->
+    <section class="card">
+      <h2 class="section" data-i18n="overall_rating">التقييم العام</h2>
+      <div class="stars" role="radiogroup" aria-label="Rating">
+        <!-- inputs kept (IDs/names/values unchanged for JS) -->
+        <input type="radio" id="star5" name="rating" value="5"><label for="star5" aria-label="5">★</label>
+        <input type="radio" id="star4" name="rating" value="4"><label for="star4" aria-label="4">★</label>
+        <input type="radio" id="star3" name="rating" value="3"><label for="star3" aria-label="3">★</label>
+        <input type="radio" id="star2" name="rating" value="2"><label for="star2" aria-label="2">★</label>
+        <input type="radio" id="star1" name="rating" value="1"><label for="star1" aria-label="1">★</label>
       </div>
+      <p class="help">اختر من نجمة إلى خمس نجوم • Choose 1–5 stars</p>
+      <label class="lbl" for="reviewText">اكتب رأيك</label>
+      <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review"></textarea>
+    </section>
+
+    <!-- Quick tags -->
+    <section class="card">
+      <h2 class="section">ما الذي أعجبك؟</h2>
+      <div class="chips" id="chipsRow" role="group" aria-label="Liked aspects"></div>
+      <p class="help">انقر للإضافة أو الإزالة • Tap to add/remove</p>
+    </section>
+
+    <!-- Satisfaction details -->
+    <section class="card">
+      <h2 class="section">تفاصيل الرضا</h2>
+      <div class="row cols-2">
+        <div class="likert">
+          <label class="lbl" for="qQuality">جودة التنظيف</label>
+          <input id="qQuality" type="range" min="1" max="5" step="1" value="4"/>
+          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+        </div>
+        <div class="likert">
+          <label class="lbl" for="qSpeed">سرعة الخدمة</label>
+          <input id="qSpeed" type="range" min="1" max="5" step="1" value="4"/>
+          <span class="help">1 بطيئة جدًا ← 5 سريعة جدًا</span>
+        </div>
+        <div class="likert">
+          <label class="lbl" for="qStaff">احترافية الموظفين</label>
+          <input id="qStaff" type="range" min="1" max="5" step="1" value="4"/>
+          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+        </div>
+        <div class="likert">
+          <label class="lbl" for="qValue">القيمة مقابل السعر</label>
+          <input id="qValue" type="range" min="1" max="5" step="1" value="4"/>
+          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loyalty -->
+    <section class="card">
+      <h2 class="section">الولاء</h2>
+      <div class="row cols-2">
+        <div>
+          <label class="lbl">هل ستعود مرة أخرى؟</label>
+          <div class="chips" role="radiogroup" aria-label="Return again">
+            <label class="chip"><input type="radio" name="return" value="yes" checked style="margin-inline-end:.5rem"> نعم</label>
+            <label class="chip"><input type="radio" name="return" value="no" style="margin-inline-end:.5rem"> لا</label>
+          </div>
+        </div>
+        <div>
+          <label class="lbl" for="nps">التوصية بنا (0–10)</label>
+          <input id="nps" type="number" min="0" max="10" value="9" inputmode="numeric"/>
+          <span class="help">0 لن أوصي إطلاقًا ← 10 أوصي بقوة</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Actions (informational only; button moved to sticky bar) -->
+    <section class="card">
+      <h2 class="section">الإرسال</h2>
+      <p class="help">سيتم حفظ تقييمك لدينا فقط.</p>
+    </section>
+
+    <footer class="note"><span>تصميم نحل • يعمل دون مكتبات خارجية</span></footer>
+  </div>
+
+  <!-- Sticky Action Bar (uses the SAME #btnSubmit; JS unchanged) -->
+  <div class="action-bar" role="region" aria-label="Submit rating">
+    <div class="inner">
+      <button id="btnSubmit" class="btn primary">حفظ التقييم</button>
     </div>
   </div>
 
-  <!-- Toast & Done -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <div id="doneView" class="card" style="display:none; margin:16px;max-width:760px;margin-inline:auto">
-    <h2 class="section">شكرًا لك! ✅</h2>
-    <p class="help">تم استلام تقييمك. نقدر وقتك.</p>
-    <div class="btns">
-      <button class="btn" id="btnAnother">إرسال تقييم آخر</button>
-    </div>
-  </div>
 
   <script>
-  (function(){
-    'use strict';
-
-    var DEBUG=false;
-    var CONFIG={
-      tags:[
-        {ar:"السرعة",en:"Speed"},
-        {ar:"الجودة",en:"Quality"},
-        {ar:"السعر",en:"Price"},
-        {ar:"الموظفون",en:"Staff"},
-        {ar:"دقة الوصول",en:"Punctual (Mobile)"},
-        {ar:"نظافة الأدوات",en:"Clean tools"},
-        {ar:"الحفاظ على الطلاء",en:"Gentle on paint"}
+    const DEBUG=false;
+    const CONFIG = {
+      tags: [
+        { ar:"السرعة", en:"Speed" },
+        { ar:"الجودة", en:"Quality" },
+        { ar:"السعر",  en:"Price" },
+        { ar:"الموظفون", en:"Staff" },
+        { ar:"دقة الوصول", en:"Punctual (Mobile)" },
+        { ar:"نظافة الأدوات", en:"Clean tools" },
+        { ar:"الحفاظ على الطلاء", en:"Gentle on paint" }
       ]
     };
 
-    var I18N={
-      ar:{
-        app_title:"قيّم تجربتك",
-        app_subtitle:"استبيان رضا الخدمة • Service satisfaction survey",
-        overall_rating:"التقييم العام",
-        write_review:"اكتب رأيك",
-        review_placeholder:"اكتب رأيك هنا…",
-        what_you_liked:"ما الذي أعجبك؟",
-        tap_to_toggle:"انقر للإضافة أو الإزالة",
-        satisfaction_details:"تفاصيل الرضا",
-        q_quality:"جودة التنظيف",
-        q_speed:"سرعة الخدمة",
-        q_staff:"احترافية الموظفين",
-        q_value:"القيمة مقابل السعر",
-        help_quality:"1 سيئة جدًا ← 5 ممتازة",
-        help_speed:"1 بطيئة جدًا ← 5 سريعة جدًا",
-        loyalty:"الولاء",
-        return_again:"هل ستعود مرة أخرى؟",
-        yes:"نعم",
-        no:"لا",
-        nps_label:"التوصية بنا (0–10)",
-        nps_help:"0 لن أوصي إطلاقًا ← 10 أوصي بقوة",
-        submit_section:"الإرسال",
-        submit_note:"سيتم حفظ تقييمك لدينا فقط.",
-        save_rating:"حفظ التقييم",
-        reset:"إعادة تعيين",
-        complete_required:"أكمل الحقول المطلوبة ثم اضغط حفظ",
-        ready_to_send:"جاهز للإرسال",
-        thanks_title:"شكرًا لك! ✅",
-        thanks_body:"تم استلام تقييمك. نقدر وقتك.",
-        send_another:"إرسال تقييم آخر",
-        saving:"جارٍ الحفظ…",
-        saved_success:"تم الحفظ بنجاح",
-        save_failed:"تعذّر الحفظ",
-        offline:"لا يوجد اتصال بالإنترنت",
-        error_bad_link:"خطأ: رابط غير صحيح (بدون bookingId).",
-        error_no_rating:"الرجاء اختيار التقييم بالنجوم",
-        error_no_text:"الرجاء كتابة التقييم النصي",
-        error_bad_nps:"قيمة NPS يجب أن تكون بين 0 و 10"
-      },
-      en:{
-        app_title:"Rate your experience",
-        app_subtitle:"Service satisfaction survey",
-        overall_rating:"Overall rating",
-        write_review:"Write your review",
-        review_placeholder:"Type your review here…",
-        what_you_liked:"What did you like?",
-        tap_to_toggle:"Tap to add/remove",
-        satisfaction_details:"Satisfaction details",
-        q_quality:"Cleaning quality",
-        q_speed:"Service speed",
-        q_staff:"Staff professionalism",
-        q_value:"Value for money",
-        help_quality:"1 Very poor ← 5 Excellent",
-        help_speed:"1 Very slow ← 5 Very fast",
-        loyalty:"Loyalty",
-        return_again:"Would you return?",
-        yes:"Yes",
-        no:"No",
-        nps_label:"Recommend us (0–10)",
-        nps_help:"0 Wouldn’t recommend ← 10 Highly recommend",
-        submit_section:"Submit",
-        submit_note:"Your rating is saved privately.",
-        save_rating:"Save rating",
-        reset:"Reset",
-        complete_required:"Complete required fields, then Save",
-        ready_to_send:"Ready to send",
-        thanks_title:"Thank you! ✅",
-        thanks_body:"We received your feedback. We appreciate your time.",
-        send_another:"Send another rating",
-        saving:"Saving…",
-        saved_success:"Saved successfully",
-        save_failed:"Save failed",
-        offline:"You’re offline",
-        error_bad_link:"Invalid link (missing bookingId).",
-        error_no_rating:"Please select a star rating",
-        error_no_text:"Please write your review",
-        error_bad_nps:"NPS must be between 0 and 10"
-      }
-    };
-
-    function $(s,r){return (r||document).querySelector(s)}
-    function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
-
-    function showToast(msg, ok){
-      if(ok===void 0) ok=true;
-      var t=$('#toast'); if(!t) return;
-      t.textContent=msg; t.className='toast show '+(ok?'ok':'err');
-      setTimeout(function(){ t.classList.remove('show') }, 2500);
-    }
-
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('show') });
-    }, {threshold:0.05});
+    const $  = (s,r=document)=>r.querySelector(s);
+    const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+    function showToast(msg, ok=true){ const t=$('#toast'); if(!t) return; t.textContent=msg; t.className='toast show '+(ok?'ok':'err'); setTimeout(()=>t.classList.remove('show'), 2500); }
 
     function hydrateTags(){
-      var row=$('#chipsRow'); if(!row) return; row.innerHTML='';
-      var lang=document.documentElement.lang||'ar';
-      CONFIG.tags.forEach(function(t){
-        var b=document.createElement('button');
-        b.type='button'; b.className='chip'; b.setAttribute('aria-pressed','false'); b.textContent=(lang==='en'?t.en:t.ar);
-        b.addEventListener('click', function(){
-          var on=b.classList.toggle('active');
-          b.setAttribute('aria-pressed', on ? 'true' : 'false');
-        });
+      const row = $('#chipsRow'); row.innerHTML='';
+      CONFIG.tags.forEach((t, i) => {
+        const b=document.createElement('button');
+        b.type='button'; b.className='chip'; b.textContent=t.ar;
+        b.addEventListener('click',()=> b.classList.toggle('active'));
         row.appendChild(b);
       });
     }
 
-    function getRating(){ var r=$$('input[name="rating"]').find(function(i){return i.checked}); return r?Number(r.value):0 }
-    function getParam(name){ var u=new URL(window.location.href); return u.searchParams.get(name) }
+    function getRating(){ const r=$$('input[name="rating"]').find(i=>i.checked); return r?Number(r.value):0; }
+    function getParam(name){ const u=new URL(window.location.href); return u.searchParams.get(name); }
 
     function collectPayload(){
-      var chips=$$('.chip.active').map(function(ch){return ch.textContent});
+      const chips = $$('.chip.active').map(ch => ch.textContent);
       return {
         bookingId: getParam('bookingId') || '',
         ts: new Date().toISOString(),
         lang: document.documentElement.lang || 'ar',
         rating: getRating(),
-        reviewText: ($('#reviewText') && $('#reviewText').value ? $('#reviewText').value.trim() : ''),
+        reviewText: $('#reviewText').value.trim(),
         tags: chips,
         q: {
-          quality: Number($('#qQuality') && $('#qQuality').value || 0),
-          speed:   Number($('#qSpeed') && $('#qSpeed').value || 0),
-          staff:   Number($('#qStaff') && $('#qStaff').value || 0),
-          value:   Number($('#qValue') && $('#qValue').value || 0)
+          quality: Number($('#qQuality').value || 0),
+          speed:   Number($('#qSpeed').value || 0),
+          staff:   Number($('#qStaff').value || 0),
+          value:   Number($('#qValue').value || 0)
         },
-        wouldReturn: (function(){ var r=$$('input[name="return"]').find(function(i){return i.checked}); return r ? r.value : 'yes' })(),
-        nps: Number($('#nps') && $('#nps').value || 0),
+        wouldReturn: $$('input[name="return"]').find(r=>r.checked)?.value || 'yes',
+        nps: Number($('#nps').value || 0),
         client: { ua: navigator.userAgent }
       };
     }
 
-    function saveToServer(payload){
-      return fetch('/api/gas-proxy', {
+    async function saveToServer(payload){
+      // Same-origin proxy expected at /api/gas-proxy → forwards to GAS (action=review.save)
+      const res = await fetch('/api/gas-proxy', {
         method:'POST',
-        headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
-        body: JSON.stringify({ action:'review.save', data: payload })
-      }).then(function(res){
-        return res.json().catch(function(){ return {} }).then(function(json){ return { status: res.status, ok: json.ok, error: json.error, id: json.id } });
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
       });
+      const txt = await res.text();
+      let json; try { json = JSON.parse(txt); } catch { json = { ok:false, error:'bad_json', raw:txt?.slice(0,500)||'' }; }
+      return { status: res.status, ...json };
     }
 
     function validate(){
-      var form=$('#rateForm');
-      if(!getParam('bookingId')){ showToast(t('error_bad_link'), false); return false }
-      if(form && !form.checkValidity()){ showToast(t('complete_required'), false); return false }
-      if(!getRating()){ showToast(t('error_no_rating'), false); return false }
-      var text = $('#reviewText') && $('#reviewText').value ? $('#reviewText').value.trim() : '';
-      if(!text){ showToast(t('error_no_text'), false); return false }
-      var nps = Number($('#nps') && $('#nps').value || 0);
-      if(isNaN(nps) || nps<0 || nps>10){ showToast(t('error_bad_nps'), false); return false }
+      const bid = getParam('bookingId');
+      if (!bid){ showToast('خطأ: رابط غير صحيح (بدون bookingId).', false); return false; }
+      const rating = getRating();
+      if (!rating){ showToast('الرجاء اختيار التقييم بالنجوم', false); return false; }
+      const text = $('#reviewText').value.trim();
+      if (!text){ showToast('الرجاء كتابة التقييم النصي', false); return false; }
       return true;
     }
 
-    function validateSoft(){
-      var hasRating = !!getRating();
-      var txt = $('#reviewText') && $('#reviewText').value ? $('#reviewText').value.trim() : '';
-      var nps = $('#nps') && $('#nps').value;
-      return hasRating && txt.length>0 && nps!=='';
-    }
-
-    function updateValidityHint(){
-      var ok = validateSoft();
-      var v = $('#validityHint'); if(v){ v.textContent = ok ? t('ready_to_send') : t('complete_required') }
-    }
-
-    function onSubmit(){
-      if(!validate()) return;
-      var btn=$('#btnSubmit'); var btnTop=$('#btnSubmitTop');
-      [btn,btnTop].forEach(function(b){ if(b){ b.disabled=true; b.textContent=t('saving') } });
-      saveToServer(collectPayload()).then(function(result){
-        if(result && result.ok){
-          showToast(t('saved_success'), true);
-          var w=document.querySelector('.wrap'); if(w) w.style.display='none';
-          var ab=$('#actionbar'); if(ab) ab.style.display='none';
-          var dv=$('#doneView'); if(dv) dv.style.display='block';
+    async function onSubmit(){
+      if (!validate()) return;
+      const btn=$('#btnSubmit'); btn.disabled=true; btn.textContent='جارٍ الحفظ…';
+      try{
+        const result = await saveToServer(collectPayload());
+        if (result.ok){
+          showToast('تم الحفظ بنجاح', true);
+          $('input[name="rating"]:checked')?.checked && ($('input[name="rating"]:checked').checked = false);
+          $('#reviewText').value=''; $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
         } else {
-          showToast(t('save_failed') + ' • ' + (result && result.error ? result.error : 'Unknown error'), false);
-          if(DEBUG) console.error(result);
+          const msg = 'تعذّر الحفظ' + (result.error ? ` • ${result.error}` : '');
+          showToast(msg, false);
+          if (DEBUG) console.error(result);
         }
-      }).catch(function(err){
-        if(DEBUG) console.error(err);
-        showToast(navigator.onLine ? t('save_failed') : t('offline'), false);
-      }).finally(function(){
-        [btn,btnTop].forEach(function(b){ if(b){ b.disabled=false; b.textContent=t('save_rating') } });
-      });
+      } catch(err){
+        if (DEBUG) console.error(err);
+        showToast('تعذّر الحفظ، حاول مرة أخرى', false);
+      } finally {
+        btn.disabled=false; btn.textContent='حفظ التقييم';
+      }
     }
 
-    function resetForm(){
-      var f=$('#rateForm'); if(f) f.reset();
-      $$('.chip.active').forEach(function(ch){ ch.classList.remove('active') });
-      updateValidityHint();
-    }
-
-    function t(key){ var lang=document.documentElement.lang||'ar'; return (I18N[lang] && I18N[lang][key]) || key }
-
-    function applyI18n(lang){
-      document.documentElement.lang=lang;
-      document.documentElement.dir=(lang==='ar')?'rtl':'ltr';
-      var el;
-      el=$('.title'); if(el) el.textContent=t('app_title');
-      el=$('.subtitle'); if(el) el.textContent=t('app_subtitle');
-      el=$('#ratingLegend'); if(el) el.textContent=t('overall_rating');
-      el=$('label[for="reviewText"]'); if(el) el.textContent=t('write_review');
-      el=$('#reviewText'); if(el) el.placeholder=t('review_placeholder');
-      var tagsSec = $('#chipsRow'); if(tagsSec){ var s = tagsSec.closest('section'); if(s){ var h=s.querySelector('h2.section'); if(h) h.textContent=t('what_you_liked'); var hp=s.querySelector('.help'); if(hp) hp.textContent=t('tap_to_toggle') } }
-      el=$('h2.section'); // not changing the first, handled above
-      var satCard = (function(){ var cards=$$('#rateForm .card'); for(var i=0;i<cards.length;i++){ if(cards[i].querySelector('.likert')) return cards[i]; } return null })();
-      if(satCard){ var h2=satCard.querySelector('h2.section'); if(h2) h2.textContent=t('satisfaction_details'); }
-      el=$('label[for="qQuality"]'); if(el) el.textContent=t('q_quality');
-      el=$('label[for="qSpeed"]'); if(el) el.textContent=t('q_speed');
-      el=$('label[for="qStaff"]'); if(el) el.textContent=t('q_staff');
-      el=$('label[for="qValue"]'); if(el) el.textContent=t('q_value');
-      var q;
-      q=$('#qQuality'); if(q && q.parentElement){ var hp1=q.parentElement.querySelector('.help'); if(hp1) hp1.textContent=t('help_quality') }
-      q=$('#qSpeed'); if(q && q.parentElement){ var hp2=q.parentElement.querySelector('.help'); if(hp2) hp2.textContent=t('help_speed') }
-      q=$('#qStaff'); if(q && q.parentElement){ var hp3=q.parentElement.querySelector('.help'); if(hp3) hp3.textContent=t('help_quality') }
-      q=$('#qValue'); if(q && q.parentElement){ var hp4=q.parentElement.querySelector('.help'); if(hp4) hp4.textContent=t('help_quality') }
-      var loyalty = (function(){ var cards=$$('#rateForm .card'); for(var i=0;i<cards.length;i++){ if(cards[i].querySelector('input[name="return"]')) return cards[i]; } return null })();
-      if(loyalty){
-        var h=loyalty.querySelector('h2.section'); if(h) h.textContent=t('loyalty');
-        el=loyalty.querySelector('.lbl'); if(el) el.textContent=t('return_again');
-        var yesInp=$('input[name="return"][value="yes"]'); if(yesInp && yesInp.parentElement){ yesInp.parentElement.lastChild.nodeValue=' '+t('yes') }
-        var noInp=$('input[name="return"][value="no"]'); if(noInp && noInp.parentElement){ noInp.parentElement.lastChild.nodeValue=' '+t('no') }
-        el=$('label[for="nps"]'); if(el) el.textContent=t('nps_label');
-        var npsHelp=$('#nps') && $('#nps').parentElement ? $('#nps').parentElement.querySelector('.help') : null; if(npsHelp) npsHelp.textContent=t('nps_help');
-      }
-      var inline=$('#inlineAction'); if(inline){
-        var sh=inline.querySelector('h2.section'); if(sh) sh.textContent=t('submit_section');
-        var sp=inline.querySelector('.help'); if(sp) sp.textContent=t('submit_note');
-        el=$('#btnSubmitTop'); if(el) el.textContent=t('save_rating');
-        el=$('#btnReset'); if(el) el.textContent=t('reset');
-      }
-      el=$('#validityHint'); if(el) el.textContent=t('complete_required');
-      el=$('#btnSubmit'); if(el) el.textContent=t('save_rating');
-      var dv=$('#doneView'); if(dv){ var h2=dv.querySelector('h2.section'); if(h2) h2.textContent=t('thanks_title'); var hp=dv.querySelector('.help'); if(hp) hp.textContent=t('thanks_body'); }
-      el=$('#btnAnother'); if(el) el.textContent=t('send_another');
+    (function init(){
       hydrateTags();
-      var langBtn=$('#langToggle'); if(langBtn){ langBtn.textContent = (lang==='ar'?'EN':'AR') }
-    }
-
-    function setTheme(theme){
-      var root=document.documentElement;
-      if(theme==='dark'){ root.setAttribute('data-theme','dark') } else { root.removeAttribute('data-theme') }
-      var thBtn=$('#themeToggle'); if(thBtn){ thBtn.textContent=(theme==='dark'?'☀️':'🌙') }
-    }
-
-    // INIT
-    $$('.reveal').forEach(function(el){ io.observe(el) });
-    hydrateTags();
-    var storedTheme=localStorage.getItem('nahl.rate.theme');
-    var prefersDark = false; try{ prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches }catch(e){}
-    setTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
-    var storedLang=localStorage.getItem('nahl.rate.lang');
-    var initialLang = storedLang || (document.documentElement.lang || 'ar');
-    applyI18n(initialLang);
-
-    var btnSubmit=$('#btnSubmit'); if(btnSubmit) btnSubmit.addEventListener('click', onSubmit);
-    var form=$('#rateForm'); if(form) form.addEventListener('submit', function(e){ e.preventDefault(); onSubmit() });
-    var btnReset=$('#btnReset'); if(btnReset) btnReset.addEventListener('click', function(){ resetForm(); showToast('↺') });
-    var btnAnother=$('#btnAnother'); if(btnAnother) btnAnother.addEventListener('click', function(){ location.reload() });
-    var langToggle=$('#langToggle'); if(langToggle) langToggle.addEventListener('click', function(){ var next=(document.documentElement.lang==='ar'?'en':'ar'); localStorage.setItem('nahl.rate.lang', next); applyI18n(next) });
-    var themeToggle=$('#themeToggle'); if(themeToggle) themeToggle.addEventListener('click', function(){ var isDark=document.documentElement.getAttribute('data-theme')==='dark'; var next=isDark?'light':'dark'; localStorage.setItem('nahl.rate.theme', next); setTheme(next) });
-    ['input','change','keyup'].forEach(function(ev){ document.addEventListener(ev, updateValidityHint, true) });
-    updateValidityHint();
-  })();
-</script>
+      $('#btnSubmit').addEventListener('click', onSubmit);
+    })();
+  </script>
 </body>
 </html>
