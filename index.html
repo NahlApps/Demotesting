@@ -79,8 +79,6 @@
     .btn { border: 1px solid transparent; padding: 12px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 14px; }
     .btn.primary { background: var(--primary); color: #fff; }
     .btn.primary:hover { background: var(--primary-600); }
-    .btn.ghost { background: #fff; color: var(--text); border-color: var(--border); }
-    .btn.ghost:hover { border-color: var(--primary); }
 
     .toast { position: fixed; inset-inline: 16px; bottom: 16px; z-index: 50; display: none; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); font-size: 14px; }
     .toast.show { display: block; }
@@ -99,7 +97,7 @@
       <div class="brand" aria-hidden="true">N</div>
       <div>
         <div class="title" data-i18n="app_title">قيّم تجربتك</div>
-        <div class="subtitle" data-i18n="app_subtitle">تقييم يشبه تجربة خرائط Google • Google-style rating</div>
+        <div class="subtitle" data-i18n="app_subtitle">استبيان رضا الخدمة • Service satisfaction survey</div>
       </div>
       <div class="lang-switch" role="group" aria-label="Language">
         <button id="btnAr" class="active">عربي</button>
@@ -192,28 +190,10 @@
     </section>
 
     <section class="card">
-      <h2 class="section" data-i18n="followup_title">متابعة اختيارية</h2>
-      <div class="row cols-2">
-        <div>
-          <label class="lbl" for="contactName" data-i18n="name">الاسم</label>
-          <input type="text" id="contactName" placeholder="الاسم / Name"/>
-        </div>
-        <div>
-          <label class="lbl" for="contactPhone" data-i18n="phone">الهاتف</label>
-          <input type="text" id="contactPhone" placeholder="+9665XXXXXXXX"/>
-        </div>
-      </div>
-      <div class="toggle-row" style="margin-top:10px">
-        <label class="radio"><input type="checkbox" id="allowContact" checked/> <span data-i18n="allow_contact">أوافق على التواصل معي بشأن تقييمي</span></label>
-      </div>
-    </section>
-
-    <section class="card">
       <h2 class="section" data-i18n="actions_title">الإرسال</h2>
-      <p class="help" data-i18n="actions_help">سيتم حفظ تقييمك لدينا، ثم فتح نافذة Google لكتابة التقييم العام.</p>
+      <p class="help" data-i18n="actions_help">سيتم حفظ تقييمك لدينا فقط.</p>
       <div class="btns">
-        <button id="btnSubmit" class="btn primary" data-i18n="btn_submit">حفظ & فتح Google</button>
-        <button id="btnGoogle" class="btn ghost" data-i18n="btn_google_only">فتح Google فقط</button>
+        <button id="btnSubmit" class="btn primary" data-i18n="btn_submit">حفظ التقييم</button>
       </div>
     </section>
 
@@ -224,7 +204,8 @@
 
   <script>
     const CONFIG = {
-      PLACE_ID: "REPLACE_WITH_GOOGLE_PLACE_ID", // e.g. ChIJN1t_tDeuEmsRUsoyG83frY4
+      // No Google usage; left here if you later re-enable location targeting
+      PLACE_ID: "", 
       defaultLang: "ar",
       tags: [
         { ar: "السرعة", en: "Speed" },
@@ -254,7 +235,7 @@
     };
 
     const I18N = {
-      ar: { app_title:"قيّم تجربتك", app_subtitle:"تقييم يشبه تجربة خرائط Google • Google-style rating",
+      ar: { app_title:"قيّم تجربتك", app_subtitle:"استبيان رضا الخدمة • Service satisfaction survey",
         overall_rating:"التقييم العام", rating_help:"اختر من نجمة إلى خمس نجوم • Choose 1–5 stars",
         write_review:"اكتب رأيك", highlights:"ما الذي أعجبك؟", chips_help:"انقر للإضافة أو الإزالة • Tap to add/remove",
         service_context:"تفاصيل الخدمة", service_received:"الخدمة", vehicle_size:"حجم المركبة", visit_date:"تاريخ الزيارة",
@@ -262,12 +243,12 @@
         scale_1_5:"1 سيئة جدًا ← 5 ممتازة", loyalty_title:"الولاء", would_return:"هل ستعود مرة أخرى؟",
         yes:"نعم", no:"لا", nps_label:"التوصية بنا (0–10)", nps_help:"0 لن أوصي إطلاقًا ← 10 أوصي بقوة",
         followup_title:"متابعة اختيارية", name:"الاسم", phone:"الهاتف", allow_contact:"أوافق على التواصل معي بشأن تقييمي",
-        actions_title:"الإرسال", actions_help:"سيتم حفظ تقييمك لدينا، ثم فتح نافذة Google لكتابة التقييم العام.",
-        btn_submit:"حفظ & فتح Google", btn_google_only:"فتح Google فقط", footer_note:"تصميم نحل • Nahl design • يعمل دون مكتبات خارجية",
+        actions_title:"الإرسال", actions_help:"سيتم حفظ تقييمك لدينا فقط.",
+        btn_submit:"حفظ التقييم", footer_note:"تصميم نحل • Nahl design • يعمل دون مكتبات خارجية",
         toast_saved:"تم الحفظ بنجاح", toast_error:"تعذّر الحفظ، حاول مرة أخرى", toast_missing_rating:"الرجاء اختيار التقييم بالنجوم",
         toast_missing_text:"الرجاء كتابة التقييم النصي"
       },
-      en: { app_title:"Rate your experience", app_subtitle:"Google-style review flow",
+      en: { app_title:"Rate your experience", app_subtitle:"Service satisfaction survey",
         overall_rating:"Overall rating", rating_help:"Choose 1–5 stars", write_review:"Write a review",
         highlights:"What stood out?", chips_help:"Tap to add/remove", service_context:"Service details",
         service_received:"Service received", vehicle_size:"Vehicle size", visit_date:"Visit date",
@@ -276,8 +257,8 @@
         loyalty_title:"Loyalty", would_return:"Would you visit again?", yes:"Yes", no:"No",
         nps_label:"Recommend us (0–10)", nps_help:"0 Not at all likely ← 10 Extremely likely",
         followup_title:"Optional follow-up", name:"Name", phone:"Phone", allow_contact:"I agree to be contacted about my review",
-        actions_title:"Submit", actions_help:"We’ll save your review, then open Google’s review dialog.",
-        btn_submit:"Save & Open Google", btn_google_only:"Open Google only", footer_note:"Nahl design • No external libraries",
+        actions_title:"Submit", actions_help:"Your review will be saved locally.",
+        btn_submit:"Save review", footer_note:"Nahl design • No external libraries",
         toast_saved:"Saved successfully", toast_error:"Save failed, please try again",
         toast_missing_rating:"Please choose a star rating", toast_missing_text:"Please write your review text"
       }
@@ -304,11 +285,6 @@
       const vs=$('#vehicleSize'); vs.innerHTML=''; CONFIG.vehicleSizes.forEach((o,i)=>{ const opt=document.createElement('option'); opt.value=i; opt.textContent=o[lang]; vs.appendChild(opt); });
     }
 
-    function buildGoogleReviewURL(){
-      if (!CONFIG.PLACE_ID || CONFIG.PLACE_ID.startsWith("REPLACE_")) return null;
-      return `https://search.google.com/local/writereview?placeid=${encodeURIComponent(CONFIG.PLACE_ID)}`;
-    }
-
     function collectPayload(){
       const lang=document.documentElement.lang || CONFIG.defaultLang;
       const rating=getRating();
@@ -319,7 +295,7 @@
       return {
         ts:new Date().toISOString(),
         lang,
-        placeId: CONFIG.PLACE_ID,
+        placeId: "", // not using Google; keep empty
         rating,
         reviewText:text,
         tags:chips,
@@ -333,16 +309,15 @@
       };
     }
 
-    // === Same-origin proxy call (no CORS issues) ===
     async function saveToGAS(payload){
       const res = await fetch("/api/gas-proxy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error("Network error: " + res.status);
-      let json; try { json=await res.json(); } catch(e){ json={ ok:false, parseError:true }; }
-      return json;
+      const raw = await res.text();
+      let json; try { json=JSON.parse(raw); } catch { json={ ok:false, error:"bad_json", raw: raw ? raw.slice(0,500) : "" }; }
+      return { status: res.status, ...json };
     }
 
     function validate(){
@@ -353,34 +328,31 @@
       return true;
     }
 
-    async function onSubmit(openGoogleAfter=true){
+    async function onSubmit(){
       if (!validate()) return;
-      const btn=$('#btnSubmit'); const googleOnlyBtn=$('#btnGoogle');
-      btn.disabled=true; googleOnlyBtn.disabled=true;
+      const btn=$('#btnSubmit');
+      btn.disabled=true;
       btn.textContent = document.documentElement.lang==='ar' ? 'جارٍ الحفظ…' : 'Saving…';
+      const lang=document.documentElement.lang;
       try{
         const payload = collectPayload();
         const result = await saveToGAS(payload);
         if (result && result.ok){
-          showToast(I18N[document.documentElement.lang].toast_saved, true);
-          if (openGoogleAfter){ const u=buildGoogleReviewURL(); if (u) window.open(u,'_blank','noopener'); }
+          showToast(I18N[lang].toast_saved, true);
           const checked=$('input[name="rating"]:checked'); if (checked) checked.checked=false;
           $('#reviewText').value=''; $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
         } else {
-          showToast(I18N[document.documentElement.lang].toast_error, false);
+          const fallback = I18N[lang].toast_error;
+          const detail = result && result.error ? result.error : '';
+          showToast(fallback + (detail ? ` • ${detail}` : ''), false);
+          console.error("Save error:", result);
         }
       } catch(err){
-        console.error(err); showToast(I18N[document.documentElement.lang].toast_error, false);
+        console.error(err); showToast(I18N[lang].toast_error, false);
       } finally {
-        btn.disabled=false; googleOnlyBtn.disabled=false;
-        btn.textContent = I18N[document.documentElement.lang].btn_submit;
+        btn.disabled=false;
+        btn.textContent = I18N[lang].btn_submit;
       }
-    }
-
-    function openGoogleOnly(){
-      const u=buildGoogleReviewURL();
-      if (u) window.open(u,'_blank','noopener');
-      else showToast('Missing PLACE_ID', false);
     }
 
     (function init(){
@@ -388,8 +360,7 @@
       $('#btnEn').addEventListener('click',()=>setLang('en'));
       hydrateOptions(CONFIG.defaultLang); setLang(CONFIG.defaultLang);
       const today=new Date(); $('#visitDate').value=today.toISOString().slice(0,10);
-      $('#btnSubmit').addEventListener('click',()=>onSubmit(true));
-      $('#btnGoogle').addEventListener('click',openGoogleOnly);
+      $('#btnSubmit').addEventListener('click',onSubmit);
     })();
   </script>
 </body>
