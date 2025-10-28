@@ -127,7 +127,7 @@
       linear-gradient(180deg,#ffffff 0%, #F6FDFF 60%, var(--brand-50) 100%),
       radial-gradient(120px 60px at 50% -20px, var(--brand-100) 0, transparent 60%);
       border:2px solid color-mix(in srgb, var(--brand-600) 35%, var(--brand-100));
-      box-shadow:0 10px 26px rgba(0,0,0,.06);transition:transform .08s,box-shadow .2s,border-color .2s,background .2s}
+      box-shadow:0 10px 26px rgba(0,0,0,.06);transition:transform .08s,box-shadow .2s,border-color .2س,background .2s}
     .radio-buttons:hover{border-color:var(--brand-600);box-shadow:0 16px 28px rgba(8,145,178,.18)}
     .radios:checked + .radio-buttons{background:
       linear-gradient(180deg, var(--brand-50) 0%, #D7F6FD 65%, #C7F0FB 100%),
@@ -156,6 +156,8 @@
     }
     #langSwitcher .btn{ border-radius:10px; padding:.35rem .6rem }
     #langSwitcher .btn:focus { outline:2px solid rgba(255,255,255,.7); outline-offset:2px }
+    /* helper to hide serviceCat when only one or none */
+    #serviceCatWrap[hidden]{display:none !important;}
   </style>
 </head>
 <body>
@@ -215,9 +217,14 @@
 
               <label for="service">الخدمة</label>
               <div style="position:relative;">
-                <!-- removed inline onchange to avoid double handlers -->
-                <select id="serviceCat" required></select>
                 <select id="service" required></select>
+
+                <!-- NEW: Service Category (single, auto-set; hides if 0/1 option) -->
+                <div id="serviceCatWrap" style="margin-top:10px;" hidden>
+                  <label for="serviceCat" style="display:block;margin-bottom:6px;">فئة الخدمة</label>
+                  <select id="serviceCat" required></select>
+                </div>
+
                 <div id="page3-2-spinner" style="position:absolute; top:0; left:50%; transform:translateX(-50%); display:none;">
                   <div class="spinner-border" role="status" style="width:1.2rem; height:1.2rem; margin-top:14%;"></div>
                 </div>
@@ -230,13 +237,14 @@
         </div>
       </div>
 
-      <!-- Page 3 (hidden) -->
-      <div id="page3" class="page" >
+      <!-- Page 3 (skip/hidden) -->
+      <div id="page3" class="page" style="display:none;">
         <div class="form-block">
           <div class="section-card">
             <form id="page3-form" onsubmit="handleSubmit(event)">
-              <select id="serviceCat" required></select>
-              <select id="serviceCount"  required>
+              <!-- Removed duplicate serviceCat here to avoid duplicate IDs -->
+              <label for="serviceCount" style="display:block;margin-bottom:6px;">عدد السيارات</label>
+              <select id="serviceCount" required>
                 <option value="1" selected>1</option>
                 <option value="2">2</option><option value="3">3</option><option value="4">4</option>
                 <option value="5">5</option><option value="6">6</option><option value="7">7</option>
@@ -492,7 +500,10 @@
 <script>
 /* ===========================================================
  * Sponge & Soap — Booking App (index.html)
- * Hard AR default, AR/EN i18n, promo mapping, polygons (AR/EN)
+ * This version FIXES serviceCat population & duplicate IDs.
+ * - Only one #serviceCat exists (Page 2).
+ * - paintServicesFromBG() now fills #serviceCat options.
+ * - #serviceCat is shown if 2+ categories; hidden if 0/1.
  * =========================================================== */
 
 /* ---------- HARD ARABIC DEFAULT ---------- */
@@ -515,7 +526,6 @@ const NAHL_BASE = 'https://nahl-platform.vercel.app';
 const baseForm = `${NAHL_BASE}/api/app/AM/general/${APP_ID}/form`;
 const RESERVE_URL_PRIMARY  = `${baseForm}/reserveAppointment`;
 const RESERVE_URL_FALLBACK = `${baseForm.replace(/\/form\/?$/, '')}/reserveAppointment`;
-// Replace with your deployed GAS URL when ready
 const GAS_BASE_URL = '/api/gas-proxy';
 
 /* ----------------------------- State ----------------------------- */
@@ -533,20 +543,16 @@ let serviceDescText = '';
 let countryCodeInput = null;
 
 /* ---------- NEW: latest-only guard for service description ---------- */
-let serviceDescReqSeq = 0; // increment on each new request; only last may update
+let serviceDescReqSeq = 0;
 
 async function safeUpdateServiceDescFor(serviceId, locale){
   const req = ++serviceDescReqSeq;
   const lang = (locale || nForm.locale || getUILang()) === 'en' ? 'en' : 'ar';
-
-  // Fast path (promo rules)
   const promo = getServicePromoText(String(serviceId), lang);
   if (promo){
     if (req === serviceDescReqSeq) updateServiceDescriptionUI(promo);
     return;
   }
-
-  // Slow path (GAS)
   const txt = await fetchServiceDescription(String(serviceId));
   if (req === serviceDescReqSeq) updateServiceDescriptionUI(txt || '');
 }
@@ -642,9 +648,10 @@ function syncNFormFromUI(){
   const areaEl = document.getElementById('area'); if(areaEl?.value) nForm.location = String(areaEl.value);
   const svcEl  = document.getElementById('service'); if(svcEl?.value) nForm.service = String(svcEl.value);
   const svcCntEl = document.getElementById('serviceCount'); nForm.serviceCount = String(svcCntEl?.value || nForm.serviceCount || '1');
-  let currentCat = document.getElementById('serviceCat')?.value || nForm.serviceCat || '';
-  if (!currentCat) currentCat = deriveCategoryIdForSelectedService() || (categoriesById.size===1 ? Array.from(categoriesById.keys())[0] : '');
+
+  const currentCat = document.getElementById('serviceCat')?.value || nForm.serviceCat || '';
   if(currentCat) nForm.serviceCat = String(currentCat);
+
   if (window.position) nForm.urlLocation = window.position;
   const locDescEl = document.getElementById('locationDescription'); if (locDescEl?.value) nForm.locationDescription = locDescEl.value;
   const nameEl = document.getElementById('name'); if (nameEl?.value) nForm.customerN = nameEl.value.trim();
@@ -778,6 +785,7 @@ async function prefetchServicesFor(locationId){
   }catch(_){}
 }
 
+/* ========== MAIN FIX: also populate #serviceCat here ========== */
 function paintServicesFromBG(locationId){
   const svcWrap = window._bg.services.get(locationId) || {};
   services = svcWrap.services || [];
@@ -793,12 +801,13 @@ function paintServicesFromBG(locationId){
     categoriesById.set(cid, c);
   });
 
+  // Services dropdown
   const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
-  const names = sorted.map(s => pickLocale(s, 'TS_service_arabic_name', 'TS_service_english_name'));
-  const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+  const svcNames = sorted.map(s => pickLocale(s, 'TS_service_arabic_name', 'TS_service_english_name'));
+  const svcIds   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+  add_dropdown_list(svcNames, svcIds, "service");
 
-  add_dropdown_list(names, ids, "service");
-
+  // Apply Select2
   try{
     const $service = $('#service');
     if ($service.data('select2')) {
@@ -806,13 +815,55 @@ function paintServicesFromBG(locationId){
     }
   }catch(_){}
 
-  const firstSvcId = ids[0] || '';
-  if (firstSvcId){
-    const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-    setServiceCatHiddenAndState(catId);
-    nForm.service = String(firstSvcId);
+  // Categories dropdown (serviceCat)
+  const catSorted = serviceCategories.slice().sort((a,b)=>(Number(a.TS_service_category_id ?? a.id) - Number(b.TS_service_category_id ?? b.id)));
+  const catNames = catSorted.map(c => pickLocale(c, 'TS_service_category_arabic_name', 'TS_service_category_english_name'));
+  const catIds   = catSorted.map(c => String(c.TS_service_category_id ?? c.category_id ?? c.id));
 
-    // Invalidate any stale requests and update description for the first option
+  const catWrap = document.getElementById('serviceCatWrap');
+  const catSel  = document.getElementById('serviceCat');
+
+  // If there are 0 or 1 categories, hide the UI and set value (if any)
+  if (catIds.length <= 1){
+    if (catSel){
+      catSel.innerHTML = '';
+      if (catIds.length === 1){
+        const opt = document.createElement('option');
+        opt.value = catIds[0]; opt.textContent = catNames[0] || 'Default';
+        opt.selected = true;
+        catSel.appendChild(opt);
+        nForm.serviceCat = String(catIds[0]);
+      } else {
+        nForm.serviceCat = ''; // none available
+      }
+    }
+    if (catWrap) catWrap.hidden = true;
+  } else {
+    // 2+ categories → show and populate
+    if (catWrap) catWrap.hidden = false;
+    add_dropdown_list(catNames, catIds, "serviceCat");
+    try{
+      const $cat = $('#serviceCat');
+      if ($cat.data('select2')) {
+        $cat.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
+      }
+    }catch(_){}
+    // If service implies a category, select it
+    const implied = deriveCategoryIdForSelectedService();
+    if (implied && catIds.includes(String(implied))){
+      catSel.value = String(implied);
+      nForm.serviceCat = String(implied);
+    } else if (catIds.length){
+      catSel.value = catIds[0];
+      nForm.serviceCat = String(catIds[0]);
+    }
+    catSel.dispatchEvent(new Event('change'));
+  }
+
+  // First service description
+  const firstSvcId = svcIds[0] || '';
+  if (firstSvcId){
+    nForm.service = String(firstSvcId);
     serviceDescReqSeq++;
     safeUpdateServiceDescFor(String(firstSvcId), nForm.locale || getUILang());
   } else {
@@ -880,17 +931,7 @@ function setServiceCatHiddenAndState(cid){
 function getServicePromoText(serviceId, locale){
   const id = String(serviceId);
   const lang = (locale === 'en') ? 'en' : 'ar';
-
-  if (id === '187'){
-    return (lang === 'en')
-      ? ''
-      : '';
-  }
-  if (id === '189'){
-    return (lang === 'en')
-      ? ''
-      : '';
-  }
+  // Customize if needed
   return '';
 }
 
@@ -922,7 +963,7 @@ $("#area").on("change", ()=>{
   const lid = String(document.getElementById("area").value || "");
   if (lid && window._bg.services.has(lid)){
     paintServicesFromBG(lid);
-    setTimeout(setBoundries, 0); // ensure polygons after paint
+    setTimeout(setBoundries, 0);
     return;
   }
   document.getElementById("page3-2-spinner").style.display="block";
@@ -933,14 +974,23 @@ $("#area").on("change", ()=>{
     setTimeout(setBoundries, 0);
   }).catch(()=>{ document.getElementById("page3-2-spinner").style.display="none"; });
 });
+
 function add_dropdown_list(show_list, value_list, element_id){
-  const parent = document.getElementById(element_id); parent.innerHTML="";
+  const parent = document.getElementById(element_id); if(!parent) return;
+  parent.innerHTML="";
   show_list.forEach((name, i)=>{
     const opt = document.createElement("option"); opt.text=name; opt.value=value_list[i]; if(i===0) opt.selected=true; parent.appendChild(opt);
   });
-  // prevent firing change when there are no options (which cleared desc)
   if (show_list.length > 0) parent.dispatchEvent(new Event('change'));
 }
+
+/* Keep #serviceCat in sync if user changes it manually */
+document.addEventListener('change', (e)=>{
+  if (e.target && e.target.id === 'serviceCat'){
+    const val = String(e.target.value || '');
+    if (val) nForm.serviceCat = val;
+  }
+});
 
 /* ----------------------------- Appointments ----------------------------- */
 let appointments=[[],[],[]], ActualTimes=[[],[],[]];
@@ -1003,8 +1053,16 @@ if (dateEl){ dateEl.onchange = ()=>{ const hasArea=!!document.getElementById("ar
 /* ---------- ONLY service change handler (guarded) ---------- */
 $('#service').on('change', async ()=>{
   nForm.service = String(document.getElementById('service').value || '');
-  const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
-  setServiceCatHiddenAndState(catId);
+
+  // When service changes, try to imply the category, else keep current selection.
+  const impliedCat = deriveCategoryIdForSelectedService();
+  const catSel = document.getElementById('serviceCat');
+  if (impliedCat && catSel && [...catSel.options].some(o=>o.value===String(impliedCat))){
+    catSel.value = String(impliedCat);
+    nForm.serviceCat = String(impliedCat);
+  } else if (catSel && catSel.options.length === 1){
+    nForm.serviceCat = String(catSel.value || '');
+  }
 
   const svcId = document.getElementById('service').value || '';
   safeUpdateServiceDescFor(String(svcId), nForm.locale || getUILang());
@@ -1039,14 +1097,28 @@ document.getElementById('page1-button').onclick = ()=>{
   document.getElementById('page2').style.display='flex';
   if (window._bg.locations && window._bg.locations.length){
     paintAreasFromBG();
-    setTimeout(setBoundries, 0); // ensure polygons on first entry
+    setTimeout(setBoundries, 0);
   } else {
     $('.js-example-basic-single').select2({ data:[], width:"100%" });
   }
 };
 document.getElementById('page2-button').onclick = ()=>{
   const area = document.getElementById("area");
-  if(!area.value){ document.getElementById('page2-form').reportValidity(); return; }
+  const catWrap = document.getElementById('serviceCatWrap');
+  const svcSel  = document.getElementById('service');
+  const catSel  = document.getElementById('serviceCat');
+
+  if(!area.value || !svcSel.value){ document.getElementById('page2-form').reportValidity(); return; }
+  // ensure serviceCat set even if hidden
+  if (catWrap.hidden){
+    // if there is a single option we already set it; otherwise derive
+    const implied = deriveCategoryIdForSelectedService();
+    if (implied) nForm.serviceCat = String(implied);
+  } else {
+    if (!catSel.value){ document.getElementById('page2-form').reportValidity(); return; }
+    nForm.serviceCat = String(catSel.value);
+  }
+
   nForm.location = area.value;
   document.getElementById('page2').style.display='none';
   document.getElementById('page3').style.display='flex';
@@ -1182,7 +1254,6 @@ document.getElementById('page6-button').addEventListener('click', ()=>{
   const plateOk = !!document.getElementById('plateNumber').value.trim();
   const paymentChosen = !!document.querySelector('input[name="payingMethod"]:checked');
   if(!nameOk || !phoneOk || !plateOk || !paymentChosen){ document.getElementById('page6-form').reportValidity(); return; }
-  // reset accepts per language
   termsAcceptAR.checked=false; termsAcceptEN.checked=false; updateConfirmEnabled();
   termsModal.show();
 });
@@ -1515,6 +1586,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const area = $('#area');
       const service = $('#service');
       const brand = $('#carBrand');
+      const cat = $('#serviceCat');
 
       if (area.data('select2'))   area.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
       if (service.data('select2')) service.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
@@ -1522,6 +1594,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const brandPh = document.getElementById('carBrand')?.dataset.i18nPlaceholder || pack.brand_ph;
         brand.select2({ placeholder: brandPh, allowClear:true, width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
       }
+      if (cat.data('select2')) cat.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
     }catch(_){}
 
     try { localStorage.setItem('ui_locale', pack._lang); } catch(_){}
@@ -1539,7 +1612,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Toggle Terms body per language
     const ta = document.getElementById('termsBody-ar');
     const te = document.getElementById('termsBody-en');
     if (ta && te){
@@ -1557,9 +1629,8 @@ document.addEventListener('DOMContentLoaded', () => {
     try{
       if (window._bg?.locations) { paintAreasFromBG(); }
       const lid = document.getElementById('area')?.value;
-      if (lid) { paintServicesFromBG(String(lid)); setTimeout(setBoundries, 0); }
+      if (lid) { paintServicesFromBG(String(lid)); setBoundries(); }
     }catch(_){}
-    // Update confirmTerms enable state after language switch
     updateConfirmEnabled();
   }
 
