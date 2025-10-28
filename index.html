@@ -11,46 +11,44 @@
 
 <style>
   :root{
-    /* Nahl Honey palette */
-    --bg:#F5F7F8;              /* app background */
+    /* Light Nahl palette */
+    --bg:#FAFBFC;              /* lighter app background */
     --card:#FFFFFF;            /* surfaces */
-    --text:#45474B;            /* primary text (warm slate) */
-    --muted:#6B7280;           /* secondary text */
-    --ink:#111827;             /* near-black for buttons/icons */
+    --text:#3F3F46;            /* softer neutral text */
+    --muted:#8A8F98;           /* secondary text */
+    --ink:#1A1A1A;             /* for text on yellow */
 
-    /* Brand accent */
-    --primary:#F4CE14;         /* Nahl honey */
-    --primary-600:#D8B40A;     /* hover/pressed */
-    --primary-700:#B89A08;     /* strong pressed/focus ring edge */
-    --ring: rgba(244,206,20,.35);
+    /* Pastel honey */
+    --primary:#FFE27A;         /* light honey */
+    --primary-600:#FFD54D;     /* hover */
+    --primary-700:#F0C53A;     /* active/focus ring edge */
+    --ring:rgba(255,226,122,.35);
 
-    /* Subtle, warm borders */
-    --border:#E8E5DA;
+    /* Very light borders & chips */
+    --border:#ECEFF3;
+    --chip:#FFF9E6;
+    --chip-text:#6B5A00;
+    --chip-active:#FFF2C2;
 
-    /* Chips (honey tints) */
-    --chip:#FFF7CC;
-    --chip-text:#463B00;
-    --chip-active:#FFE082;
-
-    --shadow:0 8px 24px rgba(0,0,0,.08);
+    --shadow:0 4px 16px rgba(0,0,0,.06);
     --radius:16px;
     --bar-h:68px;
   }
 
-  /* Dark mode tuned for Nahl palette */
+  /* keep dark mode, but still gentle */
   @media (prefers-color-scheme:dark){
     :root{
-      --bg:#141414;
-      --card:#191B1C;
-      --text:#EDEBE6;
-      --muted:#A8B0B9;
-      --border:#2A2C2E;
+      --bg:#16181A;
+      --card:#1B1E21;
+      --text:#EDEEF0;
+      --muted:#A9B1B9;
+      --border:#2A2E33;
 
       --chip:#2A2400;
       --chip-text:#FFE28A;
       --chip-active:#3A3000;
 
-      --shadow:0 10px 28px rgba(0,0,0,.35);
+      --shadow:0 8px 24px rgba(0,0,0,.35);
     }
   }
 
@@ -65,12 +63,14 @@
     display:flex;align-items:center;gap:12px;padding:16px;margin:8px 0 16px;
     background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
   }
+
   .brand{
     width:44px;height:44px;border-radius:12px;
-    background:conic-gradient(from 220deg,var(--primary),#FFD95C 40%,#FFF0A3 70%,var(--primary));
+    background:conic-gradient(from 220deg,var(--primary),#FFEB9E 45%,#FFF5C9 70%,var(--primary));
     display:grid;place-items:center;font-weight:800;color:var(--ink);
-    box-shadow:inset 0 0 0 2px rgba(255,255,255,.65);
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.75);
   }
+
   .title{font-size:18px;font-weight:800}
   .subtitle{color:var(--muted);font-size:13px}
 
@@ -80,9 +80,10 @@
   }
   .card::before{
     content:"";position:absolute;inset-inline:0;top:0;height:4px;
-    background:linear-gradient(90deg,var(--primary),#FFD95C);
-    opacity:.14;
+    background:linear-gradient(90deg,var(--primary),#FFEB9E);
+    opacity:.10;
   }
+
   h2.section{font-size:16px;margin:0 0 10px}
   label.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
   .help{font-size:12px;color:var(--muted)}
@@ -100,39 +101,38 @@
   .row{display:grid;gap:12px}
   @media (min-width:640px){.row.cols-2{grid-template-columns:1fr 1fr}}
 
-  /* Stars — Nahl golds */
+  /* Stars — softer default, pastel when checked */
   .stars{display:inline-flex;flex-direction:row-reverse;gap:6px}
   .stars input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
   .stars label{
-    cursor:pointer;font-size:32px;line-height:1;color:#C7CED9;
-    transition:transform .05s ease,color .15s ease;filter:drop-shadow(0 1px 0 rgba(0,0,0,.06));
+    cursor:pointer;font-size:32px;line-height:1;color:#D8DEE6;
+    transition:transform .05s ease,color .15s ease;filter:drop-shadow(0 1px 0 rgba(0,0,0,.04));
   }
-  .stars label:hover, .stars label:hover ~ label{color:#FFD95C;transform:scale(1.02)}
+  .stars label:hover, .stars label:hover ~ label{color:#FFEB9E;transform:scale(1.02)}
   .stars input:checked ~ label{color:var(--primary)}
   .stars input:focus-visible + label{outline:2px solid var(--primary-700);outline-offset:2px;border-radius:6px}
 
-  /* Chips — honey tints */
+  /* Chips — pale honey */
   .chips{display:flex;flex-wrap:wrap;gap:8px}
   .chip{
-    background:var(--chip);color:var(--chip-text);border:1px dashed #E3C457;
+    background:var(--chip);color:var(--chip-text);border:1px dashed #EEDB84;
     padding:10px 14px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none;
     transition:transform .06s ease,border-color .2s ease,background .2s ease;
   }
   .chip:hover{transform:translateY(-1px)}
   .chip:focus-visible{outline:2px solid var(--primary-600);outline-offset:2px}
-  .chip.active{background:var(--chip-active);border-style:solid;border-color:#E3C457}
+  .chip.active{background:var(--chip-active);border-style:solid;border-color:#EEDB84}
   @media (prefers-color-scheme:dark){
-    .chip{border-color:#715F17}
+    .chip{border-color:#6F5F1A}
     .chip.active{border-color:#8A7420}
   }
 
-  /* Range inputs — filled with honey */
+  /* Range — light track with honey progress */
   input[type="range"]{
-    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:#E7E5E4;outline:none;border:none;
+    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:#EFF1F4;outline:none;border:none;
     background-image:linear-gradient(var(--primary),var(--primary));
     background-repeat:no-repeat;
   }
-  /* JS untouched: we rely on native fill; this trick fills track up to thumb in WebKit */
   input[type="range"]::-webkit-slider-thumb{
     -webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;
     background:#fff;border:2px solid var(--primary);box-shadow:var(--shadow)
@@ -140,19 +140,18 @@
   input[type="range"]::-moz-range-thumb{
     width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--primary)
   }
-  /* Progress color for Firefox */
   input[type="range"]::-moz-range-progress{background:var(--primary);height:6px;border-radius:999px}
-  input[type="range"]::-moz-range-track{background:#E7E5E4;height:6px;border-radius:999px}
+  input[type="range"]::-moz-range-track{background:#EFF1F4;height:6px;border-radius:999px}
 
-  /* Buttons — honey CTA with dark text for AA+ contrast */
+  /* Buttons — pastel CTA with dark ink text */
   .btns{display:flex;gap:10px;flex-wrap:wrap}
   .btn{
     border:1px solid transparent;padding:12px 16px;border-radius:12px;cursor:pointer;
     font-weight:700;font-size:14px;min-height:44px;background:transparent;color:var(--text);
   }
   .btn.primary{
-    background:var(--primary);color:var(--ink); /* dark ink on yellow = high contrast */
-    box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 1px 2px rgba(0,0,0,.06);
+    background:var(--primary);color:var(--ink);
+    box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 1px 2px rgba(0,0,0,.04);
   }
   .btn.primary:hover{background:var(--primary-600)}
   .btn.primary:active{background:var(--primary-700)}
@@ -161,12 +160,12 @@
   /* Sticky submit bar */
   .action-bar{
     position:fixed;inset-inline:0;bottom:0;z-index:60;
-    background:rgba(255,255,255,.88);backdrop-filter:blur(10px);
-    box-shadow:0 -8px 24px rgba(0,0,0,.08);border-top:1px solid var(--border);
+    background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+    box-shadow:0 -6px 18px rgba(0,0,0,.06);border-top:1px solid var(--border);
     padding:8px 16px calc(8px + env(safe-area-inset-bottom));
     display:flex;justify-content:center;
   }
-  @media (prefers-color-scheme:dark){.action-bar{background:rgba(25,27,28,.88)}}
+  @media (prefers-color-scheme:dark){.action-bar{background:rgba(27,30,33,.88)}}
   .action-bar .inner{width:min(760px,100%);display:flex;gap:10px}
   .action-bar .btn{flex:1}
 
@@ -181,17 +180,12 @@
 
   footer.note{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
 
-  /* Motion */
+  /* Gentle motion */
   @media (prefers-reduced-motion:no-preference){
-    .card{animation:fadeUp .35s ease both}
-    .card:nth-of-type(1){animation-delay:.02s}
-    .card:nth-of-type(2){animation-delay:.04s}
-    .card:nth-of-type(3){animation-delay:.06s}
-    .card:nth-of-type(4){animation-delay:.08s}
-    .card:nth-of-type(5){animation-delay:.10s}
+    .card{animation:fadeUp .3s ease both}
     .toast.show{animation:slideIn .25s ease both}
   }
-  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>
 
