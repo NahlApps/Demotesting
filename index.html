@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="auto">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
@@ -9,194 +9,257 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
 
-<style>
-  :root{
-    /* Light Nahl palette */
-    --bg:#FAFBFC;              /* lighter app background */
-    --card:#FFFFFF;            /* surfaces */
-    --text:#3F3F46;            /* softer neutral text */
-    --muted:#8A8F98;           /* secondary text */
-    --ink:#1A1A1A;             /* for text on yellow */
-
-    /* Pastel honey */
-    --primary:#FFE27A;         /* light honey */
-    --primary-600:#FFD54D;     /* hover */
-    --primary-700:#F0C53A;     /* active/focus ring edge */
-    --ring:rgba(255,226,122,.35);
-
-    /* Very light borders & chips */
-    --border:#ECEFF3;
-    --chip:#FFF9E6;
-    --chip-text:#6B5A00;
-    --chip-active:#FFF2C2;
-
-    --shadow:0 4px 16px rgba(0,0,0,.06);
-    --radius:16px;
-    --bar-h:68px;
-  }
-
-  /* keep dark mode, but still gentle */
-  @media (prefers-color-scheme:dark){
+  <style>
+    /* =========================================================
+       THEME TOKENS (Light by default). Toggle via [data-theme].
+       data-theme="dark"  → force dark
+       data-theme="light" → force light
+       data-theme="auto"  → follow prefers-color-scheme
+    ========================================================== */
     :root{
-      --bg:#16181A;
-      --card:#1B1E21;
-      --text:#EDEEF0;
-      --muted:#A9B1B9;
-      --border:#2A2E33;
+      /* Light, airy Nahl palette */
+      --bg:#FAFBFC; --card:#FFFFFF; --text:#3F3F46; --muted:#8A8F98; --ink:#1A1A1A;
+      --primary:#FFE27A; --primary-600:#FFD54D; --primary-700:#F0C53A; --ring:rgba(255,226,122,.35);
+      --border:#ECEFF3; --chip:#FFF9E6; --chip-text:#6B5A00; --chip-active:#FFF2C2;
+      --shadow:0 6px 20px rgba(0,0,0,.06); --radius:16px; --bar-h:68px;
 
-      --chip:#2A2400;
-      --chip-text:#FFE28A;
-      --chip-active:#3A3000;
-
-      --shadow:0 8px 24px rgba(0,0,0,.35);
+      /* Background artwork (swap to your own high-res if desired) */
+      --bg-hero:
+        radial-gradient(1200px 600px at 100% -10%, #FFF6D4 0%, rgba(255,246,212,0) 60%),
+        radial-gradient(1000px 600px at -5% 105%, #FFF0B3 0%, rgba(255,240,179,0) 65%),
+        linear-gradient(180deg, #FFFDF7 0%, #FAFBFC 100%);
+      /* Subtle honeycomb pattern as SVG data URI */
+      --bg-pattern: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104' opacity='0.12'>\
+ <defs><pattern id='hex' width='60' height='52' patternUnits='userSpaceOnUse' patternTransform='translate(0,0)'>\
+  <polygon points='30,0 60,15 60,37 30,52 0,37 0,15' fill='none' stroke='%23d8d7cf' stroke-width='1.2'/>\
+ </pattern></defs>\
+ <rect width='100%' height='100%' fill='url(%23hex)'/>\
+</svg>");
+      --bg-image: var(--bg-hero), var(--bg-pattern);
     }
-  }
+    /* Auto → respect OS; if dark scheme preferred, dark tokens apply via media query,
+       unless data-theme is explicitly set to "light". */
+    @media (prefers-color-scheme:dark){
+      :root:not([data-theme="light"]){
+        --bg:#16181A; --card:#1B1E21; --text:#EDEEF0; --muted:#A9B1B9; --ink:#0E0E0E;
+        --border:#2A2E33; --chip:#2A2400; --chip-text:#FFE28A; --chip-active:#3A3000;
+        --shadow:0 10px 28px rgba(0,0,0,.35);
+        --bg-hero:
+          radial-gradient(1100px 550px at 105% -10%, #2A2410 0%, rgba(42,36,16,0) 60%),
+          radial-gradient(1000px 600px at -5% 105%, #1F1B0E 0%, rgba(31,27,14,0) 65%),
+          linear-gradient(180deg, #15171A 0%, #121416 100%);
+        --bg-pattern: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104' opacity='0.18'>\
+ <defs><pattern id='hex' width='60' height='52' patternUnits='userSpaceOnUse'>\
+  <polygon points='30,0 60,15 60,37 30,52 0,37 0,15' fill='none' stroke='%235f5b45' stroke-width='1.1'/>\
+ </pattern></defs>\
+ <rect width='100%' height='100%' fill='url(%23hex)'/>\
+</svg>");
+        --bg-image: var(--bg-hero), var(--bg-pattern);
+      }
+    }
+    /* Force dark/light explicitly */
+    [data-theme="dark"]{
+      --bg:#16181A; --card:#1B1E21; --text:#EDEEF0; --muted:#A9B1B9; --ink:#0E0E0E;
+      --border:#2A2E33; --chip:#2A2400; --chip-text:#FFE28A; --chip-active:#3A3000;
+      --shadow:0 10px 28px rgba(0,0,0,.35);
+      --bg-hero:
+        radial-gradient(1100px 550px at 105% -10%, #2A2410 0%, rgba(42,36,16,0) 60%),
+        radial-gradient(1000px 600px at -5% 105%, #1F1B0E 0%, rgba(31,27,14,0) 65%),
+        linear-gradient(180deg, #15171A 0%, #121416 100%);
+      --bg-pattern: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104' opacity='0.18'>\
+ <defs><pattern id='hex' width='60' height='52' patternUnits='userSpaceOnUse'>\
+  <polygon points='30,0 60,15 60,37 30,52 0,37 0,15' fill='none' stroke='%235f5b45' stroke-width='1.1'/>\
+ </pattern></defs>\
+ <rect width='100%' height='100%' fill='url(%23hex)'/>\
+</svg>");
+      --bg-image: var(--bg-hero), var(--bg-pattern);
+    }
+    [data-theme="light"]{
+      /* keeps the light tokens from :root */
+    }
 
-  [dir="ltr"] body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-  [dir="rtl"] body{font-family:Cairo,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
+    [dir="ltr"] body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    [dir="rtl"] body{font-family:Cairo,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 
-  .wrap{max-width:760px;margin:0 auto;padding:20px 16px calc(96px + env(safe-area-inset-bottom));}
+    /* Decorative background layer */
+    .bg{
+      position:fixed; inset:0; z-index:-1;
+      background-image: var(--bg-image);
+      background-attachment: fixed, fixed;
+      background-size: cover, auto;
+      background-position: center, center;
+      filter: none;
+    }
+    /* Gentle vignette to improve text readability over bright areas */
+    .bg::after{
+      content:""; position:absolute; inset:0;
+      background:radial-gradient(1200px 700px at 50% 0%, rgba(255,255,255,.25), transparent 65%),
+                 linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0) 35%, rgba(0,0,0,.04) 100%);
+      pointer-events:none;
+    }
 
-  header.site{
-    display:flex;align-items:center;gap:12px;padding:16px;margin:8px 0 16px;
-    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
-  }
+    .wrap{max-width:760px;margin:0 auto;padding:20px 16px calc(96px + env(safe-area-inset-bottom));}
+    header.site{
+      display:flex;align-items:center;gap:12px;padding:14px 16px;margin:8px 0 16px;
+      background:color-mix(in lab, var(--card) 88%, transparent);
+      backdrop-filter: blur(8px);
+      border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+      justify-content:space-between;
+    }
+    .brand{
+      width:44px;height:44px;border-radius:12px;
+      background:conic-gradient(from 220deg,#FFE27A,#FFEB9E 45%,#FFF5C9 70%,#FFE27A);
+      display:grid;place-items:center;font-weight:800;color:var(--ink);
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.75);
+      flex:0 0 44px;
+    }
+    .head-group{display:flex;align-items:center;gap:12px}
+    .title{font-size:18px;font-weight:800}
+    .subtitle{color:var(--muted);font-size:13px}
 
-  .brand{
-    width:44px;height:44px;border-radius:12px;
-    background:conic-gradient(from 220deg,var(--primary),#FFEB9E 45%,#FFF5C9 70%,var(--primary));
-    display:grid;place-items:center;font-weight:800;color:var(--ink);
-    box-shadow:inset 0 0 0 2px rgba(255,255,255,.75);
-  }
+    /* Header controls: theme + language */
+    .controls{display:flex;gap:8px}
+    .ctrl-btn{
+      border:1px solid var(--border); background:var(--card); color:var(--text);
+      padding:8px 10px; border-radius:999px; font-size:13px; cursor:pointer; min-height:36px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .ctrl-btn:focus-visible{outline:2px solid var(--primary-700); outline-offset:2px}
+    .ctrl-btn .dot{width:8px;height:8px;border-radius:50%; background:var(--primary)}
 
-  .title{font-size:18px;font-weight:800}
-  .subtitle{color:var(--muted);font-size:13px}
+    .card{
+      background:color-mix(in lab, var(--card) 92%, transparent);
+      backdrop-filter: blur(8px);
+      border:1px solid var(--border);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:16px;margin:12px 0; position:relative; overflow:hidden;
+    }
+    .card::before{
+      content:""; position:absolute; inset-inline:0; top:0; height:4px;
+      background:linear-gradient(90deg,var(--primary),#FFEB9E);
+      opacity:.10;
+    }
+    h2.section{font-size:16px;margin:0 0 10px}
+    label.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+    .help{font-size:12px;color:var(--muted)}
 
-  .card{
-    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-    box-shadow:var(--shadow);padding:16px;margin:12px 0;position:relative;overflow:hidden;
-  }
-  .card::before{
-    content:"";position:absolute;inset-inline:0;top:0;height:4px;
-    background:linear-gradient(90deg,var(--primary),#FFEB9E);
-    opacity:.10;
-  }
+    textarea, input[type="number"]{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
+      background:#fff;font-size:14px;outline:none;
+    }
+    [data-theme="dark"] textarea, [data-theme="dark"] input[type="number"],
+    :root:not([data-theme="light"]):has(body) textarea:where(:not(:-internal-any)), /* keep dark auto */
+    :root:not([data-theme="light"]):has(body) input[type="number"]:where(:not(:-internal-any)){
+      background:#101315;color:var(--text)
+    }
+    textarea:focus, input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--ring)}
+    textarea{min-height:120px;resize:vertical}
 
-  h2.section{font-size:16px;margin:0 0 10px}
-  label.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
-  .help{font-size:12px;color:var(--muted)}
+    .row{display:grid;gap:12px}
+    @media (min-width:640px){.row.cols-2{grid-template-columns:1fr 1fr}}
 
-  textarea, input[type="number"]{
-    width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
-    background:#fff;font-size:14px;outline:none;
-  }
-  @media (prefers-color-scheme:dark){
-    textarea, input[type="number"]{background:#101315;color:var(--text)}
-  }
-  textarea:focus, input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--ring)}
-  textarea{min-height:120px;resize:vertical}
+    .stars{display:inline-flex;flex-direction:row-reverse;gap:6px}
+    .stars input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+    .stars label{
+      cursor:pointer;font-size:32px;line-height:1;color:#D8DEE6;
+      transition:transform .05s ease,color .15s ease;filter:drop-shadow(0 1px 0 rgba(0,0,0,.04));
+    }
+    .stars label:hover, .stars label:hover ~ label{color:#FFEB9E;transform:scale(1.02)}
+    .stars input:checked ~ label{color:var(--primary)}
+    .stars input:focus-visible + label{outline:2px solid var(--primary-700);outline-offset:2px;border-radius:6px}
 
-  .row{display:grid;gap:12px}
-  @media (min-width:640px){.row.cols-2{grid-template-columns:1fr 1fr}}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{
+      background:var(--chip);color:var(--chip-text);border:1px dashed #EEDB84;
+      padding:10px 14px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none;
+      transition:transform .06s ease,border-color .2s ease,background .2s ease;
+    }
+    .chip:hover{transform:translateY(-1px)}
+    .chip:focus-visible{outline:2px solid var(--primary-600);outline-offset:2px}
+    .chip.active{background:var(--chip-active);border-style:solid;border-color:#EEDB84}
 
-  /* Stars — softer default, pastel when checked */
-  .stars{display:inline-flex;flex-direction:row-reverse;gap:6px}
-  .stars input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-  .stars label{
-    cursor:pointer;font-size:32px;line-height:1;color:#D8DEE6;
-    transition:transform .05s ease,color .15s ease;filter:drop-shadow(0 1px 0 rgba(0,0,0,.04));
-  }
-  .stars label:hover, .stars label:hover ~ label{color:#FFEB9E;transform:scale(1.02)}
-  .stars input:checked ~ label{color:var(--primary)}
-  .stars input:focus-visible + label{outline:2px solid var(--primary-700);outline-offset:2px;border-radius:6px}
+    input[type="range"]{
+      -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:#EFF1F4;outline:none;border:none;
+      background-image:linear-gradient(var(--primary),var(--primary));
+      background-repeat:no-repeat;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;
+      background:#fff;border:2px solid var(--primary);box-shadow:var(--shadow)
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--primary)
+    }
+    input[type="range"]::-moz-range-progress{background:var(--primary);height:6px;border-radius:999px}
+    input[type="range"]::-moz-range-track{background:#EFF1F4;height:6px;border-radius:999px}
 
-  /* Chips — pale honey */
-  .chips{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{
-    background:var(--chip);color:var(--chip-text);border:1px dashed #EEDB84;
-    padding:10px 14px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none;
-    transition:transform .06s ease,border-color .2s ease,background .2s ease;
-  }
-  .chip:hover{transform:translateY(-1px)}
-  .chip:focus-visible{outline:2px solid var(--primary-600);outline-offset:2px}
-  .chip.active{background:var(--chip-active);border-style:solid;border-color:#EEDB84}
-  @media (prefers-color-scheme:dark){
-    .chip{border-color:#6F5F1A}
-    .chip.active{border-color:#8A7420}
-  }
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      border:1px solid transparent;padding:12px 16px;border-radius:12px;cursor:pointer;
+      font-weight:700;font-size:14px;min-height:44px;background:transparent;color:var(--text);
+    }
+    .btn.primary{
+      background:var(--primary);color:var(--ink);
+      box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 1px 2px rgba(0,0,0,.04);
+    }
+    .btn.primary:hover{background:var(--primary-600)}
+    .btn.primary:active{background:var(--primary-700)}
+    .btn.primary:disabled{opacity:.7;cursor:not-allowed}
 
-  /* Range — light track with honey progress */
-  input[type="range"]{
-    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:#EFF1F4;outline:none;border:none;
-    background-image:linear-gradient(var(--primary),var(--primary));
-    background-repeat:no-repeat;
-  }
-  input[type="range"]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;
-    background:#fff;border:2px solid var(--primary);box-shadow:var(--shadow)
-  }
-  input[type="range"]::-moz-range-thumb{
-    width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--primary)
-  }
-  input[type="range"]::-moz-range-progress{background:var(--primary);height:6px;border-radius:999px}
-  input[type="range"]::-moz-range-track{background:#EFF1F4;height:6px;border-radius:999px}
+    .action-bar{
+      position:fixed; inset-inline:0; bottom:0; z-index:60;
+      background:color-mix(in lab, var(--card) 90%, transparent);
+      backdrop-filter:blur(10px);
+      box-shadow:0 -6px 18px rgba(0,0,0,.06); border-top:1px solid var(--border);
+      padding:8px 16px calc(8px + env(safe-area-inset-bottom));
+      display:flex; justify-content:center;
+    }
+    .action-bar .inner{width:min(760px,100%); display:flex; gap:10px}
+    .action-bar .btn{flex:1}
 
-  /* Buttons — pastel CTA with dark ink text */
-  .btns{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{
-    border:1px solid transparent;padding:12px 16px;border-radius:12px;cursor:pointer;
-    font-weight:700;font-size:14px;min-height:44px;background:transparent;color:var(--text);
-  }
-  .btn.primary{
-    background:var(--primary);color:var(--ink);
-    box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 1px 2px rgba(0,0,0,.04);
-  }
-  .btn.primary:hover{background:var(--primary-600)}
-  .btn.primary:active{background:var(--primary-700)}
-  .btn.primary:disabled{opacity:.7;cursor:not-allowed}
+    .toast{
+      position:fixed; inset-inline:16px;
+      bottom:calc(16px + var(--bar-h) + env(safe-area-inset-bottom));
+      z-index:70; display:none; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+      background:var(--card); box-shadow:var(--shadow); font-size:14px;
+    }
+    .toast.show{display:block}
+    .toast.ok{border-color:#bbf7d0} .toast.err{border-color:#fecaca}
 
-  /* Sticky submit bar */
-  .action-bar{
-    position:fixed;inset-inline:0;bottom:0;z-index:60;
-    background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
-    box-shadow:0 -6px 18px rgba(0,0,0,.06);border-top:1px solid var(--border);
-    padding:8px 16px calc(8px + env(safe-area-inset-bottom));
-    display:flex;justify-content:center;
-  }
-  @media (prefers-color-scheme:dark){.action-bar{background:rgba(27,30,33,.88)}}
-  .action-bar .inner{width:min(760px,100%);display:flex;gap:10px}
-  .action-bar .btn{flex:1}
+    footer.note{text-align:center; color:var(--muted); font-size:12px; margin-top:18px}
 
-  /* Toast above the bar */
-  .toast{
-    position:fixed;inset-inline:16px;bottom:calc(16px + var(--bar-h) + env(safe-area-inset-bottom));
-    z-index:70;display:none;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
-    background:var(--card);box-shadow:var(--shadow);font-size:14px;
-  }
-  .toast.show{display:block}
-  .toast.ok{border-color:#bbf7d0}.toast.err{border-color:#fecaca}
-
-  footer.note{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
-
-  /* Gentle motion */
-  @media (prefers-reduced-motion:no-preference){
-    .card{animation:fadeUp .3s ease both}
-    .toast.show{animation:slideIn .25s ease both}
-  }
-  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-</style>
-
+    @media (prefers-reduced-motion:no-preference){
+      .card{animation:fadeUp .3s ease both}
+      .toast.show{animation:slideIn .25s ease both}
+    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  </style>
 </head>
 <body>
+  <!-- Background art -->
+  <div class="bg" aria-hidden="true"></div>
+
   <div class="wrap">
     <header class="site">
-      <div class="brand" aria-hidden="true">N</div>
-      <div>
-        <div class="title" data-i18n="app_title">قيّم تجربتك</div>
-        <div class="subtitle" data-i18n="app_subtitle">استبيان رضا الخدمة • Service satisfaction survey</div>
+      <div class="head-group">
+        <div class="brand" aria-hidden="true">N</div>
+        <div>
+          <div class="title" data-i18n="app_title">قيّم تجربتك</div>
+          <div class="subtitle" data-i18n="app_subtitle">استبيان رضا الخدمة • Service satisfaction survey</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="btnLang" class="ctrl-btn" type="button" aria-pressed="false" aria-label="Switch language">
+          <span class="dot" aria-hidden="true"></span><span id="langLabel">AR</span>/<span>EN</span>
+        </button>
+        <button id="btnTheme" class="ctrl-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
+          <span class="dot" aria-hidden="true"></span><span id="themeLabel">Light</span>
+        </button>
       </div>
     </header>
 
@@ -204,90 +267,90 @@
     <section class="card">
       <h2 class="section" data-i18n="overall_rating">التقييم العام</h2>
       <div class="stars" role="radiogroup" aria-label="Rating">
-        <!-- inputs kept (IDs/names/values unchanged for JS) -->
         <input type="radio" id="star5" name="rating" value="5"><label for="star5" aria-label="5">★</label>
         <input type="radio" id="star4" name="rating" value="4"><label for="star4" aria-label="4">★</label>
         <input type="radio" id="star3" name="rating" value="3"><label for="star3" aria-label="3">★</label>
         <input type="radio" id="star2" name="rating" value="2"><label for="star2" aria-label="2">★</label>
         <input type="radio" id="star1" name="rating" value="1"><label for="star1" aria-label="1">★</label>
       </div>
-      <p class="help">اختر من نجمة إلى خمس نجوم • Choose 1–5 stars</p>
-      <label class="lbl" for="reviewText">اكتب رأيك</label>
-      <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review"></textarea>
+      <p class="help" data-i18n="stars_help">اختر من نجمة إلى خمس نجوم • Choose 1–5 stars</p>
+      <label class="lbl" for="reviewText" data-i18n="write_review_label">اكتب رأيك</label>
+      <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review" data-i18n-placeholder="review_placeholder"></textarea>
     </section>
 
     <!-- Quick tags -->
     <section class="card">
-      <h2 class="section">ما الذي أعجبك؟</h2>
+      <h2 class="section" data-i18n="what_like">ما الذي أعجبك؟</h2>
       <div class="chips" id="chipsRow" role="group" aria-label="Liked aspects"></div>
-      <p class="help">انقر للإضافة أو الإزالة • Tap to add/remove</p>
+      <p class="help" data-i18n="tap_hint">انقر للإضافة أو الإزالة • Tap to add/remove</p>
     </section>
 
     <!-- Satisfaction details -->
     <section class="card">
-      <h2 class="section">تفاصيل الرضا</h2>
+      <h2 class="section" data-i18n="satisfaction_details">تفاصيل الرضا</h2>
       <div class="row cols-2">
         <div class="likert">
-          <label class="lbl" for="qQuality">جودة التنظيف</label>
+          <label class="lbl" for="qQuality" data-i18n="q_quality">جودة التنظيف</label>
           <input id="qQuality" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
         </div>
         <div class="likert">
-          <label class="lbl" for="qSpeed">سرعة الخدمة</label>
+          <label class="lbl" for="qSpeed" data-i18n="q_speed">سرعة الخدمة</label>
           <input id="qSpeed" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help">1 بطيئة جدًا ← 5 سريعة جدًا</span>
+          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
         </div>
         <div class="likert">
-          <label class="lbl" for="qStaff">احترافية الموظفين</label>
+          <label class="lbl" for="qStaff" data-i18n="q_staff">احترافية الموظفين</label>
           <input id="qStaff" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
         </div>
         <div class="likert">
-          <label class="lbl" for="qValue">القيمة مقابل السعر</label>
+          <label class="lbl" for="qValue" data-i18n="q_value">القيمة مقابل السعر</label>
           <input id="qValue" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help">1 سيئة جدًا ← 5 ممتازة</span>
+          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
         </div>
       </div>
     </section>
 
     <!-- Loyalty -->
     <section class="card">
-      <h2 class="section">الولاء</h2>
+      <h2 class="section" data-i18n="loyalty">الولاء</h2>
       <div class="row cols-2">
         <div>
-          <label class="lbl">هل ستعود مرة أخرى؟</label>
+          <label class="lbl" data-i18n="return_again">هل ستعود مرة أخرى؟</label>
           <div class="chips" role="radiogroup" aria-label="Return again">
-            <label class="chip"><input type="radio" name="return" value="yes" checked style="margin-inline-end:.5rem"> نعم</label>
-            <label class="chip"><input type="radio" name="return" value="no" style="margin-inline-end:.5rem"> لا</label>
+            <label class="chip"><input type="radio" name="return" value="yes" checked style="margin-inline-end:.5rem"> <span data-i18n="yes">نعم</span></label>
+            <label class="chip"><input type="radio" name="return" value="no" style="margin-inline-end:.5rem"> <span data-i18n="no">لا</span></label>
           </div>
         </div>
         <div>
-          <label class="lbl" for="nps">التوصية بنا (0–10)</label>
+          <label class="lbl" for="nps" data-i18n="nps_label">التوصية بنا (0–10)</label>
           <input id="nps" type="number" min="0" max="10" value="9" inputmode="numeric"/>
-          <span class="help">0 لن أوصي إطلاقًا ← 10 أوصي بقوة</span>
+          <span class="help" data-i18n="nps_help">0 لن أوصي إطلاقًا ← 10 أوصي بقوة</span>
         </div>
       </div>
     </section>
 
-    <!-- Actions (informational only; button moved to sticky bar) -->
+    <!-- Actions -->
     <section class="card">
-      <h2 class="section">الإرسال</h2>
-      <p class="help">سيتم حفظ تقييمك لدينا فقط.</p>
+      <h2 class="section" data-i18n="submit_title">الإرسال</h2>
+      <p class="help" data-i18n="privacy_note">سيتم حفظ تقييمك لدينا فقط.</p>
     </section>
 
-    <footer class="note"><span>تصميم نحل • يعمل دون مكتبات خارجية</span></footer>
+    <footer class="note"><span data-i18n="footer_note">تصميم نحل • يعمل دون مكتبات خارجية</span></footer>
   </div>
 
-  <!-- Sticky Action Bar (uses the SAME #btnSubmit; JS unchanged) -->
+  <!-- Sticky Action Bar -->
   <div class="action-bar" role="region" aria-label="Submit rating">
     <div class="inner">
-      <button id="btnSubmit" class="btn primary">حفظ التقييم</button>
+      <button id="btnSubmit" class="btn primary" data-i18n="submit_btn">حفظ التقييم</button>
     </div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
+    /* ========= ORIGINAL CONFIG + HELPERS (kept) ========= */
     const DEBUG=false;
     const CONFIG = {
       tags: [
@@ -300,7 +363,6 @@
         { ar:"الحفاظ على الطلاء", en:"Gentle on paint" }
       ]
     };
-
     const $  = (s,r=document)=>r.querySelector(s);
     const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
     function showToast(msg, ok=true){ const t=$('#toast'); if(!t) return; t.textContent=msg; t.className='toast show '+(ok?'ok':'err'); setTimeout(()=>t.classList.remove('show'), 2500); }
@@ -309,7 +371,7 @@
       const row = $('#chipsRow'); row.innerHTML='';
       CONFIG.tags.forEach((t, i) => {
         const b=document.createElement('button');
-        b.type='button'; b.className='chip'; b.textContent=t.ar;
+        b.type='button'; b.className='chip'; b.textContent=t.ar; // default Arabic; we'll swap on language apply
         b.addEventListener('click',()=> b.classList.toggle('active'));
         row.appendChild(b);
       });
@@ -340,7 +402,6 @@
     }
 
     async function saveToServer(payload){
-      // Same-origin proxy expected at /api/gas-proxy → forwards to GAS (action=review.save)
       const res = await fetch('/api/gas-proxy', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -351,41 +412,180 @@
       return { status: res.status, ...json };
     }
 
+    /* ========= NEW: i18n + Theme (no external libs) ========= */
+    const I18N = {
+      ar: {
+        app_title:"قيّم تجربتك",
+        app_subtitle:"استبيان رضا الخدمة • Service satisfaction survey",
+        overall_rating:"التقييم العام",
+        stars_help:"اختر من نجمة إلى خمس نجوم • Choose 1–5 stars",
+        write_review_label:"اكتب رأيك",
+        review_placeholder:"اكتب رأيك هنا…",
+        what_like:"ما الذي أعجبك؟",
+        tap_hint:"انقر للإضافة أو الإزالة • Tap to add/remove",
+        satisfaction_details:"تفاصيل الرضا",
+        q_quality:"جودة التنظيف",
+        q_speed:"سرعة الخدمة",
+        q_staff:"احترافية الموظفين",
+        q_value:"القيمة مقابل السعر",
+        likert_help:"1 سيئة جدًا ← 5 ممتازة",
+        loyalty:"الولاء",
+        return_again:"هل ستعود مرة أخرى؟",
+        yes:"نعم", no:"لا",
+        nps_label:"التوصية بنا (0–10)",
+        nps_help:"0 لن أوصي إطلاقًا ← 10 أوصي بقوة",
+        submit_title:"الإرسال",
+        privacy_note:"سيتم حفظ تقييمك لدينا فقط.",
+        submit_btn:"حفظ التقييم",
+        footer_note:"تصميم نحل • يعمل دون مكتبات خارجية",
+        err_bad_link:"خطأ: رابط غير صحيح (بدون bookingId).",
+        err_need_stars:"الرجاء اختيار التقييم بالنجوم",
+        err_need_text:"الرجاء كتابة التقييم النصي",
+        save_ok:"تم الحفظ بنجاح",
+        save_fail:"تعذّر الحفظ",
+        try_again:"تعذّر الحفظ، حاول مرة أخرى",
+        theme_light:"وضع فاتح", theme_dark:"وضع داكن",
+        lang_label:"AR/EN"
+      },
+      en: {
+        app_title:"Rate your experience",
+        app_subtitle:"Service satisfaction survey",
+        overall_rating:"Overall rating",
+        stars_help:"Choose 1–5 stars",
+        write_review_label:"Write your review",
+        review_placeholder:"Write your review here…",
+        what_like:"What did you like?",
+        tap_hint:"Tap to add/remove",
+        satisfaction_details:"Satisfaction details",
+        q_quality:"Cleaning quality",
+        q_speed:"Service speed",
+        q_staff:"Staff professionalism",
+        q_value:"Value for money",
+        likert_help:"1 Very poor ← 5 Excellent",
+        loyalty:"Loyalty",
+        return_again:"Would you return?",
+        yes:"Yes", no:"No",
+        nps_label:"Recommend us (0–10)",
+        nps_help:"0 Not at all ← 10 Strongly recommend",
+        submit_title:"Submit",
+        privacy_note:"Your rating is stored privately.",
+        submit_btn:"Submit rating",
+        footer_note:"Nahl design • No external libraries",
+        err_bad_link:"Error: Invalid link (missing bookingId).",
+        err_need_stars:"Please choose a star rating",
+        err_need_text:"Please write your review",
+        save_ok:"Saved successfully",
+        save_fail:"Could not save",
+        try_again:"Couldn’t save, please try again",
+        theme_light:"Light", theme_dark:"Dark",
+        lang_label:"EN/AR"
+      }
+    };
+    let currentLang = (localStorage.getItem('lang') || document.documentElement.lang || 'ar').toLowerCase();
+    function t(k){ return (I18N[currentLang] && I18N[currentLang][k]) || I18N.ar[k] || k; }
+
+    function applyLanguageToUI(){
+      // Text nodes
+      $$('[data-i18n]').forEach(el=>{
+        el.textContent = t(el.getAttribute('data-i18n'));
+      });
+      // Placeholders
+      $$('[data-i18n-placeholder]').forEach(el=>{
+        el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+      });
+      // Chips re-label
+      const chips = $$('#chipsRow .chip');
+      chips.forEach((ch, i)=>{ if(CONFIG.tags[i]) ch.textContent = CONFIG.tags[i][currentLang] || ch.textContent; });
+      // Return yes/no
+      $$('[data-i18n="yes"]').forEach(el=> el.textContent = t('yes'));
+      $$('[data-i18n="no"]').forEach(el=> el.textContent = t('no'));
+      // Direction + lang attr
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir  = currentLang==='ar' ? 'rtl' : 'ltr';
+      // Header button labels
+      $('#langLabel').textContent = currentLang==='ar' ? 'AR' : 'EN';
+      $('#themeLabel').textContent = isDark() ? t('theme_dark') : t('theme_light');
+    }
+
+    // Theme helpers
+    function isDark(){
+      const forced = document.documentElement.getAttribute('data-theme');
+      if(forced==='dark') return true;
+      if(forced==='light') return false;
+      // auto → media query
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function setTheme(mode){ // 'light' | 'dark' | 'auto'
+      document.documentElement.setAttribute('data-theme', mode);
+      localStorage.setItem('theme', mode);
+      $('#themeLabel').textContent = isDark() ? t('theme_dark') : t('theme_light');
+    }
+
+    /* ========= VALIDATION (localized messages) ========= */
     function validate(){
       const bid = getParam('bookingId');
-      if (!bid){ showToast('خطأ: رابط غير صحيح (بدون bookingId).', false); return false; }
+      if (!bid){ showToast(t('err_bad_link'), false); return false; }
       const rating = getRating();
-      if (!rating){ showToast('الرجاء اختيار التقييم بالنجوم', false); return false; }
+      if (!rating){ showToast(t('err_need_stars'), false); return false; }
       const text = $('#reviewText').value.trim();
-      if (!text){ showToast('الرجاء كتابة التقييم النصي', false); return false; }
+      if (!text){ showToast(t('err_need_text'), false); return false; }
       return true;
     }
 
     async function onSubmit(){
       if (!validate()) return;
-      const btn=$('#btnSubmit'); btn.disabled=true; btn.textContent='جارٍ الحفظ…';
+      const btn=$('#btnSubmit'); btn.disabled=true; btn.textContent=t('submit_btn')+'…';
       try{
         const result = await saveToServer(collectPayload());
         if (result.ok){
-          showToast('تم الحفظ بنجاح', true);
+          showToast(t('save_ok'), true);
           $('input[name="rating"]:checked')?.checked && ($('input[name="rating"]:checked').checked = false);
           $('#reviewText').value=''; $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
         } else {
-          const msg = 'تعذّر الحفظ' + (result.error ? ` • ${result.error}` : '');
+          const msg = t('save_fail') + (result.error ? ` • ${result.error}` : '');
           showToast(msg, false);
           if (DEBUG) console.error(result);
         }
       } catch(err){
         if (DEBUG) console.error(err);
-        showToast('تعذّر الحفظ، حاول مرة أخرى', false);
+        showToast(t('try_again'), false);
       } finally {
-        btn.disabled=false; btn.textContent='حفظ التقييم';
+        btn.disabled=false; btn.textContent=t('submit_btn');
       }
     }
 
+    /* ========= INIT ========= */
     (function init(){
+      // Build chips
       hydrateTags();
+
+      // Restore theme/lang
+      const savedTheme = localStorage.getItem('theme') || 'auto';
+      setTheme(savedTheme);
+      currentLang = (localStorage.getItem('lang') || currentLang);
+      applyLanguageToUI();
+
+      // Wire submit
       $('#btnSubmit').addEventListener('click', onSubmit);
+
+      // Theme toggle (light/dark)
+      $('#btnTheme').addEventListener('click', ()=>{
+        const cur = document.documentElement.getAttribute('data-theme') || 'auto';
+        const next = (isDark() ? 'light' : 'dark'); // toggle between explicit light/dark
+        setTheme(next);
+      });
+
+      // Language toggle (ar/en)
+      $('#btnLang').addEventListener('click', ()=>{
+        currentLang = currentLang==='ar' ? 'en' : 'ar';
+        localStorage.setItem('lang', currentLang);
+        applyLanguageToUI();
+      });
+
+      // Reflect OS theme changes when in auto mode
+      if(!localStorage.getItem('theme') || localStorage.getItem('theme')==='auto'){
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>applyLanguageToUI());
+      }
     })();
   </script>
 </body>
