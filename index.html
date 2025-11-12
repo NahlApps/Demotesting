@@ -1,592 +1,1861 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="auto">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Nahl • Rate Experience</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <title>حجوزات المواعيد</title>
+  <meta name="title" content="حجوزات المواعيد"/>
+  <meta name="description" content="1. بنغسل سيارتك بخلطة خاصة مدعّمة بالواكس تحميها من الغبار والخدوش. 2. فوطنا دايمًا نظيفة. 3. ونستخدم إسفنجة مخصوصة للكفرات عشان نهتم بكل تفاصيل سيارتك. #غسيل_بدون_طوابير"/>
 
+  <meta itemprop="name" content="حجوزات المواعيد"/>
+  <meta itemprop="description" content="1. بنغسل سيارتك بخلطة خاصة مدعّمة بالواكس تحميها من الغبار والخدوش. 2. فوطنا دايمًا نظيفة. 3. ونستخدم إسفنجة مخصوصة للكفرات عشان نهتم بكل تفاصيل سيارتك. #غسيل_بدون_طوابير"/>
+  <meta itemprop="image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/Logo%20-%20Sponge%20and%20Soap%20-%201.png"/>
+
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://www.spongnsoap.com"/>
+  <meta property="og:title" content="حجوزات المواعيد"/>
+  <meta property="og:description" content="1. بنغسل سيارتك بخلطة خاصة مدعّمة بالواكس تحميها من الغبار والخدوش. 2. فوطنا دايمًا نظيفة. 3. ونستخدم إسفنجة مخصوصة للكفرات عشان نهتم بكل تفاصيل سيارتك. #غسيل_بدون_طوابير"/>
+  <meta property="og:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/Logo%20-%20Sponge%20and%20Soap%20-%201.png"/>
+
+  <meta property="twitter:card" content="summary_large_image"/>
+  <meta property="twitter:url" content="https://www.spongnsoap.com"/>
+  <meta property="twitter:title" content="حجوزات المواعيد"/>
+  <meta property="twitter:description" content="1. بنغسل سيارتك بخلطة خاصة مدعّمة بالواكس تحميها من الغبار والخدوش. 2. فوطنا دايمًا نظيفة. 3. ونستخدم إسفنجة مخصوصة للكفرات عشان نهتم بكل تفاصيل سيارتك. #غسيل_بدون_طوابير"/>
+  <meta property="twitter:image" content="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/Logo%20-%20Sponge%20and%20Soap%20-%201.png"/>
+
+  <link rel="shortcut icon" href="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/Logo%20-%20Sponge%20and%20Soap%20-%201.png" type="image/x-icon"/>
+
+  <!-- Libs -->
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  <!-- Luxon -->
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+
+  <!-- Icons / Fonts / UI -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- country codes -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/css/intlTelInput.css">
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.4.0/build/js/intlTelInputWithUtils.js"></script>
+  
+  <!-- Speed up TLS + DNS to your Apps Script web app -->
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+
+  <!-- ===== Theme (Aqua + Warm CTA) ===== -->
   <style>
-    /* =========================================================
-       THEME TOKENS (Light by default). Toggle via [data-theme].
-       data-theme="dark"  → force dark
-       data-theme="light" → force light
-       data-theme="auto"  → follow prefers-color-scheme
-    ========================================================== */
     :root{
-      /* Light, airy Nahl palette */
-      --bg:#FAFBFC; --card:#FFFFFF; --text:#3F3F46; --muted:#8A8F98; --ink:#1A1A1A;
-      --primary:#FFE27A; --primary-600:#FFD54D; --primary-700:#F0C53A; --ring:rgba(255,226,122,.35);
-      --border:#ECEFF3; --chip:#FFF9E6; --chip-text:#6B5A00; --chip-active:#FFF2C2;
-      --shadow:0 6px 20px rgba(0,0,0,.06); --radius:16px; --bar-h:68px;
+      --brand-700:#0E7490; --brand-600:#0891B2; --brand-500:#06B6D4;
+      --brand-100:#CFFAFE; --brand-50:#ECFEFF;
+      --hero-gradient: linear-gradient(135deg, #0E7490 0%, #0891B2 40%, #06B6D4 100%);
+      --cta-700:#C2410C; --cta-800:#9A3412; --cta-300:#FED7AA;
+      --ink-900:#0F172A; --ink-700:#334155; --ink-500:#64748B;
+      --ui-200:#E2E8F0; --surface-50:#F8FAFC; --white:#FFFFFF;
+      --success:#16A34A; --success-bg:#ECFDF5;
+      --warning:#F59E0B; --warning-bg:#FFFBEB;
+      --error:#DC2626;   --error-bg:#FEF2F2;
+      --info:#0891B2;    --info-bg:#E0F2FE;
+      --ink:var(--ink-900); --ink-on-dark:#FFFFFF; --ink-muted:var(--ink-700);
+      --panel:rgba(255,255,255,.86); --panel-strong:#ffffff; --panel-border:var(--ui-200); --panel-blur:10px;
+      --brand:var(--brand-500);
+      --field:#ffffff; --field-border:var(--ui-200); --field-focus:var(--brand-500);
+      --glass-border: rgba(8,145,178,.18);
+      --danger:var(--error); --shadow:0 18px 50px rgba(0,0,0,.12); --radius:16px;
+    }
+    html,body{height:100%;margin:0;font-family:'Cairo',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+      background:url('https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/daniele-levis-pelusi-9BObZ4pzn3Y-unsplash.jpg') center/cover fixed no-repeat;}
+    #form{flex:1;display:flex;align-items:center;justify-content:center;padding:clamp(10px,2vw,22px)}
+    #form-content{width:min(980px,100%);background:var(--panel);backdrop-filter:blur(var(--panel-blur));border:1px solid var(--panel-border);
+      border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+    .header{display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 16px 16px;background:var(--brand-500);color:var(--ink-900);
+      border-bottom:1px solid var(--glass-border);box-shadow:0 12px 24px rgba(0,0,0,.06)}
+    .header img{width:170px;height:auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.10))}
+    .stepper{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:10px 16px;background:var(--brand-50);border-bottom:1px solid var(--panel-border)}
+    .step-dot{position:relative;text-align:center;font-size:.84rem;color:var(--ink-700)}
+    .step-dot::before{content:"";display:block;margin:0 auto 6px;width:28px;height:6px;border-radius:999px;background:var(--brand-100)}
+    .step-dot.is-active::before{background:var(--hero-gradient)}
+    .progress-rail{height:6px;background:var(--brand-100);border-radius:999px;margin:8px 16px 10px;overflow:hidden}
+    .progress-fill{height:100%;width:16.6%;background:var(--hero-gradient);border-radius:999px;transition:width .25s ease}
+    .page{display:none;padding:22px clamp(14px,3vw,28px) 96px;min-height:480px}
+    h1,h2,h3{color:var(--ink-900);margin:.2em 0 .6em}
+    h1{text-align:center;font-size:clamp(1.25rem,3vw,1.8rem)}
+    .section-card{background:var(--surface-50);color:var(--ink-900);border:1px solid var(--panel-border);border-radius:14px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
+    .filter-button{align-items:center;background:var(--cta-700);color:#fff;border-radius:12px;border:0;font-weight:800;padding:.95rem 1.25rem;cursor:pointer;
+      box-shadow:0 10px 26px rgba(194,65,12,.22);transition:transform .08s,filter .2s, background .2s}
+    .filter-button:hover{background:var(--cta-800)}
+    .filter-button:active{transform:translateY(1px)}
+    .filter-button:focus-visible{outline:3px solid var(--cta-300);outline-offset:2px}
+    .btn-ghost{display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.1rem;border-radius:12px;border:1px solid var(--panel-border);
+      background:#fff;color:var(--brand-700);font-weight:700;text-decoration:none}
+    .btn-ghost:hover{border-color:var(--brand-600);background:var(--brand-50)}
+    .sticky-actions{position:sticky;bottom:0;inset-inline:0;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-top:1px solid var(--panel-border);
+      display:flex;gap:10px;justify-content:center;padding:12px}
+    .sticky-actions .filter-button{min-width:180px}
+    .form-block{width:min(760px,100%);margin-inline:auto}
+    input,select{text-align:center;color:var(--ink-900)}
+    input::placeholder{color:var(--ink-500)}
+    .field,input[type="text"],input[type="tel"],input[type="date"],select{width:100%;background:var(--field);border:1px solid var(--field-border);border-radius:12px;
+      padding:.85rem 1rem;font-size:1rem;transition:border-color .2s,box-shadow .2s}
+    input[type="date"]{color-scheme:light}
+    input:focus,select:focus{outline:0;border-color:var(--field-focus);box-shadow:0 0 0 3px color-mix(in srgb, var(--field-focus) 35%, transparent)}
+    label{color:var(--ink-700);margin:.25rem 0 .35rem;font-weight:700}
+    .select2-container--default .select2-selection--single{background:var(--field);border:1px solid var(--field-border);border-radius:12px;height:auto}
+    .select2-container--default .select2-selection--single .select2-selection__rendered{color:var(--ink-900);line-height:2.5rem;padding-inline:1rem}
+    .select2-dropdown{background:#fff;border:1px solid var(--panel-border)}
+    .select2-results__option{color:var(--ink-900)}
+    .select2-results__option--highlighted{background:var(--brand-50);color:var(--ink-900)}
+    .iti{width:100%!important}
+    .iti input{background:var(--field)!important;border:1px solid var(--field-border)!important;color:var(--ink-900)!important;border-radius:12px;height:auto;padding:.85rem 1rem .85rem 3.8rem}
+    .iti__country-list{background:#fff;color:var(--ink-900);border:1px solid var(--panel-border)}
+    .time-date-header{display:flex;border-radius:10px;overflow:hidden;border:1px solid var(--panel-border);margin:12px 0;background:var(--brand-50)}
+    .time-date-header div{padding:12px 4px;color:var(--ink-900);flex:1;cursor:pointer;transition:background .2s}
+    .time-date-header div:hover,.time-date-header .choosed{background:var(--brand-100)}
+    .time-container{display:grid;gap:10px;align-content:start;align-items:start;grid-template-columns:repeat(4,minmax(0,1fr));padding:12px;max-height:23rem;overflow:auto}
+    @media (max-width:900px){.time-container{grid-template-columns:repeat(3,1fr)}}
+    @media (max-width:600px){.time-container{grid-template-columns:repeat(2,1fr)}}
+    .time-button{background:#fff;border:1px solid var(--panel-border);border-radius:12px;padding:1rem .8rem;font-weight:800;color:var(--ink-900);cursor:pointer;transition:background .15s,border-color .15s}
+    .time-button:hover,.time-button:focus{border-color:var(--brand-600);background:var(--brand-50)}
+    .radio-label{display:block}
+    .radio-buttons{width:148px;max-width:100%;height:auto;padding:12px;border-radius:16px;background:
+      linear-gradient(180deg,#ffffff 0%, #F6FDFF 60%, var(--brand-50) 100%),
+      radial-gradient(120px 60px at 50% -20px, var(--brand-100) 0, transparent 60%);
+      border:2px solid color-mix(in srgb, var(--brand-600) 35%, var(--brand-100));
+      box-shadow:0 10px 26px rgba(0,0,0,.06);transition:transform .08s,box-shadow .2s,border-color .2s,background .2s}
+    .radio-buttons:hover{border-color:var(--brand-600);box-shadow:0 16px 28px rgba(8,145,178,.18)}
+    .radios:checked + .radio-buttons{background:
+      linear-gradient(180deg, var(--brand-50) 0%, #D7F6FD 65%, #C7F0FB 100%),
+      radial-gradient(140px 80px at 50% -20px, #ffffff 0, transparent 65%);
+      border-color:var(--brand-600);box-shadow:0 20px 36px rgba(8,145,178,.20);transform:translateY(-1px)}
+    .spinner-border{border-color:var(--brand-500);border-right-color:transparent}
+    .alert{width:min(760px,100%);margin-inline:auto}
+    .alert-danger{background:var(--error-bg);color:var(--error);border-color:color-mix(in srgb, var(--error) 30%, #ffffff)}
+    .alert-success{background:var(--success-bg);color:var(--success);border-color:color-mix(in srgb, var(--success) 30%, #ffffff)}
+    .alert-warning{background:var(--warning-bg);color:var(--warning);border-color:color-mix(in srgb, var(--warning) 30%, #ffffff)}
+    .alert-info{background:var(--info-bg);color:var(--info);border-color:color-mix(in srgb, var(--info) 30%, #ffffff)}
+    footer{color:var(--ink-900);text-align:center;padding:14px 16px;background:var(--brand-500);border-top:1px solid var(--glass-border)}
+    footer a{color:var(--ink-900);text-decoration:none;font-weight:700}
+    footer a:hover{text-decoration:underline}
+    .social-dock{position:fixed;right:15px;bottom:15px;display:flex;flex-direction:column;gap:10px;z-index:1000}
+    .social-fab{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.45);color:#fff;text-decoration:none;
+      box-shadow:0 10px 24px rgba(0,0,0,.22);transition:background .2s, transform .08s}
+    .social-fab:hover{background:rgba(15,23,42,.65);transform:translateY(-1px)}
+    .social-fab i{font-size:22px;line-height:1}
+    #globalOverlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;flex-direction:column}
+    #globalOverlay.is-visible{display:flex}
+    #serviceDescText{ color: var(--error) !important; font-size: 1.15rem; font-weight: 800; }
+    #langSwitcher .btn{ border-radius:10px; padding:.35rem .6rem }
+    #langSwitcher .btn:focus { outline:2px solid rgba(255,255,255,.7); outline-offset:2px }
 
-      /* Background artwork (swap to your own high-res if desired) */
-      --bg-hero:
-        radial-gradient(1200px 600px at 100% -10%, #FFF6D4 0%, rgba(255,246,212,0) 60%),
-        radial-gradient(1000px 600px at -5% 105%, #FFF0B3 0%, rgba(255,240,179,0) 65%),
-        linear-gradient(180deg, #FFFDF7 0%, #FAFBFC 100%);
-      /* Subtle honeycomb pattern as SVG data URI */
-      --bg-pattern: url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104' opacity='0.12'>\
- <defs><pattern id='hex' width='60' height='52' patternUnits='userSpaceOnUse' patternTransform='translate(0,0)'>\
-  <polygon points='30,0 60,15 60,37 30,52 0,37 0,15' fill='none' stroke='%23d8d7cf' stroke-width='1.2'/>\
- </pattern></defs>\
- <rect width='100%' height='100%' fill='url(%23hex)'/>\
-</svg>");
-      --bg-image: var(--bg-hero), var(--bg-pattern);
+    /* === Chips filter === */
+    .chip-toggle{
+      border:1px solid var(--panel-border);
+      background:#fff;
+      color:var(--ink-900);
+      border-radius:999px;
+      padding:.45rem .8rem;
+      font-weight:800;
+      cursor:pointer;
+      transition:background .15s, border-color .15s, transform .06s;
     }
-    /* Auto → respect OS; if dark scheme preferred, dark tokens apply via media query,
-       unless data-theme is explicitly set to "light". */
-    @media (prefers-color-scheme:dark){
-      :root:not([data-theme="light"]){
-        --bg:#16181A; --card:#1B1E21; --text:#EDEEF0; --muted:#A9B1B9; --ink:#0E0E0E;
-        --border:#2A2E33; --chip:#2A2400; --chip-text:#FFE28A; --chip-active:#3A3000;
-        --shadow:0 10px 28px rgba(0,0,0,.35);
-        --bg-hero:
-          radial-gradient(1100px 550px at 105% -10%, #2A2410 0%, rgba(42,36,16,0) 60%),
-          radial-gradient(1000px 600px at -5% 105%, #1F1B0E 0%, rgba(31,27,14,0) 65%),
-          linear-gradient(180deg, #15171A 0%, #121416 100%);
-        --bg-pattern: url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104' opacity='0.18'>\
- <defs><pattern id='hex' width='60' height='52' patternUnits='userSpaceOnUse'>\
-  <polygon points='30,0 60,15 60,37 30,52 0,37 0,15' fill='none' stroke='%235f5b45' stroke-width='1.1'/>\
- </pattern></defs>\
- <rect width='100%' height='100%' fill='url(%23hex)'/>\
-</svg>");
-        --bg-image: var(--bg-hero), var(--bg-pattern);
-      }
+    .chip-toggle:hover{ background:var(--brand-50); border-color:var(--brand-600); }
+    .chip-toggle.is-active{
+      background:var(--hero-gradient);
+      color:#fff;
+      border-color:transparent;
+      box-shadow:0 6px 16px rgba(8,145,178,.22);
     }
-    /* Force dark/light explicitly */
-    [data-theme="dark"]{
-      --bg:#16181A; --card:#1B1E21; --text:#EDEEF0; --muted:#A9B1B9; --ink:#0E0E0E;
-      --border:#2A2E33; --chip:#2A2400; --chip-text:#FFE28A; --chip-active:#3A3000;
-      --shadow:0 10px 28px rgba(0,0,0,.35);
-      --bg-hero:
-        radial-gradient(1100px 550px at 105% -10%, #2A2410 0%, rgba(42,36,16,0) 60%),
-        radial-gradient(1000px 600px at -5% 105%, #1F1B0E 0%, rgba(31,27,14,0) 65%),
-        linear-gradient(180deg, #15171A 0%, #121416 100%);
-      --bg-pattern: url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104' opacity='0.18'>\
- <defs><pattern id='hex' width='60' height='52' patternUnits='userSpaceOnUse'>\
-  <polygon points='30,0 60,15 60,37 30,52 0,37 0,15' fill='none' stroke='%235f5b45' stroke-width='1.1'/>\
- </pattern></defs>\
- <rect width='100%' height='100%' fill='url(%23hex)'/>\
-</svg>");
-      --bg-image: var(--bg-hero), var(--bg-pattern);
-    }
-    [data-theme="light"]{
-      /* keeps the light tokens from :root */
-    }
+    .chip-toggle:active{ transform:translateY(1px); }
 
-    [dir="ltr"] body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-    [dir="rtl"] body{font-family:Cairo,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
-
-    /* Decorative background layer */
-    .bg{
-      position:fixed; inset:0; z-index:-1;
-      background-image: var(--bg-image);
-      background-attachment: fixed, fixed;
-      background-size: cover, auto;
-      background-position: center, center;
-      filter: none;
-    }
-    /* Gentle vignette to improve text readability over bright areas */
-    .bg::after{
-      content:""; position:absolute; inset:0;
-      background:radial-gradient(1200px 700px at 50% 0%, rgba(255,255,255,.25), transparent 65%),
-                 linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0) 35%, rgba(0,0,0,.04) 100%);
-      pointer-events:none;
-    }
-
-    .wrap{max-width:760px;margin:0 auto;padding:20px 16px calc(96px + env(safe-area-inset-bottom));}
-    header.site{
-      display:flex;align-items:center;gap:12px;padding:14px 16px;margin:8px 0 16px;
-      background:color-mix(in lab, var(--card) 88%, transparent);
-      backdrop-filter: blur(8px);
-      border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
-      justify-content:space-between;
-    }
-    .brand{
-      width:44px;height:44px;border-radius:12px;
-      background:conic-gradient(from 220deg,#FFE27A,#FFEB9E 45%,#FFF5C9 70%,#FFE27A);
-      display:grid;place-items:center;font-weight:800;color:var(--ink);
-      box-shadow:inset 0 0 0 2px rgba(255,255,255,.75);
-      flex:0 0 44px;
-    }
-    .head-group{display:flex;align-items:center;gap:12px}
-    .title{font-size:18px;font-weight:800}
-    .subtitle{color:var(--muted);font-size:13px}
-
-    /* Header controls: theme + language */
-    .controls{display:flex;gap:8px}
-    .ctrl-btn{
-      border:1px solid var(--border); background:var(--card); color:var(--text);
-      padding:8px 10px; border-radius:999px; font-size:13px; cursor:pointer; min-height:36px;
-      display:flex; align-items:center; gap:8px;
-    }
-    .ctrl-btn:focus-visible{outline:2px solid var(--primary-700); outline-offset:2px}
-    .ctrl-btn .dot{width:8px;height:8px;border-radius:50%; background:var(--primary)}
-
-    .card{
-      background:color-mix(in lab, var(--card) 92%, transparent);
-      backdrop-filter: blur(8px);
-      border:1px solid var(--border);border-radius:var(--radius);
-      box-shadow:var(--shadow);padding:16px;margin:12px 0; position:relative; overflow:hidden;
-    }
-    .card::before{
-      content:""; position:absolute; inset-inline:0; top:0; height:4px;
-      background:linear-gradient(90deg,var(--primary),#FFEB9E);
-      opacity:.10;
-    }
-    h2.section{font-size:16px;margin:0 0 10px}
-    label.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
-    .help{font-size:12px;color:var(--muted)}
-
-    textarea, input[type="number"]{
-      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);
-      background:#fff;font-size:14px;outline:none;
-    }
-    [data-theme="dark"] textarea, [data-theme="dark"] input[type="number"],
-    :root:not([data-theme="light"]):has(body) textarea:where(:not(:-internal-any)), /* keep dark auto */
-    :root:not([data-theme="light"]):has(body) input[type="number"]:where(:not(:-internal-any)){
-      background:#101315;color:var(--text)
-    }
-    textarea:focus, input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--ring)}
-    textarea{min-height:120px;resize:vertical}
-
-    .row{display:grid;gap:12px}
-    @media (min-width:640px){.row.cols-2{grid-template-columns:1fr 1fr}}
-
-    .stars{display:inline-flex;flex-direction:row-reverse;gap:6px}
-    .stars input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-    .stars label{
-      cursor:pointer;font-size:32px;line-height:1;color:#D8DEE6;
-      transition:transform .05s ease,color .15s ease;filter:drop-shadow(0 1px 0 rgba(0,0,0,.04));
-    }
-    .stars label:hover, .stars label:hover ~ label{color:#FFEB9E;transform:scale(1.02)}
-    .stars input:checked ~ label{color:var(--primary)}
-    .stars input:focus-visible + label{outline:2px solid var(--primary-700);outline-offset:2px;border-radius:6px}
-
-    .chips{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{
-      background:var(--chip);color:var(--chip-text);border:1px dashed #EEDB84;
-      padding:10px 14px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none;
-      transition:transform .06s ease,border-color .2s ease,background .2s ease;
-    }
-    .chip:hover{transform:translateY(-1px)}
-    .chip:focus-visible{outline:2px solid var(--primary-600);outline-offset:2px}
-    .chip.active{background:var(--chip-active);border-style:solid;border-color:#EEDB84}
-
-    input[type="range"]{
-      -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:999px;background:#EFF1F4;outline:none;border:none;
-      background-image:linear-gradient(var(--primary),var(--primary));
-      background-repeat:no-repeat;
-    }
-    input[type="range"]::-webkit-slider-thumb{
-      -webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;
-      background:#fff;border:2px solid var(--primary);box-shadow:var(--shadow)
-    }
-    input[type="range"]::-moz-range-thumb{
-      width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--primary)
-    }
-    input[type="range"]::-moz-range-progress{background:var(--primary);height:6px;border-radius:999px}
-    input[type="range"]::-moz-range-track{background:#EFF1F4;height:6px;border-radius:999px}
-
-    .btns{display:flex;gap:10px;flex-wrap:wrap}
-    .btn{
-      border:1px solid transparent;padding:12px 16px;border-radius:12px;cursor:pointer;
-      font-weight:700;font-size:14px;min-height:44px;background:transparent;color:var(--text);
-    }
-    .btn.primary{
-      background:var(--primary);color:var(--ink);
-      box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 1px 2px rgba(0,0,0,.04);
-    }
-    .btn.primary:hover{background:var(--primary-600)}
-    .btn.primary:active{background:var(--primary-700)}
-    .btn.primary:disabled{opacity:.7;cursor:not-allowed}
-
-    .action-bar{
-      position:fixed; inset-inline:0; bottom:0; z-index:60;
-      background:color-mix(in lab, var(--card) 90%, transparent);
-      backdrop-filter:blur(10px);
-      box-shadow:0 -6px 18px rgba(0,0,0,.06); border-top:1px solid var(--border);
-      padding:8px 16px calc(8px + env(safe-area-inset-bottom));
-      display:flex; justify-content:center;
-    }
-    .action-bar .inner{width:min(760px,100%); display:flex; gap:10px}
-    .action-bar .btn{flex:1}
-
-    .toast{
-      position:fixed; inset-inline:16px;
-      bottom:calc(16px + var(--bar-h) + env(safe-area-inset-bottom));
-      z-index:70; display:none; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
-      background:var(--card); box-shadow:var(--shadow); font-size:14px;
-    }
-    .toast.show{display:block}
-    .toast.ok{border-color:#bbf7d0} .toast.err{border-color:#fecaca}
-
-    footer.note{text-align:center; color:var(--muted); font-size:12px; margin-top:18px}
-
-    @media (prefers-reduced-motion:no-preference){
-      .card{animation:fadeUp .3s ease both}
-      .toast.show{animation:slideIn .25s ease both}
-    }
-    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-    @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    /* === Coupon UI === */
+    .coupon-wrap{display:flex; gap:.6rem; align-items:center; margin-top:.75rem; flex-wrap:wrap}
+    .coupon-wrap input{flex:1}
+    .coupon-badge{font-weight:800; padding:.35rem .6rem; border-radius:999px; border:1px solid var(--panel-border); background:#fff}
   </style>
 </head>
 <body>
-  <!-- Background art -->
-  <div class="bg" aria-hidden="true"></div>
 
-  <div class="wrap">
-    <header class="site">
-      <div class="head-group">
-        <div class="brand" aria-hidden="true">N</div>
-        <div>
-          <div class="title" data-i18n="app_title">قيّم تجربتك</div>
-          <div class="subtitle" data-i18n="app_subtitle">استبيان رضا الخدمة • Service satisfaction survey</div>
-        </div>
-      </div>
-      <div class="controls">
-        <button id="btnLang" class="ctrl-btn" type="button" aria-pressed="false" aria-label="Switch language">
-          <span class="dot" aria-hidden="true"></span><span id="langLabel">AR</span>/<span>EN</span>
-        </button>
-        <button id="btnTheme" class="ctrl-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
-          <span class="dot" aria-hidden="true"></span><span id="themeLabel">Light</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Overall rating -->
-    <section class="card">
-      <h2 class="section" data-i18n="overall_rating">التقييم العام</h2>
-      <div class="stars" role="radiogroup" aria-label="Rating">
-        <input type="radio" id="star5" name="rating" value="5"><label for="star5" aria-label="5">★</label>
-        <input type="radio" id="star4" name="rating" value="4"><label for="star4" aria-label="4">★</label>
-        <input type="radio" id="star3" name="rating" value="3"><label for="star3" aria-label="3">★</label>
-        <input type="radio" id="star2" name="rating" value="2"><label for="star2" aria-label="2">★</label>
-        <input type="radio" id="star1" name="rating" value="1"><label for="star1" aria-label="1">★</label>
-      </div>
-      <p class="help" data-i18n="stars_help">اختر من نجمة إلى خمس نجوم • Choose 1–5 stars</p>
-      <label class="lbl" for="reviewText" data-i18n="write_review_label">اكتب رأيك</label>
-      <textarea id="reviewText" placeholder="اكتب رأيك هنا… / Write your review here…" aria-label="Review" data-i18n-placeholder="review_placeholder"></textarea>
-    </section>
-
-    <!-- Quick tags -->
-    <section class="card">
-      <h2 class="section" data-i18n="what_like">ما الذي أعجبك؟</h2>
-      <div class="chips" id="chipsRow" role="group" aria-label="Liked aspects"></div>
-      <p class="help" data-i18n="tap_hint">انقر للإضافة أو الإزالة • Tap to add/remove</p>
-    </section>
-
-    <!-- Satisfaction details -->
-    <section class="card">
-      <h2 class="section" data-i18n="satisfaction_details">تفاصيل الرضا</h2>
-      <div class="row cols-2">
-        <div class="likert">
-          <label class="lbl" for="qQuality" data-i18n="q_quality">جودة التنظيف</label>
-          <input id="qQuality" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
-        </div>
-        <div class="likert">
-          <label class="lbl" for="qSpeed" data-i18n="q_speed">سرعة الخدمة</label>
-          <input id="qSpeed" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
-        </div>
-        <div class="likert">
-          <label class="lbl" for="qStaff" data-i18n="q_staff">احترافية الموظفين</label>
-          <input id="qStaff" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
-        </div>
-        <div class="likert">
-          <label class="lbl" for="qValue" data-i18n="q_value">القيمة مقابل السعر</label>
-          <input id="qValue" type="range" min="1" max="5" step="1" value="4"/>
-          <span class="help" data-i18n="likert_help">1 سيئة جدًا ← 5 ممتازة</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Loyalty -->
-    <section class="card">
-      <h2 class="section" data-i18n="loyalty">الولاء</h2>
-      <div class="row cols-2">
-        <div>
-          <label class="lbl" data-i18n="return_again">هل ستعود مرة أخرى؟</label>
-          <div class="chips" role="radiogroup" aria-label="Return again">
-            <label class="chip"><input type="radio" name="return" value="yes" checked style="margin-inline-end:.5rem"> <span data-i18n="yes">نعم</span></label>
-            <label class="chip"><input type="radio" name="return" value="no" style="margin-inline-end:.5rem"> <span data-i18n="no">لا</span></label>
-          </div>
-        </div>
-        <div>
-          <label class="lbl" for="nps" data-i18n="nps_label">التوصية بنا (0–10)</label>
-          <input id="nps" type="number" min="0" max="10" value="9" inputmode="numeric"/>
-          <span class="help" data-i18n="nps_help">0 لن أوصي إطلاقًا ← 10 أوصي بقوة</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Actions -->
-    <section class="card">
-      <h2 class="section" data-i18n="submit_title">الإرسال</h2>
-      <p class="help" data-i18n="privacy_note">سيتم حفظ تقييمك لدينا فقط.</p>
-    </section>
-
-    <footer class="note"><span data-i18n="footer_note">تصميم نحل • يعمل دون مكتبات خارجية</span></footer>
-  </div>
-
-  <!-- Sticky Action Bar -->
-  <div class="action-bar" role="region" aria-label="Submit rating">
-    <div class="inner">
-      <button id="btnSubmit" class="btn primary" data-i18n="submit_btn">حفظ التقييم</button>
+  <!-- Full-page Overlay Spinner -->
+  <div id="globalOverlay" aria-live="polite" aria-busy="true">
+    <div class="spinner-border" role="status" style="width:3rem;height:3rem;"></div>
+    <div id="globalOverlayMsg" style="margin-top:12px; color:#0b2a33; font-weight:800; text-align:center;">
+      جاري التحميل…
     </div>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="form">
+    <div id="form-content">
+      <div class="header">
+        <img src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/Sponge%20%26%20Soap/spong%26Soap%20-%20logo.png" alt="Sponge & Soap">
+        <div id="langSwitcher" style="margin-inline-start:auto; display:flex; gap:6px;">
+          <button id="toAR" type="button" class="btn btn-light btn-sm" style="font-weight:800">العربية</button>
+          <button id="toEN" type="button" class="btn btn-outline-light btn-sm" style="font-weight:700">English</button>
+        </div>
+      </div>
 
-  <script>
-    /* ========= ORIGINAL CONFIG + HELPERS (kept) ========= */
-    const DEBUG=false;
-    const CONFIG = {
-      tags: [
-        { ar:"السرعة", en:"Speed" },
-        { ar:"الجودة", en:"Quality" },
-        { ar:"السعر",  en:"Price" },
-        { ar:"الموظفون", en:"Staff" },
-        { ar:"دقة الوصول", en:"Punctual (Mobile)" },
-        { ar:"نظافة الأدوات", en:"Clean tools" },
-        { ar:"الحفاظ على الطلاء", en:"Gentle on paint" }
-      ]
+      <div class="stepper" aria-hidden="true" role="tablist" aria-label="خطوات الحجز">
+        <div class="step-dot is-active" role="tab" aria-selected="true"><small>ابدأ</small></div>
+        <div class="step-dot" role="tab" aria-selected="false"><small>المنطقة والخدمة</small></div>
+        <div class="step-dot" role="tab" aria-selected="false"><small>الموعد</small></div>
+        <div class="step-dot" role="tab" aria-selected="false"><small>الموقع</small></div>
+        <div class="step-dot" role="tab" aria-selected="false"><small>المعلومات</small></div>
+        <div class="step-dot" role="tab" aria-selected="false"><small>التأكيد</small></div>
+      </div>
+      <div class="progress-rail"><div id="progressFill" class="progress-fill"></div></div>
+
+      <!-- Page 1 -->
+      <div id="page1" class="page" style="display:flex;">
+        <div class="form-block">
+          <div class="section-card" style="text-align:center;">
+            <h3 id="heroText">✨ واكس يحمي سيارتك<br>🧼 فوط نظيفة & لمعان مضمون<br>🛞 إسفنجة للكفرات<br><br>... نهتم بكل التفاصيل</h3>
+            <p style="margin-top:4px;"><span id="heroHashtag" style="font-weight:bold; font-size:18px; color:#0b2a33">#غسيل_بدون_طوابير</span></p>
+          </div>
+          <div class="sticky-actions">
+            <button id="page1-button" class="filter-button">احجز موعدك</button>
+            <a id="waEnquiryBtn" class="btn-ghost" href="https://wa.me/966503668222" target="_blank" rel="noopener">استفسار واتساب</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 2 -->
+      <div id="page2" class="page" style="display:none;">
+        <div class="form-block">
+          <h1>وين تحب نجيك ؟<br>اختيار المنطقة</h1>
+          <div class="section-card">
+            <form id="page2-form" onsubmit="handleSubmit(event)">
+              <label for="area">المنطقة</label>
+              <div id="select2-container" style="position:relative; margin-bottom:12px;">
+                <select id="area" class="js-example-basic-single" required></select>
+              </div>
+
+              <label for="service">الخدمة</label>
+              <div style="position:relative;">
+                <!-- Size chips filter -->
+                <div id="serviceSizeFilter" class="chip-filter" role="tablist" aria-label="Service size filter" style="margin:0 0 8px 0; display:flex; gap:8px; flex-wrap:wrap;">
+                  <button type="button" class="chip-toggle is-active" data-key="all"  aria-selected="true">الكل</button>
+                  <button type="button" class="chip-toggle"          data-key="small" aria-selected="false">صغير</button>
+                  <button type="button" class="chip-toggle"          data-key="mid"   aria-selected="false">وسط</button>
+                  <button type="button" class="chip-toggle"          data-key="big"   aria-selected="false">كبير</button>
+                </div>
+
+                <select id="service" required></select>
+                <div id="serviceDescHolder" style="margin-top:8px;">
+                  <small id="serviceDescText" style="display:block;color:#245a65;"></small>
+                </div>
+
+                <div id="page3-2-spinner" style="position:absolute; top:0; left:50%; transform:translateX(-50%); display:none;">
+                  <div class="spinner-border" role="status" style="width:1.2rem; height:1.2rem; margin-top:14%;"></div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="sticky-actions">
+            <button id="page2-button" class="filter-button">التالي</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 3 (hidden) -->
+      <div id="page3" class="page" style="display:none;">
+        <div class="form-block">
+          <div class="section-card">
+            <form id="page3-form" onsubmit="handleSubmit(event)">
+              <select id="serviceCat" style="display:none;" required></select>
+              <select id="serviceCount" style="display:none;" required>
+                <option value="1" selected>1</option>
+                <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option>
+                <option value="8">8</option><option value="9">9</option><option value="10">10</option>
+              </select>
+            </form>
+          </div>
+          <div class="sticky-actions">
+            <button id="page3-button" class="filter-button" hidden>التالي</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 4 -->
+      <div id="page4" class="page" style="display:none;">
+        <div class="form-block">
+          <h1>متى تحب نجيك ؟<br>اختيار الموعد</h1>
+          <div class="section-card">
+            <label for="date">التاريخ</label>
+            <input type="date" id="date" class="date"/>
+
+            <div id="time-date-header" class="time-date-header" hidden>
+              <div id="dayHeader1" class="choosed" style="border-radius:0 10px 0 0;display:none;" hidden>
+                <span id="day1">—</span><br><span id="day1date">—</span>
+              </div>
+              <div id="dayHeader2" style="display:none;" hidden>
+                <span id="day2">—</span><br><span id="day2date">—</span>
+              </div>
+              <div id="dayHeader3" style="display:none;border-radius:10px 0 0 0;" hidden>
+                <span id="day3">—</span><br><span id="day3date">—</span>
+              </div>
+            </div>
+
+            <div id="time-container" class="time-container"></div>
+
+            <div id="fail-alert-3" class="alert alert-danger" role="alert" style="display:none; margin-top:12px; margin-bottom:0;">
+              <span></span><br><span></span>
+            </div>
+          </div>
+          <div class="sticky-actions">
+            <button id="page4-return" class="filter-button">السابق</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 5 -->
+      <div id="page5" class="page" style="display:none;">
+        <div class="form-block">
+          <div class="section-card">
+            <label for="googleMap" style="font-size:1.5em; display:block; text-align:center;">الموقع على خريطة قوقل</label>
+            <div id="drag-instructions" style="text-align:center;">
+              <i class="fas fa-location-dot" id="drag-icon" style="font-size:26px; display:block; margin:0 auto 4px; color:#0b2a33;"></i>
+              <p style="color:#245a65;">📍 اضغط على الخريطة لوضع المؤشر — ويمكنك سحب المؤشر لتعديل المكان</p>
+            </div>
+            <div id="googleMap" style="width:100%; height:400px; margin:12px 0;"></div>
+            <p style="text-align:center; font-size:14px; color:#245a65; margin-bottom:10px;">📍 <strong>انقر لإسقاط المؤشر أو اضغط على اظهار موقعي</strong></p>
+            <button class="filter-button" id="show-my-location" style="border-radius:10px; width:100%; margin-bottom:1em;">اظهار موقعي</button>
+
+            <div id="page5-buttons" style="margin-top:8px;">
+              <div id="fail-alert-5a" class="alert alert-danger" role="alert" style="display:none; margin:12px 0 0;">
+                <span></span><br><span></span>
+              </div>
+              <div id="page5-spinner" style="display:none; flex-direction:column; align-items:center; margin-top:1em;">
+                <span class="mt-2" style="color:#0b2a33">جاري تحديد موقعك…</span>
+                <div class="spinner-border" role="status" style="margin-top:10px;"></div>
+              </div>
+              <div class="sticky-actions" style="margin-top:6px;">
+                <button id="page5-button" class="filter-button" style="width:100%;">التالي</button>
+                <button id="page5-return" class="filter-button" style="width:100%;">السابق</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 6 -->
+      <div id="page6" class="page" style="display:none;">
+        <div class="form-block">
+          <div class="section-card">
+            <form id="page6-form" onsubmit="handleSubmit(event)" style="display:flex; flex-direction:column; gap:.35rem;">
+              <h2>معلومات الاتصال</h2>
+              <label for="name">الإسم</label>
+              <input id="name" type="text" class="field" placeholder="اكتب اسمك الكامل" required />
+              <label for="mobile">رقم الجوال</label>
+              <div class="phoneCountry"><input type="tel" id="mobile"></div>
+
+              <h2 style="margin-top:.8rem;">معلومات المركبة</h2>
+              <label for="carBrand">ماركة السيارة</label>
+              <div class="chip" style="position:relative; margin-bottom:.5rem;">
+                <select id="carBrand" onchange="updateLocationDescription()">
+                  <option value="" disabled selected>🚘 اختر الماركة</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div style="display:flex; gap:1rem; margin-bottom:.5rem; flex-wrap:wrap;">
+                <div class="chip" style="flex:1; position:relative;">
+                  <input type="text" id="carName" class="field" placeholder="اسم السيارة (GT-R, كامري، إلنترا)" oninput="updateLocationDescription()"/>
+                </div>
+                <div class="chip" style="flex:1; position:relative;">
+                  <input type="text" id="plateNumber" class="field" maxlength="4" placeholder="🔢 رقم اللوحة (مثال: 1234)" oninput="updateLocationDescription()" inputmode="numeric" pattern="^\d{1,4}$" required/>
+                </div>
+              </div>
+
+              <div hidden><input type="text" id="locationDescription" class="field" readonly placeholder="ماركة السيارة, اسم السيارة, رقم اللوحة"/></div>
+
+              <h2 style="margin-top:.8rem;">طريقة الدفع</h2>
+              <div style="display:flex; flex-direction:row-reverse; justify-content:space-evenly; align-items:center;">
+                <div style="flex-grow:1; flex-basis:0;">
+                  <label class="radio-label" style="position:relative;">
+                    <input type="radio" name="payingMethod" class="radios" id="payCash" value="Cash" required style="position:absolute; opacity:0; inset:0;">
+                    <img class="radio-buttons" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/CASH%20LOGO.png" alt="Cash">
+                  </label>
+                </div>
+                <div style="flex-grow:1; flex-basis:0%;">
+                  <label class="radio-label" style="position:relative;">
+                    <input type="radio" name="payingMethod" class="radios" id="payTelrMada" value="Telr-Online" required style="position:absolute; opacity:0; inset:0;">
+                    <img class="radio-buttons" src="https://pdnmghkpepvsfaiqlafk.supabase.co/storage/v1/object/public/nahl%20assets/NahlTimeProFrom/Online%20Payment%20Security%20Icon.png" alt="بوابة الدفع الإلكتروني">
+                  </label>
+                </div>
+              </div>
+
+              <!-- === COUPON INTEGRATION (UI) === -->
+              <div id="couponBox" class="mt-3">
+                <label for="couponInput">كوبون الخصم (اختياري)</label>
+                <div class="coupon-wrap">
+                  <input id="couponInput" class="field" type="text" inputmode="text" autocomplete="off" placeholder="مثال: WASH10" />
+                  <button id="couponApplyBtn" type="button" class="btn btn-outline-primary" style="font-weight:800; border-radius:10px;">تطبيق</button>
+                  <button id="couponClearBtn" type="button" class="btn btn-outline-secondary" style="font-weight:800; border-radius:10px; display:none;">إزالة</button>
+                </div>
+                <small id="couponStatus" class="d-block mt-2" style="min-height:1.2rem; font-weight:700;"></small>
+                <div id="couponSummary" class="mt-2" style="display:none;">
+                  <span class="coupon-badge" id="couponNameBadge"></span>
+                  <span class="coupon-badge" id="couponDiscountBadge"></span>
+                  <span class="coupon-badge" id="couponTotalBadge"></span>
+                </div>
+              </div>
+              <!-- === /COUPON INTEGRATION === -->
+            </form>
+          </div>
+
+          <div id="page6-buttons" style="margin-top:12px;">
+            <div id="fail-alert-6" class="alert alert-danger" role="alert" style="display:none; margin-top:12px; margin-bottom:0;">
+              <span></span><br><span></span>
+            </div>
+            <div class="sticky-actions">
+              <button id="page6-button" class="filter-button">التالي</button>
+              <button id="page6-return" class="filter-button">السابق</button>
+            </div>
+            <div id="page6-spinner" style="display:none; flex-direction:column; align-items:center; margin-top:1em;">
+              <span class="mt-2" style="color:#0b2a33">جاري بدء عملية الدفع…</span>
+              <div class="spinner-border" role="status" style="margin-top:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 7 -->
+      <div id="page7" class="page" style="display:none;">
+        <div class="form-block" style="text-align:center;">
+          <div class="section-card">
+            <h1>شكراً لكم</h1>
+            <h2>تم حجز الموعد، وراح نأكده لكم على الواتساب</h2>
+            <h3>متحمسين نجيكم!!</h3>
+          </div>
+          <div class="sticky-actions">
+            <button id="rebook" class="filter-button">🔁 حجز جديد</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Page -->
+      <div id="statusPage" class="page" style="display:none; padding:2rem; text-align:center;">
+        <div class="form-block">
+          <div class="section-card">
+            <h1>حالة الدفع</h1>
+            <p id="statusText1" style="margin-top:.75rem;">
+              تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم
+            </p>
+            <div style="margin-top:1rem;">
+              <button
+                id="backHome"
+                class="filter-button"
+                style="margin-inline-start:.5rem;"
+                onclick="window.open('https://spongnsoap.com/', '_blank', 'noopener');">
+                العودة
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div>Sponge & Soap</div>
+        <div style="margin-top:4px;">
+          <a target="_blank" href="https://www.instagram.com/nahl.app?igsh=Y3YyOW05MGI5bnNv&utm_source=qr">Made with Nahl Perfection</a>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Social Dock -->
+  <div class="social-dock" aria-label="روابط الشبكات الاجتماعية">
+    <a target="_blank" rel="noopener" href="https://wa.me/966503668222" class="social-fab" aria-label="تواصل عبر واتساب">
+      <i class="fab fa-whatsapp" aria-hidden="true"></i>
+    </a>
+    <a target="_blank" rel="noopener" href="https://www.tiktok.com/@sponge.soap_sa?_t=ZS-8zaj1CA4aJg&_r=1" class="social-fab" aria-label="تيك توك">
+      <i class="fab fa-tiktok" aria-hidden="true"></i>
+    </a>
+    <a target="_blank" rel="noopener" href="https://www.instagram.com/sponge.soap_sa?igsh=MWRtOHI5OHZpbWpvdA==" class="social-fab" aria-label="إنستغرام">
+      <i class="fab fa-instagram" aria-hidden="true"></i>
+    </a>
+  </div>
+
+  <!-- Terms Modal (AR + EN) -->
+  <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content" style="background:var(--panel-strong);color:#0b2a33;border:1px solid var(--panel-border)">
+        <div class="modal-header" style="border-bottom-color:var(--panel-border)">
+          <h5 class="modal-title">الشروط والأحكام – مغسلة سيارات متنقلة</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        </div>
+        <div class="modal-body" style="text-align:right;">
+          <!-- Arabic Terms -->
+          <div id="termsBody-ar">
+            <ol style="padding-right:1rem;">
+              <li><strong>الخدمات المقدمة</strong><ul><li>تقدم المغسلة خدمات غسيل وتنظيف السيارات وفق الباقات المعروضة على الموقع أو حسب الاتفاق المسبق.</li></ul></li>
+              <li><strong>حجز المواعيد</strong><ul><li>يتم الحجز عبر الموقع أو من خلال التواصل المباشر.</li><li>يحق للمغسلة تعديل أو إلغاء الموعد في حال وجود ظرف طارئ مع إشعار العميل.</li></ul></li>
+              <li><strong>الدفع</strong><ul><li>الدفع عبر الوسائل المتاحة (تحويل، مدى، بطاقة، STC، Apple Pay، نقدًا).</li><li>يجب سداد المبلغ قبل بدء الخدمة، وفي حال عدم السداد يحق للمغسلة إلغاء الموعد.</li></ul></li>
+              <li><strong>الإلغاء والاسترجاع</strong><ul><li>قبل 3 ساعات من الموعد: يحق الاسترداد أو إعادة الجدولة.</li><li>أقل من 3 ساعات: لا يحق الاسترداد أو إعادة الجدولة.</li></ul></li>
+              <li><strong>مسؤولية المغسلة</strong><ul><li>تقديم الخدمة بأفضل جودة ممكنة.</li><li>غير مسؤولة عن الأعطال أو التلفيات السابقة.</li><li>في حال حدوث ضرر مباشر بسبب الخدمة: يتم التعويض بشكل عادل وبحدود الضرر المباشر فقط.</li></ul></li>
+              <li><strong>مسؤولية العميل</strong><ul><li>إخلاء السيارة من المتعلقات.</li><li>غير مسؤولة عن فقدان/تلف الأغراض الداخلية.</li><li>توفير مكان مناسب وآمن.</li></ul></li>
+              <li><strong>الوقت والتأخير</strong><ul><li>المدة تقريبية.</li><li>التأخير 15 دقيقة كحد أقصى ثم يعتبر الموعد لاغيًا.</li></ul></li>
+              <li><strong>التعديلات</strong><ul><li>يحق التعديل على الشروط.</li><li>طلب الخدمة يعتبر قبولًا لهذه الشروط.</li></ul></li>
+              <li><strong>القانون المعمول به</strong><ul><li>تطبق أنظمة المملكة العربية السعودية.</li></ul></li>
+            </ol>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" id="termsAccept">
+              <label class="form-check-label" for="termsAccept">أوافق على الشروط والأحكام</label>
+            </div>
+          </div>
+
+          <!-- English Terms -->
+          <div id="termsBody-en" style="display:none; text-align:left;">
+            <ol style="padding-left:1rem;">
+              <li><strong>Services</strong><ul><li>We provide car wash & detailing services according to the listed packages or prior agreement.</li></ul></li>
+              <li><strong>Booking</strong><ul><li>Bookings are made via the website or direct contact.</li><li>We may reschedule or cancel in emergencies with notification.</li></ul></li>
+              <li><strong>Payment</strong><ul><li>Payment methods: bank transfer, Mada, card, STC, Apple Pay, or cash.</li><li>Payment must be completed before service; otherwise, booking may be cancelled.</li></ul></li>
+              <li><strong>Cancellations & Refunds</strong><ul><li>≥ 3 hours before: refund or reschedule allowed.</li><li>&lt; 3 hours: no refund/reschedule.</li></ul></li>
+              <li><strong>Company Liability</strong><ul><li>We aim for the best quality.</li><li>Not liable for pre-existing faults/damage.</li><li>Direct damage caused by service is compensated fairly and limited to direct loss.</li></ul></li>
+              <li><strong>Customer Responsibility</strong><ul><li>Remove personal belongings.</li><li>We are not responsible for lost/damaged items inside the vehicle.</li><li>Provide a suitable and safe location.</li></ul></li>
+              <li><strong>Timing & Delays</strong><ul><li>Service duration is approximate.</li><li>15-minute grace; then booking may be void.</li></ul></li>
+              <li><strong>Changes</strong><ul><li>Terms may be updated.</li><li>Requesting service means you accept these terms.</li></ul></li>
+              <li><strong>Governing Law</strong><ul><li>Kingdom of Saudi Arabia regulations apply.</li></ul></li>
+            </ol>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" id="termsAcceptEN">
+              <label class="form-check-label" for="termsAcceptEN">I accept the terms and conditions</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top-color:var(--panel-border)">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button class="btn btn-primary" id="confirmTerms" disabled>تأكيد ومتابعة</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ===========================================================
+ * Sponge & Soap — Booking App (index.html)
+ * AR/EN + size filter + polygons + Telr + COUPON integration
+ * =========================================================== */
+
+/* ---------- HARD ARABIC DEFAULT ---------- */
+(function hardArabicDefault(){
+  try {
+    const urlLang = new URLSearchParams(location.search).get('lang');
+    if (urlLang === 'en') {
+      localStorage.setItem('ui_locale','en');
+      document.documentElement.lang='en'; document.documentElement.dir='ltr';
+    } else {
+      localStorage.setItem('ui_locale','ar'); // force AR on every load unless ?lang=en
+      document.documentElement.lang='ar'; document.documentElement.dir='rtl';
+    }
+  } catch(_) {}
+})();
+
+/* ----------------------------- Config ----------------------------- */
+const APP_ID = '33e0d05d-d771-46f4-a7e7-7c634b4e3a9e';
+const NAHL_BASE = 'https://nahl-platform.vercel.app';
+const baseForm = `${NAHL_BASE}/api/app/AM/general/${APP_ID}/form`;
+const RESERVE_URL_PRIMARY  = `${baseForm}/reserveAppointment`;
+const RESERVE_URL_FALLBACK = `${baseForm.replace(/\/form\/?$/, '')}/reserveAppointment`;
+// Replace with your deployed GAS URL when ready
+const GAS_BASE_URL = '/api/gas-proxy';
+
+// === COUPON INTEGRATION (endpoint - separate GAS project) ===
+const COUPON_API_BASE = 'https://script.google.com/macros/s/AKfycbyVsyDk3SoLw1XHEOCkhUhwcjEAIgQXiketibIjr54ZYhIHuwxS3qcGc3NfZVCj9iDB5Q/exec';
+
+/* ----------------------------- State ----------------------------- */
+const nForm = {
+  date:'', time:'', location:'', service:'', serviceCount:'1',
+  serviceCat:'', customerM:'', customerN:'', paymentMethod:'',
+  urlLocation:'', locationDescription:'', locale:(localStorage.getItem('ui_locale')==='en'?'en':'ar')
+};
+const ALLOWED_PM = new Set(['cash','telr-online','stc-manual']);
+const DateTime = luxon.DateTime;
+let controllers = [];
+let services = []; let serviceCategories = [];
+const servicesById = new Map(); const categoriesById = new Map();
+let serviceDescText = '';
+let countryCodeInput = null;
+
+// === COUPON INTEGRATION (state) ===
+let appliedCoupon = null;   // {code, discountText, newAmount, currency, meta...}
+let couponValidating = false;
+
+let serviceDescReqSeq = 0; // latest-only guard for service description
+
+async function safeUpdateServiceDescFor(serviceId, locale){
+  const req = ++serviceDescReqSeq;
+  const lang = (locale || nForm.locale || getUILang()) === 'en' ? 'en' : 'ar';
+
+  // Fast path (promo rules)
+  const promo = getServicePromoText(String(serviceId), lang);
+  if (promo){
+    if (req === serviceDescReqSeq) updateServiceDescriptionUI(promo);
+    return;
+  }
+
+  // Slow path (GAS)
+  const txt = await fetchServiceDescription(String(serviceId));
+  if (req === serviceDescReqSeq) updateServiceDescriptionUI(txt || '');
+}
+
+/* ----------------------------- Overlay ----------------------------- */
+const overlayEl   = document.getElementById('globalOverlay');
+const overlayMsgEl= document.getElementById('globalOverlayMsg');
+function showOverlay(msg="جاري التحميل…"){ overlayMsgEl.textContent=msg; overlayEl.classList.add('is-visible'); document.documentElement.style.cursor='progress'; }
+function hideOverlay(){ overlayEl.classList.remove('is-visible'); document.documentElement.style.cursor=''; }
+
+/* ----------------------------- Utils ----------------------------- */
+function handleSubmit(e){ e.preventDefault(); }
+function lockButton(btn, label = "جاري المعالجة…"){ if(!btn) return; btn.dataset._orig=btn.textContent; btn.textContent=label; btn.disabled=true; btn.setAttribute("aria-busy","true"); }
+function unlockButton(btn){ if(!btn) return; btn.textContent=btn.dataset._orig||btn.textContent; btn.disabled=false; btn.removeAttribute("aria-busy"); }
+function initPhoneInputOnce(){
+  if (countryCodeInput) return countryCodeInput;
+  const el = document.querySelector('#mobile');
+  if (!el || !window.intlTelInput) return null;
+  countryCodeInput = window.intlTelInput(el, {
+    countryOrder:["sa","qa"], initialCountry:"sa",
+    onlyCountries:["sa","qa","ae","om","kw","bh"], excludeCountries:["il"], strictMode:true
+  });
+  return countryCodeInput;
+}
+document.addEventListener('DOMContentLoaded', initPhoneInputOnce);
+
+const errorMap = ["رقم غير صحيح","رمز دولة غير صحيح","المُدخل أقصر من المتوقع","المُدخل أطول من المتوقع","رقم غير صحيح"];
+function checkNumberValidity() {
+  const number = document.getElementById("mobile");
+  const iti = initPhoneInputOnce();
+  if (!iti){ number.setCustomValidity("يرجى الانتظار لحين تهيئة حقل الجوال"); return false; }
+  const e164 = iti.getNumber();
+  const digits = (e164 || "").replace(/\D/g,'');
+  if (!digits || !iti.isValidNumber()) {
+    const msg = errorMap[iti.getValidationError()] || "رقم غير صحيح";
+    number.setCustomValidity(msg); return false;
+  }
+  number.setCustomValidity(""); return true;
+}
+function maskMobileForLog(m){ const s=String(m||'').replace(/\D/g,''); if(s.length<=6) return s? s.slice(0,3)+'***':''; return s.slice(0,3)+'***'+s.slice(-2); }
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    document.getElementById("name").value = localStorage.getItem("name") || "";
+    const savedM = localStorage.getItem("mobile");
+    if (savedM){ const iti=initPhoneInputOnce(); if (iti) iti.setNumber("+"+savedM); }
+  }catch(_){}
+});
+
+/* ----------------------------- Date ----------------------------- */
+const dateEl = document.getElementById("date");
+if (dateEl){
+  dateEl.setAttribute("min", new Date().toLocaleDateString("fr-ca"));
+  dateEl.value = DateTime.now().toFormat('yyyy-MM-dd');
+}
+
+/* ----------------------------- Payload ----------------------------- */
+const MAP_URL_RE = /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=-?\d+(?:\.\d+)?,-?\d+(?:\.\d+)?$/;
+
+function buildPayloadFromForm(f){
+  const toStr = v => (v == null ? undefined : String(v));
+  return {
+    date: /^\d{4}-\d{2}-\d{2}$/.test(f.date||'') ? f.date : '',
+    time: /^([01]\d|2[0-3]):[0-5]\d$/.test(f.time||'') ? f.time : '',
+    location: toStr(f.location),
+    service:  toStr(f.service),
+    serviceCount: String(f.serviceCount || '1'),
+    serviceCat: toStr(f.serviceCat),
+    customerM: String((f.customerM||'').replace(/\D/g,'')),
+    customerN: (f.customerN||'').trim(),
+    paymentMethod: String((f.paymentMethod||'').toLowerCase()),
+    urlLocation: (f.urlLocation||''),
+    locationDescription: (f.locationDescription||''),
+    locale: (f.locale==='en'?'en':'ar')
+  };
+}
+function validatePayloadShape(p){
+  const errs = [];
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(p.date)) errs.push('صيغة التاريخ غير صحيحة (YYYY-MM-DD)');
+  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(p.time)) errs.push('صيغة الوقت غير صحيحة (HH:mm)');
+  if(!p.location) errs.push('المنطقة مطلوبة');
+  if(!p.service) errs.push('الخدمة مطلوبة');
+  if(!/^[1-9]\d*$/.test(p.serviceCount)) errs.push('عدد الخدمات يجب أن يكون رقمًا صحيحًا موجبًا');
+  if(!p.serviceCat) errs.push('فئة الخدمة مطلوبة');
+  if(!/^\d{8,15}$/.test(p.customerM)) errs.push('رقم الجوال يجب أن يكون بصيغة دولية بدون +');
+  if(!p.customerN) errs.push('الاسم مطلوب');
+  if(!ALLOWED_PM.has(p.paymentMethod)) errs.push('طريقة الدفع غير معتمدة');
+  if(!MAP_URL_RE.test(p.urlLocation||'')) errs.push('رابط الموقع غير صحيح');
+  if(!/^(ar|en)$/.test(p.locale)) errs.push('اللغة غير صحيحة');
+  return { ok: errs.length===0, errors: errs };
+}
+function syncNFormFromUI(){
+  const areaEl = document.getElementById('area'); if(areaEl?.value) nForm.location = String(areaEl.value);
+  const svcEl  = document.getElementById('service'); if(svcEl?.value) nForm.service = String(svcEl.value);
+  const svcCntEl = document.getElementById('serviceCount'); nForm.serviceCount = String(svcCntEl?.value || nForm.serviceCount || '1');
+  let currentCat = document.getElementById('serviceCat')?.value || nForm.serviceCat || '';
+  if (!currentCat) currentCat = deriveCategoryIdForSelectedService() || (categoriesById.size===1 ? Array.from(categoriesById.keys())[0] : '');
+  if(currentCat) nForm.serviceCat = String(currentCat);
+  if (window.position) nForm.urlLocation = window.position;
+  const locDescEl = document.getElementById('locationDescription'); if (locDescEl?.value) nForm.locationDescription = locDescEl.value;
+  const nameEl = document.getElementById('name'); if (nameEl?.value) nForm.customerN = nameEl.value.trim();
+  try{ const iti = initPhoneInputOnce(); const e164 = iti? iti.getNumber():''; nForm.customerM = (e164 || '').replace(/\D/g,''); }catch(_){}
+  const pm = document.querySelector('input[name="payingMethod"]:checked'); if(pm?.value){ const tokenMap={Cash:'cash','Telr-Online':'telr-online','STC-Manual':'stc-manual'}; nForm.paymentMethod = tokenMap[pm.value] || String(pm.value).toLowerCase(); }
+  nForm.locale = (localStorage.getItem('ui_locale')==='en'?'en':'ar');
+}
+
+/* ----------------------------- Networking ----------------------------- */
+async function postReservationTry(url, payload, contentType='text/plain;charset=UTF-8'){
+  try{
+    const res = await fetch(url, {
+      method:'POST', mode:'cors', cache:'no-store', credentials:'omit', referrerPolicy:'no-referrer',
+      headers:{ 'Content-Type': contentType, 'Accept':'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const raw = await res.text(); let data=null; try{ data=JSON.parse(raw);}catch(_){}
+    return { ok: res.ok, status: res.status, data, raw };
+  }catch(err){ return { ok:false, status:0, error:String(err) }; }
+}
+async function postReservation(payload){
+  let r = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'text/plain;charset=UTF-8');
+  if(!r.ok && (r.status===415 || r.status===404 || r.status===406)){
+    const rJson = await postReservationTry(RESERVE_URL_PRIMARY, payload, 'application/json;charset=UTF-8');
+    if (rJson.ok) return rJson;
+    r = rJson;
+  }
+  if(!r.ok && (r.status===404 || r.status===405)){
+    let r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'text/plain;charset=UTF-8');
+    if(!r2.ok) r2 = await postReservationTry(RESERVE_URL_FALLBACK, payload, 'application/json;charset=UTF-8');
+    return r2;
+  }
+  return r;
+}
+function callContent2(routText, callback, abortable=false, retries=3){
+  return new Promise((resolve,reject)=>{
+    let signal = '';
+    if (abortable) {
+      if(controllers.length>0){ controllers.forEach(c=>c[0].abort()); controllers=[]; }
+      const controller = new AbortController(); signal=controller.signal; controllers.push([controller,signal]);
+    }
+    setTimeout(()=>{
+      fetch(baseForm + `${routText}`, { method:'GET', redirect:'follow', ...(abortable && { signal }) })
+        .then(async (response)=>{
+          if(!response.ok){ if(retries>0) return resolve(callContent2(routText, callback, abortable, retries-1)); else throw new Error('Network response was not ok'); }
+          const json = await response.json(); callback(json); resolve(json);
+        })
+        .catch(err=>{
+          if(String(err.message).includes('aborted')) return;
+          if(retries>0) setTimeout(()=>resolve(callContent2(routText, callback, abortable, retries-1)), 900);
+          else reject(err);
+        });
+    },300);
+  });
+}
+
+/* ----------------------------- SWR Cache ----------------------------- */
+const CACHE_KEYS = {
+  locations: 'cache.locations.v1',
+  servicesByLoc: lid => `cache.services.v1.${lid}`
+};
+function readCache(key){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || (Date.now() - (obj.ts||0) > 1000*60*30)) return null; // 30 min TTL
+    return obj.data;
+  }catch(_){ return null; }
+}
+function writeCache(key, data){
+  try{ localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); }catch(_){}
+}
+async function fetchJSONTimeout(url, {timeout=7000, retries=2} = {}){
+  for (let attempt=0; attempt<=retries; attempt++){
+    const controller = new AbortController();
+    const tm = setTimeout(()=>controller.abort(), timeout);
+    try{
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(tm);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return await res.json();
+    }catch(e){
+      clearTimeout(tm);
+      if (attempt === retries) throw e;
+      await new Promise(r=>setTimeout(r, 400*(attempt+1)));
+    }
+  }
+}
+window._bg = { locations: null, services: new Map(), ready: false };
+
+/* ----------------------------- Painters ----------------------------- */
+function getUILang(){ try { return (localStorage.getItem('ui_locale') === 'en') ? 'en' : 'ar'; } catch(_) { return 'ar'; } }
+function pickLocale(item, arKey, enKey){
+  const ar = item?.[arKey]; const en = item?.[enKey];
+  return (getUILang()==='en') ? (en ?? ar ?? '') : (ar ?? en ?? '');
+}
+
+function paintAreasFromBG(){
+  const areaSel = $('#area');
+  const locs = window._bg.locations || [];
+
+  const data = locs.map(l => ({
+    id: String(l.id),
+    text: pickLocale(l, 'TS_location_arabic_name', 'TS_location_english_name')
+  }));
+
+  areaSel.empty().select2({
+    data,
+    width: "100%",
+    dir: (getUILang()==='ar' ? 'rtl' : 'ltr')
+  });
+
+  if (data.length) areaSel.val(data[0].id).trigger('change.select2');
+}
+
+async function prefetchServicesFor(locationId){
+  const ck = CACHE_KEYS.servicesByLoc(locationId);
+  const cached = readCache(ck);
+  if (cached) window._bg.services.set(locationId, cached);
+  try{
+    const json = await fetchJSONTimeout(baseForm + `/services?location=${encodeURIComponent(locationId)}`, { timeout: 7000, retries: 1 });
+    const svc = json?.data || {};
+    if (svc?.services?.length){
+      window._bg.services.set(locationId, svc);
+      writeCache(ck, svc);
+      if (document.getElementById('service')?.options.length === 0){
+        paintServicesFromBG(locationId);
+      }
+    }
+  }catch(_){}
+}
+
+function paintServicesFromBG(locationId){
+  const svcWrap = window._bg.services.get(locationId) || {};
+  services = svcWrap.services || [];
+  serviceCategories = svcWrap.servicesCat || [];
+
+  servicesById.clear(); categoriesById.clear();
+  services.forEach(s=>{
+    const sid = String(s.TS_service_id ?? s.service_id ?? s.id);
+    servicesById.set(sid, s);
+  });
+  serviceCategories.forEach(c=>{
+    const cid = String(c.TS_service_category_id ?? c.category_id ?? c.id);
+    categoriesById.set(cid, c);
+  });
+
+  const sorted = services.slice().sort((a,b)=>(Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+  const names = sorted.map(s => pickLocale(s, 'TS_service_arabic_name', 'TS_service_english_name'));
+  const ids   = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+
+  add_dropdown_list(names, ids, "service");
+
+  try{
+    const $service = $('#service');
+    if ($service.data('select2')) {
+      $service.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
+    }
+  }catch(_){}
+
+  const firstSvcId = ids[0] || '';
+  if (firstSvcId){
+    const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+    setServiceCatHiddenAndState(catId);
+    nForm.service = String(firstSvcId);
+
+    // Invalidate any stale requests and update description for the first option
+    serviceDescReqSeq++;
+    safeUpdateServiceDescFor(String(firstSvcId), nForm.locale || getUILang());
+  } else {
+    updateServiceDescriptionUI('');
+  }
+}
+
+/* ---------- Prefetch on load ---------- */
+$('.js-example-basic-single').select2({ data:[], width:"100%" });
+document.addEventListener('DOMContentLoaded', async () => {
+  const cachedLoc = readCache(CACHE_KEYS.locations);
+  if (cachedLoc) window._bg.locations = cachedLoc;
+
+  (async () => {
+    try{
+      const json = await fetchJSONTimeout(baseForm + '/locations', { timeout: 6000, retries: 1 });
+      const locations = (json && json.data) || [];
+      if (locations?.length){
+        window._bg.locations = locations;
+        writeCache(CACHE_KEYS.locations, locations);
+        const areaSel = document.getElementById('area');
+        if (areaSel && !areaSel.options.length) paintAreasFromBG();
+      }
+      const firstId = String(locations?.[0]?.id || '');
+      if (firstId) prefetchServicesFor(firstId);
+    }catch(_){}
+    window._bg.ready = true;
+  })();
+});
+
+/* ---------- Category helpers ---------- */
+function extractCatIdFromServiceObj(svc){
+  const directId =
+    svc.TS_service_category_id ?? svc.TS_service_cat_id ?? svc.TS_service_category ?? svc.service_category_id ??
+    svc.category_id ?? svc.categoryId ?? svc.TS_category_id ?? svc.TS_cat_id ?? null;
+  if (directId != null && String(directId).trim() !== '') return String(directId);
+
+  const nameCand = String(
+    svc.TS_service_category_arabic_name ?? svc.service_category_ar_name ?? svc.category_name_ar ??
+    svc.category_name ?? svc.category ?? ''
+  ).trim();
+
+  if (nameCand) {
+    for (const [cid, cat] of categoriesById.entries()){
+      const nm = String(cat.TS_service_category_arabic_name ?? cat.service_category_ar_name ?? cat.name_ar ?? cat.name ?? '').trim();
+      if (nm && nm === nameCand) return String(cid);
+    }
+  }
+  if (categoriesById.size === 1) return Array.from(categoriesById.keys())[0];
+  return '';
+}
+function deriveCategoryIdForSelectedService(){
+  const svcId = String(document.getElementById('service')?.value || '');
+  if(!svcId) return '';
+  const svc = servicesById.get(svcId);
+  if(!svc) return '';
+  return extractCatIdFromServiceObj(svc) || '';
+}
+function setServiceCatHiddenAndState(cid){
+  const el = document.getElementById('serviceCat'); if(el) el.value = cid || '';
+  if (cid) nForm.serviceCat = String(cid);
+}
+
+/* ---------- Service promo rules (frontend) ---------- */
+function getServicePromoText(serviceId, locale){
+  const id = String(serviceId);
+  const lang = (locale === 'en') ? 'en' : 'ar';
+
+  if (id === '187'){
+    return (lang === 'en') ? 'Opening Offer - Wash for 29' : 'عرض الافتتاح - غسيل ب 29 ريال';
+  }
+  if (id === '189'){
+    return (lang === 'en') ? 'Opening Offer - Wash for 39' : 'عرض الافتتاح - غسيل ب 39 ريال';
+  }
+  if (id === '449'){
+    return (lang === 'en') ? 'Opening Offer - Wash for 29' : 'عرض الافتتاح - غسيل ب 29 ريال';
+  }
+  return '';
+}
+
+/* ---------- Service description via GAS (fallback) ---------- */
+async function fetchServiceDescription(serviceId){
+  try{
+    const res = await fetch(`${GAS_BASE_URL}?action=getServiceDescription&serviceId=${encodeURIComponent(serviceId)}`);
+    const data = await res.json();
+    if (data && data.ok) return String(data.description || '').trim();
+  }catch(_){}
+  return '';
+}
+function ensureServiceDescElement(){
+  let holder = document.getElementById('serviceDescHolder'); if (holder) return holder;
+  const selectWrap = document.getElementById('service').parentElement;
+  holder = document.createElement('div'); holder.id='serviceDescHolder'; holder.style.marginTop='8px';
+  holder.innerHTML = `<small id="serviceDescText" style="display:block;color:#245a65;"></small>`;
+  selectWrap.appendChild(holder); return holder;
+}
+function updateServiceDescriptionUI(text){
+  ensureServiceDescElement();
+  serviceDescText = text || '';
+  const el = document.getElementById('serviceDescText'); if (el) el.textContent = serviceDescText ? `ℹ️ ${serviceDescText}` : '';
+  updateLocationDescription();
+}
+
+/* ---------- Area/Service events ---------- */
+$("#area").on("change", ()=>{
+  const lid = String(document.getElementById("area").value || "");
+  if (lid && window._bg.services.has(lid)){
+    paintServicesFromBG(lid);
+    setTimeout(setBoundries, 0); // ensure polygons after paint
+    return;
+  }
+  document.getElementById("page3-2-spinner").style.display="block";
+  paintServicesFromBG(lid);
+  prefetchServicesFor(lid).then(()=>{
+    paintServicesFromBG(lid);
+    document.getElementById("page3-2-spinner").style.display="none";
+    setTimeout(setBoundries, 0);
+  }).catch(()=>{ document.getElementById("page3-2-spinner").style.display="none"; });
+});
+function add_dropdown_list(show_list, value_list, element_id){
+  const parent = document.getElementById(element_id); parent.innerHTML="";
+  show_list.forEach((name, i)=>{
+    const opt = document.createElement("option"); opt.text=name; opt.value=value_list[i]; if(i===0) opt.selected=true; parent.appendChild(opt);
+  });
+  if (show_list.length > 0) parent.dispatchEvent(new Event('change'));
+}
+
+/* ----------------------------- Appointments ----------------------------- */
+let appointments=[[],[],[]], ActualTimes=[[],[],[]];
+
+async function fetchAppointmentsForSelectedDate(){
+  const tc = document.getElementById('time-container');
+  const areaVal = document.getElementById("area")?.value || "";
+  const serviceVal = document.getElementById("service")?.value || "";
+  if (!areaVal || !serviceVal) { if (tc) tc.innerHTML = `<div style="grid-column:1/-1;justify-self:center;">اختر المنطقة والخدمة أولًا</div>`; return; }
+
+  tc.innerHTML = `<div class="spinner-border" role="status" style="grid-column:1/-1; justify-self:center;"></div>`;
+  if (dateEl) dateEl.disabled = true;
+
+  ActualTimes = [[],[],[]]; appointments=[[],[],[]];
+  const day1 = luxon.DateTime.fromISO(dateEl.value);
+  const day2 = day1.plus({days:1});
+  const day3 = day1.plus({days:2});
+  const datesSet=[day1,day2,day3];
+
+  document.getElementById('time-date-header').hidden = false;
+  for (let i = 1; i <= 3; i++) {
+    const d = datesSet[i-1];
+    document.getElementById(`day${i}`).innerHTML = formatDayNameBoth(d);
+    document.getElementById(`day${i}date`).textContent = d.toFormat('yyyy-MM-dd');
+    document.getElementById(`dayHeader${i}`).hidden = false;
+  }
+
+  ['dayHeader1','dayHeader2','dayHeader3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && !el.dataset.bound) {
+      el.dataset.bound = '1';
+      el.onclick = () => { document.querySelectorAll('.time-date-header .choosed').forEach(d=>d.classList.remove('choosed')); el.classList.add('choosed'); timesSetter(i); };
+    }
+  });
+
+  const startDate = day1.toFormat('yyyy-MM-dd');
+  try{
+    await callContent2(`/appointments?startDate=${encodeURIComponent(startDate)}&location=${encodeURIComponent(areaVal)}&service=${encodeURIComponent(serviceVal)}`, (data)=>{
+      const rec = data.data.appointments || [];
+      let tempActualTimes=[];
+      for(let i=0;i<rec.length;i++){
+        const x=luxon.DateTime.fromISO(rec[i]['TS_appointment_date'], { setZone:true });
+        const y=luxon.DateTime.fromISO(rec[i]['TS_appointment_time'], { setZone:true });
+        rec[i]['TS_appointment_date']=x.toISODate();
+        rec[i]['TS_appointment_time']=y.toLocaleString(luxon.DateTime.TIME_SIMPLE).replace(" "," ");
+        tempActualTimes[i]=y.toFormat('hh:mm a');
+      }
+      const d1=day1.toFormat('yyyy-MM-dd'), d2=day2.toFormat('yyyy-MM-dd'), d3=day3.toFormat('yyyy-MM-dd');
+      for(let i=0;i<rec.length;i++){
+        if(rec[i]["TS_appointment_date"]===d1){ appointments[0].push(rec[i]['TS_appointment_time']); ActualTimes[0].push(tempActualTimes[i]); }
+        else if(rec[i]["TS_appointment_date"]===d2){ appointments[1].push(rec[i]['TS_appointment_time']); ActualTimes[1].push(tempActualTimes[i]); }
+        else if(rec[i]["TS_appointment_date"]===d3){ appointments[2].push(rec[i]['TS_appointment_time']); ActualTimes[2].push(tempActualTimes[i]); }
+      }
+      timesSetter(0);
+    }, true);
+  } finally { if (dateEl) dateEl.disabled=false; }
+}
+if (dateEl){ dateEl.onchange = ()=>{ const hasArea=!!document.getElementById("area")?.value; const hasService=!!document.getElementById("service")?.value; if (!hasArea || !hasService) return; fetchAppointmentsForSelectedDate(); }; }
+
+/* ---------- ONLY service change handler (guarded) ---------- */
+$('#service').on('change', async ()=>{
+  nForm.service = String(document.getElementById('service').value || '');
+  const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+  setServiceCatHiddenAndState(catId);
+
+  const svcId = document.getElementById('service').value || '';
+  safeUpdateServiceDescFor(String(svcId), nForm.locale || getUILang());
+
+  // any service switch should clear an applied coupon (to avoid mismatch)
+  clearCoupon(true);
+
+  const p4=document.getElementById('page4'); 
+  if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
+});
+
+function timesSetter(index){
+  const c = document.getElementById("time-container");
+  c.innerHTML = "";
+  if(appointments[index].length===0){
+    c.innerHTML = `<div style="grid-column:1/-1; justify-self:center; color:#0b2a33;">لا توجد مواعيد متاحة</div>`;
+    return;
+  }
+  for(let y=0;y<appointments[index].length;y++){
+    c.innerHTML += `<button onclick="choosedDate('${ActualTimes[index][y]}','${document.getElementById('day'+(index+1)+'date').innerText}')" class="time-button" dir="ltr">${appointments[index][y]}</button>`;
+  }
+}
+function choosedDate(time, date){
+  nForm.date = date;
+  const parsed = luxon.DateTime.fromFormat(time, "hh:mm a");
+  nForm.time = parsed.toFormat("HH:mm");
+  document.getElementById('page4').style.display='none';
+  document.getElementById('page5').style.display='flex';
+  setTimeout(ensureMapReady, 0);
+}
+
+/* ----------------------------- Navigation ----------------------------- */
+document.getElementById('page1-button').onclick = ()=>{
+  document.getElementById('page1').style.display='none';
+  document.getElementById('page2').style.display='flex';
+  if (window._bg.locations && window._bg.locations.length){
+    paintAreasFromBG();
+    setTimeout(setBoundries, 0); // ensure polygons on first entry
+  } else {
+    $('.js-example-basic-single').select2({ data:[], width:"100%" });
+  }
+};
+document.getElementById('page2-button').onclick = ()=>{
+  const area = document.getElementById("area");
+  if(!area.value){ document.getElementById('page2-form').reportValidity(); return; }
+  nForm.location = area.value;
+  document.getElementById('page2').style.display='none';
+  document.getElementById('page3').style.display='flex';
+  setTimeout(()=>{ document.getElementById('page3').style.display='none'; document.getElementById('page4').style.display='flex'; fetchAppointmentsForSelectedDate(); }, 450);
+};
+document.getElementById('page4-return').onclick = ()=>{
+  document.getElementById('page4').style.display='none';
+  document.getElementById('page2').style.display='flex';
+};
+document.getElementById('page5-button').onclick = ()=>{
+  if(!window.position){
+    if (window.map) placeOrMovePin(window.map.getCenter());
+    if(!window.position){
+      const warn = document.getElementById('fail-alert-5a');
+      warn.style.display='block'; warn.firstElementChild.textContent = 'الرجاء تحديد موقع الخدمة على الخريطة';
+      return;
+    }
+  }
+  document.getElementById('page5').style.display='none';
+  document.getElementById('page6').style.display='flex';
+  setTimeout(initPhoneInputOnce, 0);
+};
+document.getElementById('page5-return').onclick = ()=>{
+  document.getElementById('page5').style.display='none';
+  document.getElementById('page4').style.display='flex';
+};
+document.getElementById('plateNumber').addEventListener('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); this.setCustomValidity(''); updateLocationDescription(); });
+function updateLocationDescription(){
+  const carBrand = document.getElementById("carBrand").value || "";
+  const carName = document.getElementById("carName").value || "";
+  const plateNumber = document.getElementById("plateNumber").value || "";
+  const carPart = [carBrand,carName,plateNumber].filter(Boolean).join(", ");
+  const combined = [serviceDescText, carPart].filter(Boolean).join(" | ");
+  document.getElementById("locationDescription").value = combined;
+  nForm.locationDescription = combined;
+}
+(function fillCarBrands(){
+  const list = ["Acura","Alfa Romeo","Aston Martin","Audi","Bentley","BMW","Bugatti","Buick","Cadillac","Chevrolet","Chrysler","Citroën","Dacia","Daewoo","Daihatsu","Dodge","Ferrari","Fiat","Ford","Genesis","GMC","Haval","Honda","Hummer","Hyundai","Infiniti","Isuzu","Jaguar","Jeep","Kia","Lamborghini","Lancia","Land Rover","Lexus","Lincoln","Lotus","Maserati","Mazda","McLaren","Mercedes-Benz","MG","Mini","Mitsubishi","Nissan","Opel","Peugeot","Porsche","RAM","Renault","Rolls-Royce","Saab","Seat","Skoda","Smart","SsangYong","Subaru","Suzuki","Tesla","Toyota","Volkswagen","Volvo"];
+  list.sort().forEach(b => $('#carBrand').append(`<option value="${b}">${b}</option>`));
+  $('#carBrand').select2({ placeholder: "اختر ماركة السيارة", allowClear:true, width:"100%" });
+})();
+
+/* ----------------------------- Reservation & Payment ----------------------------- */
+async function createReservationNow(payloadOverride={}){
+  syncNFormFromUI();
+  const payload = buildPayloadFromForm({ ...nForm, ...payloadOverride });
+
+  const v = validatePayloadShape(payload);
+  if(!v.ok){
+    alert('الرجاء إدخال البيانات بالشكل الصحيح:\n• ' + v.errors.join('\n• '));
+    return { ok:false, reason:'client_validation', payload };
+  }
+
+  const res = await postReservation(payload);
+  const serverMsg = res?.data?.msgAR || res?.data?.message || res?.raw || '';
+
+  if(res.ok && res.data?.success){
+    try { sessionStorage.setItem('reservationMade','1'); sessionStorage.setItem('pendingBooking', JSON.stringify({ nForm, ts:Date.now() })); } catch(_){}
+    return { ok:true, data:res.data };
+  } else {
+    alert(serverMsg || 'تعذر إنشاء الحجز');
+    return { ok:false, res };
+  }
+}
+
+function cachePendingTelr(cartId){
+  const payload = { nForm, cartId, ts:Date.now(), reservationMade: sessionStorage.getItem('reservationMade')==='1' };
+  sessionStorage.setItem('pendingBooking', JSON.stringify(payload));
+}
+function getSelectedServiceIdOrThrow(){
+  const serviceId = document.getElementById('service')?.value;
+  if(!serviceId) throw new Error('service_not_selected');
+  return String(serviceId);
+}
+let __paymentInFlight = false;
+
+/* === COUPON HELPERS (frontend only) === */
+function setCouponUI({ok=false, message='', code='', discountText='', newAmount=null, currency='SAR'}={}){
+  const st = document.getElementById('couponStatus');
+  const sum = document.getElementById('couponSummary');
+  const nameBadge = document.getElementById('couponNameBadge');
+  const discBadge = document.getElementById('couponDiscountBadge');
+  const totalBadge= document.getElementById('couponTotalBadge');
+  const clearBtn = document.getElementById('couponClearBtn');
+  const applyBtn = document.getElementById('couponApplyBtn');
+
+  if (!st || !sum) return;
+  if (!ok){
+    st.style.color = '#DC2626';
+    st.textContent = message || (getUILang()==='en' ? 'Invalid coupon.' : 'الكوبون غير صالح.');
+    sum.style.display = 'none';
+    clearBtn.style.display='none';
+    applyBtn.style.display='';
+    appliedCoupon = null;
+    return;
+  }
+  // ok true
+  st.style.color = '#16A34A';
+  st.textContent = message || (getUILang()==='en' ? 'Coupon applied.' : 'تم تطبيق الكوبون.');
+  sum.style.display = 'block';
+  nameBadge.textContent = (getUILang()==='en' ? 'Coupon: ' : 'كوبون: ') + (code || '');
+  discBadge.textContent = (getUILang()==='en' ? 'Discount: ' : 'خصم: ') + (discountText || '');
+  if (newAmount!=null){
+    totalBadge.textContent = (getUILang()==='en' ? 'New total: ' : 'الإجمالي بعد الخصم: ') + newAmount + ' ' + currency;
+    totalBadge.style.display='';
+  } else {
+    totalBadge.style.display='none';
+  }
+  clearBtn.style.display='';
+  applyBtn.style.display='none';
+}
+function clearCoupon(silent=false){
+  const input = document.getElementById('couponInput');
+  if (input && !silent) input.value='';
+  setCouponUI({ ok:false, message: silent ? '' : (getUILang()==='en' ? 'Coupon cleared.' : 'تمت إزالة الكوبون.') });
+  appliedCoupon = null;
+}
+async function applyCoupon(){
+  if (couponValidating) return;
+  const code = (document.getElementById('couponInput')?.value || '').trim();
+  if (!code){ setCouponUI({ ok:false, message:(getUILang()==='en'?'Type a coupon code':'اكتب رمز الكوبون') }); return; }
+  if (!COUPON_API_BASE.includes('/exec')){
+    setCouponUI({ ok:false, message:(getUILang()==='en'?'Coupon service not configured':'لم يتم تهيئة خدمة الكوبونات') }); return;
+  }
+  const serviceId = getSelectedServiceIdOrThrow();
+
+  couponValidating = true;
+  setCouponUI({ ok:false, message:(getUILang()==='en'?'Checking…':'جاري التحقق…') });
+  try{
+    const res = await fetch(`${COUPON_API_BASE}?action=validate&serviceId=${encodeURIComponent(serviceId)}&code=${encodeURIComponent(code)}`);
+    const data = await res.json();
+    if (!data?.ok || !data?.valid){
+      setCouponUI({ ok:false, message: data?.message || (getUILang()==='en'?'Invalid coupon':'كوبون غير صالح') });
+      return;
+    }
+    appliedCoupon = {
+      code,
+      discountText: data.discountText || '',
+      newAmount: data.newAmount ?? null,
+      currency: data.currency || 'SAR',
+      meta: data.meta || null
     };
-    const $  = (s,r=document)=>r.querySelector(s);
-    const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
-    function showToast(msg, ok=true){ const t=$('#toast'); if(!t) return; t.textContent=msg; t.className='toast show '+(ok?'ok':'err'); setTimeout(()=>t.classList.remove('show'), 2500); }
+    setCouponUI({ ok:true, message: data.message || '', code, discountText: appliedCoupon.discountText, newAmount: appliedCoupon.newAmount, currency: appliedCoupon.currency });
+  }catch(e){
+    setCouponUI({ ok:false, message:(getUILang()==='en'?'Couldn’t validate coupon':'تعذر التحقق من الكوبون') });
+  }finally{
+    couponValidating = false;
+  }
+}
+document.getElementById('couponApplyBtn')?.addEventListener('click', applyCoupon);
+document.getElementById('couponClearBtn')?.addEventListener('click', ()=> clearCoupon(false));
 
-    function hydrateTags(){
-      const row = $('#chipsRow'); row.innerHTML='';
-      CONFIG.tags.forEach((t, i) => {
-        const b=document.createElement('button');
-        b.type='button'; b.className='chip'; b.textContent=t.ar; // default Arabic; we'll swap on language apply
-        b.addEventListener('click',()=> b.classList.toggle('active'));
-        row.appendChild(b);
+async function startTelrCheckout(){
+  if (__paymentInFlight) return false;
+  const chosenId = document.querySelector('input[name="payingMethod"]:checked')?.id || '';
+  if (chosenId !== 'payTelrMada') return false;
+
+  const nameEl = document.getElementById('name');
+  if(!nameEl.value.trim()){ nameEl.setCustomValidity('يُرجى ملئ هذا الحقل'); document.getElementById('page6-form').reportValidity(); return false; }
+  if(!checkNumberValidity()){ document.getElementById('page6-form').reportValidity(); return false; }
+
+  const serviceId = getSelectedServiceIdOrThrow();
+  const customerN = (document.getElementById('name')?.value || '').trim();
+  const iti = initPhoneInputOnce(); const e164 = iti ? iti.getNumber() : ''; const customerM = (e164 || "").replace(/\D/g,'');
+  try { localStorage.setItem('name', customerN); localStorage.setItem('mobile', customerM); } catch(_){}
+
+  const p6s = document.getElementById('page6-spinner'); if(p6s) p6s.style.display='flex';
+  __paymentInFlight = true;
+
+  try{
+    // === COUPON FLOW: validate & create payment via coupon service if applied ===
+    if (appliedCoupon && appliedCoupon.code && COUPON_API_BASE.includes('/exec')){
+      const res = await fetch(`${COUPON_API_BASE}?action=validateAndCreatePayment`, {
+        method:'POST', headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          serviceId, code: appliedCoupon.code, customerN, customerM
+        })
       });
-    }
-
-    function getRating(){ const r=$$('input[name="rating"]').find(i=>i.checked); return r?Number(r.value):0; }
-    function getParam(name){ const u=new URL(window.location.href); return u.searchParams.get(name); }
-
-    function collectPayload(){
-      const chips = $$('.chip.active').map(ch => ch.textContent);
-      return {
-        bookingId: getParam('bookingId') || '',
-        ts: new Date().toISOString(),
-        lang: document.documentElement.lang || 'ar',
-        rating: getRating(),
-        reviewText: $('#reviewText').value.trim(),
-        tags: chips,
-        q: {
-          quality: Number($('#qQuality').value || 0),
-          speed:   Number($('#qSpeed').value || 0),
-          staff:   Number($('#qStaff').value || 0),
-          value:   Number($('#qValue').value || 0)
-        },
-        wouldReturn: $$('input[name="return"]').find(r=>r.checked)?.value || 'yes',
-        nps: Number($('#nps').value || 0),
-        client: { ua: navigator.userAgent }
-      };
-    }
-
-    async function saveToServer(payload){
-      const res = await fetch('/api/gas-proxy', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      const txt = await res.text();
-      let json; try { json = JSON.parse(txt); } catch { json = { ok:false, error:'bad_json', raw:txt?.slice(0,500)||'' }; }
-      return { status: res.status, ...json };
-    }
-
-    /* ========= NEW: i18n + Theme (no external libs) ========= */
-    const I18N = {
-      ar: {
-        app_title:"قيّم تجربتك",
-        app_subtitle:"استبيان رضا الخدمة • Service satisfaction survey",
-        overall_rating:"التقييم العام",
-        stars_help:"اختر من نجمة إلى خمس نجوم • Choose 1–5 stars",
-        write_review_label:"اكتب رأيك",
-        review_placeholder:"اكتب رأيك هنا…",
-        what_like:"ما الذي أعجبك؟",
-        tap_hint:"انقر للإضافة أو الإزالة • Tap to add/remove",
-        satisfaction_details:"تفاصيل الرضا",
-        q_quality:"جودة التنظيف",
-        q_speed:"سرعة الخدمة",
-        q_staff:"احترافية الموظفين",
-        q_value:"القيمة مقابل السعر",
-        likert_help:"1 سيئة جدًا ← 5 ممتازة",
-        loyalty:"الولاء",
-        return_again:"هل ستعود مرة أخرى؟",
-        yes:"نعم", no:"لا",
-        nps_label:"التوصية بنا (0–10)",
-        nps_help:"0 لن أوصي إطلاقًا ← 10 أوصي بقوة",
-        submit_title:"الإرسال",
-        privacy_note:"سيتم حفظ تقييمك لدينا فقط.",
-        submit_btn:"حفظ التقييم",
-        footer_note:"تصميم نحل • يعمل دون مكتبات خارجية",
-        err_bad_link:"خطأ: رابط غير صحيح (بدون bookingId).",
-        err_need_stars:"الرجاء اختيار التقييم بالنجوم",
-        err_need_text:"الرجاء كتابة التقييم النصي",
-        save_ok:"تم الحفظ بنجاح",
-        save_fail:"تعذّر الحفظ",
-        try_again:"تعذّر الحفظ، حاول مرة أخرى",
-        theme_light:"وضع فاتح", theme_dark:"وضع داكن",
-        lang_label:"AR/EN"
-      },
-      en: {
-        app_title:"Rate your experience",
-        app_subtitle:"Service satisfaction survey",
-        overall_rating:"Overall rating",
-        stars_help:"Choose 1–5 stars",
-        write_review_label:"Write your review",
-        review_placeholder:"Write your review here…",
-        what_like:"What did you like?",
-        tap_hint:"Tap to add/remove",
-        satisfaction_details:"Satisfaction details",
-        q_quality:"Cleaning quality",
-        q_speed:"Service speed",
-        q_staff:"Staff professionalism",
-        q_value:"Value for money",
-        likert_help:"1 Very poor ← 5 Excellent",
-        loyalty:"Loyalty",
-        return_again:"Would you return?",
-        yes:"Yes", no:"No",
-        nps_label:"Recommend us (0–10)",
-        nps_help:"0 Not at all ← 10 Strongly recommend",
-        submit_title:"Submit",
-        privacy_note:"Your rating is stored privately.",
-        submit_btn:"Submit rating",
-        footer_note:"Nahl design • No external libraries",
-        err_bad_link:"Error: Invalid link (missing bookingId).",
-        err_need_stars:"Please choose a star rating",
-        err_need_text:"Please write your review",
-        save_ok:"Saved successfully",
-        save_fail:"Could not save",
-        try_again:"Couldn’t save, please try again",
-        theme_light:"Light", theme_dark:"Dark",
-        lang_label:"EN/AR"
+      const data = await res.json();
+      if (data?.ok && data?.paymentUrl){
+        cachePendingTelr(data.cartId || data.ref || '');
+        location.href = data.paymentUrl;
+        return true;
       }
-    };
-    let currentLang = (localStorage.getItem('lang') || document.documentElement.lang || 'ar').toLowerCase();
-    function t(k){ return (I18N[currentLang] && I18N[currentLang][k]) || I18N.ar[k] || k; }
-
-    function applyLanguageToUI(){
-      // Text nodes
-      $$('[data-i18n]').forEach(el=>{
-        el.textContent = t(el.getAttribute('data-i18n'));
-      });
-      // Placeholders
-      $$('[data-i18n-placeholder]').forEach(el=>{
-        el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
-      });
-      // Chips re-label
-      const chips = $$('#chipsRow .chip');
-      chips.forEach((ch, i)=>{ if(CONFIG.tags[i]) ch.textContent = CONFIG.tags[i][currentLang] || ch.textContent; });
-      // Return yes/no
-      $$('[data-i18n="yes"]').forEach(el=> el.textContent = t('yes'));
-      $$('[data-i18n="no"]').forEach(el=> el.textContent = t('no'));
-      // Direction + lang attr
-      document.documentElement.lang = currentLang;
-      document.documentElement.dir  = currentLang==='ar' ? 'rtl' : 'ltr';
-      // Header button labels
-      $('#langLabel').textContent = currentLang==='ar' ? 'AR' : 'EN';
-      $('#themeLabel').textContent = isDark() ? t('theme_dark') : t('theme_light');
+      // fall through to normal Telr if coupon service rejects at creation
     }
 
-    // Theme helpers
-    function isDark(){
-      const forced = document.documentElement.getAttribute('data-theme');
-      if(forced==='dark') return true;
-      if(forced==='light') return false;
-      // auto → media query
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // === NORMAL FLOW (no coupon or failed) ===
+    const res2 = await fetch(`${GAS_BASE_URL}?action=createTelrByService`, {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ serviceId, customerN, customerM })
+    });
+    const data2 = await res2.json();
+    if(!data2.ok || !data2.paymentUrl){
+      alert('تعذر بدء عملية الدفع. حاول لاحقاً.');
+      if(p6s) p6s.style.display='none'; __paymentInFlight=false; return false;
     }
-    function setTheme(mode){ // 'light' | 'dark' | 'auto'
-      document.documentElement.setAttribute('data-theme', mode);
-      localStorage.setItem('theme', mode);
-      $('#themeLabel').textContent = isDark() ? t('theme_dark') : t('theme_light');
+    cachePendingTelr(data2.cartId);
+    location.href = data2.paymentUrl;
+    return true;
+  }catch(e){
+    alert('تعذر بدء عملية الدفع. حاول لاحقاً.');
+    if(p6s) p6s.style.display='none'; __paymentInFlight=false; return false;
+  }
+}
+
+/* ----------------------------- Terms modal ----------------------------- */
+const termsModal = new bootstrap.Modal(document.getElementById('termsModal'));
+const termsAcceptAR = document.getElementById('termsAccept');
+const termsAcceptEN = document.getElementById('termsAcceptEN');
+const confirmTerms = document.getElementById('confirmTerms');
+function updateConfirmEnabled(){
+  const lang = getUILang();
+  if (lang==='en'){
+    confirmTerms.disabled = !termsAcceptEN.checked;
+  }else{
+    confirmTerms.disabled = !termsAcceptAR.checked;
+  }
+}
+termsAcceptAR?.addEventListener('change', updateConfirmEnabled);
+termsAcceptEN?.addEventListener('change', updateConfirmEnabled);
+
+let __confirmInFlight = false;
+document.getElementById('page6-button').addEventListener('click', ()=>{
+  const nameOk = !!document.getElementById('name').value.trim();
+  const phoneOk = checkNumberValidity();
+  const plateOk = !!document.getElementById('plateNumber').value.trim();
+  const paymentChosen = !!document.querySelector('input[name="payingMethod"]:checked');
+  if(!nameOk || !phoneOk || !plateOk || !paymentChosen){ document.getElementById('page6-form').reportValidity(); return; }
+  // reset accepts per language
+  termsAcceptAR.checked=false; termsAcceptEN.checked=false; updateConfirmEnabled();
+  termsModal.show();
+});
+confirmTerms.addEventListener('click', async ()=>{
+  if (__confirmInFlight) return;
+  __confirmInFlight = true;
+  termsModal.hide();
+  lockButton(confirmTerms, getUILang()==='en' ? "Processing…" : "جاري المتابعة…");
+  showOverlay(getUILang()==='en' ? "Processing…" : "جاري المتابعة…");
+
+  try{
+    syncNFormFromUI();
+    const chosenId = document.querySelector('input[name="payingMethod"]:checked')?.id || '';
+
+    if (chosenId === 'payTelrMada'){
+      const booked = await createReservationNow();
+      if (!booked.ok){ unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay(); return; }
+      const started = await startTelrCheckout();
+      if (!started) { unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay(); }
+      return;
     }
 
-    /* ========= VALIDATION (localized messages) ========= */
-    function validate(){
-      const bid = getParam('bookingId');
-      if (!bid){ showToast(t('err_bad_link'), false); return false; }
-      const rating = getRating();
-      if (!rating){ showToast(t('err_need_stars'), false); return false; }
-      const text = $('#reviewText').value.trim();
-      if (!text){ showToast(t('err_need_text'), false); return false; }
-      return true;
+    const result = await createReservationNow();
+    unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay();
+    if(result.ok){
+      document.getElementById('page6').style.display='none';
+      document.getElementById('page7').style.display='flex';
     }
+  }catch(e){
+    unlockButton(confirmTerms); __confirmInFlight=false; hideOverlay();
+    alert(getUILang()==='en' ? 'Could not complete the action. Try again.' : 'تعذر إتمام الإجراء، حاول مرة أخرى.');
+  }
+});
+document.getElementById('page6-return').addEventListener('click', ()=>{
+  document.getElementById('page6').style.display='none';
+  document.getElementById('page5').style.display='flex';
+  setTimeout(ensureMapReady,0);
+});
+document.getElementById("rebook")?.addEventListener("click", ()=> location.href = location.origin + location.pathname );
+document.querySelectorAll('input[name="payingMethod"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    const tokenMap={ 'Cash':'cash','STC-Manual':'stc-manual','Telr-Online':'telr-online' };
+    nForm.paymentMethod = tokenMap[r.value] || String(r.value).toLowerCase();
+  });
+});
 
-    async function onSubmit(){
-      if (!validate()) return;
-      const btn=$('#btnSubmit'); btn.disabled=true; btn.textContent=t('submit_btn')+'…';
-      try{
-        const result = await saveToServer(collectPayload());
-        if (result.ok){
-          showToast(t('save_ok'), true);
-          $('input[name="rating"]:checked')?.checked && ($('input[name="rating"]:checked').checked = false);
-          $('#reviewText').value=''; $$('.chip.active').forEach(ch=>ch.classList.remove('active'));
-        } else {
-          const msg = t('save_fail') + (result.error ? ` • ${result.error}` : '');
-          showToast(msg, false);
-          if (DEBUG) console.error(result);
-        }
-      } catch(err){
-        if (DEBUG) console.error(err);
-        showToast(t('try_again'), false);
-      } finally {
-        btn.disabled=false; btn.textContent=t('submit_btn');
+/* ----------------------------- Progress Stepper ----------------------------- */
+(function progressHeartbeat(){
+  const fill = document.getElementById('progressFill'); if(!fill) return;
+  const widthMap = {page1:16.6,page2:33.3,page3:33.3,page4:50,page5:66.6,page6:83.3,page7:100,statusPage:100};
+  function currentPage(){
+    const ids=['page1','page2','page3','page4','page5','page6','page7','statusPage'];
+    for(const id of ids){ const el=document.getElementById(id); if(el && getComputedStyle(el).display!=='none') return id; }
+    return 'page1';
+  }
+  function tick(){
+    const id=currentPage(); fill.style.width=(widthMap[id]||16.6)+'%';
+    const dots=document.querySelectorAll('.stepper .step-dot'); dots.forEach((d,i)=>{ d.classList.toggle('is-active', false); d.setAttribute('aria-selected','false'); });
+    const stepIndexMap={page1:0,page2:1,page3:1,page4:2,page5:3,page6:4,page7:5,statusPage:5};
+    const idx=stepIndexMap[id] ?? 0;
+    const dotsArr=[...document.querySelectorAll('.stepper .step-dot')]; if (dotsArr[idx]){ dotsArr[idx].classList.add('is-active'); dotsArr[idx].setAttribute('aria-selected','true'); }
+  }
+  tick(); setInterval(tick, 350);
+})();
+
+/* ----------------------------- Google Maps ----------------------------- */
+window.prePosition     = "https://www.google.com/maps/search/?api=1&query=";
+window.defaultLocation = { lat: 26.34165524787632, lng: 50.11524831545726 };
+window.position        = "";
+window.map             = null;
+window.marker          = null;
+window.infoWindow      = null;
+window.polygon         = null;
+window.serviceBounds   = null;
+
+function updatePosition(lat,lng){ window.position = `${window.prePosition}${lat},${lng}`; }
+function insideService(latLng){
+  if (!window.polygon || !google.maps.geometry || !google.maps.geometry.poly) return true;
+  const pt = (latLng instanceof google.maps.LatLng) ? latLng : new google.maps.LatLng(latLng.lat, latLng.lng);
+  return google.maps.geometry.poly.containsLocation(pt, window.polygon);
+}
+function myMap(){
+  const mapEl = document.getElementById("googleMap"); if (!mapEl) return;
+  window.map = new google.maps.Map(mapEl, { center: window.defaultLocation, zoom:12, mapTypeControl:false, streetViewControl:false, fullscreenControl:false, gestureHandling:"greedy" });
+  window.infoWindow = new google.maps.InfoWindow();
+  const hint = document.getElementById("drag-instructions");
+  if (hint){ const p = hint.querySelector("p"); if (p) p.textContent="📍 اضغط على الخريطة لوضع المؤشر — ويمكنك سحب المؤشر لتعديل المكان";
+    setTimeout(()=>{ hint.style.display="none"; }, 4000);
+    window.map.addListener("dragstart", ()=>{ hint.style.display="none"; });
+    window.map.addListener("click", ()=>{ hint.style.display="none"; });
+  }
+  window.map.addListener("click", (e)=> placeOrMovePin(e.latLng));
+  window.addEventListener("resize", ()=>{ if (!window.map) return; google.maps.event.trigger(window.map,"resize"); });
+  setTimeout(()=>{ if (typeof setBoundries==='function') setBoundries(); }, 0);
+}
+function initMap(){ myMap(); }
+window.myMap = myMap; window.initMap = initMap;
+
+function placeOrMovePin(latLng){
+  if (!window.map) return;
+  if (!insideService(latLng)) {
+    if (!(window.serviceBounds && window.serviceBounds.contains(latLng))) {
+      if (window.infoWindow) { window.infoWindow.setContent("⚠️ عذرًا، موقعك خارج نطاق الخدمة"); window.infoWindow.setPosition(latLng); window.infoWindow.open(window.map); }
+      return;
+    }
+  }
+  if (!window.marker) {
+    window.marker = new google.maps.Marker({ map:window.map, position:latLng, draggable:true, animation:google.maps.Animation.DROP, title:getUILang()==='en'?'Selected location':'الموقع المختار' });
+    window.marker.addListener("dragend", ()=>{
+      const p = window.marker.getPosition();
+      if (!insideService(p)) {
+        if (window.infoWindow) { window.infoWindow.setContent(getUILang()==='en'?"⚠️ Outside service area — move the pin inside the allowed zone":"⚠️ خارج نطاق الخدمة — حرّك المؤشر داخل المنطقة المسموحة"); window.infoWindow.open(window.map, window.marker); }
+        return;
+      }
+      updatePosition(p.lat(), p.lng()); nForm.urlLocation = window.position;
+    });
+  } else { window.marker.setPosition(latLng); }
+  window.map.panTo(latLng); window.map.setZoom(17);
+  updatePosition(latLng.lat(), latLng.lng()); nForm.urlLocation = window.position;
+  if (window.infoWindow) { window.infoWindow.setContent(getUILang()==='en'?"✅ Location set here (you can drag the pin)":"✅ تم تحديد موقعك هنا (يمكنك سحب المؤشر للتعديل)"); window.infoWindow.open(window.map, window.marker); }
+}
+
+/* ---------- Boundaries (AR/EN names supported) ---------- */
+function setBoundries(){
+  if (!window.map) return;
+
+  const selectedText = ($('#area option:selected').text() || '').trim();
+
+  const isAziziyah   = ["العزيزية - الخبر","Aziziyah - Khobar","Al Aziziyah - Khobar","Aziziyah"].some(n => selectedText.toLowerCase().includes(n.toLowerCase()));
+  const isRakah      = ["الراكة والاحياء المحيطة","Rakah & Surrounding Districts","Rakah"].some(n => selectedText.toLowerCase().includes(n.toLowerCase()));
+  const isDhahran    = ["الظهران","Dhahran"].some(n => selectedText.toLowerCase().includes(n.toLowerCase()));
+  const isGolden     = ["الحزام الذهبي والاحياء","GoldenAve"].some(n => selectedText.toLowerCase().includes(n.toLowerCase()));
+
+  let coords = null;
+  if (isAziziyah) {
+    coords = [
+      { lat:26.219724394350184, lng:50.215045355428195 },
+      { lat:26.1870383495685,   lng:50.2135291654911   },
+      { lat:26.069703060741347, lng:50.137875179099595 },
+      { lat:26.15001891083389,  lng:50.10628808282646  },
+      { lat:26.21660551929113,  lng:50.143828288837895 },
+      { lat:26.21897351180097,  lng:50.19603263782255  }
+    ];
+  } else if (isRakah) {
+    coords = [
+      { lat:26.34357597645759,  lng:50.23350951368776  },
+      { lat:26.332590433381366, lng:50.17907349179552 },
+      { lat:26.370553389032917,  lng:50.17811064527842 },
+      { lat:26.38321515939472,  lng:50.16435785954823  },
+      { lat:26.412168247298823, lng:50.174747044633584 },
+      { lat:26.41549101351015,  lng:50.17093390436316  },
+      { lat:26.42065957069214,  lng:50.17423175540785  },
+      { lat:26.41104788139079,  lng:50.19433848549186  },
+      { lat:26.42047453268925,  lng:50.215924966344424 },
+      { lat:26.387742897392805, lng:50.23661538317798  },
+      { lat:26.370294974036963, lng:50.23977026744921  }
+    ];
+  } else if (isGolden) {
+    coords = [
+      { lat:26.278192382855956,  lng:50.22199845323068  },
+      { lat:26.289013143793674, lng:50.17815620961856},
+      { lat:26.296952938893433, lng:50.163733725528644},
+      { lat:26.31557287640532,  lng:50.179612401977174 },
+      { lat:26.332728268683557,  lng:50.1790974177831 },
+      { lat:26.339189730429563, lng:50.21171307722003},
+      { lat:26.330728219329746,  lng:50.213429690874605 },
+      { lat:26.332959041385468,  lng:50.22561764782209  },
+      { lat:26.317880924840246,  lng:50.22939419786216  }
+    ];
+  } else if (isDhahran) {
+    coords = [
+      { lat:26.341056543806932, lng:50.11488540829821  },
+      { lat:26.38339827939907, lng:50.16347946748571 },
+      { lat:26.370660867872715, lng:50.178297818356924 },
+      { lat:26.315439321393217, lng:50.17922090707148  },
+      { lat:26.30227869432462, lng:50.17063251472789 },
+      { lat:26.298116852238735,  lng:50.16511208074312  },
+      { lat:26.291729962638115,  lng:50.17359490688223  } 
+    ];
+  }
+
+  if (!coords) {
+    if (window.polygon) { window.polygon.setMap(null); window.polygon = null; }
+    window.serviceBounds = null; window.map.setCenter(window.defaultLocation); window.map.setZoom(12); return;
+  }
+
+  const path = coords.map(c => new google.maps.LatLng(c.lat, c.lng));
+  if (coords.length && (coords[0].lat !== coords[coords.length-1].lat || coords[0].lng !== coords[coords.length-1].lng)) path.push(new google.maps.LatLng(coords[0].lat, coords[0].lng));
+  if (window.polygon) window.polygon.setMap(null);
+  window.polygon = new google.maps.Polygon({ paths:path, strokeColor:"#ff6b6b", strokeOpacity:.5, strokeWeight:2, fillColor:"#06b9d2", fillOpacity:.12, clickable:false });
+  window.polygon.setMap(window.map);
+  const b = new google.maps.LatLngBounds(); path.forEach(p => b.extend(p)); window.serviceBounds = b; window.map.fitBounds(b);
+  if (window.marker) { window.marker.setMap(null); window.marker = null; }
+  window.position = "";
+}
+const page5Spinner = document.getElementById('page5-spinner');
+function showGeoSpinner(show, msg="جاري تحديد موقعك…"){ if(!page5Spinner) return; page5Spinner.style.display = show ? 'flex':'none'; page5Spinner.querySelector('span').textContent = msg; }
+document.getElementById('show-my-location')?.addEventListener('click', ()=>{
+  ensureMapReady();
+  if(!navigator.geolocation){
+    if(window.infoWindow){ window.infoWindow.setPosition(window.map.getCenter()); window.infoWindow.setContent(getUILang()==='en'?"⚠️ Geolocation not supported":"⚠️ جهازك لا يدعم تحديد الموقع."); window.infoWindow.open(window.map); }
+    return;
+  }
+  showGeoSpinner(true, getUILang()==='en'?'Getting your location…':'جاري تحديد موقعك…');
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ showGeoSpinner(false); const userPos = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude); placeOrMovePin(userPos); },
+    ()=>{ showGeoSpinner(false); if(window.infoWindow){ window.infoWindow.setPosition(window.map.getCenter()); window.infoWindow.setContent(getUILang()==='en'?"⚠️ Couldn’t get your location.":"⚠️ تعذر الحصول على موقعك."); window.infoWindow.open(window.map); } },
+    { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
+  );
+});
+function ensureMapReady(){
+  const el = document.getElementById('googleMap'); if (!el || !window.map) return;
+  google.maps.event.trigger(window.map, 'resize');
+  setTimeout(()=>{ if (window.marker){ window.map.setCenter(window.marker.getPosition()); window.map.setZoom(17); }
+                   else if (window.serviceBounds){ window.map.fitBounds(window.serviceBounds); }
+                   else { window.map.setCenter(window.defaultLocation); window.map.setZoom(12); } }, 40);
+}
+$('#area').on('change', () => { setTimeout(setBoundries, 0); });
+
+/* ----------------------------- Status Page ----------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  const isStatus = (location.hash || '').replace('#','').toLowerCase() === 'status';
+  if (!isStatus) return;
+  ['page1','page2','page3','page4','page5','page6','page7'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const statusPage = document.getElementById('statusPage');
+  if (statusPage) statusPage.style.display = 'flex';
+});
+
+/* ----------------------------- i18n (AR/EN) ----------------------------- */
+(function(){
+  const I18N = {
+    ar:{_lang:'ar',_dir:'rtl',
+      overlay_loading:'جاري التحميل…',
+      hero_text:'✨ واكس يحمي سيارتك<br>🧼 فوط نظيفة & لمعان مضمون<br>🛞 إسفنجة للكفرات<br><br>... نهتم بكل التفاصيل',
+      hero_hash:'#غسيل_بدون_طوابير',
+      start_booking:'احجز موعدك', cta_whatsapp:'استفسار واتساب',
+      step_1:'ابدأ', step_2:'المنطقة والخدمة', step_3:'الموعد', step_4:'الموقع', step_5:'المعلومات', step_6:'التأكيد',
+      p2_title:'وين تحب نجيك ؟<br>اختيار المنطقة', area_label:'المنطقة', service_label:'الخدمة', next:'التالي', prev:'السابق',
+      p4_title:'متى تحب نجيك ؟<br>اختيار الموعد', date_label:'التاريخ',
+      p5_map_title:'الموقع على خريطة قوقل', p5_hint:'📍 اضغط على الخريطة لوضع المؤشر — ويمكنك سحب المؤشر لتعديل المكان',
+      p5_hint_small:'📍 انقر لإسقاط المؤشر أو اضغط على اظهار موقعي', my_location:'اظهار موقعي',
+      p6_contact_title:'معلومات الاتصال', name_label:'الإسم', name_ph:'اكتب اسمك الكامل', mobile_label:'رقم الجوال',
+      car_title:'معلومات المركبة', brand_label:'ماركة السيارة', brand_ph:'اختر ماركة السيارة',
+      carname_ph:'اسم السيارة (GT-R, كامري، إلنترا)', plateno_ph:'🔢 رقم اللوحة (مثال: 1234)',
+      pay_title:'طريقة الدفع', page6_next:'التالي', page6_prev:'السابق', page6_processing:'جاري بدء عملية الدفع…',
+      terms_title:'الشروط والأحكام – مغسلة سيارات متنقلة', terms_accept:'أوافق على الشروط والأحكام', terms_cancel:'إلغاء', terms_confirm:'تأكيد ومتابعة',
+      thanks_h1:'شكراً لكم', thanks_h2:'تم حجز الموعد، وراح نأكده لكم على الواتساب', thanks_h3:'متحمسين نجيكم!!', rebook:'🔁 حجز جديد',
+      status_title:'حالة الدفع', status_text:'تم حجز الموعد، وسيتم إرسال حالة الدفع عبر الواتساب والإيميل الخاص بكم', back_home:'العودة'
+    },
+    en:{_lang:'en',_dir:'ltr',
+      overlay_loading:'Loading…',
+      hero_text:'✨ Wax that protects your car<br>🧼 Fresh towels & guaranteed shine<br>🛞 Tire sponge for the details<br><br>... We care about every detail',
+      hero_hash:'#NoQueueCarWash',
+      start_booking:'Book now', cta_whatsapp:'WhatsApp Enquiry',
+      step_1:'Start', step_2:'Area & Service', step_3:'Appointment', step_4:'Location', step_5:'Info', step_6:'Confirm',
+      p2_title:'Where should we come to you?<br>Select area', area_label:'Area', service_label:'Service', next:'Next', prev:'Back',
+      p4_title:'When should we visit?<br>Select appointment', date_label:'Date',
+      p5_map_title:'Location on Google Maps', p5_hint:'📍 Click the map to drop a pin — you can drag it to adjust',
+      p5_hint_small:'📍 Click to drop a pin or tap Show my location', my_location:'Show my location',
+      p6_contact_title:'Contact info', name_label:'Full name', name_ph:'Type your full name', mobile_label:'Mobile number',
+      car_title:'Vehicle info', brand_label:'Car brand', brand_ph:'Choose brand',
+      carname_ph:'Model (GT-R, Camry, Elantra)', plateno_ph:'🔢 Plate number (e.g., 1234)',
+      pay_title:'Payment method', page6_next:'Next', page6_prev:'Back', page6_processing:'Starting payment…',
+      terms_title:'Terms & Conditions – Mobile Car Wash', terms_accept:'I accept the terms and conditions', terms_cancel:'Cancel', terms_confirm:'Confirm & continue',
+      thanks_h1:'Thank you!', thanks_h2:'Your booking is placed; we will confirm via WhatsApp', thanks_h3:'Can’t wait to see you!', rebook:'🔁 New booking',
+      status_title:'Payment status', status_text:'Your booking is placed. We will send the payment status via WhatsApp and email.', back_home:'Back'
+    }
+  };
+
+  const BIND = [
+    ['#globalOverlayMsg','textContent','overlay_loading'],
+    ['#page1-button','textContent','start_booking'],
+    ['#waEnquiryBtn','textContent','cta_whatsapp'],
+    ['#heroText','innerHTML','hero_text'],
+    ['#heroHashtag','textContent','hero_hash'],
+    ['.stepper .step-dot:nth-child(1) small','textContent','step_1'],
+    ['.stepper .step-dot:nth-child(2) small','textContent','step_2'],
+    ['.stepper .step-dot:nth-child(3) small','textContent','step_3'],
+    ['.stepper .step-dot:nth-child(4) small','textContent','step_4'],
+    ['.stepper .step-dot:nth-child(5) small','textContent','step_5'],
+    ['.stepper .step-dot:nth-child(6) small','textContent','step_6'],
+    ['#page2 .form-block h1','innerHTML','p2_title'],
+    ['label[for="area"]','textContent','area_label'],
+    ['label[for="service"]','textContent','service_label'],
+    ['#page2-button','textContent','next'],
+    ['#page4 .form-block h1','innerHTML','p4_title'],
+    ['label[for="date"]','textContent','date_label'],
+    ['#page4-return','textContent','prev'],
+    ['#page5 label[for="googleMap"]','textContent','p5_map_title'],
+    ['#drag-instructions p','textContent','p5_hint'],
+    ['#page5 p[style*="text-align:center"]','textContent','p5_hint_small'],
+    ['#show-my-location','textContent','my_location'],
+    ['#page5-button','textContent','next'],
+    ['#page5-return','textContent','prev'],
+    ['#page6 h2:nth-of-type(1)','textContent','p6_contact_title'],
+    ['label[for="name"]','textContent','name_label'],
+    ['#name','placeholder','name_ph'],
+    ['label[for="mobile"]','textContent','mobile_label'],
+    ['#page6 h2:nth-of-type(2)','textContent','car_title'],
+    ['label[for="carBrand"]','textContent','brand_label'],
+    ['#carBrand','data-i18n-placeholder','brand_ph'],
+    ['#carName','placeholder','carname_ph'],
+    ['#plateNumber','placeholder','plateno_ph'],
+    ['#page6 h2:last-of-type','textContent','pay_title'],
+    ['#page6-button','textContent','page6_next'],
+    ['#page6-return','textContent','page6_prev'],
+    ['#page6-spinner span.mt-2','textContent','page6_processing'],
+    ['#termsModal .modal-title','textContent','terms_title'],
+    ['label[for="termsAccept"]','textContent','terms_accept'],
+    ['label[for="termsAcceptEN"]','textContent','terms_accept'],
+    ['#termsModal .btn.btn-outline-secondary','textContent','terms_cancel'],
+    ['#confirmTerms','textContent','terms_confirm'],
+    ['#page7 h1','textContent','thanks_h1'],
+    ['#page7 h2','textContent','thanks_h2'],
+    ['#page7 h3','textContent','thanks_h3'],
+    ['#rebook','textContent','rebook'],
+    ['#statusPage h1','textContent','status_title'],
+    ['#statusText1','textContent','status_text'],
+    ['#backHome','textContent','back_home'],
+  ];
+
+  function applyI18N(lang){
+    const pack = I18N[lang] || I18N.ar;
+
+    document.documentElement.lang = pack._lang;
+    document.documentElement.dir  = pack._dir;
+
+    BIND.forEach(([sel, prop, key])=>{
+      const el = document.querySelector(sel);
+      if (!el) return;
+      const val = pack[key] || '';
+      if (prop === 'innerHTML') el.innerHTML = val;
+      else if (prop === 'placeholder') el.setAttribute('placeholder', val);
+      else if (prop === 'data-i18n-placeholder') el.dataset.i18nPlaceholder = val;
+      else el[prop] = val;
+    });
+
+    const isRTL = pack._dir === 'rtl';
+    try{
+      const area = $('#area');
+      const service = $('#service');
+      const brand = $('#carBrand');
+
+      if (area.data('select2'))   area.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
+      if (service.data('select2')) service.select2({ width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
+      if (brand.data('select2')) {
+        const brandPh = document.getElementById('carBrand')?.dataset.i18nPlaceholder || pack.brand_ph;
+        brand.select2({ placeholder: brandPh, allowClear:true, width:'100%', dir: isRTL ? 'rtl' : 'ltr' });
+      }
+    }catch(_){}
+
+    try { localStorage.setItem('ui_locale', pack._lang); } catch(_){}
+    if (window.nForm) window.nForm.locale = pack._lang;
+
+    const arBtn = document.getElementById('toAR');
+    const enBtn = document.getElementById('toEN');
+    if (arBtn && enBtn){
+      if (pack._lang === 'ar'){
+        arBtn.classList.add('btn-light');        arBtn.classList.remove('btn-outline-light');
+        enBtn.classList.add('btn-outline-light'); enBtn.classList.remove('btn-light');
+      } else {
+        enBtn.classList.add('btn-light');        enBtn.classList.remove('btn-outline-light');
+        arBtn.classList.add('btn-outline-light'); arBtn.classList.remove('btn-light');
       }
     }
 
-    /* ========= INIT ========= */
-    (function init(){
-      // Build chips
-      hydrateTags();
+    const ta = document.getElementById('termsBody-ar');
+    const te = document.getElementById('termsBody-en');
+    if (ta && te){
+      if (pack._lang === 'en'){ ta.style.display='none'; te.style.display='block'; }
+      else { te.style.display='none'; ta.style.display='block'; }
+    }
 
-      // Restore theme/lang
-      const savedTheme = localStorage.getItem('theme') || 'auto';
-      setTheme(savedTheme);
-      currentLang = (localStorage.getItem('lang') || currentLang);
-      applyLanguageToUI();
+    const currentServiceId = document.getElementById('service')?.value || '';
+    if (currentServiceId){
+      safeUpdateServiceDescFor(String(currentServiceId), pack._lang);
+    }
 
-      // Wire submit
-      $('#btnSubmit').addEventListener('click', onSubmit);
+    try{
+      if (window._bg?.locations) { paintAreasFromBG(); }
+      const lid = document.getElementById('area')?.value;
+      if (lid) { paintServicesFromBG(String(lid)); setTimeout(setBoundries, 0); }
+    }catch(_){}
 
-      // Theme toggle (light/dark)
-      $('#btnTheme').addEventListener('click', ()=>{
-        const cur = document.documentElement.getAttribute('data-theme') || 'auto';
-        const next = (isDark() ? 'light' : 'dark'); // toggle between explicit light/dark
-        setTheme(next);
+    // update coupon texts if any
+    if (appliedCoupon){
+      setCouponUI({
+        ok:true,
+        message: (pack._lang==='en'?'Coupon applied.':'تم تطبيق الكوبون.'),
+        code: appliedCoupon.code,
+        discountText: appliedCoupon.discountText,
+        newAmount: appliedCoupon.newAmount,
+        currency: appliedCoupon.currency
       });
+    }
+    updateConfirmEnabled();
+    updateSizeChipsLabels(pack._lang);
+  }
 
-      // Language toggle (ar/en)
-      $('#btnLang').addEventListener('click', ()=>{
-        currentLang = currentLang==='ar' ? 'en' : 'ar';
-        localStorage.setItem('lang', currentLang);
-        applyLanguageToUI();
-      });
+  function initLanguage(){
+    const urlLang = new URLSearchParams(location.search).get('lang');
+    const lang = (urlLang==='en' ? 'en' : 'ar'); // default AR unless ?lang=en
+    applyI18N(lang);
 
-      // Reflect OS theme changes when in auto mode
-      if(!localStorage.getItem('theme') || localStorage.getItem('theme')==='auto'){
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>applyLanguageToUI());
-      }
-    })();
-  </script>
+    const arBtn = document.getElementById('toAR');
+    const enBtn = document.getElementById('toEN');
+    if (arBtn) arBtn.onclick = ()=> applyI18N('ar');
+    if (enBtn) enBtn.onclick = ()=> applyI18N('en');
+  }
+
+  document.addEventListener('DOMContentLoaded', initLanguage);
+})();
+// === Day name (AR + EN) ===
+function formatDayNameBoth(dtISO) {
+  const dt = (dtISO.isLuxonDateTime ? dtISO : luxon.DateTime.fromISO(dtISO));
+  const dayAR = dt.setLocale('ar').toFormat('EEEE');
+  const dayEN = dt.setLocale('en').toFormat('EEEE');
+  return `<bdi lang="ar" dir="rtl">${dayAR}</bdi> <span style="opacity:.65">/</span> <bdi lang="en" dir="ltr">${dayEN}</bdi>`;
+}
+
+/* ---------- Size Chips Filter (AR/EN) ---------- */
+let sizeFilter = 'all'; // 'all' | 'small' | 'mid' | 'big'
+const SIZE_KEYWORDS = {
+  ar: { small: ['صغير','صغيرة','صغيره'], mid: ['وسط','متوسط'], big: ['كبير','كبيرة','كبيره'] },
+  en: { small: ['small','sm'], mid: ['mid','medium','md'], big: ['big','large','lg','xl'] }
+};
+function textMatchesSize(text, lang, key){
+  if (key === 'all') return true;
+  const kw = (SIZE_KEYWORDS[lang] && SIZE_KEYWORDS[lang][key]) || [];
+  const t = String(text||'').toLowerCase();
+  return kw.some(k => t.includes(k.toLowerCase()));
+}
+function filterServicesArrayBySize(arr){
+  const lang = getUILang();
+  if (sizeFilter === 'all') return arr.slice();
+  return (arr || []).filter(svc => {
+    const nm = pickLocale(svc, 'TS_service_arabic_name', 'TS_service_english_name');
+    return textMatchesSize(nm, lang, sizeFilter);
+  });
+}
+function applyServiceFilter(){
+  if (!Array.isArray(services)) services = [];
+  const prevSelected = String(document.getElementById('service')?.value || '');
+
+  const filtered = filterServicesArrayBySize(services);
+  const sorted   = filtered.slice().sort((a,b)=> (Number(a.TS_service_id ?? a.id) - Number(b.TS_service_id ?? b.id)));
+  const names    = sorted.map(s => pickLocale(s, 'TS_service_arabic_name', 'TS_service_english_name'));
+  const ids      = sorted.map(s => String(s.TS_service_id ?? s.service_id ?? s.id));
+
+  const $service = $('#service');
+  try{ if ($service.data('select2')) $service.select2('destroy'); }catch(_){}
+
+  add_dropdown_list(names, ids, 'service');
+
+  if (prevSelected && ids.includes(prevSelected)) {
+    document.getElementById('service').value = prevSelected;
+  } else if (ids.length) {
+    document.getElementById('service').value = ids[0];
+  }
+
+  if (!ids.length){
+    updateServiceDescriptionUI('');
+    const tc = document.getElementById('time-container');
+    if (tc) tc.innerHTML = `<div style="grid-column:1/-1;justify-self:center;">${getUILang()==='en'?'No services match this filter':'لا توجد خدمات مطابقة للتصفية'}</div>`;
+  }
+
+  try{
+    $service.select2({ width:'100%', dir: (getUILang()==='ar' ? 'rtl' : 'ltr') });
+  }catch(_){}
+
+  const currentId = document.getElementById('service')?.value || '';
+  if (currentId){
+    const catId = deriveCategoryIdForSelectedService() || (categoriesById.size === 1 ? Array.from(categoriesById.keys())[0] : '');
+    setServiceCatHiddenAndState(catId);
+    nForm.service = String(currentId);
+    serviceDescReqSeq++;
+    safeUpdateServiceDescFor(String(currentId), nForm.locale || getUILang());
+  } else {
+    updateServiceDescriptionUI('');
+  }
+
+  const p4 = document.getElementById('page4');
+  if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const bar = document.getElementById('serviceSizeFilter');
+  if (!bar) return;
+  bar.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.chip-toggle');
+    if (!btn) return;
+    const key = btn.dataset.key;
+    if (!key || key === sizeFilter) return;
+    bar.querySelectorAll('.chip-toggle').forEach(b=>{
+      const active = (b === btn);
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    sizeFilter = key;
+    applyServiceFilter();
+  });
+});
+function updateSizeChipsLabels(lang){
+  const bar = document.getElementById('serviceSizeFilter');
+  if (!bar) return;
+  const t = (lang==='en')
+    ? { all:'All', small:'Small', mid:'Mid', big:'Big' }
+    : { all:'الكل', small:'صغير', mid:'وسط', big:'كبير' };
+  const map = {
+    all:   bar.querySelector('[data-key="all"]'),
+    small: bar.querySelector('[data-key="small"]'),
+    mid:   bar.querySelector('[data-key="mid"]'),
+    big:   bar.querySelector('[data-key="big"]')
+  };
+  if (map.all)   map.all.textContent   = t.all;
+  if (map.small) map.small.textContent = t.small;
+  if (map.mid)   map.mid.textContent   = t.mid;
+  if (map.big)   map.big.textContent   = t.big;
+}
+</script>
+
+<!-- Google Maps -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBHLoO038vsCovHN-SLUgAXqexlA2v0_4&callback=initMap&libraries=geometry&loading=async"></script>
 </body>
 </html>
