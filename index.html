@@ -509,7 +509,6 @@
               <li><strong>Customer Responsibility</strong><ul><li>Remove personal belongings.</li><li>We are not responsible for lost/damaged items inside the vehicle.</li><li>Provide a suitable and safe location.</li></ul></li>
               <li><strong>Timing & Delays</strong><ul><li>Service duration is approximate.</li><li>15-minute grace; then booking may be void.</li></ul></li>
               <li><strong>Changes</strong><ul><li>Terms may be updated.</li><li>Requesting service means you accept these terms.</li></ul></li>
-              <li><strong>Governing Law</strong><ul><li>Kingdom of Saudi Arabia regulations apply.</li></ul></li>
             </ol>
             <div class="form-check mt-2">
               <input class="form-check-input" type="checkbox" id="termsAcceptEN">
@@ -1225,8 +1224,6 @@ async function applyCoupon(){
   }
 }
 
-
-
 /* ----------------------------- Reservation & Payment ----------------------------- */
 async function createReservationNow(payloadOverride={}){
   syncNFormFromUI();
@@ -1717,6 +1714,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const couponBtn = document.getElementById('couponApplyBtn');
     if (couponInput) couponInput.placeholder = (lang==='en' ? 'Enter coupon (optional)' : 'أدخل كوبون الخصم (اختياري)');
     if (couponBtn) couponBtn.textContent = (lang==='en' ? 'Apply' : 'تطبيق');
+
+    // 🔥 NEW: update size chips labels on language change
+    updateSizeChipsLabels(pack._lang);
   }
 
   function initLanguage(){
@@ -1839,6 +1839,12 @@ function updateSizeChipsLabels(lang){
   if (map.mid)   map.mid.textContent   = t.mid;
   if (map.big)   map.big.textContent   = t.big;
 }
+
+/* ---------- NEW: bind the Apply Coupon button ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const btn = document.getElementById('couponApplyBtn');
+  if (btn) btn.addEventListener('click', applyCoupon);
+});
 </script>
 
 <!-- expose functions to HTML window (Apps Script HTML sandbox safe) -->
