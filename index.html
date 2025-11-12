@@ -1949,6 +1949,17 @@ function paintSubtotal(){
   el.textContent = (getUILang()==='en'?'Subtotal: ':'الإجمالي قبل الخصم: ') + st + ' SAR';
 }
 document.addEventListener('DOMContentLoaded', paintSubtotal);
+
+ 
+// Wire coupon buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const applyBtn = document.getElementById('couponApplyBtn');
+  const clearBtn = document.getElementById('couponClearBtn');
+  if (applyBtn) applyBtn.addEventListener('click', applyCoupon);
+  if (clearBtn) clearBtn.addEventListener('click', () => clearCoupon());
+});
+
+
 </script>
 
 <!-- Google Maps -->
