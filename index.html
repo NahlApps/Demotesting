@@ -1155,36 +1155,68 @@ function clearCouponAlert(){
   couponAlertEl.textContent = '';
   couponAlertEl.classList.remove('alert-success','alert-danger','alert-info','alert-warning');
 }
+
 async function applyCoupon(){
   clearCouponAlert();
+
   const code = (document.getElementById('couponCode')?.value || '').trim();
-  const serviceId = getSelectedServiceIdOrThrow();
   if (!code){
     paintCouponAlert('warning', getUILang()==='en' ? 'Please enter a coupon.' : 'الرجاء إدخال كوبون.');
     return;
   }
-  const name = (document.getElementById('name')?.value || '').trim();
-  let mobile = '';
-  try{ const iti=initPhoneInputOnce(); mobile = iti ? iti.getNumber().replace(/\D/g,'') : ''; }catch(_){}
-  const btn = document.getElementById('couponApplyBtn'); lockButton(btn, getUILang()==='en'?'Applying…':'جاري التطبيق…');
+
+  // Gather data expected by GAS
+  const serviceId    = String(document.getElementById('service')?.value || '');
+  const locationName = ($('#area option:selected').text() || '').trim(); // readable area name
+  let customerM = '';
+  try {
+    const iti = initPhoneInputOnce();
+    customerM = iti ? iti.getNumber().replace(/\D/g,'') : '';
+  } catch(_) {}
+
+  // If you can’t compute a real subtotal yet, send 0
+  const subtotal = 0;
+
+  const btn = document.getElementById('couponApplyBtn');
+  lockButton(btn, getUILang()==='en'?'Applying…':'جاري التطبيق…');
+
   try{
-    // USE COUPON PROXY HERE
     const res = await fetch(`${GAS_COUPON_URL}?action=validateCoupon`, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ coupon: code, serviceId, mobile, name, locale:getUILang() })
+      body: JSON.stringify({
+        code,            // ✅ GAS expects "code"
+        subtotal,        // ✅ number
+        serviceId,       // ✅ string
+        locationName,    // ✅ human-readable area
+        customerM        // ✅ digits only
+      })
     });
-    const data = await res.json();
-    if (data && data.ok){
+
+    const text = await res.text();
+    let data = {};
+    try { data = JSON.parse(text); } catch { /* keep raw */ }
+
+    if (!res.ok) {
+      // surface the server message to help debugging
+      paintCouponAlert('danger',
+        (data && (data.error || data.message)) ||
+        (getUILang()==='en' ? 'Server error validating coupon.' : 'خطأ من الخادم أثناء التحقق من الكوبون.')
+      );
+      return;
+    }
+
+    if (data && data.ok) {
       nForm.coupon = code;
-      try{ sessionStorage.setItem('appliedCoupon', code); }catch(_){}
-      const msg = data.message || (getUILang()==='en' ? 'Coupon applied successfully.' : 'تم تطبيق الكوبون بنجاح.');
-      paintCouponAlert('success', msg);
+      try { sessionStorage.setItem('appliedCoupon', code); } catch(_){}
+      const successMsg = data.msgAR || data.message || (getUILang()==='en' ? 'Coupon applied successfully.' : 'تم تطبيق الكوبون بنجاح.');
+      paintCouponAlert('success', successMsg);
     } else {
-      const msg = (data && data.message) || (getUILang()==='en' ? 'Invalid or expired coupon.' : 'الكوبون غير صالح أو منتهي.');
-      paintCouponAlert('danger', msg);
+      const failMsg = (data && (data.msgAR || data.message)) ||
+        (getUILang()==='en' ? 'Invalid or inapplicable coupon.' : 'الكوبون غير صالح أو غير قابل للتطبيق.');
       nForm.coupon = '';
-      try{ sessionStorage.removeItem('appliedCoupon'); }catch(_){}
+      try { sessionStorage.removeItem('appliedCoupon'); } catch(_){}
+      paintCouponAlert('danger', failMsg);
     }
   } catch(e){
     paintCouponAlert('danger', getUILang()==='en' ? 'Could not validate coupon.' : 'تعذر التحقق من الكوبون.');
@@ -1192,7 +1224,8 @@ async function applyCoupon(){
     unlockButton(btn);
   }
 }
-document.getElementById('couponApplyBtn')?.addEventListener('click', applyCoupon);
+
+
 
 /* ----------------------------- Reservation & Payment ----------------------------- */
 async function createReservationNow(payloadOverride={}){
