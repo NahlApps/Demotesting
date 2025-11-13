@@ -1,58 +1,62 @@
-// /api/coupon-proxy.ts (Edge Runtime)
-export const config = { runtime: 'edge' };
+// pages/api/coupon-proxy.js
+// Proxies requests to your Coupon GAS web app.
+// Required env: COUPON_EXEC_URL = "https://script.google.com/macros/s/XXXX/exec"
 
-function corsHeaders(origin: string) {
-  return {
-    'Access-Control-Allow-Origin': origin || '*',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-  };
-}
-function preflight(origin: string) {
-  return new Response(null, { status: 204, headers: corsHeaders(origin) });
-}
+export default async function handler(req, res) {
+  // CORS: mirror the caller’s origin (demotesting.nahl.app, spongnsoap.com, localhost)
+  const origin = req.headers.origin || '';
+  const allow =
+    /(?:^https?:\/\/(?:localhost:\d+|(?:.*\.)?nahl\.app|(?:.*\.)?spongnsoap\.com)$)/i.test(origin)
+      ? origin
+      : '*';
+  res.setHeader('Access-Control-Allow-Origin', allow);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-export default async function handler(req: Request) {
-  const origin = req.headers.get('origin') || '*';
-  if (req.method === 'OPTIONS') return preflight(origin);
-
-  const COUPON_EXEC_URL =
-    process.env.COUPON_EXEC_URL || process.env.NEXT_PUBLIC_COUPON_EXEC_URL;
-
-  if (!COUPON_EXEC_URL) {
-    return new Response(
-      JSON.stringify({ ok: false, error: 'COUPON_EXEC_URL not set' }),
-      { status: 500, headers: { 'content-type': 'application/json', ...corsHeaders(origin) } }
-    );
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
   }
 
-  const url = new URL(req.url);
-  const action = url.searchParams.get('action') || '';
+  const GAS = process.env.COUPON_EXEC_URL;
+  if (!GAS) {
+    res.status(500).json({ ok: false, error: 'missing_coupon_exec_url' });
+    return;
+  }
 
-  // Forward to Apps Script, preserving action & query
-  let target = new URL(COUPON_EXEC_URL);
-  for (const [k, v] of url.searchParams) target.searchParams.set(k, v);
-
-  const init: RequestInit = { method: req.method, headers: { 'Content-Type': 'application/json' } };
-
-  if (req.method === 'POST') {
-    // Forward the raw body to Apps Script (it expects JSON in e.postData.contents)
-    init.body = await req.text();
+  // quick self-test endpoint
+  if (req.query.action === '__selftest') {
+    res.status(200).json({ ok: true, proxy: 'coupon-proxy', env: !!GAS });
+    return;
   }
 
   try {
-    const upstream = await fetch(target.toString(), init);
-    const text = await upstream.text(); // return upstream JSON as-is
+    // Build target URL with original query (?action=...)
+    const url = new URL(GAS);
+    Object.entries(req.query || {}).forEach(([k, v]) => url.searchParams.set(k, v));
 
-    return new Response(text, {
-      status: upstream.status,
-      headers: { 'content-type': 'application/json', ...corsHeaders(origin) },
-    });
-  } catch (err: any) {
-    return new Response(
-      JSON.stringify({ ok: false, error: String(err?.message || err) }),
-      { status: 502, headers: { 'content-type': 'application/json', ...corsHeaders(origin) } }
-    );
+    const init = { method: req.method, headers: { 'Content-Type': 'application/json' } };
+    if (req.method === 'POST') init.body = JSON.stringify(req.body || {});
+
+    const r = await fetch(url.toString(), init);
+    const text = await r.text();
+    let json;
+    try { json = JSON.parse(text); } catch {}
+
+    if (!r.ok) {
+      // Bubble up underlying error so you can see it in the browser/console
+      const details = json || { body: text };
+      res.status(r.status || 502).json({
+        ok: false, proxy: 'coupon-proxy', upstream_status: r.status, details
+      });
+      return;
+    }
+
+    if (json) res.status(r.status).json(json);
+    else res.status(r.status).send(text);
+  } catch (e) {
+    console.error('coupon-proxy error:', e);
+    res.status(502).json({ ok: false, error: 'proxy_failed', message: String(e) });
   }
 }
