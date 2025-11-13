@@ -1,3 +1,4 @@
+
 // pages/api/coupon-proxy.js
 // Proxies requests to your Coupon GAS web app.
 // Required env: COUPON_EXEC_URL = "https://script.google.com/macros/s/XXXX/exec"
