@@ -82,7 +82,7 @@
     .step-dot::before{content:"";display:block;margin:0 auto 6px;width:28px;height:6px;border-radius:999px;background:var(--brand-100)}
     .step-dot.is-active::before{background:var(--hero-gradient)}
     .progress-rail{height:6px;background:var(--brand-100);border-radius:999px;margin:8px 16px 10px;overflow:hidden}
-    .progress-fill{height:100%;width:16.6%;background:var(--hero-gradient);border-radius:999px;transition:width .25s.ease}
+    .progress-fill{height:100%;width:16.6%;background:var(--hero-gradient);border-radius:999px;transition:width .25s ease}
     .page{display:none;padding:22px clamp(14px,3vw,28px) 96px;min-height:480px}
     h1,h2,h3{color:var(--ink-900);margin:.2em 0 .6em}
     h1{text-align:center;font-size:clamp(1.25rem,3vw,1.8rem)}
@@ -450,6 +450,8 @@
 
       <footer>
         <div>Sponge & Soap</div>
+        <!-- ✅ Cart total summary in footer -->
+        <div id="cartFooterSummary" style="margin-top:4px; font-size:0.9rem;"></div>
         <div style="margin-top:4px;">
           <a target="_blank" href="https://www.instagram.com/nahl.app?igsh=Y3YyOW05MGI5bnNv&utm_source=qr">Made with Nahl Perfection</a>
         </div>
@@ -471,6 +473,8 @@
   </div>
 
   <!-- Terms Modal (AR + EN) -->
+  <!-- (unchanged modal content) -->
+
   <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg">
       <div class="modal-content" style="background:var(--panel-strong);color:#0b2a33;border:1px solid var(--panel-border)">
@@ -527,7 +531,7 @@
 <script>
 /* ===========================================================
  * Sponge & Soap — Booking App (index.html)
- * AR/EN + Coupon integration with Code.gs & coupon-proxy
+ * AR/EN + Coupon integration with Code.gs
  * =========================================================== */
 
 /* ---------- HARD ARABIC DEFAULT ---------- */
@@ -569,6 +573,9 @@ let services = []; let serviceCategories = [];
 const servicesById = new Map(); const categoriesById = new Map();
 let serviceDescText = '';
 let countryCodeInput = null;
+
+/* ✅ NEW: coupon meta (for footer + locationDescription) */
+let couponMeta = { code:'', base:0, final:0, discount:0, description:'' };
 
 /* ---------- NEW: latest-only guard for service description ---------- */
 let serviceDescReqSeq = 0;
@@ -626,6 +633,69 @@ function checkNumberValidity() {
 }
 function maskMobileForLog(m){ const s=String(m||'').replace(/\D/g,''); if(s.length<=6) return s? s.slice(0,3)+'***':''; return s.slice(0,3)+'***'+s.slice(-2); }
 
+/* ✅ NEW: currency helper used by footer + locationDescription */
+function formatCurrency(amount){
+  const n = Number(amount) || 0;
+  const lang = getUILang();
+  const currency = 'SAR';
+  try{
+    return new Intl.NumberFormat(lang==='en'?'en-SA':'ar-SA', {
+      style:'currency', currency, maximumFractionDigits:0
+    }).format(n);
+  }catch(_){
+    return `${n.toFixed(0)} ${currency}`;
+  }
+}
+
+/* ✅ NEW: cart subtotal helpers */
+function getSelectedServiceObject(){
+  const id = String(document.getElementById('service')?.value || '');
+  if (!id) return null;
+  return servicesById.get(id) || null;
+}
+function getCartBaseSubtotal(){
+  const svc = getSelectedServiceObject();
+  const priceRaw = svc ? (svc.TS_service_final_price ?? svc.service_final_price ?? svc.price ?? svc.amount ?? 0) : 0;
+  const price = Number(priceRaw) || 0;
+  const count = Number(document.getElementById('serviceCount')?.value || nForm.serviceCount || 1) || 1;
+  return price * count;
+}
+
+/* ✅ NEW: update footer cart total */
+function updateCartFooterSummary(){
+  const footerEl = document.getElementById('cartFooterSummary');
+  if (!footerEl) return;
+
+  const base = getCartBaseSubtotal();
+  if (!base){
+    footerEl.textContent = '';
+    return;
+  }
+
+  const lang = getUILang();
+  const hasCoupon = couponMeta && couponMeta.code;
+  let line = '';
+
+  if (hasCoupon && couponMeta.final > 0 && couponMeta.final <= base){
+    const discount = Math.max(base - couponMeta.final, 0);
+    if (lang === 'en') {
+      line = `Cart total: ${formatCurrency(couponMeta.final)} (discount ${formatCurrency(discount)} using coupon ${couponMeta.code})`;
+    } else {
+      line = `إجمالي السلة: ${formatCurrency(couponMeta.final)} (خصم ${formatCurrency(discount)} بكوبون ${couponMeta.code})`;
+    }
+  } else {
+    if (lang === 'en') {
+      line = `Cart total: ${formatCurrency(base)}`;
+      if (hasCoupon) line += ` – coupon ${couponMeta.code} applied`;
+    } else {
+      line = `إجمالي السلة: ${formatCurrency(base)}`;
+      if (hasCoupon) line += ` – تم تطبيق الكوبون ${couponMeta.code}`;
+    }
+  }
+
+  footerEl.textContent = line;
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
   try{
     document.getElementById("name").value = localStorage.getItem("name") || "";
@@ -639,6 +709,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       paintCouponAlert('info', getUILang()==='en' ? 'Coupon is saved.' : 'تم حفظ الكوبون.');
     }
   }catch(_){}
+
+  // keep footer synced
+  updateCartFooterSummary();
 });
 
 /* ----------------------------- Date ----------------------------- */
@@ -863,6 +936,9 @@ function paintServicesFromBG(locationId){
   } else {
     updateServiceDescriptionUI('');
   }
+
+  // ✅ update footer total once services/prices are available
+  updateCartFooterSummary();
 }
 
 /* ---------- Prefetch on load ---------- */
@@ -886,6 +962,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }catch(_){}
     window._bg.ready = true;
   })();
+
+  // keep subtotal in sync if serviceCount changes later
+  const sc = document.getElementById('serviceCount');
+  if (sc) sc.addEventListener('change', updateCartFooterSummary);
 });
 
 /* ---------- Category helpers ---------- */
@@ -1058,6 +1138,9 @@ $('#service').on('change', async ()=>{
   const svcId = document.getElementById('service').value || '';
   safeUpdateServiceDescFor(String(svcId), nForm.locale || getUILang());
 
+  // ✅ recalc footer total when service changes
+  updateCartFooterSummary();
+
   const p4=document.getElementById('page4'); 
   if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
 });
@@ -1123,15 +1206,34 @@ document.getElementById('page5-return').onclick = ()=>{
   document.getElementById('page4').style.display='flex';
 };
 document.getElementById('plateNumber').addEventListener('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,4); this.setCustomValidity(''); updateLocationDescription(); });
+
+/* ✅ UPDATED: include coupon discount in locationDescription */
 function updateLocationDescription(){
   const carBrand = document.getElementById("carBrand").value || "";
   const carName = document.getElementById("carName").value || "";
   const plateNumber = document.getElementById("plateNumber").value || "";
   const carPart = [carBrand,carName,plateNumber].filter(Boolean).join(", ");
-  const combined = [serviceDescText, carPart].filter(Boolean).join(" | ");
+
+  let couponPart = '';
+  if (couponMeta && couponMeta.code){
+    const lang = getUILang();
+    let discText = '';
+    if (couponMeta.discount > 0){
+      const formatted = formatCurrency(couponMeta.discount);
+      discText = (lang==='en')
+        ? `discount ${formatted}`
+        : `خصم ${formatted}`;
+    }
+    couponPart = (lang==='en')
+      ? `Coupon: ${couponMeta.code}${discText ? ` (${discText})` : ''}`
+      : `كوبون: ${couponMeta.code}${discText ? ` (${discText})` : ''}`;
+  }
+
+  const combined = [serviceDescText, carPart, couponPart].filter(Boolean).join(" | ");
   document.getElementById("locationDescription").value = combined;
   nForm.locationDescription = combined;
 }
+
 (function fillCarBrands(){
   const list = ["Acura","Alfa Romeo","Aston Martin","Audi","Bentley","BMW","Bugatti","Buick","Cadillac","Chevrolet","Chrysler","Citroën","Dacia","Daewoo","Daihatsu","Dodge","Ferrari","Fiat","Ford","Genesis","GMC","Haval","Honda","Hummer","Hyundai","Infiniti","Isuzu","Jaguar","Jeep","Kia","Lamborghini","Lancia","Land Rover","Lexus","Lincoln","Lotus","Maserati","Mazda","McLaren","Mercedes-Benz","MG","Mini","Mitsubishi","Nissan","Opel","Peugeot","Porsche","RAM","Renault","Rolls-Royce","Saab","Seat","Skoda","Smart","SsangYong","Subaru","Suzuki","Tesla","Toyota","Volkswagen","Volvo"];
   list.sort().forEach(b => $('#carBrand').append(`<option value="${b}">${b}</option>`));
@@ -1140,7 +1242,6 @@ function updateLocationDescription(){
 
 /* ----------------------------- Coupon Helpers ----------------------------- */
 const couponAlertEl = document.getElementById('couponAlert');
-
 function paintCouponAlert(type, msg){
   if (!couponAlertEl) return;
   couponAlertEl.style.display = 'block';
@@ -1156,40 +1257,6 @@ function clearCouponAlert(){
   couponAlertEl.classList.remove('alert-success','alert-danger','alert-info','alert-warning');
 }
 
-/* 🔢 NEW: Compute real subtotal from selected service & quantity */
-function computeCouponSubtotal(){
-  try{
-    const svcId = String(document.getElementById('service')?.value || '');
-    if (!svcId) return 0;
-    const svc = servicesById.get(svcId);
-    if (!svc) return 0;
-
-    const rawPrice =
-      svc.TS_service_final_price ??
-      svc.TS_service_none_taxed_price ??
-      svc.price ??
-      svc.final_price ??
-      svc.amount ??
-      0;
-
-    // normalize "39 SAR" / "39.00" / 39
-    const unit = parseFloat(String(rawPrice).toString().replace(/[^\d.]/g,'')) || 0;
-
-    let qty = parseInt(
-      document.getElementById('serviceCount')?.value ||
-      nForm.serviceCount ||
-      '1',
-      10
-    );
-    if (!Number.isFinite(qty) || qty <= 0) qty = 1;
-
-    const subtotal = unit * qty;
-    return subtotal > 0 ? subtotal : 0;
-  }catch(_){
-    return 0;
-  }
-}
-
 async function applyCoupon(){
   clearCouponAlert();
 
@@ -1199,17 +1266,16 @@ async function applyCoupon(){
     return;
   }
 
-  // Gather data expected by GAS
+  // ✅ REAL subtotal from selected service * count
+  const subtotal = getCartBaseSubtotal();
+
   const serviceId    = String(document.getElementById('service')?.value || '');
-  const locationName = ($('#area option:selected').text() || '').trim(); // readable area name
+  const locationName = ($('#area option:selected').text() || '').trim();
   let customerM = '';
   try {
     const iti = initPhoneInputOnce();
     customerM = iti ? iti.getNumber().replace(/\D/g,'') : '';
   } catch(_) {}
-
-  // ✅ Use real subtotal instead of 0 (fixes "لا يوجد خصم قابل للتطبيق")
-  const subtotal = computeCouponSubtotal();
 
   const btn = document.getElementById('couponApplyBtn');
   lockButton(btn, getUILang()==='en'?'Applying…':'جاري التطبيق…');
@@ -1220,7 +1286,7 @@ async function applyCoupon(){
       headers:{ 'Content-Type':'application/json' },
       body: JSON.stringify({
         code,            // ✅ GAS expects "code"
-        subtotal,        // ✅ REAL number now
+        subtotal,        // ✅ real subtotal
         serviceId,       // ✅ string
         locationName,    // ✅ human-readable area
         customerM        // ✅ digits only
@@ -1232,7 +1298,6 @@ async function applyCoupon(){
     try { data = JSON.parse(text); } catch { /* keep raw */ }
 
     if (!res.ok) {
-      // surface the server message to help debugging
       paintCouponAlert('danger',
         (data && (data.error || data.message)) ||
         (getUILang()==='en' ? 'Server error validating coupon.' : 'خطأ من الخادم أثناء التحقق من الكوبون.')
@@ -1243,14 +1308,39 @@ async function applyCoupon(){
     if (data && data.ok) {
       nForm.coupon = code;
       try { sessionStorage.setItem('appliedCoupon', code); } catch(_){}
+
+      // ✅ derive discount / final total from server if possible
+      const baseFromServer  = Number(data.subtotal ?? data.baseAmount ?? data.baseSubtotal ?? 0) || 0;
+      const finalFromServer = Number(data.finalSubtotal ?? data.finalTotal ?? data.newSubtotal ?? data.subtotalAfter ?? 0) || 0;
+      const discountFromServer = Number(data.discountAmount ?? data.discount ?? 0) || 0;
+
+      const base   = baseFromServer || subtotal;
+      const final  = finalFromServer || (discountFromServer ? Math.max(base - discountFromServer,0) : base);
+      const disc   = Math.max(base - final, 0);
+
+      couponMeta = {
+        code,
+        base,
+        final,
+        discount: disc,
+        description: data.summaryAR || data.msgAR || data.message || ''
+      };
+
       const successMsg = data.msgAR || data.message || (getUILang()==='en' ? 'Coupon applied successfully.' : 'تم تطبيق الكوبون بنجاح.');
       paintCouponAlert('success', successMsg);
+
+      // ✅ reflect in locationDescription + footer
+      updateLocationDescription();
+      updateCartFooterSummary();
     } else {
       const failMsg = (data && (data.msgAR || data.message)) ||
         (getUILang()==='en' ? 'Invalid or inapplicable coupon.' : 'الكوبون غير صالح أو غير قابل للتطبيق.');
       nForm.coupon = '';
       try { sessionStorage.removeItem('appliedCoupon'); } catch(_){}
+      couponMeta = { code:'', base:0, final:0, discount:0, description:'' };
       paintCouponAlert('danger', failMsg);
+      updateLocationDescription();
+      updateCartFooterSummary();
     }
   } catch(e){
     paintCouponAlert('danger', getUILang()==='en' ? 'Could not validate coupon.' : 'تعذر التحقق من الكوبون.');
@@ -1258,6 +1348,23 @@ async function applyCoupon(){
     unlockButton(btn);
   }
 }
+
+/* ✅ clear coupon meta if user empties input */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const cInput = document.getElementById('couponCode');
+  if (cInput){
+    cInput.addEventListener('input', ()=>{
+      const v = cInput.value.trim();
+      if (!v){
+        nForm.coupon = '';
+        couponMeta = { code:'', base:0, final:0, discount:0, description:'' };
+        clearCouponAlert();
+        updateLocationDescription();
+        updateCartFooterSummary();
+      }
+    });
+  }
+});
 
 /* ----------------------------- Reservation & Payment ----------------------------- */
 async function createReservationNow(payloadOverride={}){
@@ -1752,6 +1859,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 🔥 NEW: update size chips labels on language change
     updateSizeChipsLabels(pack._lang);
+
+    // ✅ refresh footer total text in correct language
+    updateCartFooterSummary();
   }
 
   function initLanguage(){
@@ -1836,6 +1946,9 @@ function applyServiceFilter(){
     updateServiceDescriptionUI('');
   }
 
+  // ✅ after filtering services, re-calc footer total
+  updateCartFooterSummary();
+
   const p4 = document.getElementById('page4');
   if (p4 && getComputedStyle(p4).display!=='none') fetchAppointmentsForSelectedDate();
 }
@@ -1875,20 +1988,22 @@ function updateSizeChipsLabels(lang){
   if (map.big)   map.big.textContent   = t.big;
 }
 
-/* ---------- Bind Apply Coupon button ---------- */
+/* ---------- NEW: bind the Apply Coupon button ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   const btn = document.getElementById('couponApplyBtn');
   if (btn) btn.addEventListener('click', applyCoupon);
 });
+</script>
 
-// expose functions
-window.choosedDate = choosedDate;
-window.setBoundries = setBoundries;
-window.ensureMapReady = ensureMapReady;
-window.fetchAppointmentsForSelectedDate = fetchAppointmentsForSelectedDate;
-window.initMap = initMap;
-window.myMap = myMap;
-window.applyCoupon = applyCoupon;
+<!-- expose functions to HTML window (Apps Script HTML sandbox safe) -->
+<script>
+  window.choosedDate = choosedDate;
+  window.setBoundries = setBoundries;
+  window.ensureMapReady = ensureMapReady;
+  window.fetchAppointmentsForSelectedDate = fetchAppointmentsForSelectedDate;
+  window.initMap = initMap;
+  window.myMap = myMap;
+  window.applyCoupon = applyCoupon;
 </script>
 
 <!-- Google Maps -->
